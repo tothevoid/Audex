@@ -3,6 +3,7 @@
   "category_system": "System",
   "category_reports": "Reports",
   "category_brokers": "Brokers",
+  "category_crypto": "Crypto",
   "category_general": "General",
   "cleanup_expired_tokens_name": "Clean Up Session Tokens",
   "cleanup_expired_tokens_desc": "Remove expired and revoked JWT refresh tokens older than 30 days",
@@ -13,5 +14,7 @@
   "database_backup_name": "Database Backup",
   "database_backup_desc": "Create automated database backup snapshot and upload to S3",
   "pull_quotations_name": "Update MOEX Quotations",
-  "pull_quotations_desc": "Periodically fetch latest security quotes from MOEX exchange"
+  "pull_quotations_desc": "Periodically fetch latest security quotes from MOEX exchange",
+  "pull_crypto_prices_name": "Update Cryptocurrency Prices",
+  "pull_crypto_prices_desc": "Periodically fetch latest cryptocurrency prices in USD from CoinGecko"
 }

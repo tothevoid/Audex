@@ -17,5 +17,6 @@ namespace Audex.Application.Interfaces.Crypto
         Task DeleteAsync(Guid id);
         Task<FileStreamDto> GetIconStreamAsync(string iconKey);
         Task<string> GetIconUrlAsync(string iconKey);
+        Task<int> PullPricesAsync(System.Threading.CancellationToken cancellationToken = default);
     }
 }

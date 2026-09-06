@@ -1,4 +1,4 @@
-﻿namespace Audex.Application.Constants
+namespace Audex.Application.Constants
 {
     public static class LocalizationKeys
     {
@@ -24,6 +24,7 @@
             public const string AssetReportSuccess = "scheduler.asset_report_success";
             public const string BackupSuccess = "scheduler.backup_success";
             public const string PullQuotationsSuccess = "scheduler.pull_quotations_success";
+            public const string PullCryptoPricesSuccess = "scheduler.pull_crypto_prices_success";
         }
 
         public static class Reports
@@ -75,6 +76,7 @@
                 public const string System = "jobs.category_system";
                 public const string Reports = "jobs.category_reports";
                 public const string Brokers = "jobs.category_brokers";
+                public const string Crypto = "jobs.category_crypto";
                 public const string General = "jobs.category_general";
             }
 
@@ -106,6 +108,12 @@
             {
                 public const string Name = "jobs.pull_quotations_name";
                 public const string Description = "jobs.pull_quotations_desc";
+            }
+
+            public static class PullCryptoPrices
+            {
+                public const string Name = "jobs.pull_crypto_prices_name";
+                public const string Description = "jobs.pull_crypto_prices_desc";
             }
         }
 

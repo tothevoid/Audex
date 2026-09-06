@@ -1,16 +1,21 @@
 using Audex.Infrastructure.Interfaces.Database;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Crypto;
 using Audex.Application.DTO.Currencies;
 using Audex.Application.DTO.FileStorage;
 using Audex.Application.Interfaces.Crypto;
 using Audex.Application.Interfaces.Currencies;
+using Audex.Application.Interfaces.Integrations.Crypto;
 using Audex.Application.Mappings;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Entities.Crypto;
 using Audex.Application.Interfaces.FileStorage;
+using Audex.Infrastructure.Interfaces.Messages;
 using Microsoft.AspNetCore.Http;
 
 namespace Audex.Application.Services.Crypto
@@ -22,19 +27,25 @@ namespace Audex.Application.Services.Crypto
         private readonly ApplicationMapper _mapper;
         private readonly IFileStorageService _fileStorageService;
         private readonly ICurrencyService _currencyService;
+        private readonly ICryptoConnector _cryptoConnector;
+        private readonly IServerNotifier _serverNotifier;
         private const string _iconsBucket = "cryptocurrency";
 
         public CryptocurrencyService(
             IUnitOfWork uow,
             ApplicationMapper mapper,
             IFileStorageService fileStorageService,
-            ICurrencyService currencyService)
+            ICurrencyService currencyService,
+            ICryptoConnector cryptoConnector,
+            IServerNotifier serverNotifier = null)
         {
             _db = uow;
             _mapper = mapper;
             _cryptocurrencyRepo = uow.CreateRepository<Cryptocurrency>();
             _fileStorageService = fileStorageService;
             _currencyService = currencyService;
+            _cryptoConnector = cryptoConnector;
+            _serverNotifier = serverNotifier;
         }
 
         public async Task<CurrencyDto> GetBaseCurrencyAsync()
@@ -61,8 +72,30 @@ namespace Audex.Application.Services.Crypto
 
         public async Task<CryptocurrencyDto> AddAsync(CryptocurrencyDto cryptocurrencyDto, IFormFile cryptocurrencyIcon)
         {
+            if (cryptocurrencyDto == null || string.IsNullOrWhiteSpace(cryptocurrencyDto.Symbol))
+            {
+                throw new ArgumentException("Cryptocurrency symbol is required.");
+            }
+
+            var normalizedSymbol = cryptocurrencyDto.Symbol.Trim().ToUpperInvariant();
+
+            var existing = await _cryptocurrencyRepo.FindAsync(c => c.Symbol == normalizedSymbol);
+            if (existing != null)
+            {
+                throw new InvalidOperationException($"Cryptocurrency with symbol '{normalizedSymbol}' already exists.");
+            }
+
+            var coinInfo = await _cryptoConnector.GetCoinInfoBySymbolAsync(normalizedSymbol);
+            if (coinInfo == null)
+            {
+                throw new InvalidOperationException($"Cryptocurrency with symbol '{normalizedSymbol}' was not found on CoinGecko or has no price.");
+            }
+
             var cryptocurrency = _mapper.Map(cryptocurrencyDto);
             cryptocurrency.Id = Guid.NewGuid();
+            cryptocurrency.Symbol = normalizedSymbol;
+            cryptocurrency.Name = coinInfo.Value.Name;
+            cryptocurrency.Price = coinInfo.Value.PriceUsd;
 
             if (cryptocurrencyIcon != null)
             {
@@ -78,8 +111,35 @@ namespace Audex.Application.Services.Crypto
 
         public async Task<CryptocurrencyDto> UpdateAsync(CryptocurrencyDto cryptocurrencyDto, IFormFile cryptocurrencyIcon)
         {
+            if (cryptocurrencyDto == null || string.IsNullOrWhiteSpace(cryptocurrencyDto.Symbol))
+            {
+                throw new ArgumentException("Cryptocurrency symbol is required.");
+            }
+
+            var normalizedSymbol = cryptocurrencyDto.Symbol.Trim().ToUpperInvariant();
+
+            var existingWithSameSymbol = await _cryptocurrencyRepo.FindAsync(c => c.Symbol == normalizedSymbol && c.Id != cryptocurrencyDto.Id);
+            if (existingWithSameSymbol != null)
+            {
+                throw new InvalidOperationException($"Cryptocurrency with symbol '{normalizedSymbol}' already exists.");
+            }
+
             var existingCrypto = await _cryptocurrencyRepo.GetByIdAsync(cryptocurrencyDto.Id);
+            if (existingCrypto == null)
+            {
+                throw new InvalidOperationException($"Cryptocurrency with id '{cryptocurrencyDto.Id}' not found.");
+            }
+
+            var coinInfo = await _cryptoConnector.GetCoinInfoBySymbolAsync(normalizedSymbol);
+            if (coinInfo == null)
+            {
+                throw new InvalidOperationException($"Cryptocurrency with symbol '{normalizedSymbol}' was not found on CoinGecko or has no price.");
+            }
+
             var cryptocurrency = _mapper.Map(cryptocurrencyDto);
+            cryptocurrency.Symbol = normalizedSymbol;
+            cryptocurrency.Name = coinInfo.Value.Name;
+            cryptocurrency.Price = coinInfo.Value.PriceUsd;
 
             if (cryptocurrencyIcon != null)
             {
@@ -121,6 +181,44 @@ namespace Audex.Application.Services.Crypto
         public async Task<string> GetIconUrlAsync(string iconKey)
         {
             return await _fileStorageService.GetFileUrlAsync(_iconsBucket, iconKey);
+        }
+
+        public async Task<int> PullPricesAsync(CancellationToken cancellationToken = default)
+        {
+            var entities = (await _cryptocurrencyRepo.GetAllAsync(disableTracking: false)).ToList();
+            if (entities.Count == 0)
+            {
+                return 0;
+            }
+
+            var dtos = _mapper.Map(entities);
+            var prices = (await _cryptoConnector.GetPricesAsync(dtos, cancellationToken)).ToList();
+            if (prices.Count == 0)
+            {
+                return 0;
+            }
+
+            var pricesById = prices
+                .GroupBy(p => p.CryptocurrencyId)
+                .ToDictionary(g => g.Key, g => g.Last().PriceUsd);
+
+            var updatedCount = 0;
+            foreach (var entity in entities)
+            {
+                if (pricesById.TryGetValue(entity.Id, out var newPrice) && newPrice > 0)
+                {
+                    entity.Price = newPrice;
+                    _cryptocurrencyRepo.Update(entity);
+                    updatedCount++;
+                }
+            }
+
+            if (updatedCount > 0)
+            {
+                await _db.CommitAsync();
+            }
+
+            return updatedCount;
         }
     }
 }

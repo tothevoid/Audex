@@ -3,5 +3,6 @@
   "clean_up_notifications_success": "Successfully cleaned up read system notifications older than {0} days",
   "asset_report_success": "Successfully generated all assets report ({0}, {1} KB)",
   "backup_success": "Successfully created {0}database backup ({1:F1} KB)",
-  "pull_quotations_success": "Successfully updated securities quotations from MOEX"
+  "pull_quotations_success": "Successfully updated securities quotations from MOEX",
+  "pull_crypto_prices_success": "Successfully updated prices for {0} cryptocurrencies from CoinGecko"
 }

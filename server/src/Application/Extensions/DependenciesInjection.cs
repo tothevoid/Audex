@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Audex.Application.Integrations.Crypto.CoinGecko;
 using Audex.Application.Integrations.Currency;
 using Audex.Application.Integrations.Stock.Moex;
 using Audex.Application.Interfaces.Accounts;
@@ -11,6 +12,7 @@ using Audex.Application.Interfaces.Dashboard;
 using Audex.Application.Interfaces.Debts;
 using Audex.Application.Interfaces.Deposits;
 using Audex.Application.Interfaces.FileStorage;
+using Audex.Application.Interfaces.Integrations.Crypto;
 using Audex.Application.Interfaces.Integrations.Currency;
 using Audex.Application.Interfaces.Integrations.Stock;
 using Audex.Application.Interfaces.Localization;
@@ -98,6 +100,8 @@ namespace Audex.Application.Extensions
             //TODO: possible change AddTransient to AddSingleton
             services.AddTransient<IStockConnector, MoexConnector>();
             services.AddTransient<ICurrencyGrabber, CbrCurrencyGrabber>();
+            services.AddTransient<CoinGeckoApiClient>();
+            services.AddTransient<ICryptoConnector, CoinGeckoConnector>();
 
             services.AddScoped<IFileStorageService, FileStorageService>();
 
@@ -112,12 +116,14 @@ namespace Audex.Application.Extensions
             services.AddTransient<IScheduledJob, PullQuotationsJob>();
             services.AddTransient<IScheduledJob, CleanUpOldNotificationsJob>();
             services.AddTransient<IScheduledJob, CleanUpExpiredRefreshTokensJob>();
+            services.AddTransient<IScheduledJob, PullCryptoPricesJob>();
 
             services.AddTransient<AssetReportJob>();
             services.AddTransient<DatabaseBackupJob>();
             services.AddTransient<PullQuotationsJob>();
             services.AddTransient<CleanUpOldNotificationsJob>();
             services.AddTransient<CleanUpExpiredRefreshTokensJob>();
+            services.AddTransient<PullCryptoPricesJob>();
 
             return services;
         }

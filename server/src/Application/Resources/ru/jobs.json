@@ -3,6 +3,7 @@
   "category_system": "Система",
   "category_reports": "Отчеты",
   "category_brokers": "Брокеры",
+  "category_crypto": "Криптовалюта",
   "category_general": "Общие",
   "cleanup_expired_tokens_name": "Очистка сессионных токенов",
   "cleanup_expired_tokens_desc": "Удаление истекших и отозванных JWT refresh-токенов старше 30 дней",
@@ -13,5 +14,7 @@
   "database_backup_name": "Резервное копирование БД",
   "database_backup_desc": "Создание резервной копии базы данных и выгрузка в S3",
   "pull_quotations_name": "Обновление котировок MOEX",
-  "pull_quotations_desc": "Периодическое получение актуальных котировок ценных бумаг с Московской биржи"
+  "pull_quotations_desc": "Периодическое получение актуальных котировок ценных бумаг с Московской биржи",
+  "pull_crypto_prices_name": "Обновление цен криптовалют",
+  "pull_crypto_prices_desc": "Периодическое получение актуальных цен криптовалют в USD с CoinGecko"
 }
