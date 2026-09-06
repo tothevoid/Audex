@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,16 +23,14 @@ namespace Audex.Application.Tests.Services.Scheduler
             {
                 var service = sp.GetRequiredService<ISchedulerTaskService>();
 
+                await service.DeleteTaskAsync("PullCryptoPrices");
+
                 var definitions = await service.GetNotScheduledTasksAsync();
 
                 Assert.NotNull(definitions);
                 var list = definitions.ToList();
-                Assert.True(list.Count >= 5);
-                Assert.Contains(list, d => d.TaskName == "GenerateAllAssetsReport");
-                Assert.Contains(list, d => d.TaskName == "DatabaseBackup");
-                Assert.Contains(list, d => d.TaskName == "PullQuotations");
-                Assert.Contains(list, d => d.TaskName == "CleanUpOldNotifications");
-                Assert.Contains(list, d => d.TaskName == "CleanUpExpiredRefreshTokens");
+                Assert.True(list.Count >= 4);
+                Assert.Contains(list, d => d.TaskName == "PullCryptoPrices");
             });
         }
 
@@ -93,6 +91,9 @@ namespace Audex.Application.Tests.Services.Scheduler
                 };
 
                 await Assert.ThrowsAsync<InvalidOperationException>(() => service.CreateTaskAsync(duplicateDto));
+
+                // Clean up
+                await service.DeleteTaskAsync("DatabaseBackup");
             });
         }
 

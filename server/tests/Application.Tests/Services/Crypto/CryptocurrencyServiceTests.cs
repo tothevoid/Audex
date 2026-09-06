@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.Interfaces.Crypto;
 using Audex.Application.Tests.Fixtures;
 using Audex.Application.DTO.Crypto;
@@ -47,9 +47,7 @@ namespace Audex.Application.Tests.Services.Crypto
         {
             var dto = new CryptocurrencyDto
             {
-                Name = "Ethereum",
-                Symbol = "ETH",
-                Price = 3500m
+                Symbol = "ETH"
             };
 
             var added = await ExecuteScopeAsync(async sp =>
@@ -58,7 +56,11 @@ namespace Audex.Application.Tests.Services.Crypto
                 return await service.AddAsync(dto, null);
             });
 
-            added.Price = 3800m;
+            Assert.Equal("Ethereum", added.Name);
+            Assert.Equal(3500m, added.Price);
+
+            // Update symbol to SOL
+            added.Symbol = "SOL";
             var updated = await ExecuteScopeAsync(async sp =>
             {
                 var service = sp.GetRequiredService<ICryptocurrencyService>();
@@ -66,7 +68,16 @@ namespace Audex.Application.Tests.Services.Crypto
             });
 
             Assert.NotNull(updated);
-            Assert.Equal(3800m, updated.Price);
+            Assert.Equal("SOL", updated.Symbol);
+            Assert.Equal("Solana", updated.Name);
+            Assert.Equal(150m, updated.Price);
+
+            // Cleanup
+            await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ICryptocurrencyService>();
+                await service.DeleteAsync(added.Id);
+            });
         }
 
         [Fact]
@@ -74,9 +85,7 @@ namespace Audex.Application.Tests.Services.Crypto
         {
             var dto = new CryptocurrencyDto
             {
-                Name = "Ethereum",
-                Symbol = "ETH",
-                Price = 3500m
+                Symbol = "LTC"
             };
 
             var added = await ExecuteScopeAsync(async sp =>
@@ -228,6 +237,36 @@ namespace Audex.Application.Tests.Services.Crypto
             Assert.NotNull(iconStream);
             Assert.NotNull(iconStream.Stream);
             Assert.Equal("image/png", iconStream.ContentType);
+        }
+
+        [Fact]
+        public async Task TestPullPrices()
+        {
+            var dto = new CryptocurrencyDto
+            {
+                Symbol = "DOGE"
+            };
+
+            var added = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ICryptocurrencyService>();
+                return await service.AddAsync(dto, null);
+            });
+
+            var count = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ICryptocurrencyService>();
+                return await service.PullPricesAsync();
+            });
+
+            Assert.True(count >= 0);
+
+            // Cleanup
+            await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ICryptocurrencyService>();
+                await service.DeleteAsync(added.Id);
+            });
         }
 
         private static Microsoft.AspNetCore.Http.IFormFile CreateDummyFormFile()

@@ -84,7 +84,11 @@ namespace Audex.Application.Integrations.Crypto.CoinGecko
         public async Task<Dictionary<string, decimal>> GetPricesInUsdAsync(IEnumerable<string> coinIds, CancellationToken cancellationToken = default)
         {
             var result = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
-            var idList = coinIds?.Where(id => !string.IsNullOrWhiteSpace(id)).Distinct().ToList();
+            var idList = coinIds?
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Select(id => id.Trim().ToLowerInvariant())
+                .Distinct()
+                .ToList();
 
             if (idList == null || idList.Count == 0)
             {

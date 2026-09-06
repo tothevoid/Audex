@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
@@ -58,6 +58,7 @@ namespace Audex.Tests.Shared.Fixtures
             services.AddInfrastructureServices();
 
             services.AddSingleton<Audex.Infrastructure.Interfaces.DatabaseBackup.IDatabaseBackupProvider, TestDatabaseBackupProvider>();
+            services.AddScoped<Audex.Application.Interfaces.Integrations.Crypto.ICryptoConnector, TestCryptoConnector>();
 
             services.AddMinio(configureClient => configureClient
                 .WithEndpoint(MinioEndpoint)

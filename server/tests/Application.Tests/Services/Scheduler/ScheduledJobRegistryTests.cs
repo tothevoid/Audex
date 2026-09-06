@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Scheduler;
@@ -25,12 +25,13 @@ namespace Audex.Application.Tests.Services.Scheduler
                 var descriptors = registry.GetAllDescriptors();
 
                 Assert.NotNull(descriptors);
-                Assert.True(descriptors.Count >= 5);
+                Assert.True(descriptors.Count >= 6);
                 Assert.Contains(descriptors, d => d.TaskName == "GenerateAllAssetsReport");
                 Assert.Contains(descriptors, d => d.TaskName == "DatabaseBackup");
                 Assert.Contains(descriptors, d => d.TaskName == "PullQuotations");
                 Assert.Contains(descriptors, d => d.TaskName == "CleanUpOldNotifications");
                 Assert.Contains(descriptors, d => d.TaskName == "CleanUpExpiredRefreshTokens");
+                Assert.Contains(descriptors, d => d.TaskName == "PullCryptoPrices");
                 return Task.CompletedTask;
             });
         }

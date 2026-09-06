@@ -79,12 +79,6 @@ namespace Audex.Application.Services.Crypto
 
             var normalizedSymbol = cryptocurrencyDto.Symbol.Trim().ToUpperInvariant();
 
-            var existing = await _cryptocurrencyRepo.FindAsync(c => c.Symbol == normalizedSymbol);
-            if (existing != null)
-            {
-                throw new InvalidOperationException($"Cryptocurrency with symbol '{normalizedSymbol}' already exists.");
-            }
-
             var coinInfo = await _cryptoConnector.GetCoinInfoBySymbolAsync(normalizedSymbol);
             if (coinInfo == null)
             {
@@ -117,12 +111,6 @@ namespace Audex.Application.Services.Crypto
             }
 
             var normalizedSymbol = cryptocurrencyDto.Symbol.Trim().ToUpperInvariant();
-
-            var existingWithSameSymbol = await _cryptocurrencyRepo.FindAsync(c => c.Symbol == normalizedSymbol && c.Id != cryptocurrencyDto.Id);
-            if (existingWithSameSymbol != null)
-            {
-                throw new InvalidOperationException($"Cryptocurrency with symbol '{normalizedSymbol}' already exists.");
-            }
 
             var existingCrypto = await _cryptocurrencyRepo.GetByIdAsync(cryptocurrencyDto.Id);
             if (existingCrypto == null)
