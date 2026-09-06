@@ -14,6 +14,7 @@
 
     "cryptocurrency_form_title": "Криптовалюта",
     "cryptocurrency_form_symbol": "Символ",
+    "cryptocurrency_form_symbol_hint": "Название и цена загрузятся автоматически из CoinGecko по символу",
     "cryptocurrency_form_name": "Название",
     "cryptocurrency_form_price": "Цена",
     "cryptocurrency_delete_title": "Удалить криптовалюту",

@@ -1,11 +1,10 @@
-import { Field, Input, Stack} from "@chakra-ui/react"
+import { Field, Input, Stack, Text } from "@chakra-ui/react"
 import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { CryptocurrencyFormInput, getCryptocurrencyValidationSchema } from "./CryptocurrencyValidationSchema";
 import BaseFormModal from "../../../shared/modals/BaseFormModal/BaseFormModal";
-import MoneyInput from "../../../shared/components/MoneyInput/MoneyInput";
 import { BaseModalRef } from "../../../shared/utilities/modalUtilities";
 import { CryptocurrencyEntity } from "../../../models/crypto/CryptocurrencyEntity";
 import { getIconUrl } from "../../../api/crypto/cryptocurrencyApi";
@@ -35,7 +34,7 @@ const CryptocurrencyModal: React.FC<ModalProps> = (props: ModalProps) => {
     const { t } = useTranslation();
     const validationSchema = useMemo(() => getCryptocurrencyValidationSchema(t), [t]);
 
-    const { register, control, handleSubmit, formState: { errors }, reset} = useForm<CryptocurrencyFormInput>({
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<CryptocurrencyFormInput>({
         resolver: zodResolver(validationSchema),
         mode: "onBlur",
         defaultValues: getDefaultValues()
@@ -75,22 +74,25 @@ const CryptocurrencyModal: React.FC<ModalProps> = (props: ModalProps) => {
     return <BaseFormModal visibilityChanged={onVisibilityChanged} ref={props.modalRef} title={t("cryptocurrency_form_title")} submitHandler={handleSubmit(onSubmit)}>
         <Stack marginBlock={2} gapX={4} alignItems={"center"} direction={"row"}>
             <ImageInput imageUrl={iconUrl} onImageSelected={onImageSelected} />
-            <Field.Root invalid={!!errors.symbol}>
+            <Field.Root invalid={!!errors.symbol} flex={1}>
                 <Field.Label>{t("cryptocurrency_form_symbol")}</Field.Label>
                 <Input {...register("symbol")} autoComplete="off" placeholder='BTC' />
                 <Field.ErrorText>{errors.symbol?.message}</Field.ErrorText>
             </Field.Root>
         </Stack>
-        <Field.Root invalid={!!errors.name}>
-            <Field.Label>{t("cryptocurrency_form_name")}</Field.Label>
-            <Input {...register("name")} autoComplete="off" placeholder='Bitcoin' />
-            <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
-        </Field.Root>
-        <Field.Root invalid={!!errors.price} mt={4}>
-            <Field.Label>{t("cryptocurrency_form_price")}</Field.Label>
-            <MoneyInput name="price" control={control} currency="USD" decimalScale={4} placeholder='10' />
-            <Field.ErrorText>{errors.price?.message}</Field.ErrorText>
-        </Field.Root>
+        <Text fontSize="xs" color="text_secondary" mt={1}>
+            {t("cryptocurrency_form_symbol_hint")}
+        </Text>
+        {props.cryptocurrency && (
+            <Stack mt={4} p={3} borderRadius="md" bg="background_secondary" gapY={1}>
+                <Text fontSize="sm" color="text_secondary">
+                    {t("cryptocurrency_form_name")}: <Text as="span" color="text_primary" fontWeight="semibold">{props.cryptocurrency.name}</Text>
+                </Text>
+                <Text fontSize="sm" color="text_secondary">
+                    {t("cryptocurrency_form_price")}: <Text as="span" color="text_primary" fontWeight="semibold">${props.cryptocurrency.price.toLocaleString()}</Text>
+                </Text>
+            </Stack>
+        )}
     </BaseFormModal>
 }
 

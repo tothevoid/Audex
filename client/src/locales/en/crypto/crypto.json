@@ -14,6 +14,7 @@
 
     "cryptocurrency_form_title": "Cryptocurrency",
     "cryptocurrency_form_symbol": "Symbol",
+    "cryptocurrency_form_symbol_hint": "Name and price are automatically fetched from CoinGecko by symbol",
     "cryptocurrency_form_name": "Name",
     "cryptocurrency_form_price": "Price",
     "cryptocurrency_delete_title": "Delete cryptocurrency",
