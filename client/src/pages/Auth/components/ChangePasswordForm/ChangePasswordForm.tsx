@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { MdVisibility, MdVisibilityOff, MdErrorOutline, MdArrowBack } from "react-icons/md";
 import { changePassword } from "../../../../api/auth/authApi";
+import { AuthErrorCode } from "../../../../models/auth/AuthResult";
 import { ChangePasswordFormInput, getChangePasswordValidationSchema } from "./ChangePasswordFormValidationSchema";
 import { Nullable } from "../../../../shared/utilities/nullable";
 
@@ -25,7 +26,8 @@ const ChangePasswordForm: React.FC<Props> = ({ defaultPasswordResetValues, onTok
         return {
             userName: defaultPasswordResetValues?.userName ?? "",
             currentPassword: defaultPasswordResetValues?.currentPassword ?? "",
-            newPassword: ""
+            newPassword: "",
+            confirmPassword: ""
         };
     }, [defaultPasswordResetValues]);
 
@@ -46,23 +48,27 @@ const ChangePasswordForm: React.FC<Props> = ({ defaultPasswordResetValues, onTok
         setError("");
         setLoading(true);
         try {
-            const token = await changePassword(
+            const result = await changePassword(
                 authData.userName,
                 authData.currentPassword,
                 authData.newPassword
             );
 
-            if (token) {
-                onTokenReceived(token);
+            if (result.success) {
+                onTokenReceived(result.token);
                 return;
-            } else {
-                setError(t("change_password_form_error"));
             }
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(err.message || t("change_password_form_error"));
-            } else {
-                setError(t("change_password_form_error"));
+
+            switch (result.errorCode) {
+                case AuthErrorCode.ServerUnavailable:
+                    setError(t("auth_form_error_server_unavailable"));
+                    break;
+                case AuthErrorCode.InvalidCredentials:
+                    setError(t("change_password_form_error_invalid_credentials"));
+                    break;
+                default:
+                    setError(t("change_password_form_error"));
+                    break;
             }
         } finally {
             setLoading(false);

@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { MdVisibility, MdVisibilityOff, MdErrorOutline } from "react-icons/md";
 import { auth } from "../../../../api/auth/authApi";
+import { AuthErrorCode } from "../../../../models/auth/AuthResult";
 import { AuthFormInput, getAuthValidationSchema } from "./AuthValidationSchema";
 import { Nullable } from "../../../../shared/utilities/nullable";
 
@@ -20,7 +21,7 @@ const AuthForm: React.FC<Props> = ({ onPasswordChangeRequired, onTokenReceived }
     const { t } = useTranslation();
     const validationSchema = useMemo(() => getAuthValidationSchema(t), [t]);
 
-    const { register, handleSubmit, watch, formState: { errors } } = useForm<AuthFormInput>({
+    const { register, handleSubmit, formState: { errors } } = useForm<AuthFormInput>({
         resolver: zodResolver(validationSchema),
         mode: "onBlur",
         defaultValues: {
@@ -29,37 +30,33 @@ const AuthForm: React.FC<Props> = ({ onPasswordChangeRequired, onTokenReceived }
         }
     });
 
-    const userName = watch("userName");
-    const password = watch("password");
-
     const onSubmit = async (authData: AuthFormInput) => {
         setError("");
         setLoading(true);
         try {
-            const authInfo = await auth(authData.userName, authData.password);
+            const result = await auth(authData.userName, authData.password);
 
-            if (!authInfo) {
-                setError(t("auth_form_error_invalid_credentials"));
+            if (!result.success) {
+                switch (result.errorCode) {
+                    case AuthErrorCode.ServerUnavailable:
+                        setError(t("auth_form_error_server_unavailable"));
+                        break;
+                    case AuthErrorCode.InvalidCredentials:
+                        setError(t("auth_form_error_invalid_credentials"));
+                        break;
+                    default:
+                        setError(t("auth_form_error"));
+                        break;
+                }
                 return;
             }
 
-            if (authInfo.passwordChangeRequired) {
-                onPasswordChangeRequired(userName, password);
+            if (result.passwordChangeRequired) {
+                onPasswordChangeRequired(authData.userName, authData.password);
                 return;
             }
 
-            if (authInfo.token) {
-                onTokenReceived(authInfo.token);
-                return;
-            }
-
-            setError(t("auth_form_error_invalid_credentials"));
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(err.message || t("auth_form_error"));
-            } else {
-                setError(t("auth_form_error"));
-            }
+            onTokenReceived(result.token);
         } finally {
             setLoading(false);
         }

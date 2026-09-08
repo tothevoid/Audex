@@ -3,17 +3,33 @@ import config from '../../config';
 import { Nullable } from '../../shared/utilities/nullable';
 import { setAccessToken, clearAccessToken, getAccessToken } from '../tokenStorage';
 
+import {
+    AuthErrorCode,
+    AuthResult,
+    ChangePasswordResult
+} from '../../models/auth/AuthResult';
 const basicUrl = `${config.api.URL}/Auth`;
 
-export interface AuthResult {
-    passwordChangeRequired: boolean;
-    token: Nullable<string>;
-}
+const parseAuthError = (err: unknown): AuthErrorCode => {
+    if (!axios.isAxiosError(err)) {
+        return AuthErrorCode.Unknown;
+    }
+
+    if (!err.response) {
+        return AuthErrorCode.ServerUnavailable;
+    }
+
+    if (err.response.status === 400 || err.response.status === 401) {
+        return AuthErrorCode.InvalidCredentials;
+    }
+
+    return AuthErrorCode.Unknown;
+};
 
 export const auth = async (
     userName: string,
     password: Nullable<string>
-): Promise<Nullable<AuthResult>> => {
+): Promise<AuthResult> => {
     try {
         const response = await axios.post(
             `${basicUrl}/Login`,
@@ -23,17 +39,30 @@ export const auth = async (
 
         const data = response.data;
         if (data?.passwordChangeRequired) {
-            return { passwordChangeRequired: true, token: null };
+            return {
+                success: true,
+                passwordChangeRequired: true
+            };
         }
 
         if (data?.accessToken) {
             setAccessToken(data.accessToken);
-            return { passwordChangeRequired: false, token: data.accessToken };
+            return {
+                success: true,
+                passwordChangeRequired: false,
+                token: data.accessToken
+            };
         }
 
-        return null;
-    } catch {
-        return null;
+        return {
+            success: false,
+            errorCode: AuthErrorCode.Unknown
+        };
+    } catch (err) {
+        return {
+            success: false,
+            errorCode: parseAuthError(err)
+        };
     }
 };
 
@@ -41,7 +70,7 @@ export const changePassword = async (
     userName: string,
     currentPassword: Nullable<string>,
     newPassword: string
-): Promise<Nullable<string>> => {
+): Promise<ChangePasswordResult> => {
     try {
         const response = await axios.post(
             `${basicUrl}/ChangePassword`,
@@ -52,12 +81,21 @@ export const changePassword = async (
         const data = response.data;
         if (data?.accessToken) {
             setAccessToken(data.accessToken);
-            return data.accessToken;
+            return {
+                success: true,
+                token: data.accessToken
+            };
         }
 
-        return null;
-    } catch {
-        return null;
+        return {
+            success: false,
+            errorCode: AuthErrorCode.Unknown
+        };
+    } catch (err) {
+        return {
+            success: false,
+            errorCode: parseAuthError(err)
+        };
     }
 };
 

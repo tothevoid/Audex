@@ -7,6 +7,7 @@ import { BaseModalRef } from '../../src/shared/utilities/modalUtilities';
 import BaseFormModal from '../../src/shared/modals/BaseFormModal/BaseFormModal';
 import { useUserProfile } from '../UserProfileSettingsModal/hooks/UserProfileContext';
 import { changePassword } from '../../src/api/auth/authApi';
+import { AuthErrorCode } from '../../src/models/auth/AuthResult';
 import { PasswordInput } from '../../src/shared/components/PasswordInput/PasswordInput';
 import {
     ChangePasswordModalInput,
@@ -53,16 +54,23 @@ const ChangePasswordModal = forwardRef<BaseModalRef>((_, ref) => {
         setApiError(null);
         if (!user?.userName) return;
 
-        try {
-            const token = await changePassword(user.userName, data.currentPassword ?? '', data.newPassword);
-            if (token) {
-                modalRef.current?.closeModal();
-                reset();
-            } else {
+        const result = await changePassword(user.userName, data.currentPassword ?? '', data.newPassword);
+        if (result.success) {
+            modalRef.current?.closeModal();
+            reset();
+            return;
+        }
+
+        switch (result.errorCode) {
+            case AuthErrorCode.ServerUnavailable:
+                setApiError(t('auth_form_error_server_unavailable'));
+                break;
+            case AuthErrorCode.InvalidCredentials:
+                setApiError(t('change_password_form_error_invalid_credentials'));
+                break;
+            default:
                 setApiError(t('change_password_form_error'));
-            }
-        } catch {
-            setApiError(t('change_password_form_error'));
+                break;
         }
     };
 
