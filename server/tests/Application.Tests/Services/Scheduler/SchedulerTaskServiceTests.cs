@@ -3,9 +3,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Scheduler;
+using Audex.Application.Enums.Scheduler;
 using Audex.Application.Interfaces.Scheduler;
 using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Entities.Scheduler;
+using TickerQ.Utilities.Entities;
+using TickerQ.Utilities.Enums;
 using Xunit;
 
 namespace Audex.Application.Tests.Services.Scheduler
@@ -178,10 +181,12 @@ namespace Audex.Application.Tests.Services.Scheduler
                 };
 
                 var updated = await service.UpdateScheduleAsync("GenerateAllAssetsReport", updateDto);
+                Assert.True(updated);
 
-                Assert.NotNull(updated);
-                Assert.Equal("0 10 * * 2", updated.CronExpression);
-                Assert.False(updated.IsEnabled);
+                var taskInDb = await service.GetTaskByNameAsync("GenerateAllAssetsReport");
+                Assert.NotNull(taskInDb);
+                Assert.Equal("0 10 * * 2", taskInDb.CronExpression);
+                Assert.False(taskInDb.IsEnabled);
             });
         }
 
@@ -201,12 +206,16 @@ namespace Audex.Application.Tests.Services.Scheduler
                 });
 
                 var updated = await service.ToggleTaskStatusAsync("CleanUpExpiredRefreshTokens", false);
-                Assert.NotNull(updated);
-                Assert.False(updated.IsEnabled);
+                Assert.True(updated);
+                var taskInDb = await service.GetTaskByNameAsync("CleanUpExpiredRefreshTokens");
+                Assert.NotNull(taskInDb);
+                Assert.False(taskInDb.IsEnabled);
 
                 var reEnabled = await service.ToggleTaskStatusAsync("CleanUpExpiredRefreshTokens", true);
-                Assert.NotNull(reEnabled);
-                Assert.True(reEnabled.IsEnabled);
+                Assert.True(reEnabled);
+                taskInDb = await service.GetTaskByNameAsync("CleanUpExpiredRefreshTokens");
+                Assert.NotNull(taskInDb);
+                Assert.True(taskInDb.IsEnabled);
             });
         }
 
@@ -247,6 +256,69 @@ namespace Audex.Application.Tests.Services.Scheduler
                 Assert.Equal("All Assets Report (Excel)", enReport.DisplayName);
                 Assert.Equal("Automatically generate Excel statement for all accounts, assets and debts", enReport.Description);
                 Assert.Equal("Reports", enReport.Category);
+            });
+        }
+
+        [Fact]
+        public async Task GetTaskByNameAsync_WithPastExecutionAndQueuedNextRun_ReturnsPastExecutionAsLastRun()
+        {
+            await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ISchedulerTaskService>();
+                var db = sp.GetRequiredService<Audex.Infrastructure.Interfaces.Database.IUnitOfWork>();
+                var tickerRepo = db.CreateRepository<ScheduledCronTicker>();
+                var occurrenceRepo = db.CreateRepository<CronTickerOccurrenceEntity<ScheduledCronTicker>>();
+
+                await service.DeleteTaskAsync("DatabaseBackup");
+                await service.CreateTaskAsync(new CreateScheduledTaskDto
+                {
+                    TaskName = "DatabaseBackup",
+                    CronExpression = "0 3 * * 0",
+                    IsEnabled = true
+                });
+
+                var ticker = await tickerRepo.FindAsync(t => t.Function == "DatabaseBackup");
+                Assert.NotNull(ticker);
+
+                var pastExecutedAt = DateTime.UtcNow.AddMinutes(-30);
+                var completedOccurrence = new CronTickerOccurrenceEntity<ScheduledCronTicker>
+                {
+                    Id = Guid.NewGuid(),
+                    CronTickerId = ticker.Id,
+                    ExecutionTime = pastExecutedAt,
+                    ExecutedAt = pastExecutedAt,
+                    ElapsedTime = 420,
+                    Status = TickerStatus.Done,
+                    CreatedAt = pastExecutedAt,
+                    UpdatedAt = pastExecutedAt
+                };
+
+                var futureExecutionTime = DateTime.UtcNow.AddHours(2);
+                var queuedOccurrence = new CronTickerOccurrenceEntity<ScheduledCronTicker>
+                {
+                    Id = Guid.NewGuid(),
+                    CronTickerId = ticker.Id,
+                    ExecutionTime = futureExecutionTime,
+                    ExecutedAt = null,
+                    ElapsedTime = 0,
+                    Status = TickerStatus.Queued,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                await occurrenceRepo.AddAsync(completedOccurrence);
+                await occurrenceRepo.AddAsync(queuedOccurrence);
+                await db.CommitAsync();
+
+                var task = await service.GetTaskByNameAsync("DatabaseBackup");
+                Assert.NotNull(task);
+                Assert.NotNull(task.LastExecutionUtc);
+                Assert.Equal(pastExecutedAt, task.LastExecutionUtc.Value, TimeSpan.FromSeconds(1));
+                Assert.Equal(ScheduledTaskExecutionStatus.Done, task.LastExecutionStatus);
+                Assert.Equal(420, task.LastExecutionDurationMs);
+
+                // Clean up
+                await service.DeleteTaskAsync("DatabaseBackup");
             });
         }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -95,17 +95,17 @@ namespace Audex.WebApi.Controllers.Scheduler
         }
 
         [HttpPut("tasks/{taskName}/schedule")]
-        public async Task<ActionResult<ScheduledTaskModel>> UpdateSchedule(string taskName, [FromBody] UpdateScheduleModel model)
+        public async Task<IActionResult> UpdateSchedule(string taskName, [FromBody] UpdateScheduleModel model)
         {
             try
             {
                 var dto = _mapper.Map(model);
                 var updated = await _schedulerTaskService.UpdateScheduleAsync(taskName, dto);
-                if (updated == null)
+                if (!updated)
                 {
                     return NotFound();
                 }
-                return Ok(_mapper.Map(updated));
+                return Ok();
             }
             catch (ArgumentException ex)
             {
@@ -114,14 +114,14 @@ namespace Audex.WebApi.Controllers.Scheduler
         }
 
         [HttpPut("tasks/{taskName}/toggle")]
-        public async Task<ActionResult<ScheduledTaskModel>> ToggleTask(string taskName, [FromQuery] bool isEnabled)
+        public async Task<IActionResult> ToggleTask(string taskName, [FromQuery] bool isEnabled)
         {
             var updated = await _schedulerTaskService.ToggleTaskStatusAsync(taskName, isEnabled);
-            if (updated == null)
+            if (!updated)
             {
                 return NotFound();
             }
-            return Ok(_mapper.Map(updated));
+            return Ok();
         }
 
         [HttpPost("tasks/{taskName}/run-now")]

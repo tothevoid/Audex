@@ -20,7 +20,7 @@ export interface ScheduleConfigModalRef {
 }
 
 interface ScheduleConfigModalProps {
-    onSaved?: (updatedTask: ScheduledTaskEntity) => void;
+    onSaved: () => void;
 }
 
 export const ScheduleConfigModal = forwardRef<ScheduleConfigModalRef, ScheduleConfigModalProps>(({ onSaved }, ref) => {
@@ -58,7 +58,7 @@ export const ScheduleConfigModal = forwardRef<ScheduleConfigModalRef, ScheduleCo
             });
 
             if (result) {
-                onSaved?.(result);
+                onSaved();
                 formModalRef.current?.closeModal();
             }
         } finally {

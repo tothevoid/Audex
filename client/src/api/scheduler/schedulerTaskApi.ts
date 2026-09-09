@@ -47,26 +47,26 @@ export const getScheduledTask = async (taskName: string): Promise<ScheduledTaskE
 export const updateSchedule = async (
     taskName: string,
     request: UpdateScheduleEntityRequest
-): Promise<ScheduledTaskEntity | null> => {
+): Promise<boolean> => {
     try {
-        const response = await httpClient.put(`${basicUrl}/tasks/${taskName}/schedule`, request);
-        return response.data ? prepareScheduledTask(response.data) : null;
+        await httpClient.put(`${basicUrl}/tasks/${taskName}/schedule`, request);
+        return true;
     } catch (error) {
         logPromiseError(error);
-        return null;
+        return false;
     }
 };
 
 export const toggleTaskStatus = async (
     taskName: string,
     isEnabled: boolean
-): Promise<ScheduledTaskEntity | null> => {
+): Promise<boolean> => {
     try {
-        const response = await httpClient.put(`${basicUrl}/tasks/${taskName}/toggle?isEnabled=${isEnabled}`);
-        return response.data ? prepareScheduledTask(response.data) : null;
+        await httpClient.put(`${basicUrl}/tasks/${taskName}/toggle?isEnabled=${isEnabled}`);
+        return true;
     } catch (error) {
         logPromiseError(error);
-        return null;
+        return false;
     }
 };
 

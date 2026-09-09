@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -155,18 +155,18 @@ namespace Audex.Application.Services.Scheduler
             return MapToDto(newTicker, descriptor, null, DateTime.UtcNow, lang);
         }
 
-        public async Task<ScheduledTaskDto> UpdateScheduleAsync(string taskName, UpdateScheduleDto dto)
+        public async Task<bool> UpdateScheduleAsync(string taskName, UpdateScheduleDto dto)
         {
             if (string.IsNullOrWhiteSpace(taskName) || dto == null)
             {
-                return null;
+                return false;
             }
 
             var ticker = await _tickerRepo.FindAsync(t => t.Function == taskName, disableTracking: false);
 
             if (ticker == null)
             {
-                return null;
+                return false;
             }
 
             bool deletePendingOccurrences = false;
@@ -203,24 +203,21 @@ namespace Audex.Application.Services.Scheduler
             _tickerRepo.Update(ticker);
             await _db.CommitAsync();
 
-            var lang = await _localizer.GetUserLanguageAsync();
-
-            var descriptor = _jobRegistry.TryGetDescriptor(taskName, out var jobDescriptor) ? jobDescriptor : null;
-            return MapToDto(ticker, descriptor, null, DateTime.UtcNow, lang);
+            return true;
         }
 
-        public async Task<ScheduledTaskDto> ToggleTaskStatusAsync(string taskName, bool isEnabled)
+        public async Task<bool> ToggleTaskStatusAsync(string taskName, bool isEnabled)
         {
             if (string.IsNullOrWhiteSpace(taskName))
             {
-                return null;
+                return false;
             }
 
             var ticker = await _tickerRepo.FindAsync(t => t.Function == taskName, disableTracking: false);
 
             if (ticker == null)
             {
-                return null;
+                return false;
             }
 
             ticker.IsEnabled = isEnabled;
@@ -232,10 +229,7 @@ namespace Audex.Application.Services.Scheduler
             _tickerRepo.Update(ticker);
             await _db.CommitAsync();
 
-            var lang = await _localizer.GetUserLanguageAsync();
-
-            var descriptor = _jobRegistry.TryGetDescriptor(taskName, out var jobDescriptor) ? jobDescriptor : null;
-            return MapToDto(ticker, descriptor, null, DateTime.UtcNow, lang);
+            return true;
         }
 
         public async Task<bool> DeleteTaskAsync(string taskName)
@@ -301,7 +295,7 @@ namespace Audex.Application.Services.Scheduler
                 CronExpression = clientCronExpression,
                 IsEnabled = ticker.IsEnabled,
                 Category = category,
-                LastExecutionUtc = latestOccurrence?.ExecutedAt,
+                LastExecutionUtc = latestOccurrence?.ExecutedAt ?? (latestOccurrence != null ? latestOccurrence.ExecutionTime : null),
                 LastExecutionStatus = lastStatus,
                 LastExecutionDurationMs = latestOccurrence?.ElapsedTime,
                 NextExecutionUtc = ticker.IsEnabled ? CronExpressionHelper.GetNextExecutionUtc(ticker.Expression, currentUtcTime) : null
@@ -311,6 +305,7 @@ namespace Audex.Application.Services.Scheduler
         private static IQueryable<ScheduledCronTicker> GetFullHierarchyColumns(IQueryable<ScheduledCronTicker> query)
         {
             return query.Include(ticker => ticker.Occurrences
+                .Where(occurrence => occurrence.Status != TickerStatus.Idle && occurrence.Status != TickerStatus.Queued)
                 .OrderByDescending(occurrence => occurrence.ExecutedAt ?? occurrence.ExecutionTime)
                 .Take(1));
         }
