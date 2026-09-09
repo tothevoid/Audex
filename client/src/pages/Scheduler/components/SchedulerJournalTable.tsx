@@ -128,15 +128,17 @@ export const SchedulerJournalTable: React.FC<SchedulerJournalTableProps> = ({
                         </Table.Header>
                         <Table.Body backgroundColor="background_primary">
                             {records.map((record) => {
-                                const hasAttachments = record.attachments && record.attachments.length > 0;
-                                const isExpanded = !!expandedMap[record.id];
+                                const hasAttachments = Boolean(record.attachments && record.attachments.length > 0);
+                                const hasLog = Boolean(record.errorMessage || record.logMessage);
+                                const isExpandable = hasLog || hasAttachments;
+                                const isExpanded = isExpandable && !!expandedMap[record.id];
 
                                 return (
                                     <React.Fragment key={record.id}>
                                         <Table.Row
-                                            onClick={() => toggleExpand(record.id)}
-                                            cursor="pointer"
-                                            _hover={{ backgroundColor: 'background_secondary' }}
+                                            onClick={() => isExpandable && toggleExpand(record.id)}
+                                            cursor={isExpandable ? 'pointer' : 'default'}
+                                            _hover={isExpandable ? { backgroundColor: 'background_secondary' } : undefined}
                                             backgroundColor={isExpanded ? 'background_secondary' : 'inherit'}
                                             transition="background-color 0.15s ease"
                                         >
@@ -174,9 +176,11 @@ export const SchedulerJournalTable: React.FC<SchedulerJournalTableProps> = ({
                                                             {record.attachments.length}
                                                         </Badge>
                                                     )}
-                                                    <Icon color="text_secondary" fontSize="18px">
-                                                        {isExpanded ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
-                                                    </Icon>
+                                                    {isExpandable && (
+                                                        <Icon color="text_secondary" fontSize="18px">
+                                                            {isExpanded ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
+                                                        </Icon>
+                                                    )}
                                                 </HStack>
                                             </Table.Cell>
                                         </Table.Row>
@@ -184,53 +188,51 @@ export const SchedulerJournalTable: React.FC<SchedulerJournalTableProps> = ({
                                         {isExpanded && (
                                             <Table.Row backgroundColor="background_secondary">
                                                 <Table.Cell colSpan={colSpan} p={4}>
-                                                    <SimpleGrid columns={{ base: 1, md: hasAttachments ? 2 : 1 }} gap={4}>
+                                                    <SimpleGrid columns={{ base: 1, md: hasLog && hasAttachments ? 2 : 1 }} gap={4}>
                                                         {/* Блок лога / результата */}
-                                                        <Box
-                                                            p={3.5}
-                                                            borderRadius="md"
-                                                            backgroundColor="background_primary"
-                                                            borderWidth="1px"
-                                                            borderColor="border_primary"
-                                                        >
-                                                            <Flex justify="space-between" align="center" mb={2}>
-                                                                <HStack gap={1.5} color="text_primary">
-                                                                    <Icon color={record.errorMessage ? 'red.400' : 'blue.400'}>
-                                                                        {record.errorMessage ? <MdErrorOutline /> : <MdInfoOutline />}
-                                                                    </Icon>
-                                                                    <Text fontSize="xs" fontWeight="semibold">
-                                                                        {t('scheduler_journal_log')}
-                                                                    </Text>
-                                                                </HStack>
-                                                                {(record.errorMessage || record.logMessage) && (
+                                                        {hasLog && (
+                                                            <Box
+                                                                p={3.5}
+                                                                borderRadius="md"
+                                                                backgroundColor="background_primary"
+                                                                borderWidth="1px"
+                                                                borderColor="border_primary"
+                                                            >
+                                                                <Flex justify="space-between" align="center" mb={2}>
+                                                                    <HStack gap={1.5} color="text_primary">
+                                                                        <Icon color={record.errorMessage ? 'red.400' : 'blue.400'}>
+                                                                            {record.errorMessage ? <MdErrorOutline /> : <MdInfoOutline />}
+                                                                        </Icon>
+                                                                        <Text fontSize="xs" fontWeight="semibold">
+                                                                            {t('scheduler_journal_log')}
+                                                                        </Text>
+                                                                    </HStack>
                                                                     <CopyButton
                                                                         text={record.errorMessage || record.logMessage || ''}
                                                                         size="2xs"
                                                                         color={record.errorMessage ? 'red.200' : 'text_secondary'}
                                                                     />
-                                                                )}
-                                                            </Flex>
+                                                                </Flex>
 
-                                                            {record.errorMessage ? (
-                                                                <Box
-                                                                    p={2.5}
-                                                                    borderRadius="md"
-                                                                    backgroundColor="red.950"
-                                                                    borderColor="red.800"
-                                                                    borderWidth="1px"
-                                                                >
-                                                                    <Text fontSize="xs" color="red.200" fontFamily="mono">
-                                                                        {record.errorMessage}
+                                                                {record.errorMessage ? (
+                                                                    <Box
+                                                                        p={2.5}
+                                                                        borderRadius="md"
+                                                                        backgroundColor="red.950"
+                                                                        borderColor="red.800"
+                                                                        borderWidth="1px"
+                                                                    >
+                                                                        <Text fontSize="xs" color="red.200" fontFamily="mono">
+                                                                            {record.errorMessage}
+                                                                        </Text>
+                                                                    </Box>
+                                                                ) : (
+                                                                    <Text fontSize="xs" color="text_secondary">
+                                                                        {record.logMessage}
                                                                     </Text>
-                                                                </Box>
-                                                            ) : record.logMessage ? (
-                                                                <Text fontSize="xs" color="text_secondary">
-                                                                    {record.logMessage}
-                                                                </Text>
-                                                            ) : (
-                                                                <Text fontSize="xs" color="text_secondary">—</Text>
-                                                            )}
-                                                        </Box>
+                                                                )}
+                                                            </Box>
+                                                        )}
 
                                                         {/* Блок прикрепленных файлов */}
                                                         {hasAttachments && (
