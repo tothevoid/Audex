@@ -8,6 +8,7 @@ import { getIconUrl } from '../../../../api/securities/securityApi';
 import { BrokerAccountSecurityEntity } from '../../../../models/brokers/BrokerAccountSecurityEntity';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import StoredIcon from '../../../../shared/components/StoredIcon';
+import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
 
 type Props = {
     brokerAccountSecurity: BrokerAccountSecurityEntity;
@@ -39,14 +40,7 @@ export const BrokerAccountSecurity = ({ brokerAccountSecurity }: Props) => {
     const iconUrl = security.iconKey ? getIconUrl(security.iconKey) : undefined;
 
     return (
-        <Card.Root
-            backgroundColor="background_primary"
-            borderColor="border_primary"
-            overflow="hidden"
-            position="relative"
-            transition="transform 0.2s, box-shadow 0.2s"
-            _hover={{ transform: "translateY(-2px)", boxShadow: "lg" }}
-        >
+        <EntityCard>
             <Box h="3px" bg={pnlColor} w="full" />
 
             <Card.Body color="text_primary" p={4.5}>
@@ -164,7 +158,7 @@ export const BrokerAccountSecurity = ({ brokerAccountSecurity }: Props) => {
                     )}
                 </Stack>
             </Card.Body>
-        </Card.Root>
+        </EntityCard>
     );
 };
 

@@ -8,6 +8,7 @@ import { BrokerAccountPortfolioEntity } from '../../../../models/brokers/BrokerA
 import { BsBank } from 'react-icons/bs';
 import StoredIcon from '../../../../shared/components/StoredIcon';
 import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
 
 interface Props {
 	brokerAccount: BrokerAccountEntity
@@ -41,8 +42,8 @@ const BrokerAccount = (props: Props) => {
 	const bankIconUrl = bank?.iconKey ? getBankIconUrl(bank.iconKey) : undefined;
 
 	return <Fragment>
-		<Card.Root backgroundColor="background_primary" borderColor="border_primary" >
-			<Card.Body color="text_primary" boxShadow={"sm"} _hover={{ boxShadow: "md" }} >
+		<EntityCard>
+			<Card.Body color="text_primary" p={4}>
 				<Flex justifyContent="space-between" alignItems="center">
 					<Stack>
 						<Flex gapX={2} alignItems={"center"}>
@@ -67,7 +68,7 @@ const BrokerAccount = (props: Props) => {
 					/>
 				</Flex>
 			</Card.Body>
-		</Card.Root>
+		</EntityCard>
 	</Fragment>
 };
 

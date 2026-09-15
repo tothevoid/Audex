@@ -6,6 +6,7 @@ import { FaBitcoin } from "react-icons/fa";
 import { getIconUrl } from '../../../../api/crypto/cryptocurrencyApi';
 import StoredIcon from '../../../../shared/components/StoredIcon';
 import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
 
 interface Props {
     cryptocurrency: CryptocurrencyEntity,
@@ -19,8 +20,8 @@ const Cryptocurrency = (props: Props) => {
     const iconUrl = iconKey ? getIconUrl(iconKey) : undefined;
 
     return <Fragment>
-        <Card.Root backgroundColor="background_primary" borderColor="border_primary" >
-            <Card.Body color="text_primary" boxShadow={"sm"} _hover={{ boxShadow: "md" }} >
+        <EntityCard>
+            <Card.Body color="text_primary" p={4}>
                 <Flex justifyContent="space-between" alignItems="center">
                     <Stack>
                         <Stack justifyContent={"start"} direction="row" alignItems="center">
@@ -41,7 +42,7 @@ const Cryptocurrency = (props: Props) => {
                     />
                 </Flex>
             </Card.Body>
-        </Card.Root>
+        </EntityCard>
     </Fragment>
 };
 

@@ -6,6 +6,7 @@ import { DebtEntity } from '../../../../models/debts/DebtEntity';
 import { formatDate } from '../../../../shared/utilities/formatters/dateFormatter';
 import DebtTagBadge from '../DebtTagBadge/DebtTagBadge';
 import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
 
 type Props = {
 	debt: DebtEntity,
@@ -21,14 +22,12 @@ const Debt = (props: Props) => {
 	const { i18n } = useTranslation();
 
 	return (
-		<Card.Root
-			backgroundColor="background_primary"
-			borderColor={props.isSelected ? "action_primary" : "border_primary"}
-			borderWidth={props.isSelected ? "2px" : "1px"}
+		<EntityCard
+			isSelected={props.isSelected}
 			cursor={props.onSelect ? "pointer" : "default"}
 			onClick={() => props.onSelect && props.onSelect(props.debt)}
 		>
-			<Card.Body color="text_primary" boxShadow={"sm"} _hover={{ boxShadow: "md" }}>
+			<Card.Body color="text_primary" p={4}>
 				<Flex justifyContent="space-between" alignItems="flex-start">
 					<Stack gap={1}>
 						<Text fontWeight={600} fontSize="lg">{name}</Text>
@@ -66,7 +65,7 @@ const Debt = (props: Props) => {
 					))}
 				</Flex>
 			</Card.Body>
-		</Card.Root>
+		</EntityCard>
 	);
 };
 

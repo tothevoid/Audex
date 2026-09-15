@@ -7,6 +7,7 @@ import { ACCOUNT_TYPE } from '../../../../shared/constants/accountType';
 import { BsCurrencyExchange, BsBank } from "react-icons/bs";
 import StoredIcon from '../../../../shared/components/StoredIcon';
 import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
 
 interface Props {
     account: AccountEntity,
@@ -50,8 +51,8 @@ const Account = (props: Props) => {
     };
 
     return <Fragment>
-        <Card.Root backgroundColor="background_primary" borderColor="border_primary" >
-            <Card.Body color="text_primary" boxShadow={"sm"} _hover={{ boxShadow: "md" }} >
+        <EntityCard>
+            <Card.Body color="text_primary" p={4}>
                 <Flex justifyContent="space-between" alignItems="center">
                     <Stack>
                         <Flex gapX={2} alignItems={"center"}>
@@ -68,7 +69,7 @@ const Account = (props: Props) => {
                     />
                 </Flex>
             </Card.Body>
-        </Card.Root>
+        </EntityCard>
     </Fragment>
 };
 

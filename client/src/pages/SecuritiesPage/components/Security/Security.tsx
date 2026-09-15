@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
+import { Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
 import { HiOutlineBuildingOffice2 } from 'react-icons/hi2';
 import { getIconUrl } from '../../../../api/securities/securityApi';
 import { SecurityEntity } from '../../../../models/securities/SecurityEntity';
@@ -7,6 +7,7 @@ import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/forma
 import StoredIcon from '../../../../shared/components/StoredIcon';
 import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
 import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
 
 type Props = {
     security: SecurityEntity;
@@ -21,20 +22,7 @@ const Security: React.FC<Props> = ({ security, onEditClicked, onDeleteClicked })
     const iconUrl = iconKey ? getIconUrl(iconKey) : undefined;
 
     return (
-        <Card.Root
-            backgroundColor="background_primary"
-            borderColor="border_primary"
-            borderWidth="1px"
-            borderRadius="xl"
-            overflow="hidden"
-            position="relative"
-            h="full"
-            display="flex"
-            flexDirection="column"
-            justifyContent="space-between"
-            transition="all 0.2s ease-in-out"
-            _hover={{ transform: "translateY(-2px)", boxShadow: "lg", borderColor: "rgba(255, 255, 255, 0.18)" }}
-        >
+        <EntityCard h="full" display="flex" flexDirection="column" justifyContent="space-between">
             <Card.Body p={4} color="text_primary" flex="1" display="flex" flexDirection="column" justifyContent="space-between">
                 <Stack gap={3}>
                     <Flex justify="space-between" align="center" gap={2}>
@@ -81,13 +69,13 @@ const Security: React.FC<Props> = ({ security, onEditClicked, onDeleteClicked })
                         <AccentBadge variant="success">
                             {type.name}
                         </AccentBadge>
-                    ) : <Box />}
+                    ) : <span />}
                     <Text fontSize="xl" fontWeight="900" letterSpacing="tight" color="text_primary">
                         {formatMoneyByCurrencyCulture(actualPrice, currency?.name)}
                     </Text>
                 </Flex>
             </Card.Body>
-        </Card.Root>
+        </EntityCard>
     );
 };
 

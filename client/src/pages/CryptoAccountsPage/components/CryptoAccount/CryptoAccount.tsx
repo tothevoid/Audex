@@ -9,6 +9,7 @@ import { getCryptoProviderIconUrl } from '../../../../api/crypto/cryptoProviderA
 import StoredIcon from '../../../../shared/components/StoredIcon/StoredIcon';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
 
 interface Props {
     cryptoAccount: CryptoAccountEntity;
@@ -34,14 +35,7 @@ const CryptoAccount = (props: Props) => {
 
     return (
         <Fragment>
-            <Card.Root
-                backgroundColor="background_primary"
-                borderColor="border_primary"
-                borderRadius="xl"
-                boxShadow="sm"
-                _hover={{ boxShadow: "md" }}
-                transition="all 0.2s ease"
-            >
+            <EntityCard>
                 <Card.Body padding={4} color="text_primary">
                     {/* Top row: Account title, provider icon, action buttons */}
                     <Flex justifyContent="space-between" alignItems="flex-start" gap={2} mb={3}>
@@ -87,17 +81,17 @@ const CryptoAccount = (props: Props) => {
                         >
                             <BsWallet2 size={18} />
                         </Flex>
-                        <Stack gap={0}>
-                            <Text fontSize="xs" color="text_secondary" fontWeight={500}>
-                                {t("crypto_account_card_balance")}
+                        <Stack gap={0} flex={1}>
+                            <Text fontSize="xs" color="text_secondary">
+                                {t("crypto_account_card_total_balance")}
                             </Text>
-                            <Text fontSize="xl" fontWeight={800} color="text_primary">
+                            <Text fontSize="lg" fontWeight={700} color="text_primary">
                                 {formatMoneyByCurrencyCulture(totalAmount, "USD")}
                             </Text>
                         </Stack>
                     </Flex>
                 </Card.Body>
-            </Card.Root>
+            </EntityCard>
         </Fragment>
     );
 };
