@@ -12,81 +12,91 @@ import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
 import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
 
 const SecuritiesList: React.FC = () => {
-	const { t } = useTranslation()
+    const { t } = useTranslation();
 
-	const { 
-		activeEntity,
-		modalRef,
-		confirmModalRef,
-		onAddClicked,
-		onEditClicked,
-		onDeleteClicked,
-		mode,
-		onActionEnded
-	} = useEntityModal<SecurityEntity>();
+    const {
+        activeEntity,
+        modalRef,
+        confirmModalRef,
+        onAddClicked,
+        onEditClicked,
+        onDeleteClicked,
+        mode,
+        onActionEnded
+    } = useEntityModal<SecurityEntity>();
 
-	const {
-		securities,
-		createSecurityEntity,
-		updateSecurityEntity,
-		deleteSecurityEntity	
-	} = useSecurities();
-	
-	
-	const getHeader = () => {
-		const addButton = <AddButton 
-			buttonTitle={t("security_page_summary_add")} 
-			onClick={onAddClicked}/>
+    const {
+        securities,
+        createSecurityEntity,
+        updateSecurityEntity,
+        deleteSecurityEntity
+    } = useSecurities();
 
-		if (!securities.length) {
-			return <Placeholder text={t("security_page_summary_no_securities")}>
-				{addButton}
-			</Placeholder>
-		}
+    const getHeader = () => {
+        const addButton = (
+            <AddButton
+                buttonTitle={t("security_page_summary_add")}
+                onClick={onAddClicked}
+            />
+        );
 
-		return <Flex justifyContent="space-between" alignItems="center" pb={5}>
-			{addButton}
-		</Flex>
-	}
+        if (!securities.length) {
+            return (
+                <Placeholder text={t("security_page_summary_no_securities")}>
+                    {addButton}
+                </Placeholder>
+            );
+        }
 
-	const onSecuritySaved = async (security: SecurityEntity, file: File | null) => {
-		if (mode === ActiveEntityMode.Add) {
+        return (
+            <Flex justifyContent="space-between" alignItems="center" pb={3}>
+                {addButton}
+            </Flex>
+        );
+    };
+
+    const onSecuritySaved = async (security: SecurityEntity, file: File | null) => {
+        if (mode === ActiveEntityMode.Add) {
             await createSecurityEntity(security, file);
         } else {
             await updateSecurityEntity(security, file);
         }
 
-		onActionEnded();
-	}
+        onActionEnded();
+    };
 
-	const onDeleteConfirmed = async () => {
-		if (!activeEntity) {
-            throw new Error("Deleted entity is not set")
+    const onDeleteConfirmed = async () => {
+        if (!activeEntity) {
+            throw new Error("Deleted entity is not set");
         }
 
         await deleteSecurityEntity(activeEntity);
-		onActionEnded();
-    }
+        onActionEnded();
+    };
 
-	return (
-		<Fragment>
-			{getHeader()}
-			<SimpleGrid pt={5} pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(300px, 3fr))'>
-				{
-					securities.map((security: SecurityEntity) => 
-						<Security key={security.id} security={security} 
-							onEditClicked={onEditClicked} 
-							onDeleteClicked={onDeleteClicked}/>)
-				}
-			</SimpleGrid>
-			<ConfirmModal onConfirmed={onDeleteConfirmed}
-				title={t("security_delete_title")}
-				message={t("modals_delete_message")}
-				confirmActionName={t("modals_delete_button")}
-				ref={confirmModalRef}/>
-			<SecurityModal security={activeEntity} modalRef={modalRef} onSaved={onSecuritySaved}/>
-		</Fragment>
-	);
-}
+    return (
+        <Fragment>
+            {getHeader()}
+            <SimpleGrid pt={2} pb={5} gap={4} templateColumns="repeat(auto-fill, minmax(320px, 1fr))">
+                {securities.map((security: SecurityEntity) => (
+                    <Security
+                        key={security.id}
+                        security={security}
+                        onEditClicked={onEditClicked}
+                        onDeleteClicked={onDeleteClicked}
+                    />
+                ))}
+            </SimpleGrid>
+            <ConfirmModal
+                onConfirmed={onDeleteConfirmed}
+                title={t("security_delete_title")}
+                message={t("modals_delete_message")}
+                confirmActionName={t("modals_delete_button")}
+                ref={confirmModalRef}
+            />
+            <SecurityModal security={activeEntity} modalRef={modalRef} onSaved={onSecuritySaved} />
+        </Fragment>
+    );
+};
 
 export default SecuritiesList;

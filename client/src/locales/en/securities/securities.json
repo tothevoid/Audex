@@ -56,5 +56,14 @@
     "security_history_period_min": "Min",
     "security_history_period_max": "Max",
     "security_history_period_avg": "Avg",
-    "security_history_no_data": "No quotation history data available"
+    "security_history_no_data": "No quotation history data available",
+
+    "security_type_precious_metal": "Precious Metal",
+    "security_type_investment_fund_unit": "Fund Unit",
+    "security_type_stock": "Stock",
+    "security_type_bond": "Bond",
+    "security_type_currency": "Currency",
+    "security_type_etf": "ETF",
+    "security_type_crypto": "Crypto"
 }
+

@@ -1,4 +1,4 @@
-import { Card, Flex, Link, Stack, Text, Badge, Box, Button } from '@chakra-ui/react';
+import { Card, Flex, Link, Stack, Text, Box, Button } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineBuildingOffice2 } from 'react-icons/hi2';
@@ -8,6 +8,7 @@ import { getIconUrl } from '../../../../api/securities/securityApi';
 import { BrokerAccountSecurityEntity } from '../../../../models/brokers/BrokerAccountSecurityEntity';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import StoredIcon from '../../../../shared/components/StoredIcon';
+import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
 
 type Props = {
     brokerAccountSecurity: BrokerAccountSecurityEntity;
@@ -51,27 +52,27 @@ export const BrokerAccountSecurity = ({ brokerAccountSecurity }: Props) => {
 
             <Card.Body color="text_primary" p={4.5}>
                 <Stack spaceY={3.5}>
-                    <Flex justify="space-between" align="center">
-                        <Flex align="center" gap={3}>
+                    <Flex justify="space-between" align="flex-start">
+                        <Flex align="flex-start" gap={3} flex="1" minW={0}>
                             <StoredIcon
                                 src={iconUrl}
                                 fallbackIcon={<HiOutlineBuildingOffice2 size={22} color="#aaa" />}
                                 size="lg"
                             />
-                            <Stack spaceY={0}>
-                                <Flex align="center" gap={1.5}>
-                                    <Link color="text_primary" href={securityLink} fontSize="lg" fontWeight="900">
-                                        {security?.name}
-                                    </Link>
-                                </Flex>
-                                <Flex gap={1.5} align="center">
-                                    <Badge size="xs" variant="solid" colorPalette="purple">
+                            <Stack gap={0.5} minW={0} flex="1">
+                                <Flex align="center" gap={2} flexWrap="wrap">
+                                    <Link color="text_primary" href={securityLink} fontSize="lg" fontWeight="900" letterSpacing="tight" truncate title={security?.ticker}>
                                         {security?.ticker}
-                                    </Badge>
-                                    <Text fontSize="2xs" color="gray.400">
-                                        {security?.currency?.name}
-                                    </Text>
+                                    </Link>
+                                    {security?.type?.name && (
+                                        <AccentBadge variant="success" size="xs" px={2} py={0.5}>
+                                            {security.type.name}
+                                        </AccentBadge>
+                                    )}
                                 </Flex>
+                                <Text fontSize="xs" color="gray.400" fontWeight="500" truncate title={security?.name}>
+                                    {security?.name}
+                                </Text>
                             </Stack>
                         </Flex>
 

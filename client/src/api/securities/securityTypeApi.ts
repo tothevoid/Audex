@@ -1,10 +1,12 @@
- import { SecurityTypeEntity } from '../../models/securities/SecurityTypeEntity';
+import { SecurityTypeEntity } from '../../models/securities/SecurityTypeEntity';
 import { createEntity, deleteEntity, getAllEntities, updateEntity } from '../basicApi';
+import { prepareSecurityType } from './securityTypeApiMapping';
 
 const basicUrl = `SecurityType`;
 
 export const getSecurityTypes = async (): Promise<SecurityTypeEntity[]> => {
-   return await getAllEntities<SecurityTypeEntity>(basicUrl);
+   const types = await getAllEntities<SecurityTypeEntity>(basicUrl);
+   return types.map(prepareSecurityType);
 };
 
 export const createSecurityType = async (addedSecurityType: SecurityTypeEntity): Promise<SecurityTypeEntity | void> => {
