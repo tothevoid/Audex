@@ -23,6 +23,7 @@ export const ActionsModalRestoreCard: React.FC = () => {
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isEncrypted, setIsEncrypted] = useState(false);
+    const [isValidFile, setIsValidFile] = useState(false);
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isValidating, setIsValidating] = useState(false);
@@ -35,32 +36,40 @@ export const ActionsModalRestoreCard: React.FC = () => {
         setSelectedFile(file);
         setStatusMessage(null);
         setIsEncrypted(false);
+        setIsValidFile(false);
 
         // Pre-validate with backend (backend inspects binary structure & encryption format)
         setIsValidating(true);
         try {
             const validation = await validateDatabaseBackup(file);
             setIsEncrypted(validation.isEncrypted);
+            setIsValidFile(validation.isValid);
+
             if (!validation.isValid && validation.errorMessage) {
                 setStatusMessage({
                     type: 'error',
                     text: validation.errorMessage
                 });
             }
-        } catch {
-            // fallback handled by validateDatabaseBackup
+        } catch (err: unknown) {
+            setIsValidFile(false);
+            const error = err as { message?: string };
+            setStatusMessage({
+                type: 'error',
+                text: error?.message ?? 'Validation failed'
+            });
         } finally {
             setIsValidating(false);
         }
     };
 
     const handleRestoreClick = () => {
-        if (!selectedFile) return;
+        if (!selectedFile || !isValidFile) return;
         confirmModalRef.current?.openModal();
     };
 
     const handleConfirmedRestore = async () => {
-        if (!selectedFile) return;
+        if (!selectedFile || !isValidFile) return;
 
         setIsLoading(true);
         setStatusMessage(null);
@@ -73,6 +82,7 @@ export const ActionsModalRestoreCard: React.FC = () => {
                 });
                 setSelectedFile(null);
                 setPassword('');
+                setIsValidFile(false);
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
                 }
@@ -139,7 +149,7 @@ export const ActionsModalRestoreCard: React.FC = () => {
                                 variant="subtle"
                                 size="sm"
                                 onClick={handleRestoreClick}
-                                disabled={!selectedFile || isLoading || isValidating}
+                                disabled={!selectedFile || !isValidFile || isLoading || isValidating || (isEncrypted && !password.trim())}
                                 minW="140px"
                             >
                                 {isLoading ? (

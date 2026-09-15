@@ -59,6 +59,7 @@ namespace InfrastructureManager.Application.Services
                         .WithBucket(bucket.Name)
                         .WithRecursive(true);
 
+                    var bucketObjectsCount = 0;
                     await foreach (var item in _minio.ListObjectsEnumAsync(listArgs, cancellationToken))
                     {
                         if (item.IsDir)
@@ -79,8 +80,11 @@ namespace InfrastructureManager.Application.Services
                             await _minio.GetObjectAsync(getArgs, cancellationToken);
                         }
 
+                        bucketObjectsCount++;
                         totalCount++;
                     }
+
+                    _logger.LogInformation("Finished S3 bucket '{BucketName}': exported {Count} objects.", bucket.Name, bucketObjectsCount);
                 }
             }
             catch (Exception ex)

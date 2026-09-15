@@ -32,24 +32,23 @@ namespace Audex.Application.Services.DatabaseBackup
 
         public async Task<GeneratedBackupDto> CreateBackupAsync(string? password = null)
         {
-            var rawDumpBytes = await _databaseBackupProvider.ExportDatabaseDumpAsync();
-            var compressedBytes = CompressGzip(rawDumpBytes);
+            var rawZipBytes = await _databaseBackupProvider.ExportDatabaseDumpAsync();
             var isEncrypted = !string.IsNullOrEmpty(password);
 
             var data = isEncrypted
-                ? await _backupEncryptionService.EncryptAsync(compressedBytes, password!)
-                : compressedBytes;
+                ? await _backupEncryptionService.EncryptAsync(rawZipBytes, password!)
+                : rawZipBytes;
 
             var timestamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
             var fileName = isEncrypted
                 ? $"audex_backup_{timestamp}.audexbackup"
-                : $"audex_backup_{timestamp}.sql.gz";
+                : $"audex_backup_{timestamp}.zip";
 
             return new GeneratedBackupDto
             {
                 Data = data,
                 FileName = fileName,
-                ContentType = isEncrypted ? "application/octet-stream" : "application/gzip",
+                ContentType = isEncrypted ? "application/octet-stream" : "application/zip",
                 IsEncrypted = isEncrypted
             };
         }
@@ -121,7 +120,7 @@ namespace Audex.Application.Services.DatabaseBackup
             }
 
             var isEncrypted = _backupEncryptionService.IsEncryptedBackup(backupData);
-            byte[] rawCompressed;
+            byte[] rawZipBytes;
 
             try
             {
@@ -136,11 +135,11 @@ namespace Audex.Application.Services.DatabaseBackup
                         };
                     }
 
-                    rawCompressed = await _backupEncryptionService.DecryptAsync(backupData, password);
+                    rawZipBytes = await _backupEncryptionService.DecryptAsync(backupData, password);
                 }
                 else
                 {
-                    rawCompressed = backupData;
+                    rawZipBytes = backupData;
                 }
             }
             catch (Exception ex)
@@ -153,32 +152,17 @@ namespace Audex.Application.Services.DatabaseBackup
                 };
             }
 
-            byte[] rawDumpBytes;
-            try
-            {
-                rawDumpBytes = DecompressGzip(rawCompressed);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Failed to decompress backup data during restore.");
-                return new RestoreBackupResultDto
-                {
-                    Success = false,
-                    Message = $"Decompression failed: {ex.Message}"
-                };
-            }
-
             // Acquire exclusive maintenance lock through state service
             using (await _databaseStateService.BeginRestoreScopeAsync())
             {
                 try
                 {
-                    await _databaseBackupProvider.ImportDatabaseDumpAsync(rawDumpBytes);
+                    await _databaseBackupProvider.ImportDatabaseDumpAsync(rawZipBytes);
 
                     return new RestoreBackupResultDto
                     {
                         Success = true,
-                        Message = "Database restored successfully from full PostgreSQL dump."
+                        Message = "Database and infrastructure restored successfully."
                     };
                 }
                 catch (Exception ex)
@@ -192,25 +176,6 @@ namespace Audex.Application.Services.DatabaseBackup
                     };
                 }
             }
-        }
-
-        private static byte[] CompressGzip(byte[] data)
-        {
-            using var output = new MemoryStream();
-            using (var gzip = new GZipStream(output, CompressionLevel.Optimal, leaveOpen: true))
-            {
-                gzip.Write(data, 0, data.Length);
-            }
-            return output.ToArray();
-        }
-
-        private static byte[] DecompressGzip(byte[] data)
-        {
-            using var input = new MemoryStream(data);
-            using var gzip = new GZipStream(input, CompressionMode.Decompress);
-            using var output = new MemoryStream();
-            gzip.CopyTo(output);
-            return output.ToArray();
         }
     }
 }
