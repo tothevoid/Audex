@@ -66,7 +66,7 @@ Deploy the full Audex stack on your server in minutes:
 
 2. **Launch All Services**:
    ```bash
-   docker compose -p audex up --build -d
+   docker compose up --build -d
    ```
 
 3. **Apply Database Migrations (Optional)**:
@@ -88,9 +88,9 @@ Run the full local development environment with hot reloading:
 
 ### Local Setup Steps
 
-1. **Start Infrastructure Services (Database & Storage)**:
+1. **Start Infrastructure Services (Database, Object Storage & Infra Manager)**:
    ```bash
-   docker compose -p audex_dev --env-file .env.dev up -d database files-database infrastructure_manager
+   docker compose -f docker-compose.yml -f docker-compose.dev.yml --env-file .env.dev up -d
    ```
 
 2. **Run Backend API**:

@@ -66,6 +66,7 @@ services:
       - server-network
       - postgres-network
   server:
+    profiles: ["app"]
     build: ./server
     container_name: ${PROJECT_NAME}_server
     restart: always
@@ -101,6 +102,7 @@ services:
       - server-network
       - postgres-network
   client:
+    profiles: ["app"]
     container_name: ${PROJECT_NAME}_client
     restart: always
     depends_on:

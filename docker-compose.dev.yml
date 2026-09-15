@@ -1,0 +1,4 @@
+services:
+  infrastructure_manager:
+    ports:
+      - ${INFRA_MANAGER_PORT:-5050}:${INFRA_MANAGER_PORT:-5050}

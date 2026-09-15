@@ -1,7 +1,7 @@
 import HeaderItem from '../HeaderItem/HeaderItem';
-import { Box, Button, Flex, Icon, Image, Link } from '@chakra-ui/react';
+import { Badge, Box, Button, Flex, Icon, Image, Link } from '@chakra-ui/react';
 import { AiFillTool } from 'react-icons/ai';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import UserProfileSettingsModal from '../../UserProfileSettingsModal/UserProfileSettingsModal';
 import ChangePasswordModal from '../../ChangePasswordModal/ChangePasswordModal';
@@ -19,6 +19,12 @@ const Header = () => {
     const changePasswordModalRef = useRef<BaseModalRef>(null);
     const tokensModalRef = useRef<BaseModalRef>(null);
     const actionsModalRef = useRef<BaseModalRef>(null);
+
+    useEffect(() => {
+        if (import.meta.env.DEV && !document.title.startsWith('[DEV]')) {
+            document.title = `[DEV] ${document.title}`;
+        }
+    }, []);
 
     const onOpenSettingsClick = () => {
         userProfileSettingsRef.current?.openModal();
@@ -52,11 +58,36 @@ const Header = () => {
 
     return <nav>
         <Box w="100%">
-            <Flex minH={50} alignItems="center" padding={1} direction={'row'} backgroundColor="header_bg" color="text_primary">
+            <Flex
+                minH={50}
+                alignItems="center"
+                padding={1}
+                direction={'row'}
+                backgroundColor="header_bg"
+                color="text_primary"
+                borderTop={import.meta.env.DEV ? "3px solid #f59e0b" : undefined}
+            >
                 <Flex flex={{ base: 1 }} justify="center" align={"center"}>
-                    <Link href='/'>
-                        <Image marginInline={"10px"} width="30px" src={appIcon}></Image>
-                    </Link>
+                    <Flex align="center" mr={2}>
+                        <Link href='/'>
+                            <Image marginInline={"10px"} width="30px" src={appIcon}></Image>
+                        </Link>
+                        {import.meta.env.DEV && (
+                            <Badge
+                                colorPalette="amber"
+                                variant="solid"
+                                fontSize="0.65rem"
+                                fontWeight="bold"
+                                px={2}
+                                py={0.5}
+                                borderRadius="md"
+                                letterSpacing="0.05em"
+                                boxShadow="0 0 8px rgba(245, 158, 11, 0.4)"
+                            >
+                                DEV
+                            </Badge>
+                        )}
+                    </Flex>
                     <Flex flex="1">
                         {
                             tabs.map(tab =>
