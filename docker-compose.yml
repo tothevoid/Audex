@@ -18,9 +18,9 @@ services:
       - ${POSTGRES_PORT}:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
-  files_database:
+  files-database:
     image: minio/minio
-    container_name: ${PROJECT_NAME}_files_database
+    container_name: ${PROJECT_NAME}_files-database
     restart: always
     ports:
       - ${MINIO_API_PORT}:9000
@@ -46,6 +46,11 @@ services:
       - ASPNETCORE_HTTP_PORTS=${INFRA_MANAGER_PORT:-5050}
       - INFRA_MANAGER_AUTH_KEY=${INFRA_MANAGER_AUTH_KEY:-dev-infra-secret-key-321}
       - DB__ConnectionString=Host=database;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+      - FileStorage__Endpoint=files-database
+      - FileStorage__Port=9000
+      - FileStorage__User=${MINIO_ROOT_USER}
+      - FileStorage__Password=${MINIO_ROOT_PASSWORD}
+      - FileStorage__UseSsl=false
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:${INFRA_MANAGER_PORT:-5050}/health || exit 1"]
       interval: 5s
@@ -54,6 +59,8 @@ services:
       start_period: 3s
     depends_on:
       database:
+        condition: service_healthy
+      files-database:
         condition: service_healthy
     networks:
       - server-network
@@ -86,7 +93,7 @@ services:
     depends_on:
       database:
         condition: service_healthy
-      files_database:
+      files-database:
         condition: service_healthy
       infrastructure_manager:
         condition: service_healthy
