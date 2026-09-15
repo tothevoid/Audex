@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,17 +31,29 @@ namespace Audex.WebApi.Controllers.Auth
 
             var result = await _authService.LoginAsync(loginData.UserName, loginData.Password, ipAddress, userAgent);
 
-            if (result.PasswordChangeRequired)
+            if (!result.IsSuccess || result.Data == null)
             {
-                return Ok(result);
+                return Unauthorized(new ProblemDetails
+                {
+                    Status = StatusCodes.Status401Unauthorized,
+                    Title = "Unauthorized",
+                    Detail = result.ErrorMessage
+                });
             }
 
-            if (!string.IsNullOrEmpty(result.RefreshToken))
+            var responseData = result.Data;
+
+            if (responseData.PasswordChangeRequired)
             {
-                SetRefreshTokenCookie(result.RefreshToken, DateTime.UtcNow.AddDays(30));
+                return Ok(responseData);
             }
 
-            return Ok(result);
+            if (!string.IsNullOrEmpty(responseData.RefreshToken))
+            {
+                SetRefreshTokenCookie(responseData.RefreshToken, DateTime.UtcNow.AddDays(30));
+            }
+
+            return Ok(responseData);
         }
 
         [HttpPost(nameof(RefreshToken))]
@@ -131,12 +143,24 @@ namespace Audex.WebApi.Controllers.Auth
                     ipAddress,
                     userAgent);
 
-                if (!string.IsNullOrEmpty(result.RefreshToken))
+                if (!result.IsSuccess || result.Data == null)
                 {
-                    SetRefreshTokenCookie(result.RefreshToken, DateTime.UtcNow.AddDays(30));
+                    return BadRequest(new ProblemDetails
+                    {
+                        Status = StatusCodes.Status400BadRequest,
+                        Title = "Bad Request",
+                        Detail = result.ErrorMessage ?? "Login failed after password change."
+                    });
                 }
 
-                return Ok(result);
+                var responseData = result.Data;
+
+                if (!string.IsNullOrEmpty(responseData.RefreshToken))
+                {
+                    SetRefreshTokenCookie(responseData.RefreshToken, DateTime.UtcNow.AddDays(30));
+                }
+
+                return Ok(responseData);
             }
 
             return BadRequest("Password change failed.");

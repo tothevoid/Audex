@@ -21,6 +21,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Audex.Application.Constants;
+using Audex.Application.Interfaces.Localization;
 
 namespace Audex.Application.Services.Auth
 {
@@ -33,13 +35,15 @@ namespace Audex.Application.Services.Auth
         private readonly IUserProfileService _userProfileService;
         private readonly ApplicationMapper _mapper;
         private readonly IPasswordHasherService _passwordHasher;
+        private readonly ILocalizationService _localizer;
 
         public AuthService(
             ApplicationMapper mapper,
             IUnitOfWork uow,
             IConfiguration appConfig,
             IUserProfileService userProfileService,
-            IPasswordHasherService passwordHasher)
+            IPasswordHasherService passwordHasher,
+            ILocalizationService localizer)
         {
             _uow = uow;
             _userProfileRepo = uow.CreateRepository<UserProfile>();
@@ -48,15 +52,17 @@ namespace Audex.Application.Services.Auth
             _userProfileService = userProfileService;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
+            _localizer = localizer;
         }
 
-        public async Task<LoginResponseDto> LoginAsync(string userName, string password, string? ipAddress = null, string? userAgent = null)
+        public async Task<LoginResultDto> LoginAsync(string userName, string password, string? ipAddress = null, string? userAgent = null)
         {
             var user = await _userProfileService.GetByAuthAsync(userName, password);
 
             if (user == null)
             {
-                throw new ArgumentException("Invalid username or password.", nameof(userName));
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.InvalidCredentials);
+                return LoginResultDto.Failure(errorMessage);
             }
 
             var isPasswordEmpty = string.IsNullOrEmpty(password) && string.IsNullOrEmpty(user.Password);
@@ -66,13 +72,13 @@ namespace Audex.Application.Services.Auth
             await _refreshTokenRepo.AddAsync(refreshTokenEntity);
             await _uow.CommitAsync();
 
-            return new LoginResponseDto
+            return LoginResultDto.Success(new LoginResponseDto
             {
                 AccessToken = accessToken,
                 RefreshToken = rawRefreshToken,
                 PasswordChangeRequired = isPasswordEmpty,
                 UserProfile = user
-            };
+            });
         }
 
         public async Task<TokenResponseDto> RefreshTokenAsync(string refreshToken, string? ipAddress = null, string? userAgent = null)
@@ -81,13 +87,15 @@ namespace Audex.Application.Services.Auth
 
             if (storedToken == null)
             {
-                throw new SecurityException("Invalid refresh token.");
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.InvalidToken);
+                throw new SecurityException(errorMessage);
             }
 
             if (storedToken.IsRevoked)
             {
                 await RevokeAllUserTokensAsync(storedToken.UserProfileId);
-                throw new SecurityException("Compromised token used. All sessions revoked.");
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.TokenCompromised, storedToken.UserProfileId);
+                throw new SecurityException(errorMessage);
             }
 
             if (storedToken.IsUsed)
@@ -99,18 +107,21 @@ namespace Audex.Application.Services.Auth
                 }
 
                 await RevokeAllUserTokensAsync(storedToken.UserProfileId);
-                throw new SecurityException("Compromised token used. All sessions revoked.");
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.TokenCompromised, storedToken.UserProfileId);
+                throw new SecurityException(errorMessage);
             }
 
             if (storedToken.ExpiresAt < DateTime.UtcNow)
             {
-                throw new SecurityException("Refresh token expired.");
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.TokenExpired, storedToken.UserProfileId);
+                throw new SecurityException(errorMessage);
             }
 
             var user = await _userProfileRepo.GetByIdAsync(storedToken.UserProfileId);
             if (user == null)
             {
-                throw new SecurityException("User not found.");
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.UserNotFound);
+                throw new SecurityException(errorMessage);
             }
 
             var userDto = _mapper.Map(user);

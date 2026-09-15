@@ -123,6 +123,8 @@ namespace Audex.Application.Constants
             public const string UserNotFound = "auth.user_not_found";
             public const string TokenExpired = "auth.token_expired";
             public const string TokenRevoked = "auth.token_revoked";
+            public const string InvalidToken = "auth.invalid_token";
+            public const string TokenCompromised = "auth.token_compromised";
         }
 
         public static class Errors

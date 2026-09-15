@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO;
 using Audex.Application.DTO.Auth;
 using Audex.Application.DTO.User;
@@ -71,8 +71,10 @@ namespace Audex.Application.Tests.Services.Auth
             });
 
             Assert.NotNull(loginResult);
-            Assert.False(string.IsNullOrWhiteSpace(loginResult.AccessToken));
-            Assert.False(string.IsNullOrWhiteSpace(loginResult.RefreshToken));
+            Assert.True(loginResult.IsSuccess);
+            Assert.NotNull(loginResult.Data);
+            Assert.False(string.IsNullOrWhiteSpace(loginResult.Data.AccessToken));
+            Assert.False(string.IsNullOrWhiteSpace(loginResult.Data.RefreshToken));
         }
 
         [Fact]
@@ -96,21 +98,25 @@ namespace Audex.Application.Tests.Services.Auth
             });
 
             Assert.NotNull(newLoginResult);
-            Assert.False(string.IsNullOrWhiteSpace(newLoginResult.AccessToken));
-            Assert.False(string.IsNullOrWhiteSpace(newLoginResult.RefreshToken));
+            Assert.True(newLoginResult.IsSuccess);
+            Assert.NotNull(newLoginResult.Data);
+            Assert.False(string.IsNullOrWhiteSpace(newLoginResult.Data.AccessToken));
+            Assert.False(string.IsNullOrWhiteSpace(newLoginResult.Data.RefreshToken));
         }
 
         [Fact]
-        public async Task TestLogin_WithInvalidCredentials_ThrowsException()
+        public async Task TestLogin_WithInvalidCredentials_ReturnsFailureResult()
         {
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            var loginResult = await ExecuteScopeAsync(async sp =>
             {
-                await ExecuteScopeAsync(async sp =>
-                {
-                    var authService = sp.GetRequiredService<IAuthService>();
-                    await authService.LoginAsync("non_existent_user_12345", "wrong_password");
-                });
+                var authService = sp.GetRequiredService<IAuthService>();
+                return await authService.LoginAsync("non_existent_user_12345", "wrong_password");
             });
+
+            Assert.NotNull(loginResult);
+            Assert.False(loginResult.IsSuccess);
+            Assert.Null(loginResult.Data);
+            Assert.False(string.IsNullOrWhiteSpace(loginResult.ErrorMessage));
         }
 
         [Fact]
@@ -128,13 +134,13 @@ namespace Audex.Application.Tests.Services.Auth
             var refreshResult = await ExecuteScopeAsync(async sp =>
             {
                 var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.RefreshTokenAsync(loginResult.RefreshToken);
+                return await authService.RefreshTokenAsync(loginResult.Data!.RefreshToken);
             });
 
             Assert.NotNull(refreshResult);
             Assert.False(string.IsNullOrWhiteSpace(refreshResult.AccessToken));
             Assert.False(string.IsNullOrWhiteSpace(refreshResult.RefreshToken));
-            Assert.NotEqual(loginResult.RefreshToken, refreshResult.RefreshToken);
+            Assert.NotEqual(loginResult.Data!.RefreshToken, refreshResult.RefreshToken);
 
             // Subsequent refresh using the newly rotated token should succeed
             var secondRefreshResult = await ExecuteScopeAsync(async sp =>
@@ -163,7 +169,7 @@ namespace Audex.Application.Tests.Services.Auth
             var refreshResult = await ExecuteScopeAsync(async sp =>
             {
                 var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.RefreshTokenAsync(loginResult.RefreshToken);
+                return await authService.RefreshTokenAsync(loginResult.Data!.RefreshToken);
             });
 
             Assert.NotNull(refreshResult);
@@ -172,7 +178,7 @@ namespace Audex.Application.Tests.Services.Auth
             var concurrentResult = await ExecuteScopeAsync(async sp =>
             {
                 var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.RefreshTokenAsync(loginResult.RefreshToken);
+                return await authService.RefreshTokenAsync(loginResult.Data!.RefreshToken);
             });
 
             Assert.NotNull(concurrentResult);
@@ -194,7 +200,7 @@ namespace Audex.Application.Tests.Services.Auth
             var refreshResult = await ExecuteScopeAsync(async sp =>
             {
                 var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.RefreshTokenAsync(loginResult.RefreshToken);
+                return await authService.RefreshTokenAsync(loginResult.Data!.RefreshToken);
             });
 
             Assert.NotNull(refreshResult);
@@ -219,7 +225,7 @@ namespace Audex.Application.Tests.Services.Auth
                 await ExecuteScopeAsync(async sp =>
                 {
                     var authService = sp.GetRequiredService<IAuthService>();
-                    await authService.RefreshTokenAsync(loginResult.RefreshToken);
+                    await authService.RefreshTokenAsync(loginResult.Data!.RefreshToken);
                 });
             });
 
@@ -248,7 +254,7 @@ namespace Audex.Application.Tests.Services.Auth
             var revoked = await ExecuteScopeAsync(async sp =>
             {
                 var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.RevokeTokenAsync(loginResult.RefreshToken);
+                return await authService.RevokeTokenAsync(loginResult.Data!.RefreshToken);
             });
 
             Assert.True(revoked);
@@ -259,7 +265,7 @@ namespace Audex.Application.Tests.Services.Auth
                 await ExecuteScopeAsync(async sp =>
                 {
                     var authService = sp.GetRequiredService<IAuthService>();
-                    await authService.RefreshTokenAsync(loginResult.RefreshToken);
+                    await authService.RefreshTokenAsync(loginResult.Data!.RefreshToken);
                 });
             });
         }
@@ -295,7 +301,7 @@ namespace Audex.Application.Tests.Services.Auth
                 await ExecuteScopeAsync(async sp =>
                 {
                     var authService = sp.GetRequiredService<IAuthService>();
-                    await authService.RefreshTokenAsync(session1.RefreshToken);
+                    await authService.RefreshTokenAsync(session1.Data!.RefreshToken);
                 });
             });
 
@@ -304,7 +310,7 @@ namespace Audex.Application.Tests.Services.Auth
                 await ExecuteScopeAsync(async sp =>
                 {
                     var authService = sp.GetRequiredService<IAuthService>();
-                    await authService.RefreshTokenAsync(session2.RefreshToken);
+                    await authService.RefreshTokenAsync(session2.Data!.RefreshToken);
                 });
             });
         }
@@ -331,7 +337,7 @@ namespace Audex.Application.Tests.Services.Auth
             var activeTokens = await ExecuteScopeAsync(async sp =>
             {
                 var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.GetRefreshTokensAsync(user.Id, isActive: true, 1, 10, session1.RefreshToken);
+                return await authService.GetRefreshTokensAsync(user.Id, isActive: true, 1, 10, session1.Data!.RefreshToken);
             });
 
             Assert.NotNull(activeTokens);
@@ -382,7 +388,7 @@ namespace Audex.Application.Tests.Services.Auth
                 await ExecuteScopeAsync(async sp =>
                 {
                     var authService = sp.GetRequiredService<IAuthService>();
-                    await authService.RefreshTokenAsync(session.RefreshToken);
+                    await authService.RefreshTokenAsync(session.Data!.RefreshToken);
                 });
             });
         }
@@ -407,7 +413,7 @@ namespace Audex.Application.Tests.Services.Auth
             var revokedOthers = await ExecuteScopeAsync(async sp =>
             {
                 var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.RevokeOtherTokensAsync(user.Id, currentSession.RefreshToken);
+                return await authService.RevokeOtherTokensAsync(user.Id, currentSession.Data!.RefreshToken);
             });
 
             Assert.True(revokedOthers);
@@ -416,7 +422,7 @@ namespace Audex.Application.Tests.Services.Auth
             var refreshedCurrent = await ExecuteScopeAsync(async sp =>
             {
                 var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.RefreshTokenAsync(currentSession.RefreshToken);
+                return await authService.RefreshTokenAsync(currentSession.Data!.RefreshToken);
             });
 
             Assert.NotNull(refreshedCurrent);
@@ -428,7 +434,7 @@ namespace Audex.Application.Tests.Services.Auth
                 await ExecuteScopeAsync(async sp =>
                 {
                     var authService = sp.GetRequiredService<IAuthService>();
-                    await authService.RefreshTokenAsync(otherSession.RefreshToken);
+                    await authService.RefreshTokenAsync(otherSession.Data!.RefreshToken);
                 });
             });
         }
@@ -438,7 +444,6 @@ namespace Audex.Application.Tests.Services.Auth
         {
             var (user, password) = await EnsureUserWithKnownPasswordAsync();
 
-            // Create a token
             var loginResult = await ExecuteScopeAsync(async sp =>
             {
                 var authService = sp.GetRequiredService<IAuthService>();
@@ -446,12 +451,24 @@ namespace Audex.Application.Tests.Services.Auth
             });
 
             Assert.NotNull(loginResult);
+            Assert.True(loginResult.IsSuccess);
 
-            // Clean up tokens older than -1 day (should delete the token just created)
+            // Mark token as expired in DB
+            await ExecuteScopeAsync(async sp =>
+            {
+                var uow = sp.GetRequiredService<IUnitOfWork>();
+                var tokenRepo = uow.CreateRepository<UserRefreshToken>();
+                var token = (await tokenRepo.GetAllAsync(t => t.UserProfileId == user.Id, disableTracking: false)).First();
+                token.ExpiresAt = DateTime.UtcNow.AddDays(-31);
+                tokenRepo.Update(token);
+                await uow.CommitAsync();
+            });
+
+            // Clean up tokens older than 30 days
             var deletedCount = await ExecuteScopeAsync(async sp =>
             {
                 var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.CleanUpExpiredRefreshTokensAsync(olderThanDays: -1);
+                return await authService.CleanUpExpiredRefreshTokensAsync(olderThanDays: 30);
             });
 
             Assert.True(deletedCount >= 1);
@@ -486,6 +503,7 @@ namespace Audex.Application.Tests.Services.Auth
             });
 
             Assert.NotNull(loginResult);
+            Assert.True(loginResult.IsSuccess);
 
             // Check that database password has been updated to Argon2id format
             var updatedUser = await ExecuteScopeAsync(async sp =>
@@ -504,16 +522,18 @@ namespace Audex.Application.Tests.Services.Auth
             });
 
             Assert.NotNull(secondLoginResult);
+            Assert.True(secondLoginResult.IsSuccess);
 
-            // Login with wrong password throws ArgumentException
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            // Login with wrong password returns failure result
+            var wrongPasswordResult = await ExecuteScopeAsync(async sp =>
             {
-                await ExecuteScopeAsync(async sp =>
-                {
-                    var authService = sp.GetRequiredService<IAuthService>();
-                    await authService.LoginAsync(user.UserName, "IncorrectPassword");
-                });
+                var authService = sp.GetRequiredService<IAuthService>();
+                return await authService.LoginAsync(user.UserName, "IncorrectPassword");
             });
+
+            Assert.NotNull(wrongPasswordResult);
+            Assert.False(wrongPasswordResult.IsSuccess);
+            Assert.False(string.IsNullOrWhiteSpace(wrongPasswordResult.ErrorMessage));
         }
     }
 }
