@@ -1,13 +1,13 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-COPY ["InfrastructureManager.Application/InfrastructureManager.Application.csproj", "InfrastructureManager.Application/"]
-COPY ["InfrastructureManager.WebApi/InfrastructureManager.WebApi.csproj", "InfrastructureManager.WebApi/"]
-RUN dotnet restore "InfrastructureManager.WebApi/InfrastructureManager.WebApi.csproj"
+COPY ["src/Application/Application.csproj", "src/Application/"]
+COPY ["src/WebApi/WebApi.csproj", "src/WebApi/"]
+RUN dotnet restore "src/WebApi/WebApi.csproj"
 
 COPY . .
-WORKDIR "/src/InfrastructureManager.WebApi"
-RUN dotnet publish "InfrastructureManager.WebApi.csproj" -c Release -o /app/build
+WORKDIR "/src/src/WebApi"
+RUN dotnet publish "WebApi.csproj" -c Release -o /app/build
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates gnupg lsb-release \

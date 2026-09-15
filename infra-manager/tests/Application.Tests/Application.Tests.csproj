@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <RootNamespace>InfrastructureManager.Application.Tests</RootNamespace>
+    <AssemblyName>InfrastructureManager.Application.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\InfrastructureManager.Application\InfrastructureManager.Application.csproj" />
-    <ProjectReference Include="..\InfrastructureManager.WebApi\InfrastructureManager.WebApi.csproj" />
+    <ProjectReference Include="..\..\src\Application\Application.csproj" />
+    <ProjectReference Include="..\..\src\WebApi\WebApi.csproj" />
   </ItemGroup>
 
 </Project>

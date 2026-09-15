@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>InfrastructureManager.Application</RootNamespace>
+    <AssemblyName>InfrastructureManager.Application</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
