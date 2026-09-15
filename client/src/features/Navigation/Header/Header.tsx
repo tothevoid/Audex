@@ -1,6 +1,6 @@
 import HeaderItem from '../HeaderItem/HeaderItem';
 import { Badge, Box, Button, Flex, Icon, Image, Link } from '@chakra-ui/react';
-import { AiFillTool } from 'react-icons/ai';
+import { IoIosFlash } from 'react-icons/io';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import UserProfileSettingsModal from '../../UserProfileSettingsModal/UserProfileSettingsModal';
@@ -13,6 +13,24 @@ import { HeaderNotificationBell } from './HeaderNotificationBell';
 import { HeaderProfileMenu } from './HeaderProfileMenu';
 import { HeaderNavDropdown, HeaderNavDropdownItem } from './HeaderNavDropdown';
 import appIcon from './AppIcon.svg';
+
+import { MdAccountBalance, MdAccountBalanceWallet, MdCurrencyBitcoin, MdSchedule, MdShowChart, MdStorage } from 'react-icons/md';
+
+type SingleNavItem = {
+    type?: 'link';
+    path: string;
+    title: string;
+    exact?: boolean;
+};
+
+type DropdownNavItem = {
+    type: 'dropdown';
+    title: string;
+    items: HeaderNavDropdownItem[];
+    activePrefixes: string[];
+};
+
+type NavItem = SingleNavItem | DropdownNavItem;
 
 const Header = () => {
     const { t } = useTranslation();
@@ -44,42 +62,75 @@ const Header = () => {
         actionsModalRef.current?.openModal();
     };
 
-    const standaloneTabs = [
-        { path: "/", title: t("header_dashboard") },
-        { path: "/accounts", title: t("header_accounts") },
-        { path: "/transactions", title: t("header_transactions") },
-        { path: "/deposits", title: t("header_deposits") }
+    const investmentNavItem: DropdownNavItem = {
+        type: 'dropdown',
+        title: t("header_investments"),
+        activePrefixes: ['/broker_accounts', '/securities', '/broker_account/', '/security/'],
+        items: [
+            {
+                path: "/broker_accounts",
+                title: t("header_broker_accounts_short"),
+                description: t("header_broker_accounts_desc"),
+                icon: MdAccountBalance
+            },
+            {
+                path: "/securities",
+                title: t("header_securities"),
+                description: t("header_securities_desc"),
+                icon: MdShowChart
+            }
+        ]
+    };
+
+    const cryptoNavItem: DropdownNavItem = {
+        type: 'dropdown',
+        title: t("header_crypto"),
+        activePrefixes: ['/crypto_accounts', '/cryptocurrencies', '/crypto_account/'],
+        items: [
+            {
+                path: "/crypto_accounts",
+                title: t("header_crypto_accounts_short"),
+                description: t("header_crypto_accounts_desc"),
+                icon: MdAccountBalanceWallet
+            },
+            {
+                path: "/cryptocurrencies",
+                title: t("header_cryptocurrencies"),
+                description: t("header_cryptocurrencies_desc"),
+                icon: MdCurrencyBitcoin
+            }
+        ]
+    };
+
+    const configurationNavItem: DropdownNavItem = {
+        type: 'dropdown',
+        title: t("header_configuration"),
+        activePrefixes: ['/scheduler', '/data'],
+        items: [
+            {
+                path: "/scheduler",
+                title: t("header_scheduler"),
+                description: t("header_scheduler_desc"),
+                icon: MdSchedule
+            },
+            {
+                path: "/data",
+                title: t("header_data"),
+                description: t("header_data_desc"),
+                icon: MdStorage
+            }
+        ]
+    };
+
+    const navItems: NavItem[] = [
+        { type: 'link', path: "/accounts", title: t("header_accounts") },
+        { type: 'link', path: "/transactions", title: t("header_transactions") },
+        { type: 'link', path: "/deposits", title: t("header_deposits") },
+        { type: 'link', path: "/debts", title: t("header_debts") },
+        investmentNavItem,
+        cryptoNavItem,
+        configurationNavItem
     ];
-
-    const investmentItems: HeaderNavDropdownItem[] = [
-        { path: "/broker_accounts", title: t("header_broker_accounts_short") },
-        { path: "/securities", title: t("header_securities") }
-    ];
-
-    const cryptoItems: HeaderNavDropdownItem[] = [
-        { path: "/crypto_accounts", title: t("header_crypto_accounts_short") },
-        { path: "/cryptocurrencies", title: t("header_cryptocurrencies") }
-    ];
-
-    const trailingTabs = [
-        { path: "/debts", title: t("header_debts") }
-    ];
-
-    const endingTabs = [
-        { path: "/scheduler", title: t("header_scheduler") },
-        { path: "/data", title: t("header_data") }
-    ];
-
-    const isInvestmentsActive =
-        location.pathname.startsWith('/broker_accounts') ||
-        location.pathname.startsWith('/securities') ||
-        location.pathname.startsWith('/broker_account/') ||
-        location.pathname.startsWith('/security/');
-
-    const isCryptoActive =
-        location.pathname.startsWith('/crypto_accounts') ||
-        location.pathname.startsWith('/cryptocurrencies') ||
-        location.pathname.startsWith('/crypto_account/');
 
     return <nav>
         <Box w="100%">
@@ -115,39 +166,32 @@ const Header = () => {
                     </Flex>
                     <Flex flex="1" align="center" gap={1}>
                         {
-                            standaloneTabs.map(tab =>
-                                <NavLink key={tab.path} to={tab.path} end={tab.path === '/'} className={({ isActive }) => isActive ? 'active' : ''}>
-                                    {({ isActive }) => <HeaderItem title={tab.title} active={isActive} />}
-                                </NavLink>
-                            )
-                        }
+                            navItems.map((item, index) => {
+                                if (item.type !== 'dropdown') {
+                                    return (
+                                        <NavLink
+                                            key={item.path}
+                                            to={item.path}
+                                            end={item.exact}
+                                            className={({ isActive }) => isActive ? 'active' : ''}
+                                        >
+                                            {({ isActive }) => <HeaderItem title={item.title} active={isActive} />}
+                                        </NavLink>
+                                    );
+                                }
 
-                        <HeaderNavDropdown
-                            title={t("header_investments")}
-                            active={isInvestmentsActive}
-                            items={investmentItems}
-                        />
-
-                        {
-                            trailingTabs.map(tab =>
-                                <NavLink key={tab.path} to={tab.path} className={({ isActive }) => isActive ? 'active' : ''}>
-                                    {({ isActive }) => <HeaderItem title={tab.title} active={isActive} />}
-                                </NavLink>
-                            )
-                        }
-
-                        <HeaderNavDropdown
-                            title={t("header_crypto")}
-                            active={isCryptoActive}
-                            items={cryptoItems}
-                        />
-
-                        {
-                            endingTabs.map(tab =>
-                                <NavLink key={tab.path} to={tab.path} className={({ isActive }) => isActive ? 'active' : ''}>
-                                    {({ isActive }) => <HeaderItem title={tab.title} active={isActive} />}
-                                </NavLink>
-                            )
+                                const isDropdownActive = item.activePrefixes.some(prefix =>
+                                    location.pathname.startsWith(prefix)
+                                );
+                                return (
+                                    <HeaderNavDropdown
+                                        key={item.title + index}
+                                        title={item.title}
+                                        active={isDropdownActive}
+                                        items={item.items}
+                                    />
+                                );
+                            })
                         }
                     </Flex>
                 </Flex>
@@ -162,7 +206,7 @@ const Header = () => {
                         title={t("header_actions_title")}
                     >
                         <Icon color="card_action_icon_primary">
-                            <AiFillTool />
+                            <IoIosFlash fontSize="1.1rem" />
                         </Icon>
                     </Button>
                     <HeaderProfileMenu
