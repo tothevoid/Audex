@@ -52,7 +52,7 @@ const BrokerAccount = (props: Props) => {
 								fallbackIcon={<BsBank size={16} color="#aaa" />}
 								size="sm"
 							/>
-							<Link fontSize="2xl" fontWeight={900} color="text_primary" href={accountLink}>{name}</Link>
+							<Link fontSize="2xl" fontWeight={900} color="text_primary" href={accountLink} textDecoration="none" _hover={{ color: "action_primary", textDecoration: "none" }}>{name}</Link>
 						</Flex>
 						<Text fontWeight={600}>{broker.name}</Text>
 						<Text fontWeight={600}>{type.name}</Text>

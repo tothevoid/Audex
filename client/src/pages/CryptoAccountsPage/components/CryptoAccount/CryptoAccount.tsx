@@ -54,7 +54,8 @@ const CryptoAccount = (props: Props) => {
                                     fontWeight={800}
                                     color="text_primary"
                                     href={accountLink}
-                                    _hover={{ color: "action_primary" }}
+                                    textDecoration="none"
+                                    _hover={{ color: "action_primary", textDecoration: "none" }}
                                 >
                                     {name}
                                 </Link>
