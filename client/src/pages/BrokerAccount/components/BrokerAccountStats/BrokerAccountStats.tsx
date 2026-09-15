@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { getBrokerAccountStats } from "../../../../api/brokers/brokerAccountSummaryApi";
 import { BrokerAccountSummaryEntity } from "../../../../models/brokers/BrokerAccountSummaryEntity";
 import { SimpleGrid } from "@chakra-ui/react";
-import { useUserProfile } from "../../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
 import MoneyCard from "../../../../shared/components/MoneyCard/MoneyCard";
 import BrokerAccountTransfersHistoryChart from "../BrokerAccountTransfersHistoryChart/BrokerAccountTransfersHistoryChart";
 import { useTranslation } from "react-i18next";

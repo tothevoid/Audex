@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Flex, Icon, Skeleton, Stack, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineDevices } from 'react-icons/md';
-import { UserRefreshTokenEntity } from '../../../src/models/auth/UserRefreshTokenEntity';
+import { UserRefreshTokenEntity } from '../../../models/auth/UserRefreshTokenEntity';
 import { TokenItem } from './TokenItem';
 import { TokensTabType } from './TokensTabs';
 

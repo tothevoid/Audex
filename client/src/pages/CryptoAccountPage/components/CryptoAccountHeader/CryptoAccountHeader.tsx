@@ -9,7 +9,7 @@ import { getCryptoProviderIconUrl } from "../../../../api/crypto/cryptoProviderA
 import StoredIcon from "../../../../shared/components/StoredIcon/StoredIcon";
 
 import AddButton from "../../../../shared/components/AddButton/AddButton";
-import { useUserProfile } from "../../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { getCurrencies } from "../../../../api/currencies/currencyApi";
 
 interface CryptoAccountHeaderProps {

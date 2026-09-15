@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { TransactionEntity } from "../../models/transactions/TransactionEntity";
 import { formatDate } from "../../shared/utilities/formatters/dateFormatter";
 import { formatMoneyByCurrencyCulture } from "../../shared/utilities/formatters/moneyFormatter";
-import { useUserProfile } from "../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { useUserProfile } from "../../features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { useTransactions } from "./hooks/useTransactions";
 import { groupByKey, sumEntities } from "../../shared/utilities/arrayUtilities";
 import NewTransactionModal from "./modals/NewTransactionModal/NewTransactionModal";

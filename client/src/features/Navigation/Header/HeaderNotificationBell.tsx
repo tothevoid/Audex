@@ -22,8 +22,8 @@ import {
 } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useNotifications } from "../../../src/shared/hooks/useNotifications";
-import { NotificationEntity, NotificationSeverity } from "../../../src/models/notifications/NotificationEntity";
+import { useNotifications } from "../../../shared/hooks/useNotifications";
+import { NotificationEntity, NotificationSeverity } from "../../../models/notifications/NotificationEntity";
 
 export const HeaderNotificationBell: React.FC = () => {
     const { t } = useTranslation();

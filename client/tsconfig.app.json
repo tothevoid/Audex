@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "features/UserProfileSettingsModal/hooks/UserProfileContext.tsx", "features/Navigation/Header", "features/Navigation/Header", "features/Navigation/HeaderItem"]
+  "include": ["src"]
 }

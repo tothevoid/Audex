@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, TooltipValueType } from 'recharts';
 import { TransactionEntity } from '../../../../models/transactions/TransactionEntity';
 import { getChartLabelConfig } from '../../../../shared/utilities/chartUtilities';
-import { useUserProfile } from '../../../../../features/UserProfileSettingsModal/hooks/UserProfileContext';
+import { useUserProfile } from '../../../../features/UserProfileSettingsModal/hooks/UserProfileContext';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 
 type Props = {

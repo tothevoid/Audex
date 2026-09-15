@@ -7,14 +7,16 @@ import UserProfileSettingsModal from '../../UserProfileSettingsModal/UserProfile
 import ChangePasswordModal from '../../ChangePasswordModal/ChangePasswordModal';
 import TokensModal from '../../TokensModal/TokensModal';
 import ActionsModal from '../../ActionsModal/ActionsModal';
-import { NavLink } from 'react-router-dom';
-import { BaseModalRef } from '../../../src/shared/utilities/modalUtilities';
+import { NavLink, useLocation } from 'react-router-dom';
+import { BaseModalRef } from '../../../shared/utilities/modalUtilities';
 import { HeaderNotificationBell } from './HeaderNotificationBell';
 import { HeaderProfileMenu } from './HeaderProfileMenu';
+import { HeaderNavDropdown, HeaderNavDropdownItem } from './HeaderNavDropdown';
 import appIcon from './AppIcon.svg';
 
 const Header = () => {
     const { t } = useTranslation();
+    const location = useLocation();
     const userProfileSettingsRef = useRef<BaseModalRef>(null);
     const changePasswordModalRef = useRef<BaseModalRef>(null);
     const tokensModalRef = useRef<BaseModalRef>(null);
@@ -42,19 +44,42 @@ const Header = () => {
         actionsModalRef.current?.openModal();
     };
 
-    const tabs = [
+    const standaloneTabs = [
         { path: "/", title: t("header_dashboard") },
-        { path: "accounts", title: t("header_accounts") },
-        { path: "transactions", title: t("header_transactions") },
-        { path: "deposits", title: t("header_deposits") },
-        { path: "broker_accounts", title: t("header_broker_account") },
-        { path: "securities", title: t("header_securities") },
-        { path: "debts", title: t("header_debts") },
-        { path: "cryptocurrencies", title: t("header_cryptocurrencies") },
-        { path: "crypto_accounts", title: t("header_cryptoaccounts") },
-        { path: "scheduler", title: t("header_scheduler") },
-        { path: "data", title: t("header_data") }
+        { path: "/accounts", title: t("header_accounts") },
+        { path: "/transactions", title: t("header_transactions") },
+        { path: "/deposits", title: t("header_deposits") }
     ];
+
+    const investmentItems: HeaderNavDropdownItem[] = [
+        { path: "/broker_accounts", title: t("header_broker_accounts_short") },
+        { path: "/securities", title: t("header_securities") }
+    ];
+
+    const cryptoItems: HeaderNavDropdownItem[] = [
+        { path: "/crypto_accounts", title: t("header_crypto_accounts_short") },
+        { path: "/cryptocurrencies", title: t("header_cryptocurrencies") }
+    ];
+
+    const trailingTabs = [
+        { path: "/debts", title: t("header_debts") }
+    ];
+
+    const endingTabs = [
+        { path: "/scheduler", title: t("header_scheduler") },
+        { path: "/data", title: t("header_data") }
+    ];
+
+    const isInvestmentsActive =
+        location.pathname.startsWith('/broker_accounts') ||
+        location.pathname.startsWith('/securities') ||
+        location.pathname.startsWith('/broker_account/') ||
+        location.pathname.startsWith('/security/');
+
+    const isCryptoActive =
+        location.pathname.startsWith('/crypto_accounts') ||
+        location.pathname.startsWith('/cryptocurrencies') ||
+        location.pathname.startsWith('/crypto_account/');
 
     return <nav>
         <Box w="100%">
@@ -88,9 +113,37 @@ const Header = () => {
                             </Badge>
                         )}
                     </Flex>
-                    <Flex flex="1">
+                    <Flex flex="1" align="center" gap={1}>
                         {
-                            tabs.map(tab =>
+                            standaloneTabs.map(tab =>
+                                <NavLink key={tab.path} to={tab.path} end={tab.path === '/'} className={({ isActive }) => isActive ? 'active' : ''}>
+                                    {({ isActive }) => <HeaderItem title={tab.title} active={isActive} />}
+                                </NavLink>
+                            )
+                        }
+
+                        <HeaderNavDropdown
+                            title={t("header_investments")}
+                            active={isInvestmentsActive}
+                            items={investmentItems}
+                        />
+
+                        {
+                            trailingTabs.map(tab =>
+                                <NavLink key={tab.path} to={tab.path} className={({ isActive }) => isActive ? 'active' : ''}>
+                                    {({ isActive }) => <HeaderItem title={tab.title} active={isActive} />}
+                                </NavLink>
+                            )
+                        }
+
+                        <HeaderNavDropdown
+                            title={t("header_crypto")}
+                            active={isCryptoActive}
+                            items={cryptoItems}
+                        />
+
+                        {
+                            endingTabs.map(tab =>
                                 <NavLink key={tab.path} to={tab.path} className={({ isActive }) => isActive ? 'active' : ''}>
                                     {({ isActive }) => <HeaderItem title={tab.title} active={isActive} />}
                                 </NavLink>

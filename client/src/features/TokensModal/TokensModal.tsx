@@ -1,15 +1,15 @@
 import { Box } from '@chakra-ui/react';
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
-import { BaseModalRef } from '../../src/shared/utilities/modalUtilities';
-import BaseModal from '../../src/shared/modals/BaseModal/BaseModal';
-import { UserRefreshTokenEntity } from '../../src/models/auth/UserRefreshTokenEntity';
+import { BaseModalRef } from '../../shared/utilities/modalUtilities';
+import BaseModal from '../../shared/modals/BaseModal/BaseModal';
+import { UserRefreshTokenEntity } from '../../models/auth/UserRefreshTokenEntity';
 import {
     getRefreshTokens,
     getRefreshTokensPagination,
     revokeOtherTokens,
     revokeToken
-} from '../../src/api/auth/tokensApi';
-import CollectionPagination from '../../src/shared/components/CollectionPagination/CollectionPagination';
+} from '../../api/auth/tokensApi';
+import CollectionPagination from '../../shared/components/CollectionPagination/CollectionPagination';
 import { TokensHeader } from './components/TokensHeader';
 import { TokensTabs, TokensTabType } from './components/TokensTabs';
 import { TokensList } from './components/TokensList';

@@ -4,13 +4,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { UserProfileFormInput, UserProfileValidationSchema } from "./UserProfileValidationSchema";
-import { getCurrencies } from "../../src/api/currencies/currencyApi";
-import { updateUserProfile } from "../../src/api/user/userProfileApi";
-import { CurrencyEntity } from "../../src/models/currencies/CurrencyEntity";
-import { UserProfileEntity } from "../../src/models/user/UserProfileEntity";
-import CollectionSelect from "../../src/shared/components/CollectionSelect/CollectionSelect";
-import { BaseModalRef } from "../../src/shared/utilities/modalUtilities";
-import BaseFormModal from "../../src/shared/modals/BaseFormModal/BaseFormModal";
+import { getCurrencies } from "../../api/currencies/currencyApi";
+import { updateUserProfile } from "../../api/user/userProfileApi";
+import { CurrencyEntity } from "../../models/currencies/CurrencyEntity";
+import { UserProfileEntity } from "../../models/user/UserProfileEntity";
+import CollectionSelect from "../../shared/components/CollectionSelect/CollectionSelect";
+import { BaseModalRef } from "../../shared/utilities/modalUtilities";
+import BaseFormModal from "../../shared/modals/BaseFormModal/BaseFormModal";
 import { useUserProfile } from "./hooks/UserProfileContext";
 
 interface State {

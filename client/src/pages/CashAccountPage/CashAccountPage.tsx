@@ -7,7 +7,7 @@ import { CurrencyTransactionEntity } from "../../models/transactions/CurrencyTra
 import { useTranslation } from "react-i18next";
 import { getCurrenciesMap } from "../../api/currencies/currencyApi";
 import { AccountEntity } from "../../models/accounts/AccountEntity";
-import { useUserProfile } from "../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { useUserProfile } from "../../features/UserProfileSettingsModal/hooks/UserProfileContext";
 import CurrencyTransactionModal from "../Transactions/modals/CurrencyTransactionModal/CurrencyTransactionModal";
 import { ConfirmModal } from "../../shared/modals/ConfirmModal/ConfirmModal";
 import { useEntityModal } from "../../shared/hooks/useEntityModal";

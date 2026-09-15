@@ -11,10 +11,10 @@ import {
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { MdAttachFile, MdCheckCircle, MdError, MdLock, MdRestore } from 'react-icons/md';
-import { restoreDatabaseBackup, validateDatabaseBackup } from '../../../src/api/system/databaseBackupApi';
-import { ConfirmModal } from '../../../src/shared/modals/ConfirmModal/ConfirmModal';
-import { BaseModalRef } from '../../../src/shared/utilities/modalUtilities';
-import { PasswordInput } from '../../../src/shared/components/PasswordInput/PasswordInput';
+import { restoreDatabaseBackup, validateDatabaseBackup } from '../../../api/system/databaseBackupApi';
+import { ConfirmModal } from '../../../shared/modals/ConfirmModal/ConfirmModal';
+import { BaseModalRef } from '../../../shared/utilities/modalUtilities';
+import { PasswordInput } from '../../../shared/components/PasswordInput/PasswordInput';
 
 export const ActionsModalRestoreCard: React.FC = () => {
     const { t } = useTranslation();

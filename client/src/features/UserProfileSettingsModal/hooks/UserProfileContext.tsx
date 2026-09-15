@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import { UserProfileEntity } from '../../../src/models/user/UserProfileEntity';
-import { getUserProfile } from '../../../src/api/user/userProfileApi';
+import { UserProfileEntity } from '../../../models/user/UserProfileEntity';
+import { getUserProfile } from '../../../api/user/userProfileApi';
 import { changeLanguage } from 'i18next';
 
 type UserContextType = {

@@ -7,7 +7,7 @@ import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModa
 import { getCurrencies, updateCurrency, createCurrency, deleteCurrency, syncRates } from "../../../../api/currencies/currencyApi";
 import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
 import CurrencyModal from "../../modals/CurrencyModal/CurrencyModal";
-import { useUserProfile } from "../../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
 import RefreshButton from "../../../../shared/components/RefreshButton/RefreshButton";
 import DataTable, { ColumnDef } from "../../../../shared/components/DataTable/DataTable";

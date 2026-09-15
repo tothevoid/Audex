@@ -2,7 +2,7 @@ import { Fragment } from "react/jsx-runtime";
 import BrokerAccountHeader from "../BrokerAccount/components/BrokerAccountHeader/BrokerAccountHeader";
 import BrokerAccountSecuritiesList, { BrokerAccountSecuritiesListRef } from "../BrokerAccount/components/BrokerAccountSecuritiesList/BrokerAccountSecuritiesList";
 import BrokerAccountTabs, { ChangeAction } from "../BrokerAccount/components/BrokerAccountTabs/BrokerAccountTabs";
-import { useUserProfile } from "../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { useUserProfile } from "../../features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { getLastPullDate, pullBrokerAccountQuotations } from "../../api/brokers/brokerAccountSecurityApi";
 import { useSignalR } from "../../shared/hooks/useSignalR";
 import { useCallback, useEffect, useRef, useState } from "react";

@@ -1,5 +1,5 @@
 import './App.scss';
-import Header from '../features/Navigation/Header/Header';
+import Header from './features/Navigation/Header/Header';
 import TransactionsPage from './pages/Transactions/TransactionsPage'
 import DepositsPage from './pages/Deposits/DepositsPage';
 
@@ -17,7 +17,7 @@ import CryptocurrenciesPage from './pages/CryptocurrenciesPage/CryptocurrenciesP
 import CryptoAccountsPage from './pages/CryptoAccountsPage/CryptoAccountsPage';
 import CryptoAccountPage from './pages/CryptoAccountPage/CryptoAccountPage';
 import AuthPage from './pages/Auth/AuthPage';
-import { UserProvider } from '../features/UserProfileSettingsModal/hooks/UserProfileContext.tsx';
+import { UserProvider } from './features/UserProfileSettingsModal/hooks/UserProfileContext';
 import NotificationsPage from './pages/Notifications/NotificationsPage';
 import CashAccountPage from './pages/CashAccountPage/CashAccountPage.tsx';
 import SchedulerPage from './pages/Scheduler/SchedulerPage.tsx';

@@ -6,7 +6,7 @@ import { CryptoAccountStatsEntity } from "../../../../models/crypto/CryptoAccoun
 import { getCryptoAccountStats } from "../../../../api/crypto/cryptoAccountStatsApi";
 import DistributionChart from "../../../Dashboard/components/DistributionChart";
 import Placeholder from "../../../../shared/components/Placeholder/Placeholder";
-import { useUserProfile } from "../../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
 
 interface Props {
     cryptoAccountId?: Nullable<string>;

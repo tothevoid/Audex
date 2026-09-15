@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Badge, Box, Button, Flex, HStack, Icon, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
-import { formatDateTime } from '../../../src/shared/utilities/formatters/dateFormatter';
-import { UserRefreshTokenEntity } from '../../../src/models/auth/UserRefreshTokenEntity';
-import { parseDeviceAndBrowser } from '../../../src/shared/utilities/deviceUtilities';
+import { formatDateTime } from '../../../shared/utilities/formatters/dateFormatter';
+import { UserRefreshTokenEntity } from '../../../models/auth/UserRefreshTokenEntity';
+import { parseDeviceAndBrowser } from '../../../shared/utilities/deviceUtilities';
 
 interface TokenItemProps {
     token: UserRefreshTokenEntity;

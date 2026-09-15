@@ -2,7 +2,7 @@ import { Box, Flex, SimpleGrid, Text } from "@chakra-ui/react";
 import React, { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getDepositsSummary } from "../../../../api/deposits/depositApi";
-import { useUserProfile } from "../../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
 import ButtonGroup, { ButtonGroupOption } from "../../../../shared/components/ButtonGroup/ButtonGroup";
 import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
 import { formatPeriodLabel } from "./depositChartUtils";

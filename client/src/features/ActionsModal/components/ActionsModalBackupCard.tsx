@@ -11,9 +11,9 @@ import {
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { MdBackup, MdDownload, MdLock, MdShield } from 'react-icons/md';
-import { exportDatabaseBackup } from '../../../src/api/system/databaseBackupApi';
-import { PasswordInput } from '../../../src/shared/components/PasswordInput/PasswordInput';
-import SwitchInput from '../../../src/shared/components/SwitchInput/SwitchInput';
+import { exportDatabaseBackup } from '../../../api/system/databaseBackupApi';
+import { PasswordInput } from '../../../shared/components/PasswordInput/PasswordInput';
+import SwitchInput from '../../../shared/components/SwitchInput/SwitchInput';
 
 export const ActionsModalBackupCard: React.FC = () => {
     const { t } = useTranslation();

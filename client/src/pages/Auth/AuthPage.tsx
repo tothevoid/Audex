@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AuthForm from "./components/AuthForm/AuthForm";
 import ChangePasswordForm from "./components/ChangePasswordForm/ChangePasswordForm";
 import { Nullable } from "../../shared/utilities/nullable";
-import appIcon from "../../../features/Navigation/Header/AppIcon.svg";
+import appIcon from "../../features/Navigation/Header/AppIcon.svg";
 
 enum FormType {
     Auth,

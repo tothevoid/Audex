@@ -2,7 +2,7 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import { SimpleGrid, Stack, Text, Input, Card, Skeleton, Button } from "@chakra-ui/react";
 import DatePicker from "react-datepicker";
 import { useTranslation } from "react-i18next";
-import { useUserProfile } from "../../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
 import MoneyCard from "../../../../shared/components/MoneyCard/MoneyCard";
 import { Nullable } from "../../../../shared/utilities/nullable";
 import { getBrokerAccountPortfolioHistory } from "../../../../api/brokers/brokerAccountPortfolioHistoryApi";

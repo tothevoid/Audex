@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Box, Button, Card, Flex, Icon, Spinner, Text } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { MdTableChart, MdDownload } from 'react-icons/md';
-import { downloadAllAssetsReportXlsx } from '../../../src/api/reports/allAssetsReport';
-import { formatTimestampForReport } from '../../../src/shared/utilities/dateUtils';
+import { downloadAllAssetsReportXlsx } from '../../../api/reports/allAssetsReport';
+import { formatTimestampForReport } from '../../../shared/utilities/dateUtils';
 
 export const ActionsModalReportCard: React.FC = () => {
     const { t } = useTranslation();
