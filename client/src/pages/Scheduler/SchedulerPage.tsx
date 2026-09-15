@@ -11,6 +11,7 @@ import { SchedulerJournalTable } from './components/SchedulerJournalTable';
 import { ScheduleConfigModal, ScheduleConfigModalRef } from './components/ScheduleConfigModal';
 import { CreateTaskModal, CreateTaskModalRef } from './components/CreateTaskModal';
 import CollectionPagination from '../../shared/components/CollectionPagination/CollectionPagination';
+import PageContainer from '../../shared/components/PageContainer/PageContainer';
 import { PaginationConfig } from '../../shared/models/PaginationConfig';
 import { useSchedulerEvents } from '../../shared/hooks/useSchedulerEvents';
 
@@ -121,7 +122,7 @@ const SchedulerPage: React.FC = () => {
     const selectedTask = selectedTaskName ? tasks.find((t) => t.taskName === selectedTaskName) || null : null;
 
     return (
-        <Box pb={8}>
+        <PageContainer>
             <VStack align="stretch" gap={5}>
                 {/* Header with Title */}
                 <Heading size="lg" color="text_primary">
@@ -182,7 +183,7 @@ const SchedulerPage: React.FC = () => {
                     onCreated={() => handleTaskUpdated(false)}
                 />
             </VStack>
-        </Box>
+        </PageContainer>
     );
 };
 

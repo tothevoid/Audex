@@ -11,6 +11,7 @@ import Placeholder from "../../shared/components/Placeholder/Placeholder";
 import { useEntityModal } from "../../shared/hooks/useEntityModal";
 import { ConfirmModal } from "../../shared/modals/ConfirmModal/ConfirmModal";
 import AddButton from "../../shared/components/AddButton/AddButton";
+import PageContainer from "../../shared/components/PageContainer/PageContainer";
 import { ActiveEntityMode } from "../../shared/enums/activeEntityMode";
 
 const DepositsPage: React.FC = () => {
@@ -94,7 +95,7 @@ const DepositsPage: React.FC = () => {
     }
 
 	return (
-		<Box paddingTop={5}>
+		<PageContainer>
 			{deposits.length > 0 && selectedMaxMonths ? (
 				<Box mb={6}>
 					<DepositStats onlyActive={onlyActive} selectedMinMonths={selectedMinMonths} selectedMaxMonths={selectedMaxMonths}/>
@@ -133,7 +134,7 @@ const DepositsPage: React.FC = () => {
 				confirmActionName={t("modals_delete_button")}
 				ref={confirmModalRef}/>
 			<DepositModal deposit={activeEntity} modalRef={modalRef} onSaved={onDepositSaved}/>
-		</Box>
+		</PageContainer>
 	);
 };
 

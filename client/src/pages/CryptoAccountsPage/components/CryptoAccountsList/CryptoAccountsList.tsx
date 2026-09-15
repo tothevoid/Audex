@@ -60,7 +60,7 @@ const CryptoAccountsList: React.FC<Props> = (props: Props) => {
         );
 
         return cryptoAccounts.length ? (
-            <Flex justifyContent="space-between" alignItems="center" pt={4} pb={4}>
+            <Flex justifyContent="space-between" alignItems="center" pb={4}>
                 {addButton}
             </Flex>
         ) : (

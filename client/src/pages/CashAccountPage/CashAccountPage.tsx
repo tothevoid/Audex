@@ -113,7 +113,7 @@ const CashAccountPage: React.FC = () => {
     };
 
     return (
-        <Stack p={6} gap={4}>
+        <Stack pb={6} gap={4}>
             <CashAccountHeader
                 account={account}
                 totalPnl={totalPnl}

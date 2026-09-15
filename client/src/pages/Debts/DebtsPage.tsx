@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box } from "@chakra-ui/react";
+import PageContainer from "../../shared/components/PageContainer/PageContainer";
 import DebtsList from "./components/DebtsList/DebtsList";
 import DebtsPaymentsList from "./components/DebtsPaymentsList/DebtsPaymentsList";
 import { DebtTagManagerModal } from "./modals/DebtTagManagerModal/DebtTagManagerModal";
@@ -65,7 +65,7 @@ const DebtsPage: React.FC = () => {
 	};
 
 	return (
-		<Box>
+		<PageContainer>
 			<DebtsList
 				debtsPaymentsVersion={version}
 				onDebtsChanged={onDebtsChanged}
@@ -91,7 +91,7 @@ const DebtsPage: React.FC = () => {
 
 			<DebtTagManagerModal ref={tagManagerModalRef} tags={tags} onTagsChanged={handleTagCreatedOrUpdated} />
 			<DebtTagStatsModal ref={tagStatsModalRef} stats={tagStats} />
-		</Box>
+		</PageContainer>
 	);
 };
 

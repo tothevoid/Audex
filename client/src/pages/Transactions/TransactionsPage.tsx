@@ -23,6 +23,7 @@ import TransactionModal from "./modals/TransactionModal/TransactionModal";
 import AddButton from "../../shared/components/AddButton/AddButton";
 import { BaseModalRef } from "../../shared/utilities/modalUtilities";
 import { ACCOUNT_TYPE } from "../../shared/constants/accountType";
+import PageContainer from "../../shared/components/PageContainer/PageContainer";
 import { createCurrencyTransaction } from "../../api/transactions/currencyTransactionApi";
 
 interface State {
@@ -117,7 +118,7 @@ const TransactionsPage: React.FC = () => {
     }
 
     return (
-        <Box color="text_primary" paddingTop={4} paddingBottom={4}>
+        <PageContainer color="text_primary">
             <SimpleGrid columns={2} gap={16}>
                 <Box>
                     <Flex justifyContent={"space-between"}>
@@ -172,7 +173,7 @@ const TransactionsPage: React.FC = () => {
             <TransactionModal transaction={activeEntity} modalRef={modalRef} onSaved={onTransactionSaved}/>
             <NewTransactionModal modalRef={addTransactionModalRef} 
                 onTransactionSaved={createTransactionEntity} onCurrencyTransactionSaved={onCreateCurrencyTransaction}/>
-        </Box>
+        </PageContainer>
     );
 }
 

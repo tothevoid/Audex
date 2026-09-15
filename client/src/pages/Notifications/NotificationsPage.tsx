@@ -24,7 +24,7 @@ const NotificationsPage: React.FC = () => {
     } = useNotifications({ autoLoad: false });
 
     return (
-        <Container maxW="1000px" py={6}>
+        <Container maxW="1000px" pb={6}>
             <VStack align="stretch" gap={6}>
                 <NotificationsHeader
                     unreadCount={unreadCount}

@@ -55,7 +55,7 @@ const BrokerAccountsList: React.FC = () => {
 			onClick={onAddClicked}/>;
 
 		return brokerAccounts.length ?
-			<Flex justifyContent="space-between" alignItems="center" pt={5} pb={5}>
+			<Flex justifyContent="space-between" alignItems="center" pb={5}>
 				{addButton}
 			</Flex>:
 			<Placeholder text={t("broker_accounts_page_no_accounts")}>

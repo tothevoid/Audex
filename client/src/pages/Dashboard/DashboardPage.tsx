@@ -8,6 +8,7 @@ import { GlobalDashboard, DistributionModel } from "../../models/dashboard/Dashb
 import { formatMoneyByCurrencyCulture } from "../../shared/utilities/formatters/moneyFormatter";
 import DistributionChart from "./components/DistributionChart";
 import Placeholder from "../../shared/components/Placeholder/Placeholder";
+import PageContainer from "../../shared/components/PageContainer/PageContainer";
 import { Nullable } from "../../shared/utilities/nullable";
 
 interface State {
@@ -112,7 +113,7 @@ const DashboardPage: React.FC = () => {
 	}
 
 	return (
-		<Stack color="text_primary">
+		<PageContainer color="text_primary">
 			<Text fontWeight={900} fontSize={"3xl"}>{t("dashboard_title")}</Text>
 			<Stack gap={5}>
 				{getChart()}
@@ -123,7 +124,7 @@ const DashboardPage: React.FC = () => {
 					{transactionsStats}
 				</Grid>
 			</Stack>
-		</Stack>
+		</PageContainer>
 	)
 }
 

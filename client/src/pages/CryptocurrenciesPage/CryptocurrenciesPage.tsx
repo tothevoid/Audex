@@ -47,7 +47,7 @@ const CryptocurrenciesPage: React.FC = () => {
             buttonTitle={t("security_page_summary_add")}/>
 
         return cryptocurrencies.length ?
-            <Flex justifyContent="space-between" alignItems="center" pt={5} pb={5}>
+            <Flex justifyContent="space-between" alignItems="center" pb={5}>
                 {addButton}
             </Flex>:
             <Placeholder text={t("cryptocurrencies_page_no_cryptocurrencies")}>

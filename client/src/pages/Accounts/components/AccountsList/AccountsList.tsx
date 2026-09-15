@@ -86,7 +86,7 @@ const AccountsList: React.FC<Props> = ({onAccountsChanged}) => {
 	}
 
 	return <Box>
-		<Flex justifyContent="space-between" alignItems="center" pt={5} pb={5}>
+		<Flex justifyContent="space-between" alignItems="center" pb={5}>
 			<Box>
 				<Checkbox.Root checked={accountQueryParameters.onlyActive} onCheckedChange={onCheckboxChanged} variant="solid">
 					<Checkbox.HiddenInput />
