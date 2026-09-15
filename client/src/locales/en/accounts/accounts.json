@@ -16,5 +16,9 @@
     "account_balance_transfer_modal_to": "To account",
     "account_balance_transfer_modal_balance": "Balance",
     "account_balance_transfer_modal_fee": "Transfer fee",
-    "account_balance_transfer_modal_transfer_button": "Transfer"
+    "account_balance_transfer_modal_transfer_button": "Transfer",
+
+    "account_type_cash": "Cash",
+    "account_type_debit_card": "Debit card",
+    "account_type_credit_card": "Credit card"
 }

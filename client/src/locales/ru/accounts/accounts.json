@@ -16,5 +16,9 @@
     "account_balance_transfer_modal_to": "На счёт",
     "account_balance_transfer_modal_balance": "Сумма",
     "account_balance_transfer_modal_fee": "Комиссия за перевод",
-    "account_balance_transfer_modal_transfer_button": "Перевести"
+    "account_balance_transfer_modal_transfer_button": "Перевести",
+
+    "account_type_cash": "Наличные",
+    "account_type_debit_card": "Дебетовая карта",
+    "account_type_credit_card": "Кредитная карта"
 }
