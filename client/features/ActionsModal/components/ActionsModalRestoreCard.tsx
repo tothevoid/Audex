@@ -163,7 +163,7 @@ export const ActionsModalRestoreCard: React.FC = () => {
                             <input
                                 ref={fileInputRef}
                                 type="file"
-                                accept=".audexbackup,.sql.gz,.gz,.sql"
+                                accept=".audexbackup,.zip"
                                 style={{ display: 'none' }}
                                 onChange={handleFileChange}
                             />

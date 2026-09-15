@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -79,33 +79,23 @@ namespace Audex.Application.Services.DatabaseBackup
 
             try
             {
-                byte[] rawCompressed;
+                byte[] rawZipBytes;
                 if (isEncrypted)
                 {
-                    rawCompressed = await _backupEncryptionService.DecryptAsync(backupData, password!);
+                    rawZipBytes = await _backupEncryptionService.DecryptAsync(backupData, password!);
                 }
                 else
                 {
-                    rawCompressed = backupData;
+                    rawZipBytes = backupData;
                 }
 
-                var sqlBytes = DecompressGzip(rawCompressed);
-                var sqlText = Encoding.UTF8.GetString(sqlBytes);
-
-                if (string.IsNullOrWhiteSpace(sqlText) || (!sqlText.Contains("PostgreSQL database dump", StringComparison.OrdinalIgnoreCase) && !sqlText.Contains("CREATE TABLE", StringComparison.OrdinalIgnoreCase)))
-                {
-                    return new BackupValidationResultDto
-                    {
-                        IsValid = false,
-                        IsEncrypted = isEncrypted,
-                        ErrorMessage = "Invalid PostgreSQL backup dump content."
-                    };
-                }
+                var validationResult = await _databaseBackupProvider.ValidateDatabaseDumpAsync(rawZipBytes);
 
                 return new BackupValidationResultDto
                 {
-                    IsValid = true,
-                    IsEncrypted = isEncrypted
+                    IsValid = validationResult.IsValid,
+                    IsEncrypted = isEncrypted,
+                    ErrorMessage = validationResult.ErrorMessage
                 };
             }
             catch (Exception ex)

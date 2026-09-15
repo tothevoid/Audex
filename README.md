@@ -90,7 +90,7 @@ Run the full local development environment with hot reloading:
 
 1. **Start Infrastructure Services (Database & Storage)**:
    ```bash
-   docker compose -p audex_dev --env-file .env.dev up -d database files_database infrastructure_manager
+   docker compose -p audex_dev --env-file .env.dev up -d database files-database infrastructure_manager
    ```
 
 2. **Run Backend API**:

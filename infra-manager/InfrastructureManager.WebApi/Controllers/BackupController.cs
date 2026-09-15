@@ -70,5 +70,12 @@ namespace InfrastructureManager.WebApi.Controllers
                 Message = "Infrastructure restore (Database + S3) completed successfully."
             });
         }
+
+        [HttpPost("validate")]
+        public async Task<IResult> ValidateBackup(CancellationToken cancellationToken)
+        {
+            var result = await _infrastructureBackupService.ValidateBackupFromStreamAsync(Request.Body, cancellationToken);
+            return Results.Ok(result);
+        }
     }
 }

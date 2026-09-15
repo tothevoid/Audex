@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,9 +28,9 @@ namespace Audex.Application.Tests.Services.DatabaseBackup
                 Assert.NotNull(backup);
                 Assert.NotNull(backup.Data);
                 Assert.True(backup.Data.Length > 0);
-                Assert.Equal("application/gzip", backup.ContentType);
+                Assert.Equal("application/zip", backup.ContentType);
                 Assert.False(backup.IsEncrypted);
-                Assert.EndsWith(".sql.gz", backup.FileName);
+                Assert.EndsWith(".zip", backup.FileName);
 
                 var validationResult = await backupService.ValidateBackupAsync(backup.Data);
                 Assert.True(validationResult.IsValid);
@@ -54,7 +54,7 @@ namespace Audex.Application.Tests.Services.DatabaseBackup
                 Assert.True(backup.Data.Length > 0);
                 Assert.Equal("application/octet-stream", backup.ContentType);
                 Assert.True(backup.IsEncrypted);
-                Assert.EndsWith(".sql.gz.enc", backup.FileName);
+                Assert.EndsWith(".audexbackup", backup.FileName);
 
                 // Validation without password should indicate encrypted
                 var valWithoutPass = await backupService.ValidateBackupAsync(backup.Data);

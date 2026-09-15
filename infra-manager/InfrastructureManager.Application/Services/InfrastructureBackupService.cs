@@ -113,5 +113,74 @@ namespace InfrastructureManager.Application.Services
 
             _logger.LogInformation("Full infrastructure restore completed successfully.");
         }
+
+        public async Task<BackupValidationResultDto> ValidateBackupFromStreamAsync(Stream sourceStream, CancellationToken cancellationToken = default)
+        {
+            if (sourceStream == null || sourceStream.CanRead == false)
+            {
+                return new BackupValidationResultDto
+                {
+                    IsValid = false,
+                    ErrorMessage = "Backup stream is empty or unreadable."
+                };
+            }
+
+            try
+            {
+                using var memoryStream = new MemoryStream();
+                await sourceStream.CopyToAsync(memoryStream, cancellationToken);
+                if (memoryStream.Length == 0)
+                {
+                    return new BackupValidationResultDto
+                    {
+                        IsValid = false,
+                        ErrorMessage = "Backup stream is empty."
+                    };
+                }
+                memoryStream.Position = 0;
+
+                using var zip = new ZipArchive(memoryStream, ZipArchiveMode.Read);
+
+                var manifestEntry = zip.GetEntry(ManifestFileName);
+                var dbEntry = zip.GetEntry(DatabaseDumpFileName);
+
+                if (manifestEntry == null || dbEntry == null)
+                {
+                    return new BackupValidationResultDto
+                    {
+                        IsValid = false,
+                        ErrorMessage = $"Invalid backup archive: missing {ManifestFileName} or {DatabaseDumpFileName}."
+                    };
+                }
+
+                using (var manifestStream = manifestEntry.Open())
+                {
+                    var manifest = await JsonSerializer.DeserializeAsync<BackupManifestDto>(manifestStream, cancellationToken: cancellationToken);
+                    if (manifest == null)
+                    {
+                        return new BackupValidationResultDto
+                        {
+                            IsValid = false,
+                            ErrorMessage = $"Failed to read {ManifestFileName} from backup archive."
+                        };
+                    }
+                }
+
+                return new BackupValidationResultDto
+                {
+                    IsValid = true,
+                    ErrorMessage = null
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Backup validation failed.");
+                return new BackupValidationResultDto
+                {
+                    IsValid = false,
+                    ErrorMessage = ex.Message
+                };
+            }
+        }
     }
 }
