@@ -1,11 +1,11 @@
-import { Button, Card, Flex, Icon, Stack, Text } from '@chakra-ui/react';
-import { MdDelete, MdEdit } from "react-icons/md";
+import { Card, Flex, Stack, Text } from '@chakra-ui/react';
 import { Fragment } from 'react';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import { CryptocurrencyEntity } from '../../../../models/crypto/CryptocurrencyEntity';
 import { FaBitcoin } from "react-icons/fa";
 import { getIconUrl } from '../../../../api/crypto/cryptocurrencyApi';
 import StoredIcon from '../../../../shared/components/StoredIcon';
+import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
 
 interface Props {
     cryptocurrency: CryptocurrencyEntity,
@@ -34,18 +34,11 @@ const Cryptocurrency = (props: Props) => {
                         <Text fontWeight={600}>{name}</Text>
                         <Text fontWeight={600}>1 {symbol} = {formatMoneyByCurrencyCulture(price, "USD")}</Text>
                     </Stack>
-                    <Flex gap={1}>
-                        <Button borderColor="background_secondary" background="button_background_secondary" size={'sm'} onClick={() => props.onEditClicked(props.cryptocurrency)}>
-                            <Icon color="card_action_icon_primary">
-                                <MdEdit/>
-                            </Icon>
-                        </Button>
-                        <Button borderColor="background_secondary" background="button_background_secondary" size={'sm'} onClick={() => props.onDeletedClicked(props.cryptocurrency)}>
-                            <Icon color="card_action_icon_danger">
-                                <MdDelete/>
-                            </Icon>
-                        </Button>
-                    </Flex>
+                    <CardActionButtons
+                        size="sm"
+                        onEdit={() => props.onEditClicked(props.cryptocurrency)}
+                        onDelete={() => props.onDeletedClicked(props.cryptocurrency)}
+                    />
                 </Flex>
             </Card.Body>
         </Card.Root>

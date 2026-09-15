@@ -1,5 +1,4 @@
-import { Button, Card, Flex, Icon, Link, Span, Stack, Text } from '@chakra-ui/react';
-import { MdDelete, MdEdit } from "react-icons/md";
+import { Card, Flex, Link, Span, Stack, Text } from '@chakra-ui/react';
 import { Fragment, useEffect, useState } from 'react';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import { BrokerAccountEntity } from '../../../../models/brokers/BrokerAccountEntity';
@@ -8,6 +7,7 @@ import { getPortfolioValues } from '../../../../api/brokers/brokerAccountSummary
 import { BrokerAccountPortfolioEntity } from '../../../../models/brokers/BrokerAccountPortfolioEntity';
 import { BsBank } from 'react-icons/bs';
 import StoredIcon from '../../../../shared/components/StoredIcon';
+import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
 
 interface Props {
 	brokerAccount: BrokerAccountEntity
@@ -60,18 +60,11 @@ const BrokerAccount = (props: Props) => {
 							<Span color={color}>({formatMoneyByCurrencyCulture(portfolio.profitAndLoss, currency.name)})</Span>
 						</Stack>
 					</Stack>
-					<Flex gap={1}>
-						<Button borderColor="background_secondary" background="button_background_secondary" size={'sm'} onClick={() => props.onEditClick(props.brokerAccount)}>
-							<Icon color="card_action_icon_primary">
-								<MdEdit/>
-							</Icon>
-						</Button>
-						<Button borderColor="background_secondary" background="button_background_secondary" size={'sm'} onClick={() => props.onDeleteClick(props.brokerAccount)}>
-							<Icon color="card_action_icon_danger">
-								<MdDelete/>
-							</Icon>
-						</Button>
-					</Flex>
+					<CardActionButtons
+						size="sm"
+						onEdit={() => props.onEditClick(props.brokerAccount)}
+						onDelete={() => props.onDeleteClick(props.brokerAccount)}
+					/>
 				</Flex>
 			</Card.Body>
 		</Card.Root>

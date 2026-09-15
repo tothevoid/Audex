@@ -1,12 +1,12 @@
 import React from 'react';
-import { Box, Button, Card, Flex, HStack, Icon, Link, Stack, Text } from '@chakra-ui/react';
-import { MdDelete, MdEdit } from "react-icons/md";
+import { Box, Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
 import { HiOutlineBuildingOffice2 } from 'react-icons/hi2';
 import { getIconUrl } from '../../../../api/securities/securityApi';
 import { SecurityEntity } from '../../../../models/securities/SecurityEntity';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import StoredIcon from '../../../../shared/components/StoredIcon';
 import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
+import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
 
 type Props = {
     security: SecurityEntity;
@@ -69,40 +69,10 @@ const Security: React.FC<Props> = ({ security, onEditClicked, onDeleteClicked })
                             </Stack>
                         </HStack>
 
-                        <HStack gap={1} flexShrink={0}>
-                            <Button
-                                size="xs"
-                                variant="subtle"
-                                bg="button_background_secondary"
-                                borderColor="border_primary"
-                                borderWidth="1px"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    onEditClicked(security);
-                                }}
-                            >
-                                <Icon color="card_action_icon_primary" size="sm">
-                                    <MdEdit />
-                                </Icon>
-                            </Button>
-                            <Button
-                                size="xs"
-                                variant="subtle"
-                                bg="button_background_secondary"
-                                borderColor="border_primary"
-                                borderWidth="1px"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    onDeleteClicked(security);
-                                }}
-                            >
-                                <Icon color="card_action_icon_danger" size="sm">
-                                    <MdDelete />
-                                </Icon>
-                            </Button>
-                        </HStack>
+                        <CardActionButtons
+                            onEdit={() => onEditClicked(security)}
+                            onDelete={() => onDeleteClicked(security)}
+                        />
                     </Flex>
                 </Stack>
 

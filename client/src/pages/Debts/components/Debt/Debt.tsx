@@ -1,10 +1,11 @@
-import { Button, Card, Flex, Icon, Stack, Text } from '@chakra-ui/react';
-import { MdDelete, MdEdit, MdSettings } from "react-icons/md";
+import { Button, Card, Flex, Stack, Text } from '@chakra-ui/react';
+import { MdSettings } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import { DebtEntity } from '../../../../models/debts/DebtEntity';
 import { formatDate } from '../../../../shared/utilities/formatters/dateFormatter';
 import DebtTagBadge from '../DebtTagBadge/DebtTagBadge';
+import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
 
 type Props = {
 	debt: DebtEntity,
@@ -35,18 +36,11 @@ const Debt = (props: Props) => {
 						<Text fontSize="xs" color="gray.500">{formatDate(date, i18n)}</Text>
 					</Stack>
 
-					<Flex gap={1} onClick={(e) => e.stopPropagation()}>
-						<Button borderColor="background_secondary" background="button_background_secondary" size={'sm'} onClick={() => props.onEditClicked(props.debt)}>
-							<Icon color="card_action_icon_primary">
-								<MdEdit/>
-							</Icon>
-						</Button>
-						<Button borderColor="background_secondary" background="button_background_secondary" size={'sm'} onClick={() => props.onDeleteClicked(props.debt)}>
-							<Icon color="card_action_icon_danger">
-								<MdDelete/>
-							</Icon>
-						</Button>
-					</Flex>
+					<CardActionButtons
+						size="sm"
+						onEdit={() => props.onEditClicked(props.debt)}
+						onDelete={() => props.onDeleteClicked(props.debt)}
+					/>
 				</Flex>
 
 				<Flex pt={3} mt={3} borderTopWidth="1px" borderColor="border_primary" wrap="wrap" alignItems="center" gap={2} onClick={(e) => e.stopPropagation()}>

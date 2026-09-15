@@ -1,5 +1,4 @@
-import { Button, Card, Flex, Icon, Link, Stack, Text } from '@chakra-ui/react';
-import { MdDelete, MdEdit } from "react-icons/md";
+import { Card, Flex, Link, Stack, Text } from '@chakra-ui/react';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsWallet2 } from 'react-icons/bs';
@@ -9,6 +8,7 @@ import { getTotalBalance } from '../../../../api/crypto/cryptoAccountCryptocurre
 import { getCryptoProviderIconUrl } from '../../../../api/crypto/cryptoProviderApi';
 import StoredIcon from '../../../../shared/components/StoredIcon/StoredIcon';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
+import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
 
 interface Props {
     cryptoAccount: CryptoAccountEntity;
@@ -66,28 +66,11 @@ const CryptoAccount = (props: Props) => {
                                 </Link>
                             </Flex>
                         </Stack>
-                        <Flex gap={1} flexShrink={0}>
-                            <Button
-                                borderColor="background_secondary"
-                                background="button_background_secondary"
-                                size="sm"
-                                onClick={() => props.onEditClicked(props.cryptoAccount)}
-                            >
-                                <Icon color="card_action_icon_primary">
-                                    <MdEdit />
-                                </Icon>
-                            </Button>
-                            <Button
-                                borderColor="background_secondary"
-                                background="button_background_secondary"
-                                size="sm"
-                                onClick={() => props.onDeleteClicked(props.cryptoAccount)}
-                            >
-                                <Icon color="card_action_icon_danger">
-                                    <MdDelete />
-                                </Icon>
-                            </Button>
-                        </Flex>
+                        <CardActionButtons
+                            size="sm"
+                            onEdit={() => props.onEditClicked(props.cryptoAccount)}
+                            onDelete={() => props.onDeleteClicked(props.cryptoAccount)}
+                        />
                     </Flex>
 
                     {/* Balance section */}

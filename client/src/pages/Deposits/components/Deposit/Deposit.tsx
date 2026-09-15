@@ -1,5 +1,4 @@
-import { MdDelete, MdEdit, MdContentCopy } from "react-icons/md";
-import { Card, Flex, Stack, Button, Text, Container, Icon, Progress } from "@chakra-ui/react";
+import { Card, Flex, Stack, Text, Container, Progress } from "@chakra-ui/react";
 import { formatNumericDate } from "../../../../shared/utilities/formatters/dateFormatter";
 import { formatMoney } from "../../../../shared/utilities/formatters/moneyFormatter";
 import { DepositEntity } from "../../../../models/deposits/DepositEntity";
@@ -7,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { getBankIconUrl } from "../../../../api/banks/bankApi";
 import { BsBank } from "react-icons/bs";
 import StoredIcon from "../../../../shared/components/StoredIcon";
+import CardActionButtons from "../../../../shared/components/CardActionButtons/CardActionButtons";
 
 interface Props {
     deposit: DepositEntity
@@ -75,22 +75,13 @@ const Deposit: React.FC<Props> = ({deposit, onEditClicked, onCloneClicked, onDel
                             </Flex>
                     }
                   
-                    <Flex gap={2} paddingTop={4} justifyContent="end">
-                        <Button background={'background_secondary'} onClick={() => onEditClicked(deposit)} size={'sm'}>
-                            <Icon color="card_action_icon_primary">
-                                <MdEdit/>
-                            </Icon>
-                        </Button>
-                        <Button background={'background_secondary'} onClick={() => onCloneClicked(deposit)} size={'sm'}>
-                            <Icon color="card_action_icon_primary">
-                                <MdContentCopy/>
-                            </Icon>
-                        </Button>
-                        <Button background={'background_secondary'} onClick={() => onDeleteClicked(deposit)} size={'sm'}>
-                            <Icon color="card_action_icon_danger">
-                                <MdDelete/>
-                            </Icon>
-                        </Button>
+                    <Flex paddingTop={4} justifyContent="end">
+                        <CardActionButtons
+                            size="sm"
+                            onEdit={() => onEditClicked(deposit)}
+                            onCopy={() => onCloneClicked(deposit)}
+                            onDelete={() => onDeleteClicked(deposit)}
+                        />
                     </Flex>
                 </Container>
             </Stack>

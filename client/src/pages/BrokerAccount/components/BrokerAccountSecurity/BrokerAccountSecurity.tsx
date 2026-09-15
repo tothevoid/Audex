@@ -8,7 +8,6 @@ import { getIconUrl } from '../../../../api/securities/securityApi';
 import { BrokerAccountSecurityEntity } from '../../../../models/brokers/BrokerAccountSecurityEntity';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import StoredIcon from '../../../../shared/components/StoredIcon';
-import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
 
 type Props = {
     brokerAccountSecurity: BrokerAccountSecurityEntity;
@@ -60,16 +59,9 @@ export const BrokerAccountSecurity = ({ brokerAccountSecurity }: Props) => {
                                 size="lg"
                             />
                             <Stack gap={0.5} minW={0} flex="1">
-                                <Flex align="center" gap={2} flexWrap="wrap">
-                                    <Link color="text_primary" href={securityLink} fontSize="lg" fontWeight="900" letterSpacing="tight" truncate title={security?.ticker}>
-                                        {security?.ticker}
-                                    </Link>
-                                    {security?.type?.name && (
-                                        <AccentBadge variant="success" size="xs" px={2} py={0.5}>
-                                            {security.type.name}
-                                        </AccentBadge>
-                                    )}
-                                </Flex>
+                                <Link color="text_primary" href={securityLink} fontSize="lg" fontWeight="900" letterSpacing="tight" truncate title={security?.ticker}>
+                                    {security?.ticker}
+                                </Link>
                                 <Text fontSize="xs" color="gray.400" fontWeight="500" truncate title={security?.name}>
                                     {security?.name}
                                 </Text>
