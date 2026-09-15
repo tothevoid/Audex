@@ -11,30 +11,63 @@ namespace InfrastructureManager.WebApi.Controllers
     [Route("api")]
     public class BackupController : ControllerBase
     {
-        private readonly IPostgresBackupService _postgresBackupService;
+        private readonly IInfrastructureBackupService _infrastructureBackupService;
 
-        public BackupController(IPostgresBackupService postgresBackupService)
+        public BackupController(IInfrastructureBackupService infrastructureBackupService)
         {
-            _postgresBackupService = postgresBackupService;
+            _infrastructureBackupService = infrastructureBackupService;
         }
 
         [HttpGet("backup")]
         public IResult ExportBackup(CancellationToken cancellationToken)
         {
             return Results.Stream(
-                async stream => await _postgresBackupService.WriteDumpToStreamAsync(stream, cancellationToken),
-                contentType: "application/octet-stream",
-                fileDownloadName: "backup.dump");
+                async destinationStream =>
+                {
+                    var pipe = new System.IO.Pipelines.Pipe();
+
+                    var produceTask = Task.Run(async () =>
+                    {
+                        System.Exception? error = null;
+                        try
+                        {
+                            await using var writeStream = pipe.Writer.AsStream();
+                            await _infrastructureBackupService.WriteFullBackupToStreamAsync(writeStream, cancellationToken);
+                        }
+                        catch (System.Exception ex)
+                        {
+                            error = ex;
+                        }
+                        finally
+                        {
+                            await pipe.Writer.CompleteAsync(error);
+                        }
+                    }, cancellationToken);
+
+                    try
+                    {
+                        await using var readStream = pipe.Reader.AsStream();
+                        await readStream.CopyToAsync(destinationStream, cancellationToken);
+                    }
+                    finally
+                    {
+                        await pipe.Reader.CompleteAsync();
+                    }
+
+                    await produceTask;
+                },
+                contentType: "application/zip",
+                fileDownloadName: "backup.zip");
         }
 
         [HttpPost("restore")]
         public async Task<IResult> RestoreBackup(CancellationToken cancellationToken)
         {
-            await _postgresBackupService.RestoreDumpFromStreamAsync(Request.Body, cancellationToken);
+            await _infrastructureBackupService.RestoreFullBackupFromStreamAsync(Request.Body, cancellationToken);
             return Results.Ok(new RestoreResultDto
             {
                 Success = true,
-                Message = "Database restore completed successfully."
+                Message = "Infrastructure restore (Database + S3) completed successfully."
             });
         }
     }

@@ -14,13 +14,13 @@ namespace InfrastructureManager.Application.Tests.Controllers
 {
     public class BackupControllerTests
     {
-        private readonly IPostgresBackupService _postgresBackupService;
+        private readonly IInfrastructureBackupService _infrastructureBackupService;
         private readonly BackupController _controller;
 
         public BackupControllerTests()
         {
-            _postgresBackupService = Substitute.For<IPostgresBackupService>();
-            _controller = new BackupController(_postgresBackupService);
+            _infrastructureBackupService = Substitute.For<IInfrastructureBackupService>();
+            _controller = new BackupController(_infrastructureBackupService);
 
             var httpContext = new DefaultHttpContext();
             _controller.ControllerContext = new ControllerContext
@@ -30,7 +30,7 @@ namespace InfrastructureManager.Application.Tests.Controllers
         }
 
         [Fact]
-        public async Task ExportBackup_Should_Return_Stream_Result_And_Call_WriteDumpToStreamAsync()
+        public async Task ExportBackup_Should_Return_Stream_Result_And_Call_WriteFullBackupToStreamAsync()
         {
             // Arrange
             var httpContext = new DefaultHttpContext();
@@ -47,12 +47,12 @@ namespace InfrastructureManager.Application.Tests.Controllers
             await result.ExecuteAsync(httpContext);
 
             // Assert
-            httpContext.Response.ContentType.Should().Be("application/octet-stream");
-            await _postgresBackupService.Received(1).WriteDumpToStreamAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>());
+            httpContext.Response.ContentType.Should().Be("application/zip");
+            await _infrastructureBackupService.Received(1).WriteFullBackupToStreamAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>());
         }
 
         [Fact]
-        public async Task RestoreBackup_Should_Call_RestoreDumpFromStreamAsync_And_Return_Ok()
+        public async Task RestoreBackup_Should_Call_RestoreFullBackupFromStreamAsync_And_Return_Ok()
         {
             // Arrange
             var requestBody = new MemoryStream(new byte[] { 1, 2, 3 });
@@ -63,7 +63,7 @@ namespace InfrastructureManager.Application.Tests.Controllers
 
             // Assert
             result.Should().NotBeNull();
-            await _postgresBackupService.Received(1).RestoreDumpFromStreamAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>());
+            await _infrastructureBackupService.Received(1).RestoreFullBackupFromStreamAsync(Arg.Any<Stream>(), Arg.Any<CancellationToken>());
         }
     }
 }
