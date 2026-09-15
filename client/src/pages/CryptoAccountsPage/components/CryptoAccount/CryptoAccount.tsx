@@ -1,7 +1,5 @@
-import { Card, Flex, Link, Stack, Text } from '@chakra-ui/react';
+import { Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
 import { Fragment, useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { BsWallet2 } from 'react-icons/bs';
 import { SiBinance } from 'react-icons/si';
 import { CryptoAccountEntity } from '../../../../models/crypto/CryptoAccountEntity';
 import { getTotalBalance } from '../../../../api/crypto/cryptoAccountCryptocurrencyApi';
@@ -10,6 +8,7 @@ import StoredIcon from '../../../../shared/components/StoredIcon/StoredIcon';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
 import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
+import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
 
 interface Props {
     cryptoAccount: CryptoAccountEntity;
@@ -19,7 +18,6 @@ interface Props {
 
 const CryptoAccount = (props: Props) => {
     const { id, name, cryptoProvider } = props.cryptoAccount;
-    const { t } = useTranslation();
     const accountLink = `../crypto_account/${id}`;
 
     const [totalAmount, setTotalAmount] = useState<number>(0);
@@ -35,61 +33,48 @@ const CryptoAccount = (props: Props) => {
 
     return (
         <Fragment>
-            <EntityCard>
-                <Card.Body padding={4} color="text_primary">
-                    {/* Top row: Account title, provider icon, action buttons */}
-                    <Flex justifyContent="space-between" alignItems="flex-start" gap={2} mb={3}>
-                        <Stack gap={1} flex={1} minW={0}>
-                            <Flex alignItems="center" gap={2} flexWrap="wrap">
-                                {cryptoProvider && (
-                                    <StoredIcon
-                                        src={cryptoProvider.iconKey ? getCryptoProviderIconUrl(cryptoProvider.iconKey) : undefined}
-                                        fallbackIcon={<SiBinance size={16} color="#aaa" />}
-                                        size="sm"
-                                        title={cryptoProvider.name}
-                                    />
-                                )}
-                                <Link
-                                    fontSize="xl"
-                                    fontWeight={800}
-                                    color="text_primary"
-                                    href={accountLink}
-                                    textDecoration="none"
-                                    _hover={{ color: "action_primary", textDecoration: "none" }}
-                                >
-                                    {name}
-                                </Link>
-                            </Flex>
-                        </Stack>
-                        <CardActionButtons
-                            size="sm"
-                            onEdit={() => props.onEditClicked(props.cryptoAccount)}
-                            onDelete={() => props.onDeleteClicked(props.cryptoAccount)}
-                        />
-                    </Flex>
-
-                    {/* Balance section */}
-                    <Flex alignItems="center" gap={3} p={3} borderRadius="lg" backgroundColor="background_secondary">
-                        <Flex
-                            w={9}
-                            h={9}
-                            borderRadius="md"
-                            backgroundColor="rgba(234, 179, 8, 0.15)"
-                            color="yellow.400"
-                            alignItems="center"
-                            justifyContent="center"
-                            flexShrink={0}
-                        >
-                            <BsWallet2 size={18} />
+            <EntityCard h="full" display="flex" flexDirection="column" justifyContent="space-between">
+                <Card.Body p={4} color="text_primary" flex="1" display="flex" flexDirection="column" justifyContent="space-between">
+                    <Stack gap={3}>
+                        <Flex justify="space-between" align="center" gap={2}>
+                            <HStack gap={3} align="center" minW={0} flex="1">
+                                <StoredIcon
+                                    src={cryptoProvider?.iconKey ? getCryptoProviderIconUrl(cryptoProvider.iconKey) : undefined}
+                                    fallbackIcon={<SiBinance size={22} color="#aaa" />}
+                                    size="lg"
+                                    title={cryptoProvider?.name}
+                                />
+                                <Stack gap={0.5} minW={0} flex="1">
+                                    <Link
+                                        fontSize="md"
+                                        fontWeight="700"
+                                        lineHeight="1.3"
+                                        lineClamp={2}
+                                        color="text_primary"
+                                        href={accountLink}
+                                        textDecoration="none"
+                                        _hover={{ color: "action_primary", textDecoration: "none" }}
+                                        title={name}
+                                    >
+                                        {name}
+                                    </Link>
+                                </Stack>
+                            </HStack>
+                            <CardActionButtons
+                                size="sm"
+                                onEdit={() => props.onEditClicked(props.cryptoAccount)}
+                                onDelete={() => props.onDeleteClicked(props.cryptoAccount)}
+                            />
                         </Flex>
-                        <Stack gap={0} flex={1}>
-                            <Text fontSize="xs" color="text_secondary">
-                                {t("crypto_account_card_total_balance")}
-                            </Text>
-                            <Text fontSize="lg" fontWeight={700} color="text_primary">
-                                {formatMoneyByCurrencyCulture(totalAmount, "USD")}
-                            </Text>
-                        </Stack>
+                    </Stack>
+
+                    <Flex justify="space-between" align="center" pt={3} borderTopWidth="1px" borderColor="border_primary" mt={3}>
+                        <AccentBadge variant="neutral">
+                            {cryptoProvider?.name ?? "Crypto"}
+                        </AccentBadge>
+                        <Text fontSize="xl" fontWeight="900" letterSpacing="tight" color="text_primary">
+                            {formatMoneyByCurrencyCulture(totalAmount, "USD")}
+                        </Text>
                     </Flex>
                 </Card.Body>
             </EntityCard>

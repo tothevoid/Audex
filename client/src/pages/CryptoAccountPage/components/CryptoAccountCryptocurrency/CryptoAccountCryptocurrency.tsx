@@ -8,7 +8,6 @@ import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/forma
 import StoredIcon from '../../../../shared/components/StoredIcon';
 import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
 import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
-import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
 
 type Props = {
     cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity;
@@ -22,72 +21,76 @@ const CryptoAccountCryptocurrency: React.FC<Props> = ({
     onEditClicked,
     onDeleteClicked,
 }) => {
-    const { quantity, cryptocurrency } = cryptoAccountCryptocurrency;
     const { t } = useTranslation();
 
+    if (!cryptoAccountCryptocurrency || !cryptoAccountCryptocurrency.cryptocurrency) {
+        return null;
+    }
+
+    const { quantity = 0, cryptocurrency } = cryptoAccountCryptocurrency;
     const iconUrl = cryptocurrency.iconKey ? getIconUrl(cryptocurrency.iconKey) : undefined;
-    const totalValue = quantity * cryptocurrency.price;
+    const totalValue = quantity * (cryptocurrency.price ?? 0);
 
     return (
-        <EntityCard>
-            <Card.Body color="text_primary" p={4.5}>
-                <Stack spaceY={3.5}>
-                    <Flex justify="space-between" align="flex-start" gap={2}>
-                        <HStack gap={3} align="flex-start" minW={0} flex="1">
+        <EntityCard h="full" display="flex" flexDirection="column" justifyContent="space-between">
+            <Card.Body p={4} color="text_primary" flex="1" display="flex" flexDirection="column" justifyContent="space-between">
+                <Stack gap={3}>
+                    <Flex justify="space-between" align="center" gap={2}>
+                        <HStack gap={3} align="center" minW={0} flex="1">
                             <StoredIcon
                                 src={iconUrl}
-                                fallbackIcon={<FaBitcoin size={22} color="#aaa" />}
+                                fallbackIcon={<FaBitcoin size={24} color="#aaa" />}
                                 size="lg"
                             />
                             <Stack gap={0.5} minW={0} flex="1">
                                 <Text
                                     color="text_primary"
                                     fontWeight="700"
-                                    fontSize="md"
-                                    lineHeight="1.3"
-                                    lineClamp={2}
+                                    fontSize="lg"
+                                    letterSpacing="tight"
+                                    truncate
+                                    title={cryptocurrency.symbol}
+                                >
+                                    {cryptocurrency.symbol}
+                                </Text>
+                                <Text
+                                    fontSize="xs"
+                                    color="text_secondary"
+                                    fontWeight="500"
+                                    truncate
                                     title={cryptocurrency.name}
                                 >
                                     {cryptocurrency.name}
                                 </Text>
-                                <Flex gap={1.5} align="center">
-                                    <AccentBadge variant="success">
-                                        {cryptocurrency.symbol}
-                                    </AccentBadge>
-                                </Flex>
                             </Stack>
                         </HStack>
 
                         <CardActionButtons
-                            size="sm"
                             onEdit={() => onEditClicked(cryptoAccountCryptocurrency)}
                             onDelete={() => onDeleteClicked(cryptoAccountCryptocurrency)}
                         />
                     </Flex>
-
-                    <Flex justify="space-between" align="baseline" pt={1}>
-                        <Stack spaceY={0}>
-                            <Text fontSize="xs" color="text_secondary" fontWeight="medium">
-                                {t("crypto_account_cryptocurrency_quantity")}
-                            </Text>
-                            <Text fontSize="md" fontWeight="bold" color="text_primary">
-                                {quantity} {cryptocurrency.symbol}
-                            </Text>
-                            <Text fontSize="2xs" color="text_secondary">
-                                1 {cryptocurrency.symbol} = {formatMoneyByCurrencyCulture(cryptocurrency.price, "USD")}
-                            </Text>
-                        </Stack>
-
-                        <Stack spaceY={0} align="flex-end">
-                            <Text fontSize="xs" color="text_secondary" fontWeight="medium">
-                                {t("crypto_account_cryptocurrency_total_value")}
-                            </Text>
-                            <Text fontSize="2xl" fontWeight="900" letterSpacing="tight" color="text_primary">
-                                {formatMoneyByCurrencyCulture(totalValue, "USD")}
-                            </Text>
-                        </Stack>
-                    </Flex>
                 </Stack>
+
+                <Flex justify="space-between" align="flex-end" pt={3} borderTopWidth="1px" borderColor="border_primary" mt={3}>
+                    <Stack gap={0}>
+                        <Text fontSize="2xs" color="text_secondary">
+                            {t("crypto_account_cryptocurrency_quantity")}
+                        </Text>
+                        <Text fontSize="sm" fontWeight="700" color="text_primary">
+                            {quantity} {cryptocurrency.symbol}
+                        </Text>
+                    </Stack>
+
+                    <Stack gap={0} align="flex-end">
+                        <Text fontSize="2xs" color="text_secondary">
+                            {t("crypto_account_cryptocurrency_total_value")}
+                        </Text>
+                        <Text fontSize="xl" fontWeight="900" letterSpacing="tight" color="text_primary">
+                            {formatMoneyByCurrencyCulture(totalValue, "USD")}
+                        </Text>
+                    </Stack>
+                </Flex>
             </Card.Body>
         </EntityCard>
     );

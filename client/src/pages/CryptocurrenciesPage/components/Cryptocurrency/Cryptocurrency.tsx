@@ -5,6 +5,7 @@ import { getIconUrl } from '../../../../api/crypto/cryptocurrencyApi';
 import { CryptocurrencyEntity } from '../../../../models/crypto/CryptocurrencyEntity';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import StoredIcon from '../../../../shared/components/StoredIcon';
+import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
 import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
 import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
 
@@ -40,15 +41,6 @@ const Cryptocurrency: React.FC<Props> = (props: Props) => {
                                 >
                                     {symbol}
                                 </Text>
-                                <Text
-                                    fontSize="xs"
-                                    color="text_secondary"
-                                    fontWeight="500"
-                                    truncate
-                                    title={name}
-                                >
-                                    {name}
-                                </Text>
                             </Stack>
                         </HStack>
 
@@ -59,7 +51,12 @@ const Cryptocurrency: React.FC<Props> = (props: Props) => {
                     </Flex>
                 </Stack>
 
-                <Flex justify="flex-end" align="center" pt={3} borderTopWidth="1px" borderColor="border_primary" mt={3}>
+                <Flex justify="space-between" align="center" pt={3} borderTopWidth="1px" borderColor="border_primary" mt={3}>
+                    {name ? (
+                        <AccentBadge variant="neutral">
+                            {name}
+                        </AccentBadge>
+                    ) : <span />}
                     <Text fontSize="xl" fontWeight="900" letterSpacing="tight" color="text_primary">
                         {formatMoneyByCurrencyCulture(price, "USD")}
                     </Text>
