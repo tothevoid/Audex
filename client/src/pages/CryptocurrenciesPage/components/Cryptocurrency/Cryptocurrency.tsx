@@ -1,9 +1,9 @@
-import { Card, Flex, Stack, Text } from '@chakra-ui/react';
-import { Fragment } from 'react';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import { CryptocurrencyEntity } from '../../../../models/crypto/CryptocurrencyEntity';
+import React from 'react';
+import { Card, Flex, HStack, Stack, Text } from '@chakra-ui/react';
 import { FaBitcoin } from "react-icons/fa";
 import { getIconUrl } from '../../../../api/crypto/cryptocurrencyApi';
+import { CryptocurrencyEntity } from '../../../../models/crypto/CryptocurrencyEntity';
+import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import StoredIcon from '../../../../shared/components/StoredIcon';
 import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
 import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
@@ -14,36 +14,59 @@ interface Props {
     onDeletedClicked: (cryptocurrency: CryptocurrencyEntity) => void
 }
 
-const Cryptocurrency = (props: Props) => {
+const Cryptocurrency: React.FC<Props> = (props: Props) => {
     const { name, symbol, price, iconKey } = props.cryptocurrency;
-
     const iconUrl = iconKey ? getIconUrl(iconKey) : undefined;
 
-    return <Fragment>
-        <EntityCard>
-            <Card.Body color="text_primary" p={4}>
-                <Flex justifyContent="space-between" alignItems="center">
-                    <Stack>
-                        <Stack justifyContent={"start"} direction="row" alignItems="center">
+    return (
+        <EntityCard h="full" display="flex" flexDirection="column" justifyContent="space-between">
+            <Card.Body p={4} color="text_primary" flex="1" display="flex" flexDirection="column" justifyContent="space-between">
+                <Stack gap={3}>
+                    <Flex justify="space-between" align="center" gap={2}>
+                        <HStack gap={3} align="center" minW={0} flex="1">
                             <StoredIcon
                                 src={iconUrl}
-                                fallbackIcon={<FaBitcoin size={20} color="#aaa" />}
-                                size="md"
+                                fallbackIcon={<FaBitcoin size={24} color="#aaa" />}
+                                size="lg"
                             />
-                            <Text fontSize="2xl" fontWeight={600} color="text_primary">{symbol}</Text>
-                        </Stack>
-                        <Text fontWeight={600}>{name}</Text>
-                        <Text fontWeight={600}>1 {symbol} = {formatMoneyByCurrencyCulture(price, "USD")}</Text>
-                    </Stack>
-                    <CardActionButtons
-                        size="sm"
-                        onEdit={() => props.onEditClicked(props.cryptocurrency)}
-                        onDelete={() => props.onDeletedClicked(props.cryptocurrency)}
-                    />
+                            <Stack gap={0.5} minW={0} flex="1">
+                                <Text
+                                    color="text_primary"
+                                    fontWeight="700"
+                                    fontSize="lg"
+                                    letterSpacing="tight"
+                                    truncate
+                                    title={symbol}
+                                >
+                                    {symbol}
+                                </Text>
+                                <Text
+                                    fontSize="xs"
+                                    color="text_secondary"
+                                    fontWeight="500"
+                                    truncate
+                                    title={name}
+                                >
+                                    {name}
+                                </Text>
+                            </Stack>
+                        </HStack>
+
+                        <CardActionButtons
+                            onEdit={() => props.onEditClicked(props.cryptocurrency)}
+                            onDelete={() => props.onDeletedClicked(props.cryptocurrency)}
+                        />
+                    </Flex>
+                </Stack>
+
+                <Flex justify="flex-end" align="center" pt={3} borderTopWidth="1px" borderColor="border_primary" mt={3}>
+                    <Text fontSize="xl" fontWeight="900" letterSpacing="tight" color="text_primary">
+                        {formatMoneyByCurrencyCulture(price, "USD")}
+                    </Text>
                 </Flex>
             </Card.Body>
         </EntityCard>
-    </Fragment>
+    );
 };
 
 export default Cryptocurrency;
