@@ -91,10 +91,11 @@ This document contains guidelines, coding standards, and architectural patterns 
 ### Stack & Structure
 - **Framework**: React 19 + TypeScript + Vite (`client/src`).
 - **UI & Styling**: Chakra UI v3, `react-icons`.
-- **Theme**: Pure **Dark Theme** (`darkTheme` token system with `#121212` background, `color-scheme: dark`, custom dark scrollbars, and `scrollbar-gutter: stable` to eliminate layout shift across pages).
+- **Theme**: Modular Dual Theme System (`client/src/theme/`) supporting **Dark Theme** (`#121212`) and **Solarized Sand Light Theme** (`#fbf8f2` warm paper/sand palette) with semantic tokens (`background_main`, `background_primary`, `background_secondary`, `text_primary`, `text_secondary`, `border_primary`, `action_primary`, `gain`, `loss`, `status_*`). Theme switching is managed via `ColorModeProvider` / `useColorMode()` and persisted in `localStorage`.
 - **i18n**: `react-i18next`.
 - **Directory Scope**: ALL client source files (components, features, pages, hooks) MUST reside under `client/src/`. Do NOT create feature folders at `client/features`.
 - **Structure**:
+  - `client/src/theme`: Modular theme system (`colors/`, `recipes/`, `types.ts`, `index.ts`).
   - `client/src/features`: Shared domain feature modules (e.g. Navigation, UserProfileSettingsModal).
   - `client/src/models/<domain>`: Domain interfaces, requests (`*EntityRequest`), responses (`*EntityResponse`).
   - `client/src/api/<domain>`: API client functions and response/request mappers.
@@ -187,8 +188,8 @@ This document contains guidelines, coding standards, and architectural patterns 
 - **Loading & Empty States**: Pages MUST use Skeleton loaders (`CardSkeleton`, `TableSkeleton`) during data fetches and `<EmptyStatePlaceholder>` when entity collections are empty.
 - **Date Picker**: Use `react-datepicker` (`DatePicker`) with Chakra UI `<Input width="200px" color="text_primary" backgroundColor="background_primary" borderColor="border_primary" />`.
 - **Default Date**: Default to today (`new Date()`). Display as `dd.MM.yyyy` to the user, and format as ISO date `YYYY-MM-DD` for API queries.
-- **Dark Theme & Scrollbars**: The application exclusively uses a sleek Dark Theme (`darkTheme`). Root elements (`html`, `body` in `index.css`) specify `color-scheme: dark`, `#121212` (`background_main`), and custom dark scrollbars. Always preserve `scrollbar-gutter: stable` on `html` to prevent layout jumping/shifting between scrollable and non-scrollable pages.
-- **Layout & Styling**: Use Chakra UI v3 theme tokens (`background_main`, `background_primary`, `background_secondary`, `text_primary`, `text_secondary`, `border_primary`, `action_primary`) and `<SimpleGrid columns={2} gap={4}>` with `<MoneyCard>` for metric grids.
+- **Themes & Scrollbars**: The application supports Dark Theme and Solarized Sand Light Theme via Chakra UI v3 semantic tokens. Root elements (`html`, `body` in `index.css`) support `[data-theme="dark"]` and `[data-theme="light"]`, matching scrollbars and WebKit autofill styles. Always preserve `scrollbar-gutter: stable` on `html` to prevent layout jumping/shifting between scrollable and non-scrollable pages.
+- **Layout & Styling**: Use Chakra UI v3 theme tokens (`background_main`, `background_primary`, `background_secondary`, `text_primary`, `text_secondary`, `border_primary`, `action_primary`) and `<SimpleGrid columns={2} gap={4}>` with `<MoneyCard>` for metric grids. Do NOT use hardcoded hex/rgb/rgba colors in components.
 
 ### API Client Functions
 - **Dual Endpoint Handling**: API functions accept `brokerAccountId: Nullable<string>` and switch URLs conditionally:
