@@ -51,6 +51,13 @@
     "user_profile_settings_currency_placeholder": "Select currency",
     "user_profile_settings_language": "Display in language",
     "user_profile_settings_language_placeholder": "Select language",
+    "user_profile_settings_theme": "Theme",
+    "user_profile_settings_theme_placeholder": "Select theme",
+
+    "theme_toggle_title": "Switch theme",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "theme_system": "System",
 
     "number_unit_thousand": "k",
     "number_unit_million": "M",

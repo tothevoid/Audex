@@ -71,11 +71,11 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
         <Box
             p={4}
             borderRadius="xl"
-            backgroundColor={item.isRead ? "background_secondary" : "rgba(10, 142, 58, 0.08)"}
+            backgroundColor={item.isRead ? "background_secondary" : "status_success_bg"}
             borderWidth="1px"
             borderLeftWidth="4px"
             borderLeftColor={getSeverityBorderColor(item.severity, item.isRead)}
-            borderColor={item.isRead ? "border_primary" : "rgba(10, 142, 58, 0.3)"}
+            borderColor={item.isRead ? "border_primary" : "status_success_border"}
             transition="all 0.2s"
             _hover={{ borderColor: "action_primary", boxShadow: "md" }}
         >

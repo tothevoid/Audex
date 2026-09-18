@@ -56,14 +56,9 @@ const getGraphData = (transactions: TransactionEntity[],
     return data;
 }
 
-const getPossibleColors = () => {
-    return [
-        "#FF6347", "#2E8B57", "#D2691E",
-        "#DCDCDC", "#A52A2A", "#5F9EA0", "#FF4500",
-        "#6A5ACD", "#C71585", "#4682B4", "#8B4513",
-        "#B8860B", "#20B2AA", "#FF8C00", "#6B8E23", "#483D8B"
-    ]
-}
+import { CHARTS_COLORS } from "../../../../shared/constants/chartColors";
+
+const getPossibleColors = () => CHARTS_COLORS;
 
 const getNameMapping = <CollectionType,>(
     collection: Array<CollectionType>,
@@ -126,7 +121,7 @@ const TransactionStats = (props: Props) => {
                                     <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />))
                             }
                         </Pie>
-                        <Tooltip itemStyle={{ color: '#FFFFFF' }} contentStyle={getChartLabelConfig()} formatter={(value: TooltipValueType | undefined, name: TooltipValueType | undefined) => [formatMoneyByCurrencyCulture(Number(value ?? 0), user?.currency.name), String(name ?? '')]} />
+                        <Tooltip itemStyle={{ color: 'var(--chakra-colors-text_primary)' }} contentStyle={getChartLabelConfig()} formatter={(value: TooltipValueType | undefined, name: TooltipValueType | undefined) => [formatMoneyByCurrencyCulture(Number(value ?? 0), user?.currency.name), String(name ?? '')]} />
                         <Legend/>
                     </PieChart>
                 </ResponsiveContainer>

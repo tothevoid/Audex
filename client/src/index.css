@@ -1,15 +1,38 @@
+:root {
+  --scrollbar-track: #121212;
+  --scrollbar-thumb: #333333;
+  --scrollbar-thumb-hover: #4a4a4a;
+}
+
 html {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+:root[data-theme="dark"],
+html[data-theme="dark"],
+html.dark {
+  --scrollbar-track: #121212;
+  --scrollbar-thumb: #333333;
+  --scrollbar-thumb-hover: #4a4a4a;
   color-scheme: dark;
   background-color: #121212;
-  scrollbar-gutter: stable;
-  scrollbar-color: #383838 #121212;
-  scrollbar-width: auto;
+  color: #E0E0E0;
+}
+
+:root[data-theme="light"],
+html[data-theme="light"],
+html.light {
+  --scrollbar-track: #eee6d8;
+  --scrollbar-thumb: #c8bfb3;
+  --scrollbar-thumb-hover: #ad9e8e;
+  color-scheme: light;
+  background-color: #fbf8f2;
+  color: #2b303a;
 }
 
 body {
   margin: 0;
-  background-color: #121212;
-  color: #E0E0E0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -17,24 +40,39 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom dark scrollbar styling */
+html[data-theme="dark"] body,
+html.dark body {
+  background-color: #121212;
+}
+
+html[data-theme="light"] body,
+html.light body {
+  background-color: #fbf8f2;
+}
+
+/* Global scrollbar rules (Chromium requires unqualified ::-webkit-scrollbar for viewport) */
 ::-webkit-scrollbar {
-  width: 14px;
-  height: 14px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #121212;
+  background: var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #333333;
-  border-radius: 7px;
-  border: 3px solid #121212;
+  background-color: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  border: 2px solid var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #4a4a4a;
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+* {
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
 }
 
 code {
@@ -70,12 +108,31 @@ input[type="number"] {
 }
 
 /* Prevent blue/yellow autofill background in dark theme */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
+html[data-theme="dark"] input:-webkit-autofill,
+html[data-theme="dark"] input:-webkit-autofill:hover,
+html[data-theme="dark"] input:-webkit-autofill:focus,
+html[data-theme="dark"] input:-webkit-autofill:active,
+html.dark input:-webkit-autofill,
+html.dark input:-webkit-autofill:hover,
+html.dark input:-webkit-autofill:focus,
+html.dark input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 1000px #1E1E1E inset !important;
   -webkit-text-fill-color: #E0E0E0 !important;
   caret-color: #E0E0E0 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Prevent blue/yellow autofill background in light theme */
+html[data-theme="light"] input:-webkit-autofill,
+html[data-theme="light"] input:-webkit-autofill:hover,
+html[data-theme="light"] input:-webkit-autofill:focus,
+html[data-theme="light"] input:-webkit-autofill:active,
+html.light input:-webkit-autofill,
+html.light input:-webkit-autofill:hover,
+html.light input:-webkit-autofill:focus,
+html.light input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #e8e0d2 inset !important;
+  -webkit-text-fill-color: #2b303a !important;
+  caret-color: #2b303a !important;
   transition: background-color 5000s ease-in-out 0s;
 }

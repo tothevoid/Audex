@@ -135,7 +135,7 @@ const TransactionTypesTable: React.FC = () => {
             render: (transactionType) => (
                 <StoredIcon
                     src={transactionType.iconKey ? getTransactionTypeIconUrl(transactionType.iconKey) : undefined}
-                    fallbackIcon={<MdOutlinePayment size={20} color="#aaa" />}
+                    fallbackIcon={<MdOutlinePayment size={20} color="var(--chakra-colors-text_secondary)" />}
                     size="md"
                 />
             )

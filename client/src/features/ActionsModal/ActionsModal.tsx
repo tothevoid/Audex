@@ -32,11 +32,11 @@ const ActionsModal = forwardRef<BaseModalRef>((_, ref) => {
             <Box minH="420px" maxH="420px" display="flex" flexDirection="column">
                 <Tabs.Root lazyMount={true} unmountOnExit={true} defaultValue="reports" variant="enclosed" display="flex" flexDirection="column" flex="1">
                     <Tabs.List background="background_primary">
-                        <Tabs.Trigger _selected={{ bg: "action_primary" }} color="text_primary" value="reports">
+                        <Tabs.Trigger value="reports">
                             <Icon mr={2}><MdAssessment /></Icon>
                             {t("actions_tab_reports")}
                         </Tabs.Trigger>
-                        <Tabs.Trigger _selected={{ bg: "action_primary" }} color="text_primary" value="backup">
+                        <Tabs.Trigger value="backup">
                             <Icon mr={2}><MdBackup /></Icon>
                             {t("actions_tab_backup")}
                         </Tabs.Trigger>

@@ -23,10 +23,10 @@ const DividendPayment = (props: Props) => {
         <CardBody>
             <Flex justifyContent="space-between" alignItems="center">
                 <Stack direction={'row'} alignItems="center">
-                    <Text textAlign={'center'} w={150} rounded={10} padding={1} background={'action_primary'}>{formatDate(props.dividendPayment.receivedAt, i18n, true)}</Text>
+                    <Text textAlign={'center'} w={150} rounded={10} padding={1} background={'action_primary'} color="white">{formatDate(props.dividendPayment.receivedAt, i18n, true)}</Text>
                     {
                         props.isGlobalBrokerAccount &&
-                        <Text textAlign={'center'} w={150} rounded={10} padding={1} background={'action_primary'}>{props.dividendPayment.brokerAccount?.name}</Text>
+                        <Text textAlign={'center'} w={150} rounded={10} padding={1} background={'action_primary'} color="white">{props.dividendPayment.brokerAccount?.name}</Text>
                     }
                     <Text fontWeight={700}>{dividend.security?.name} ({dividend.security?.ticker})</Text>
                 </Stack>

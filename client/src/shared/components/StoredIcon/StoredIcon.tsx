@@ -79,7 +79,7 @@ export const StoredIcon: React.FC<StoredIconProps> = ({
                 title={title ?? alt}
                 flexShrink={0}
             >
-                {fallbackIcon ?? <LuImage size={iconPixelSize} color="#aaa" />}
+                {fallbackIcon ?? <LuImage size={iconPixelSize} color="var(--chakra-colors-text_secondary)" />}
             </Flex>
         );
     };

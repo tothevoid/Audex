@@ -23,17 +23,17 @@ export const CHARTS_COLORS = [
 ];
 
 export const CHART_THEME_COLORS = {
-    earnings: "#10b981", // Emerald accent for positive earnings / yield
-    positive: "#4ade80", // Green for profits / gains
-    negative: "#f87171", // Red for losses / expenses
-    grid: "rgba(255, 255, 255, 0.07)",
-    axisLine: "rgba(255, 255, 255, 0.1)",
+    earnings: "var(--chakra-colors-gain)",
+    positive: "var(--chakra-colors-gain)",
+    negative: "var(--chakra-colors-loss)",
+    grid: "var(--chakra-colors-border_primary)",
+    axisLine: "var(--chakra-colors-border_primary)",
     axisText: "var(--chakra-colors-text_secondary)",
-    cursorStroke: "rgba(255, 255, 255, 0.15)",
-    cursorFill: "rgba(255, 255, 255, 0.05)",
-    tooltipBg: "#1E1E1E",
-    tooltipBorder: "rgba(255, 255, 255, 0.15)",
-    divider: "rgba(255, 255, 255, 0.08)",
+    cursorStroke: "var(--chakra-colors-border_primary)",
+    cursorFill: "var(--chakra-colors-background_secondary)",
+    tooltipBg: "var(--chakra-colors-background_primary)",
+    tooltipBorder: "var(--chakra-colors-border_primary)",
+    divider: "var(--chakra-colors-border_primary)",
 };
 
 export const getChartColor = (index: number): string => {

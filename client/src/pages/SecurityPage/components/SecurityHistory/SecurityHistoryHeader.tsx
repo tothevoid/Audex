@@ -132,7 +132,7 @@ const SecurityHistoryHeader: React.FC<Props> = ({
                             color={isSelected ? "white" : "text_secondary"}
                             cursor="pointer"
                             transition="all 0.15s ease"
-                            _hover={isSelected ? {} : { color: "text_primary", backgroundColor: "rgba(255, 255, 255, 0.05)" }}
+                            _hover={isSelected ? {} : { color: "text_primary", backgroundColor: "background_secondary" }}
                         >
                             {t(labelKey)}
                         </Box>

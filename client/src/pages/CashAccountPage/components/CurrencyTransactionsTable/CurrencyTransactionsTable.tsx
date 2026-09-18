@@ -50,7 +50,7 @@ export const CurrencyTransactionsTable: React.FC<CurrencyTransactionsTableProps>
                         const isPositive = diff.rawProfitAndLoss >= 0;
 
                         return (
-                            <Table.Row key={tr.id} _hover={{ backgroundColor: "rgba(255, 255, 255, 0.02)" }}>
+                            <Table.Row key={tr.id} _hover={{ backgroundColor: "background_secondary" }}>
                                 <Table.Cell>
                                     <Text fontWeight="600" color="text_primary">
                                         {formatNumericDate(tr.date, i18n)}

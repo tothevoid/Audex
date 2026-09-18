@@ -1,55 +1,84 @@
-.calendar{
+.calendar {
     width: 200px;
     margin: 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    .calendar-header{
+    border: 1px solid var(--chakra-colors-border_primary);
+    border-radius: 8px;
+    padding: 8px;
+    background: var(--chakra-colors-background_primary);
+    color: var(--chakra-colors-text_primary);
+
+    .calendar-header {
         width: 200px;
         display: flex;
         align-items: center;
-        .prev-button, .next-button{
-            width: 40px;
-            height: 40px;
+        justify-content: space-between;
+
+        .prev-button, .next-button {
+            width: 32px;
+            height: 32px;
             border: none;
-            &:disabled{
-                // color: #414242;
-            } 
+            background: transparent;
+            color: var(--chakra-colors-text_primary);
+            cursor: pointer;
+            border-radius: 4px;
+
+            &:hover {
+                background: var(--chakra-colors-background_secondary);
+            }
         }
-        .calendar-title{
-            height: 40px;
-            width: 120px;
+
+        .calendar-title {
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            font-weight: bold;
+            color: var(--chakra-colors-text_primary);
+            border-radius: 4px;
+            padding: 0 8px;
+
+            &:hover {
+                background: var(--chakra-colors-background_secondary);
+            }
         }        
     }
-    .calendar-content{
+
+    .calendar-content {
         width: 200px;
         display: flex;
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;
-        .calendar-element{
-            height: 50px;
+
+        .calendar-element {
+            height: 40px;
             width: 25%;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            &:hover{
-                background: #409EFE;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--chakra-colors-text_primary);
+
+            &:hover {
+                background: var(--chakra-colors-background_secondary);
             }
         }
-        .current{
-            background: red;
+
+        .current {
+            background: var(--chakra-colors-action_primary);
+            color: #ffffff;
+            font-weight: bold;
+
+            &:hover {
+                background: var(--chakra-colors-action_primary);
+            }
         }
-       
     }
 }
-
-
-
-

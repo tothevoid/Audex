@@ -98,8 +98,8 @@ const DepositStats: React.FC<Props> = ({ selectedMinMonths, selectedMaxMonths, o
                     <Box
                         p={2}
                         borderRadius="lg"
-                        bg="rgba(16, 185, 129, 0.12)"
-                        color="#10b981"
+                        bg="status_success_bg"
+                        color="gain"
                         display="flex"
                         alignItems="center"
                         justifyContent="center"
@@ -136,7 +136,7 @@ const DepositStats: React.FC<Props> = ({ selectedMinMonths, selectedMaxMonths, o
                         <Text fontSize="2xs" color="text_secondary" fontWeight="medium" textTransform="uppercase" letterSpacing="wider">
                             {t("deposits_stats_total_earnings")}
                         </Text>
-                        <Text fontSize="lg" fontWeight="bold" color="#10b981" mt={0.5}>
+                        <Text fontSize="lg" fontWeight="bold" color="gain" mt={0.5}>
                             {formatMoneyByCurrencyCulture(summary.totalEarnings, currency)}
                         </Text>
                     </Box>

@@ -10,6 +10,7 @@
 	position: sticky;
 	top: 0;
 	z-index: 1000;
+	background-color: var(--chakra-colors-header_bg);
 }
 
 .app-main {
@@ -21,10 +22,6 @@
 	box-sizing: border-box;
 }
 
-input[type="time"],
-input[type="date"] {
-	color-scheme: dark;
-}
 
 input[type="time"]::-webkit-calendar-picker-indicator,
 input[type="date"]::-webkit-calendar-picker-indicator {

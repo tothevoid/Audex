@@ -26,9 +26,9 @@ const DebtPayment = (props: Props) => {
             mt={5} mb={5} boxShadow={"sm"} _hover={{ boxShadow: "md" }}>
             <CardBody>
                 <Flex justifyContent="space-between" alignItems="center">
-                    <Stack direction={"row"}>
-                        <Text textAlign={'center'} w={150} rounded={10} padding={1} background={'action_primary'}>{formatDate(date, i18n, false)}</Text>
-                        {isPercentagePayment && <Text textAlign={'center'} w={10} rounded={10} padding={1} background={'action_primary'}>%</Text>}
+                    <Stack direction={"row"} alignItems="center">
+                        <Text textAlign={'center'} w={150} rounded={10} padding={1} background={'action_primary'} color="white">{formatDate(date, i18n, false)}</Text>
+                        {isPercentagePayment && <Text textAlign={'center'} w={10} rounded={10} padding={1} background={'action_primary'} color="white">%</Text>}
                         <Text fontWeight={600}>{title}</Text>
                     </Stack>
                     <Flex gap={2} justifyContent="space-between" alignItems="center">

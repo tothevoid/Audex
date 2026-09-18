@@ -47,7 +47,7 @@ const StatCard: React.FC<StatCardProps> = ({
             gap={3}
             alignItems="center"
             transition="all 0.2s ease"
-            _hover={{ borderColor: "rgba(255, 255, 255, 0.2)", backgroundColor: "rgba(255, 255, 255, 0.02)" }}
+            _hover={{ borderColor: "action_primary", backgroundColor: "background_primary" }}
         >
             <Box
                 p={2}
@@ -114,7 +114,7 @@ const SecurityHeader: React.FC<Props> = ({ security, securityStats }) => {
                     <HStack gap={3.5} alignItems="center">
                         <StoredIcon
                             src={iconUrl}
-                            fallbackIcon={<HiOutlineBuildingOffice2 size={24} color="#aaa" />}
+                            fallbackIcon={<HiOutlineBuildingOffice2 size={24} color="var(--chakra-colors-text_secondary)" />}
                             size="lg"
                         />
                         <Stack gap={1}>

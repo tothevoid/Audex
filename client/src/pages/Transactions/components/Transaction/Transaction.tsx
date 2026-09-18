@@ -36,7 +36,7 @@ const Transaction: React.FC<Props> = (props: Props) => {
 				<Stack direction={'row'} alignItems="center">
 					<StoredIcon
 						src={iconUrl}
-						fallbackIcon={<MdOutlinePayment size={20} color="#aaa" />}
+						fallbackIcon={<MdOutlinePayment size={20} color="var(--chakra-colors-text_secondary)" />}
 						size="md"
 					/>
 					<Stack direction={"row"} ml={5}>

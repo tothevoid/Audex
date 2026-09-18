@@ -32,9 +32,9 @@ export const AccentBadge: React.FC<AccentBadgeProps> = ({
             borderColor: 'status_danger_border',
         },
         info: {
-            bg: 'rgba(59, 130, 246, 0.12)',
-            color: 'blue.400',
-            borderColor: 'rgba(59, 130, 246, 0.3)',
+            bg: 'status_info_bg',
+            color: 'status_info',
+            borderColor: 'status_info_border',
         },
         neutral: {
             bg: 'background_secondary',
@@ -42,9 +42,9 @@ export const AccentBadge: React.FC<AccentBadgeProps> = ({
             borderColor: 'border_primary',
         },
         primary: {
-            bg: 'rgba(10, 142, 58, 0.12)',
+            bg: 'status_success_bg',
             color: 'action_primary',
-            borderColor: 'rgba(10, 142, 58, 0.3)',
+            borderColor: 'status_success_border',
         },
     };
 

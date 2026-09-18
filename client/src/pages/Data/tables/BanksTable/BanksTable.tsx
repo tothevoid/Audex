@@ -137,7 +137,7 @@ const BanksTable: React.FC = () => {
             render: (bank) => (
                 <StoredIcon
                     src={bank.iconKey ? getBankIconUrl(bank.iconKey) : undefined}
-                    fallbackIcon={<BsBank size={20} color="#aaa" />}
+                    fallbackIcon={<BsBank size={20} color="var(--chakra-colors-text_secondary)" />}
                     size="md"
                 />
             )

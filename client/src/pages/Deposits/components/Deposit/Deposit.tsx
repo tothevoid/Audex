@@ -39,7 +39,7 @@ const Deposit: React.FC<Props> = ({ deposit, onEditClicked, onCloneClicked, onDe
                     <Flex gapX={2} alignItems="center" justifyContent="flex-start">
                         <StoredIcon
                             src={bankIconUrl}
-                            fallbackIcon={<BsBank size={16} color="#aaa" />}
+                            fallbackIcon={<BsBank size={16} color="var(--chakra-colors-text_secondary)" />}
                             size="sm"
                         />
                         <Text fontSize="xl" fontWeight={600}>

@@ -1,5 +1,5 @@
 import HeaderItem from '../HeaderItem/HeaderItem';
-import { Badge, Box, Button, Flex, Icon, Image, Link } from '@chakra-ui/react';
+import { Badge, Box, Button, Flex, Icon, Link } from '@chakra-ui/react';
 import { IoIosFlash } from 'react-icons/io';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ import { BaseModalRef } from '../../../shared/utilities/modalUtilities';
 import { HeaderNotificationBell } from './HeaderNotificationBell';
 import { HeaderProfileMenu } from './HeaderProfileMenu';
 import { HeaderNavDropdown, HeaderNavDropdownItem } from './HeaderNavDropdown';
-import appIcon from './AppIcon.svg';
+import AppIcon from '../../../shared/components/AppIcon/AppIcon';
 
 import { MdAccountBalance, MdAccountBalanceWallet, MdCurrencyBitcoin, MdSchedule, MdShowChart, MdStorage } from 'react-icons/md';
 
@@ -146,7 +146,7 @@ const Header = () => {
                 <Flex flex={{ base: 1 }} justify="center" align={"center"}>
                     <Flex align="center" mr={2}>
                         <Link href='/'>
-                            <Image marginInline={"10px"} width="30px" src={appIcon}></Image>
+                            <AppIcon marginInline="10px" size="30px" color="text_primary" />
                         </Link>
                         {import.meta.env.DEV && (
                             <Badge
@@ -198,12 +198,17 @@ const Header = () => {
                 <Flex width="auto" justify="flex-end" direction="row" gap={2}>
                     <HeaderNotificationBell />
                     <Button
-                        borderColor="background_secondary"
+                        borderColor="border_primary"
                         background="button_background_secondary"
                         color="text_primary"
                         size={'md'}
                         onClick={onOpenActionsClick}
                         title={t("header_actions_title")}
+                        transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                        _hover={{
+                            borderColor: "action_primary",
+                            backgroundColor: "background_primary"
+                        }}
                     >
                         <Icon color="card_action_icon_primary">
                             <IoIosFlash fontSize="1.1rem" />

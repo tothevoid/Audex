@@ -9,9 +9,11 @@ import { updateUserProfile } from "../../api/user/userProfileApi";
 import { CurrencyEntity } from "../../models/currencies/CurrencyEntity";
 import { UserProfileEntity } from "../../models/user/UserProfileEntity";
 import CollectionSelect from "../../shared/components/CollectionSelect/CollectionSelect";
+import BaseSelect from "../../shared/components/BaseSelect/BaseSelect";
 import { BaseModalRef } from "../../shared/utilities/modalUtilities";
 import BaseFormModal from "../../shared/modals/BaseFormModal/BaseFormModal";
 import { useUserProfile } from "./hooks/UserProfileContext";
+import { useColorMode } from "../../shared/context/ColorModeContext";
 
 interface State {
 	currencies: CurrencyEntity[]
@@ -34,6 +36,7 @@ const convertToSchemaValues = (userProfile: UserProfileEntity | null) => {
 }
 
 const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {	 
+	const { t } = useTranslation();
 	const [state, setState] = useState<State>({currencies: [], languages: languages})
 	const { user, updateUser } = useUserProfile();
 	const modalRef = useRef<BaseModalRef>(null);
@@ -66,6 +69,7 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 	const onVisibilityChanged = (open: boolean) => {
 		if (open && user) {
 			reset(convertToSchemaValues(user));
+			setSelectedTheme(themeOptions.find(opt => opt.value === colorMode) ?? themeOptions[0]);
 		}
 	}
 
@@ -79,10 +83,24 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 
 		await updateUserProfile(userProfile);
 		updateUser(userProfile);
+		setColorMode(selectedTheme.value);
 		modalRef.current?.closeModal();
 	}
 
-	const { t } = useTranslation();
+	const themeOptions = [
+		{ key: t("theme_dark"), value: "dark" as const },
+		{ key: t("theme_light"), value: "light" as const },
+		{ key: t("theme_system"), value: "system" as const },
+	];
+
+	const { colorMode, setColorMode } = useColorMode();
+	const [selectedTheme, setSelectedTheme] = useState(
+		themeOptions.find(opt => opt.value === colorMode) ?? themeOptions[0]
+	);
+
+	useEffect(() => {
+		setSelectedTheme(themeOptions.find(opt => opt.value === colorMode) ?? themeOptions[0]);
+	}, [colorMode, t]);
 
 	return (
 		<BaseFormModal
@@ -114,6 +132,21 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 					valueSelector={(language => language.value)}
 				/>
 				<Field.ErrorText>{errors.languageCode?.message}</Field.ErrorText>
+			</Field.Root>
+			<Field.Root mt={4}>
+				<Field.Label>{t("user_profile_settings_theme")}</Field.Label>
+				<BaseSelect
+					placeholder={t("user_profile_settings_theme_placeholder")}
+					collection={themeOptions}
+					selectedValue={selectedTheme}
+					labelSelector={(item) => item.key}
+					valueSelector={(item) => item.value}
+					onSelected={(item) => {
+						if (item) {
+							setSelectedTheme(item);
+						}
+					}}
+				/>
 			</Field.Root>
 		</BaseFormModal>
 	)

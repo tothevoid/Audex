@@ -42,7 +42,7 @@ export const CashAccountHeader: React.FC<CashAccountHeaderProps> = ({
                         {account?.bank?.iconKey ? (
                             <StoredIcon
                                 src={getBankIconUrl(account.bank.iconKey)}
-                                fallbackIcon={<BsBank size={20} color="#aaa" />}
+                                fallbackIcon={<BsBank size={20} color="var(--chakra-colors-text_secondary)" />}
                                 size="md"
                             />
                         ) : null}

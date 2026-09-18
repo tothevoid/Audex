@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="48 0 210 210" width="100%" height="100%">
   <title>Audex Logo</title>
-  <path fill="#F8FAFC" fill-rule="evenodd" d="
+  <path fill="currentColor" fill-rule="evenodd" d="
     M152 21
     L118 75 L119 79 L146 121
     L110 176 L80 176 L79 173 L121 104

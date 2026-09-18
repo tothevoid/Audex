@@ -1,0 +1,48 @@
+import React from 'react';
+import { Box, BoxProps } from '@chakra-ui/react';
+
+export interface AppIconProps extends BoxProps {
+    size?: string | number;
+}
+
+export const AppIcon: React.FC<AppIconProps> = ({ size = '30px', color = 'text_primary', ...rest }) => {
+    return (
+        <Box
+            display="inline-flex"
+            alignItems="center"
+            justifyContent="center"
+            width={size}
+            height={size}
+            color={color}
+            flexShrink={0}
+            {...rest}
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="48 0 210 210"
+                width="100%"
+                height="100%"
+            >
+                <path
+                    fill="currentColor"
+                    fillRule="evenodd"
+                    d="
+                        M152 21
+                        L118 75 L119 79 L146 121
+                        L110 176 L80 176 L79 173 L121 104
+                        L116 95 L114 94 L60 183 L59 187
+                        L117 186 L152 132 L156 136 L184 180
+                        L190 187 L246 187 L247 186 L191 94
+                        L184 104 L226 172 L226 176 L196 176
+                        L188 166 L159 120 L188 76 L158 28 Z
+
+                        M152 43 L156 46 L174 75 L173 79
+                        L153 108 L149 105 L131 77 L131 75 Z
+                    "
+                />
+            </svg>
+        </Box>
+    );
+};
+
+export default AppIcon;

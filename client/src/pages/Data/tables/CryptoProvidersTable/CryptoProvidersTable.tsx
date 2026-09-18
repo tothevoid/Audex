@@ -55,7 +55,7 @@ const CryptoProvidersTable: React.FC = () => {
 			render: (cryptoProvider) => (
 				<StoredIcon
 					src={cryptoProvider.iconKey ? getCryptoProviderIconUrl(cryptoProvider.iconKey) : undefined}
-					fallbackIcon={<SiBinance size={20} color="#aaa" />}
+					fallbackIcon={<SiBinance size={20} color="var(--chakra-colors-text_secondary)" />}
 					size="md"
 				/>
 			)

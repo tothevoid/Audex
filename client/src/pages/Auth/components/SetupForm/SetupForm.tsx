@@ -99,7 +99,7 @@ const SetupForm: React.FC<Props> = ({ userName = "admin", onTokenReceived }) => 
                             color="text_primary"
                             backgroundColor="background_secondary"
                             borderColor="border_primary"
-                            _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                            _hover={{ borderColor: "action_primary" }}
                             _focusVisible={{ borderColor: "action_primary", boxShadow: "0 0 0 1px {colors.action_primary}" }}
                             placeholder={t("setup_form_password")}
                             size="lg"
@@ -137,7 +137,7 @@ const SetupForm: React.FC<Props> = ({ userName = "admin", onTokenReceived }) => 
                             color="text_primary"
                             backgroundColor="background_secondary"
                             borderColor="border_primary"
-                            _hover={{ borderColor: "rgba(255, 255, 255, 0.2)" }}
+                            _hover={{ borderColor: "action_primary" }}
                             _focusVisible={{ borderColor: "action_primary", boxShadow: "0 0 0 1px {colors.action_primary}" }}
                             placeholder={t("setup_form_confirm_password")}
                             size="lg"

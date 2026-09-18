@@ -95,8 +95,13 @@ export const HeaderNotificationBell: React.FC = () => {
                     <Button
                         aria-label="Notifications"
                         size="md"
-                        borderColor="background_secondary"
+                        borderColor="border_primary"
                         background="button_background_secondary"
+                        transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
+                        _hover={{
+                            borderColor: "action_primary",
+                            backgroundColor: "background_primary"
+                        }}
                     >
                         <Icon color="card_action_icon_primary">
                             <MdNotifications />
@@ -168,8 +173,6 @@ export const HeaderNotificationBell: React.FC = () => {
                             <Button
                                 size="xs"
                                 variant={!onlyUnreadFilter ? "solid" : "ghost"}
-                                background={!onlyUnreadFilter ? "action_primary" : "transparent"}
-                                color="text_primary"
                                 onClick={() => setOnlyUnreadFilter(false)}
                             >
                                 {t("notifications_filter_recent")} ({notifications.length})
@@ -177,8 +180,6 @@ export const HeaderNotificationBell: React.FC = () => {
                             <Button
                                 size="xs"
                                 variant={onlyUnreadFilter ? "solid" : "ghost"}
-                                background={onlyUnreadFilter ? "action_primary" : "transparent"}
-                                color="text_primary"
                                 onClick={() => setOnlyUnreadFilter(true)}
                             >
                                 {t("notifications_filter_unread")} ({unreadCount})
@@ -208,7 +209,7 @@ export const HeaderNotificationBell: React.FC = () => {
                                         borderColor={item.isRead ? "border_primary" : "rgba(10, 142, 58, 0.3)"}
                                         cursor="pointer"
                                         transition="background 0.2s"
-                                        _hover={{ backgroundColor: "rgba(255, 255, 255, 0.04)" }}
+                                        _hover={{ backgroundColor: "background_primary" }}
                                         onClick={() => handleItemClick(item)}
                                     >
                                         <Flex justify="space-between" align="flex-start" gap={2}>

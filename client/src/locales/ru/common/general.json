@@ -51,6 +51,13 @@
     "user_profile_settings_currency_placeholder": "Выберите валюту",
     "user_profile_settings_language": "Язык отображения",
     "user_profile_settings_language_placeholder": "Выберите язык",
+    "user_profile_settings_theme": "Тема оформления",
+    "user_profile_settings_theme_placeholder": "Выберите тему",
+
+    "theme_toggle_title": "Переключить тему",
+    "theme_light": "Светлая (Песочная)",
+    "theme_dark": "Темная",
+    "theme_system": "Системная",
 
     "number_unit_thousand": "тыс.",
     "number_unit_million": "млн",

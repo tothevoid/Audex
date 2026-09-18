@@ -28,8 +28,6 @@ export const NotificationsFilterBar: React.FC<NotificationsFilterBarProps> = ({
                     <Button
                         size="sm"
                         variant={!onlyUnreadFilter ? "solid" : "ghost"}
-                        background={!onlyUnreadFilter ? "action_primary" : "transparent"}
-                        color="text_primary"
                         onClick={() => onToggleUnreadFilter(false)}
                     >
                         {t("notifications_filter_all")}
@@ -37,8 +35,6 @@ export const NotificationsFilterBar: React.FC<NotificationsFilterBarProps> = ({
                     <Button
                         size="sm"
                         variant={onlyUnreadFilter ? "solid" : "ghost"}
-                        background={onlyUnreadFilter ? "action_primary" : "transparent"}
-                        color="text_primary"
                         onClick={() => onToggleUnreadFilter(true)}
                     >
                         {t("notifications_filter_unread")} ({unreadCount})
@@ -51,7 +47,6 @@ export const NotificationsFilterBar: React.FC<NotificationsFilterBarProps> = ({
                             size="xs"
                             variant={selectedCategory === "All" ? "solid" : "outline"}
                             borderColor="border_primary"
-                            background={selectedCategory === "All" ? "action_primary" : "transparent"}
                             onClick={() => onSelectCategory("All")}
                         >
                             {t("notifications_category_all")}
@@ -62,7 +57,6 @@ export const NotificationsFilterBar: React.FC<NotificationsFilterBarProps> = ({
                                 size="xs"
                                 variant={selectedCategory === cat ? "solid" : "outline"}
                                 borderColor="border_primary"
-                                background={selectedCategory === cat ? "action_primary" : "transparent"}
                                 onClick={() => onSelectCategory(cat)}
                             >
                                 {cat}

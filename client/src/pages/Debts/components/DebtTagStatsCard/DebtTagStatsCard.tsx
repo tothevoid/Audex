@@ -31,14 +31,14 @@ export const DebtTagStatsCard: React.FC<Props> = ({ stats, columns = { base: 1, 
                                 borderRadius="md"
                                 fontWeight="bold"
                             />
-                            <Text fontSize="xs" color="gray.400">
+                            <Text fontSize="xs" color="text_secondary">
                                 {stat.repaymentPercentage.toFixed(1)}%
                             </Text>
                         </Flex>
 
                         <Box mb={2}>
                             <Flex justifyContent="space-between" fontSize="xs" mb={1}>
-                                <Text color="gray.500">{t("debt_tag_stats_remaining")}:</Text>
+                                <Text color="text_secondary">{t("debt_tag_stats_remaining")}:</Text>
                                 <Text fontWeight="semibold">
                                     {stat.currencyName
                                         ? formatMoneyByCurrencyCulture(stat.remainingAmount, stat.currencyName)
@@ -46,15 +46,15 @@ export const DebtTagStatsCard: React.FC<Props> = ({ stats, columns = { base: 1, 
                                 </Text>
                             </Flex>
                             <Flex justifyContent="space-between" fontSize="xs" mb={1}>
-                                <Text color="gray.500">{t("debt_tag_stats_paid")}:</Text>
-                                <Text color="green.500">
+                                <Text color="text_secondary">{t("debt_tag_stats_paid")}:</Text>
+                                <Text color="gain" fontWeight="semibold">
                                     {stat.currencyName
                                         ? formatMoneyByCurrencyCulture(stat.totalPaid, stat.currencyName)
                                         : formatMoney(stat.totalPaid)}
                                 </Text>
                             </Flex>
                             <Flex justifyContent="space-between" fontSize="xs">
-                                <Text color="gray.500">{t("debt_tag_stats_total")}:</Text>
+                                <Text color="text_secondary">{t("debt_tag_stats_total")}:</Text>
                                 <Text>
                                     {stat.currencyName
                                         ? formatMoneyByCurrencyCulture(stat.totalAmount, stat.currencyName)

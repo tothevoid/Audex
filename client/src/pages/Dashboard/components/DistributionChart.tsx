@@ -43,7 +43,7 @@ const DistributionChart = (props: Props) => {
                         )) 
                     }
                     </Pie>
-                    <Tooltip contentStyle={getChartLabelConfig()} itemStyle={{ color: "#E0E0E0" }} formatter={formatLabel}/>
+                    <Tooltip contentStyle={getChartLabelConfig()} itemStyle={{ color: "var(--chakra-colors-text_primary)" }} formatter={formatLabel}/>
                     <Legend
                         formatter={(value, entry) => {
                             const payload = entry?.payload as (DistributionModel & { value?: number, payload?: DistributionModel }) | undefined;

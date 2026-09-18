@@ -1,8 +1,8 @@
 export const getChartLabelConfig = () => {
     return {
-        backgroundColor: '#333333',
-        borderColor: '#555555',
-        color: "#FFFFFF",
+        backgroundColor: 'var(--chakra-colors-background_primary)',
+        borderColor: 'var(--chakra-colors-border_primary)',
+        color: "var(--chakra-colors-text_primary)",
         borderRadius: "10px"
-    }
-}
+    };
+};

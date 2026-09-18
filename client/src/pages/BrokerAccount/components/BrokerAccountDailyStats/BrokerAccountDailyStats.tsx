@@ -72,7 +72,7 @@ const BrokerAccountDailyStats: React.FC<Props> = ({ brokerAccountId, currencyNam
 					<Flex align="center" gap={2}>
 						<StoredIcon
 							src={iconUrl}
-							fallbackIcon={<HiOutlineBuildingOffice2 size={16} color="#aaa" />}
+							fallbackIcon={<HiOutlineBuildingOffice2 size={16} color="var(--chakra-colors-text_secondary)" />}
 							size="sm"
 						/>
 						{stat.security.ticker}

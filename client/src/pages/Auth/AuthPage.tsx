@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Box, Flex, Image, Spinner, Text, VStack } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text, VStack } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthForm from "./components/AuthForm/AuthForm";
 import ChangePasswordForm from "./components/ChangePasswordForm/ChangePasswordForm";
 import SetupForm from "./components/SetupForm/SetupForm";
 import { Nullable } from "../../shared/utilities/nullable";
-import appIcon from "../../features/Navigation/Header/AppIcon.svg";
+import AppIcon from "../../shared/components/AppIcon/AppIcon";
 import { getAuthStatus } from "../../api/auth/authApi";
 
 enum FormType {
@@ -84,7 +84,7 @@ const AuthPage: React.FC = () => {
             >
                 <VStack gap={4} align="stretch">
                     <Flex direction="column" align="center" justify="center" gap={2} mb={1}>
-                        <Image src={appIcon} alt="Audex" width="48px" height="48px" />
+                        <AppIcon size="48px" color="action_primary" />
                         <Text fontSize="2xl" fontWeight="bold" color="text_primary" letterSpacing="0.05em">
                             Audex
                         </Text>

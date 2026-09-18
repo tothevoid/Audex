@@ -207,7 +207,7 @@ const CurrencyTransactionForm: React.FC<Props> = (props: Props) => {
                             borderRadius="full"
                             onClick={handleSwapAccounts}
                             title={t("currency_transaction_swap_accounts")}
-                            _hover={{ backgroundColor: "rgba(255, 255, 255, 0.1)", borderColor: "action_primary" }}
+                            _hover={{ backgroundColor: "background_primary", borderColor: "action_primary" }}
                         >
                             <Icon fontSize="22px" color="action_primary">
                                 <MdSwapHoriz />

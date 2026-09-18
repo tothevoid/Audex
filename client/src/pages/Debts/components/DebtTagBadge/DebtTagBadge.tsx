@@ -1,5 +1,7 @@
 import React from "react";
 import { Badge, BadgeProps } from "@chakra-ui/react";
+import { useColorMode } from "../../../../shared/context/ColorModeContext";
+import { getAccessibleTagStyles } from "../../../../shared/utilities/colorUtilities";
 
 export interface DebtTagBadgeProps extends Omit<BadgeProps, "name"> {
     name: string;
@@ -20,43 +22,20 @@ export const DebtTagBadge: React.FC<DebtTagBadgeProps> = ({
     style,
     ...restProps
 }) => {
-    const defaultBg = colorHex
-        ? (isSelected !== undefined
-            ? (isSelected ? `${colorHex}40` : `${colorHex}1A`)
-            : `${colorHex}26`)
-        : (isSelected !== undefined
-            ? (isSelected ? "action_primary" : "transparent")
-            : "transparent");
+    const { resolvedColorMode } = useColorMode();
+    const tagStyles = getAccessibleTagStyles(colorHex, resolvedColorMode, isSelected);
 
-    const defaultColor = colorHex
-        ? colorHex
-        : (isSelected ? "white" : "text_primary");
-
-    const defaultBorder = colorHex
-        ? (isSelected !== undefined
-            ? `1px solid ${colorHex}${isSelected ? "80" : "40"}`
-            : `1px solid ${colorHex}50`)
-        : (isSelected
-            ? "1px solid var(--chakra-colors-action_primary)"
-            : "1px solid var(--chakra-colors-border_primary)");
-
-    const defaultOutline = isSelected
-        ? (colorHex ? `2px solid ${colorHex}` : "1px solid var(--chakra-colors-action_primary)")
-        : "none";
-
-    const defaultOpacity = colorHex ? undefined : (isSelected ? 1 : 0.85);
-
-    const defaultFontWeight = fontWeight || (isSelected !== undefined ? (isSelected ? "bold" : "normal") : "semibold");
+    const defaultFontWeight = fontWeight || (isSelected !== undefined ? (isSelected ? "bold" : "semibold") : "semibold");
 
     return (
         <Badge
             variant="plain"
             style={{
-                backgroundColor: defaultBg,
-                color: defaultColor,
-                border: defaultBorder,
-                outline: defaultOutline,
-                opacity: defaultOpacity,
+                backgroundColor: tagStyles.bg,
+                color: tagStyles.color,
+                border: tagStyles.border,
+                outline: tagStyles.outline,
+                transition: "all 0.15s ease",
                 ...style,
             }}
             px={px}

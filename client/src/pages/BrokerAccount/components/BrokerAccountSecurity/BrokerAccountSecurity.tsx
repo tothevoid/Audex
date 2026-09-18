@@ -49,7 +49,7 @@ export const BrokerAccountSecurity = ({ brokerAccountSecurity }: Props) => {
                         <Flex align="flex-start" gap={3} flex="1" minW={0}>
                             <StoredIcon
                                 src={iconUrl}
-                                fallbackIcon={<HiOutlineBuildingOffice2 size={22} color="#aaa" />}
+                                fallbackIcon={<HiOutlineBuildingOffice2 size={22} color="var(--chakra-colors-text_secondary)" />}
                                 size="lg"
                             />
                             <Stack gap={0.5} minW={0} flex="1">
@@ -113,9 +113,9 @@ export const BrokerAccountSecurity = ({ brokerAccountSecurity }: Props) => {
                         size="xs"
                         width="full"
                         onClick={() => setIsOpen(!isOpen)}
-                        color="gray.400"
+                        color="text_secondary"
                         bg="transparent"
-                        _hover={{ bg: "rgba(255,255,255,0.06)", color: "text_primary" }}
+                        _hover={{ bg: "background_secondary", color: "text_primary" }}
                     >
                         <Flex align="center" gap={1.5}>
                             <Text fontSize="2xs">{t("broker_account_security_card_details")}</Text>
@@ -125,8 +125,8 @@ export const BrokerAccountSecurity = ({ brokerAccountSecurity }: Props) => {
 
                     {isOpen && (
                         <Stack spaceY={2} pt={2} borderTopWidth="1px" borderColor="border_primary" fontSize="xs">
-                            <Flex justify="space-between" align="center" p={2} bg="rgba(59, 130, 246, 0.08)" borderRadius="md">
-                                <Flex align="center" gap={1.5} color="blue.400">
+                            <Flex justify="space-between" align="center" p={2} bg="status_info_bg" borderRadius="md">
+                                <Flex align="center" gap={1.5} color="status_info">
                                     <TbArrowDownLeft size={16} />
                                     <Text fontWeight="bold">{t("broker_account_security_card_security_initial_price")}</Text>
                                 </Flex>
@@ -134,14 +134,14 @@ export const BrokerAccountSecurity = ({ brokerAccountSecurity }: Props) => {
                                     <Text fontWeight="bold">
                                         {quantity} {t("broker_account_security_card_pieces")} ({formatMoneyByCurrencyCulture(price, security?.currency?.name)})
                                     </Text>
-                                    <Text fontSize="2xs" color="gray.400">
+                                    <Text fontSize="2xs" color="text_secondary">
                                         {t("broker_account_security_card_avg_buy")}: {formatMoneyByCurrencyCulture(avgBuyPrice, security?.currency?.name)}
                                     </Text>
                                 </Box>
                             </Flex>
 
-                            <Flex justify="space-between" align="center" p={2} bg="rgba(249, 115, 22, 0.08)" borderRadius="md">
-                                <Flex align="center" gap={1.5} color="orange.400">
+                            <Flex justify="space-between" align="center" p={2} bg="status_danger_bg" borderRadius="md">
+                                <Flex align="center" gap={1.5} color="status_danger">
                                     <TbArrowUpRight size={16} />
                                     <Text fontWeight="bold">{t("broker_account_security_card_security_sold_quantity")}</Text>
                                 </Flex>
@@ -149,7 +149,7 @@ export const BrokerAccountSecurity = ({ brokerAccountSecurity }: Props) => {
                                     <Text fontWeight="bold">
                                         {soldQuantity} {t("broker_account_security_card_pieces")} ({formatMoneyByCurrencyCulture(soldPrice, security?.currency?.name)})
                                     </Text>
-                                    <Text fontSize="2xs" color="gray.400">
+                                    <Text fontSize="2xs" color="text_secondary">
                                         {t("broker_account_security_card_avg_sell")}: {formatMoneyByCurrencyCulture(avgSellPrice, security?.currency?.name)}
                                     </Text>
                                 </Box>

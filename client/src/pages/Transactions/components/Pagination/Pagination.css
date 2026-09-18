@@ -6,18 +6,18 @@
 .paging-element{
     height: 35px;
     padding: 0 10px;
-    color: #414242;
-    background:  white;
+    color: var(--chakra-colors-text_primary);
+    background: var(--chakra-colors-background_primary);
+    border: 1px solid var(--chakra-colors-border_primary);
     margin: auto 0;
 }
 .paging-button{
     cursor: pointer;
     width: 40px;
-    border: 0px solid black;
 }
 .page-previous{
     border-radius: 10px 0 0 10px;
-    border-right: none
+    border-right: none;
 }
 .page-next{
     border-radius: 0 10px 10px 0;

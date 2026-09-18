@@ -64,7 +64,7 @@ export const CryptoAccountHeader: React.FC<CryptoAccountHeaderProps> = ({
                                 {cryptoAccount?.cryptoProvider && (
                                     <StoredIcon
                                         src={cryptoAccount.cryptoProvider.iconKey ? getCryptoProviderIconUrl(cryptoAccount.cryptoProvider.iconKey) : undefined}
-                                        fallbackIcon={<SiBinance size={16} color="#aaa" />}
+                                        fallbackIcon={<SiBinance size={16} color="var(--chakra-colors-text_secondary)" />}
                                         size="sm"
                                         title={providerName}
                                     />

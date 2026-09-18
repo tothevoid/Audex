@@ -4,6 +4,7 @@ import { AccountCurrencySummary } from "../../../../models/accounts/accountsSumm
 import { NumericMetricItem } from "../../../../shared/components/MetricItem";
 import { useTranslation } from "react-i18next";
 import { getCurrencyColor, getCurrencyIcon } from "../../../../shared/utilities/currencyUtils";
+import { useColorMode } from "../../../../shared/context/ColorModeContext";
 
 interface Props {
 	accountCurrencySummaries: AccountCurrencySummary[];
@@ -11,6 +12,7 @@ interface Props {
 
 const AccountsTotal: React.FC<Props> = ({ accountCurrencySummaries }) => {
 	const { i18n } = useTranslation();
+	const { resolvedColorMode } = useColorMode();
 
 	if (!accountCurrencySummaries.length) {
 		return null;
@@ -26,7 +28,7 @@ const AccountsTotal: React.FC<Props> = ({ accountCurrencySummaries }) => {
 					gap={{ base: 4, md: 8 }}
 				>
 					{accountCurrencySummaries.map((currencySummary) => {
-						const { iconBg, iconColor } = getCurrencyColor(currencySummary.name);
+						const { iconBg, iconColor } = getCurrencyColor(currencySummary.name, resolvedColorMode);
 						const icon = getCurrencyIcon(currencySummary.name, i18n.language);
 
 						return (

@@ -49,7 +49,7 @@ const BrokerAccount = (props: Props) => {
 						<Flex gapX={2} alignItems={"center"}>
 							<StoredIcon
 								src={bankIconUrl}
-								fallbackIcon={<BsBank size={16} color="#aaa" />}
+								fallbackIcon={<BsBank size={16} color="var(--chakra-colors-text_secondary)" />}
 								size="sm"
 							/>
 							<Link fontSize="2xl" fontWeight={900} color="text_primary" href={accountLink} textDecoration="none" _hover={{ color: "action_primary", textDecoration: "none" }}>{name}</Link>

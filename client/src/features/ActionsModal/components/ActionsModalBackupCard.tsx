@@ -10,7 +10,7 @@ import {
     VStack
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { MdBackup, MdDownload, MdLock, MdShield } from 'react-icons/md';
+import { MdBackup, MdDownload, MdLock } from 'react-icons/md';
 import { exportDatabaseBackup } from '../../../api/system/databaseBackupApi';
 import { PasswordInput } from '../../../shared/components/PasswordInput/PasswordInput';
 import SwitchInput from '../../../shared/components/SwitchInput/SwitchInput';
@@ -93,8 +93,10 @@ export const ActionsModalBackupCard: React.FC = () => {
                                 w="44px"
                                 h="44px"
                                 borderRadius="lg"
-                                bg="green.500/15"
-                                color="green.400"
+                                backgroundColor="background_primary"
+                                color="card_action_icon_primary"
+                                border="1px solid"
+                                borderColor="border_primary"
                                 align="center"
                                 justify="center"
                                 flexShrink={0}
@@ -107,14 +109,12 @@ export const ActionsModalBackupCard: React.FC = () => {
                                 <Text fontWeight="bold" fontSize="md" color="text_primary">
                                     {t("action_backup_title")}
                                 </Text>
-                                <Text fontSize="xs" color="gray.400" mt={1}>
+                                <Text fontSize="xs" color="text_secondary" mt={1}>
                                     {t("action_backup_desc")}
                                 </Text>
                             </Box>
                         </Flex>
                         <Button
-                            colorPalette="green"
-                            variant="subtle"
                             size="sm"
                             onClick={handleDownloadBackup}
                             disabled={isLoading}
@@ -140,9 +140,6 @@ export const ActionsModalBackupCard: React.FC = () => {
                     <Box pt={2} borderTopWidth="1px" borderColor="border_primary">
                         <Flex align="center" justify="space-between">
                             <Flex align="center" gap={2}>
-                                <Icon color="teal.400">
-                                    <MdShield />
-                                </Icon>
                                 <Text fontSize="sm" fontWeight="medium" color="text_primary">
                                     {t("action_backup_protect_toggle")}
                                 </Text>
@@ -196,7 +193,7 @@ export const ActionsModalBackupCard: React.FC = () => {
                                     />
                                 </Box>
 
-                                <Text fontSize="xs" color="teal.300" lineHeight="1.4">
+                                <Text fontSize="xs" color="gray.400" lineHeight="1.4">
                                     {t("action_backup_info_banner")}
                                 </Text>
                             </VStack>

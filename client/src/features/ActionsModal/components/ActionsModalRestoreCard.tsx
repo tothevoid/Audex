@@ -124,8 +124,10 @@ export const ActionsModalRestoreCard: React.FC = () => {
                                     w="44px"
                                     h="44px"
                                     borderRadius="lg"
-                                    bg="orange.500/15"
-                                    color="orange.400"
+                                    backgroundColor="background_primary"
+                                    color="card_action_icon_primary"
+                                    border="1px solid"
+                                    borderColor="border_primary"
                                     align="center"
                                     justify="center"
                                     flexShrink={0}
@@ -138,15 +140,13 @@ export const ActionsModalRestoreCard: React.FC = () => {
                                     <Text fontWeight="bold" fontSize="md" color="text_primary">
                                         {t("action_restore_title")}
                                     </Text>
-                                    <Text fontSize="xs" color="gray.400" mt={1}>
+                                    <Text fontSize="xs" color="text_secondary" mt={1}>
                                         {t("action_restore_desc")}
                                     </Text>
                                 </Box>
                             </Flex>
 
                             <Button
-                                colorPalette="orange"
-                                variant="subtle"
                                 size="sm"
                                 onClick={handleRestoreClick}
                                 disabled={!selectedFile || !isValidFile || isLoading || isValidating || (isEncrypted && !password.trim())}

@@ -159,16 +159,13 @@ const BrokerAccountTransfersHistoryChart: React.FC<Props> = ({ brokerAccountId, 
             </SimpleGrid>
             <ResponsiveContainer height={500}>
                 <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip contentStyle={getChartLabelConfig()}
-                        // TODO: add dynamic currency formatting
-                        // formatter={(value: number, name: string) => [formatMoneyByCurrencyCulture(value, brokerAccount.currency.name), name]}
-                    />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--chakra-colors-border_primary)" />
+                    <XAxis dataKey="name" stroke="var(--chakra-colors-text_secondary)" />
+                    <YAxis stroke="var(--chakra-colors-text_secondary)" />
+                    <Tooltip contentStyle={getChartLabelConfig()} />
                     <Legend />
-                    <Bar dataKey="income" fill="#4CAF50" name={t('broker_account_stats_deposited')} />
-                    <Bar dataKey="withdraw" fill="#F44336" name={t('broker_account_stats_withdrawn')} />
+                    <Bar dataKey="income" fill="var(--chakra-colors-gain)" name={t('broker_account_stats_deposited')} />
+                    <Bar dataKey="withdraw" fill="var(--chakra-colors-loss)" name={t('broker_account_stats_withdrawn')} />
                 </BarChart>
             </ResponsiveContainer>
         </Box>

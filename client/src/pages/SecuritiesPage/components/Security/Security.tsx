@@ -29,7 +29,7 @@ const Security: React.FC<Props> = ({ security, onEditClicked, onDeleteClicked })
                         <HStack gap={3} align="center" minW={0} flex="1">
                             <StoredIcon
                                 src={iconUrl}
-                                fallbackIcon={<HiOutlineBuildingOffice2 size={24} color="#aaa" />}
+                                fallbackIcon={<HiOutlineBuildingOffice2 size={24} color="var(--chakra-colors-text_secondary)" />}
                                 size="lg"
                             />
                             <Stack gap={0.5} minW={0} flex="1">

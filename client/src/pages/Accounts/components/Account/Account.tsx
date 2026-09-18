@@ -23,7 +23,7 @@ const Account = (props: Props) => {
         if (accountType?.id === ACCOUNT_TYPE.CASH) {
             return (
                 <StoredIcon
-                    fallbackIcon={<BsCurrencyExchange size={22} color="#aaa" />}
+                    fallbackIcon={<BsCurrencyExchange size={22} color="var(--chakra-colors-text_secondary)" />}
                     size="lg"
                 />
             );
@@ -33,7 +33,7 @@ const Account = (props: Props) => {
         return (
             <StoredIcon
                 src={iconUrl}
-                fallbackIcon={<BsBank size={22} color="#aaa" />}
+                fallbackIcon={<BsBank size={22} color="var(--chakra-colors-text_secondary)" />}
                 size="lg"
             />
         );

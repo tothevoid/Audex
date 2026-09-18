@@ -17,8 +17,8 @@ export const CardActionButton: React.FC<CardActionButtonProps> = ({
     icon,
     onClick,
     iconColor = 'card_action_icon_primary',
-    hoverBg = 'rgba(255, 255, 255, 0.12)',
-    hoverBorderColor = 'rgba(255, 255, 255, 0.3)',
+    hoverBg = 'background_primary',
+    hoverBorderColor = 'border_primary',
     title,
 }) => (
     <Button

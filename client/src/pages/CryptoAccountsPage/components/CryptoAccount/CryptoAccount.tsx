@@ -40,7 +40,7 @@ const CryptoAccount = (props: Props) => {
                             <HStack gap={3} align="center" minW={0} flex="1">
                                 <StoredIcon
                                     src={cryptoProvider?.iconKey ? getCryptoProviderIconUrl(cryptoProvider.iconKey) : undefined}
-                                    fallbackIcon={<SiBinance size={22} color="#aaa" />}
+                                    fallbackIcon={<SiBinance size={22} color="var(--chakra-colors-text_secondary)" />}
                                     size="lg"
                                     title={cryptoProvider?.name}
                                 />

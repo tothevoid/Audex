@@ -57,16 +57,16 @@ const SecurityTransactionsChart: React.FC<Props> = (props) => {
                     top: 20,
                     bottom: 20,
                 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date"/>
-                <YAxis yAxisId="left" orientation="left" domain={['dataMin - 10', 'dataMax + 10']} />
-                <YAxis yAxisId="right" orientation="right" domain={[0, "auto"]} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--chakra-colors-border_primary)" />
+                <XAxis dataKey="date" stroke="var(--chakra-colors-text_secondary)" />
+                <YAxis yAxisId="left" orientation="left" domain={['dataMin - 10', 'dataMax + 10']} stroke="var(--chakra-colors-text_secondary)" />
+                <YAxis yAxisId="right" orientation="right" domain={[0, "auto"]} stroke="var(--chakra-colors-text_secondary)" />
 
                 <Line
                     yAxisId="left"
                     type="monotone"
                     dataKey="valueWithPayments"
-                    stroke="#16a34a"
+                    stroke="var(--chakra-colors-gain)"
                     strokeWidth={2}
                     activeDot={{ r: 8 }}
                     name={t("securities_transactions_with_dividends")}
@@ -76,7 +76,7 @@ const SecurityTransactionsChart: React.FC<Props> = (props) => {
                     yAxisId="left"
                     type="monotone"
                     dataKey="valueWithoutPayments"
-                    stroke="#5ef395ff"
+                    stroke="var(--chakra-colors-status_success)"
                     strokeWidth={2}
                     activeDot={{ r: 8 }}
                     name={t("securities_transactions_without_dividends")}
@@ -86,13 +86,13 @@ const SecurityTransactionsChart: React.FC<Props> = (props) => {
                     yAxisId="right"
                     dataKey="volume"
                     barSize={20}
-                    fill="#16a34a"
+                    fill="var(--chakra-colors-gain)"
                     opacity={0.4}
                     name={t("securities_transactions_volume")}
                 />
 
                 <Legend />
-                <ReferenceLine  yAxisId="left" y={props.currentPrice} stroke="red" strokeDasharray="5 5" label={t("securities_transactions_current_price")} />
+                <ReferenceLine yAxisId="left" y={props.currentPrice} stroke="var(--chakra-colors-loss)" strokeDasharray="5 5" label={t("securities_transactions_current_price")} />
                 <Tooltip contentStyle={getChartLabelConfig()} formatter={formatTooltipValue} />
             </ComposedChart>
         </ResponsiveContainer>

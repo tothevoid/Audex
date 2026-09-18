@@ -27,7 +27,7 @@ const Cryptocurrency: React.FC<Props> = (props: Props) => {
                         <HStack gap={3} align="center" minW={0} flex="1">
                             <StoredIcon
                                 src={iconUrl}
-                                fallbackIcon={<FaBitcoin size={24} color="#aaa" />}
+                                fallbackIcon={<FaBitcoin size={24} color="var(--chakra-colors-text_secondary)" />}
                                 size="lg"
                             />
                             <Stack gap={0.5} minW={0} flex="1">

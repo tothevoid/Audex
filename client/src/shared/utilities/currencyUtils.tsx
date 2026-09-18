@@ -23,9 +23,12 @@ export const getCurrencySymbol = (currencyCode: string, locale: string = "ru-RU"
 };
 
 /**
- * Deterministically generates a harmonious color palette for any currency code.
+ * Deterministically generates a harmonious color palette for any currency code across themes.
  */
-export const getCurrencyColor = (currencyName: string): { iconBg: string; iconColor: string } => {
+export const getCurrencyColor = (
+    currencyName: string,
+    theme: 'light' | 'dark' = 'dark'
+): { iconBg: string; iconColor: string } => {
     const code = currencyName?.trim().toUpperCase() || "";
 
     let hash = 0;
@@ -35,10 +38,20 @@ export const getCurrencyColor = (currencyName: string): { iconBg: string; iconCo
 
     const hue = Math.abs(hash) % 360;
 
-    return {
-        iconBg: `hsla(${hue}, 65%, 45%, 0.15)`,
-        iconColor: `hsl(${hue}, 80%, 65%)`,
-    };
+    if (theme === 'light') {
+        // Light Theme: Deep, rich, readable colors with gentle tint (never neon)
+        const maxLightness = (hue >= 35 && hue <= 165) ? 24 : 32;
+        return {
+            iconBg: `hsla(${hue}, 45%, 45%, 0.12)`,
+            iconColor: `hsl(${hue}, 70%, ${maxLightness}%)`,
+        };
+    } else {
+        // Dark Theme
+        return {
+            iconBg: `hsla(${hue}, 65%, 45%, 0.15)`,
+            iconColor: `hsl(${hue}, 80%, 65%)`,
+        };
+    }
 };
 
 /**

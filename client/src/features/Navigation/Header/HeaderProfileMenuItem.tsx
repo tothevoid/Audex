@@ -21,9 +21,13 @@ export const HeaderProfileMenuItem: React.FC<HeaderProfileMenuItemProps> = ({
         as="button"
         align="center"
         justify="space-between"
+        w="100%"
+        textAlign="left"
         p={2.5}
         borderRadius="xl"
         cursor="pointer"
+        border="none"
+        backgroundColor="transparent"
         transition="all 0.15s ease"
         _hover={{
             backgroundColor: isDanger ? 'status_danger_bg' : 'background_primary',
@@ -31,10 +35,11 @@ export const HeaderProfileMenuItem: React.FC<HeaderProfileMenuItemProps> = ({
         }}
         onClick={onClick}
     >
-        <HStack gap={3}>
+        <HStack gap={3} flex={1} align="center" textAlign="left">
             <Flex
                 w="36px"
                 h="36px"
+                minW="36px"
                 borderRadius="lg"
                 backgroundColor={isDanger ? 'status_danger_bg' : 'background_primary'}
                 color={isDanger ? 'status_danger' : 'card_action_icon_primary'}
@@ -43,19 +48,20 @@ export const HeaderProfileMenuItem: React.FC<HeaderProfileMenuItemProps> = ({
                 fontSize="18px"
                 border="1px solid"
                 borderColor={isDanger ? 'status_danger_border' : 'border_primary'}
+                flexShrink={0}
             >
                 {icon}
             </Flex>
-            <VStack align="flex-start" gap={0}>
-                <Text fontSize="sm" fontWeight="medium" color={isDanger ? 'status_danger' : 'text_primary'}>
+            <VStack align="start" gap={0} flex={1} textAlign="left">
+                <Text fontSize="sm" fontWeight="medium" color={isDanger ? 'status_danger' : 'text_primary'} textAlign="left">
                     {title}
                 </Text>
-                <Text fontSize="xs" color="text_secondary">
+                <Text fontSize="xs" color="text_secondary" textAlign="left">
                     {description}
                 </Text>
             </VStack>
         </HStack>
-        <Icon fontSize="18px" color={isDanger ? 'status_danger' : 'text_secondary'}>
+        <Icon fontSize="18px" color={isDanger ? 'status_danger' : 'text_secondary'} flexShrink={0}>
             <MdChevronRight />
         </Icon>
     </Flex>
