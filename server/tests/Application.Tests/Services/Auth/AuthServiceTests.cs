@@ -535,5 +535,83 @@ namespace Audex.Application.Tests.Services.Auth
             Assert.False(wrongPasswordResult.IsSuccess);
             Assert.False(string.IsNullOrWhiteSpace(wrongPasswordResult.ErrorMessage));
         }
+
+        [Fact]
+        public async Task TestGetAuthStatus_WhenPasswordEmpty_ReturnsSetupRequiredTrue()
+        {
+            await ExecuteScopeAsync(async sp =>
+            {
+                var uow = sp.GetRequiredService<IUnitOfWork>();
+                var userProfileRepo = uow.CreateRepository<UserProfile>();
+                var user = (await userProfileRepo.GetAllAsync(disableTracking: false)).FirstOrDefault();
+                if (user != null)
+                {
+                    user.Password = string.Empty;
+                    userProfileRepo.Update(user);
+                    await uow.CommitAsync();
+                }
+            });
+
+            var status = await ExecuteScopeAsync(async sp =>
+            {
+                var authService = sp.GetRequiredService<IAuthService>();
+                return await authService.GetAuthStatusAsync();
+            });
+
+            Assert.NotNull(status);
+            Assert.True(status.IsSetupRequired);
+        }
+
+        [Fact]
+        public async Task TestInitialSetup_Success_SetsPasswordAndLogsIn()
+        {
+            var testUser = await ExecuteScopeAsync(async sp =>
+            {
+                var uow = sp.GetRequiredService<IUnitOfWork>();
+                var userProfileRepo = uow.CreateRepository<UserProfile>();
+                var user = (await userProfileRepo.GetAllAsync(disableTracking: false)).FirstOrDefault();
+                if (user != null)
+                {
+                    user.Password = string.Empty;
+                    userProfileRepo.Update(user);
+                    await uow.CommitAsync();
+                }
+                return user;
+            });
+
+            var newPassword = "MyInitialSecurePassword123!";
+
+            var setupResult = await ExecuteScopeAsync(async sp =>
+            {
+                var authService = sp.GetRequiredService<IAuthService>();
+                return await authService.InitialSetupAsync(testUser!.UserName, newPassword);
+            });
+
+            Assert.NotNull(setupResult);
+            Assert.True(setupResult.IsSuccess);
+            Assert.NotNull(setupResult.Data);
+            Assert.False(string.IsNullOrWhiteSpace(setupResult.Data.AccessToken));
+            Assert.False(string.IsNullOrWhiteSpace(setupResult.Data.RefreshToken));
+
+            // Status is now setupRequired = false
+            var statusAfter = await ExecuteScopeAsync(async sp =>
+            {
+                var authService = sp.GetRequiredService<IAuthService>();
+                return await authService.GetAuthStatusAsync();
+            });
+
+            Assert.NotNull(statusAfter);
+            Assert.False(statusAfter.IsSetupRequired);
+
+            // Cannot re-run initial setup once completed
+            var duplicateSetup = await ExecuteScopeAsync(async sp =>
+            {
+                var authService = sp.GetRequiredService<IAuthService>();
+                return await authService.InitialSetupAsync(testUser!.UserName, "AnotherPassword123!");
+            });
+
+            Assert.NotNull(duplicateSetup);
+            Assert.False(duplicateSetup.IsSuccess);
+        }
     }
 }

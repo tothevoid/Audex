@@ -9,6 +9,10 @@ namespace Audex.Application.Interfaces.Auth
 {
     public interface IAuthService
     {
+        Task<AuthStatusDto> GetAuthStatusAsync();
+
+        Task<LoginResultDto> InitialSetupAsync(string userName, string password, string? ipAddress = null, string? userAgent = null);
+
         Task<LoginResultDto> LoginAsync(string username, string password, string? ipAddress = null, string? userAgent = null);
 
         Task<TokenResponseDto> RefreshTokenAsync(string refreshToken, string? ipAddress = null, string? userAgent = null);

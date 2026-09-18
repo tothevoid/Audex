@@ -125,6 +125,8 @@ namespace Audex.Application.Constants
             public const string TokenRevoked = "auth.token_revoked";
             public const string InvalidToken = "auth.invalid_token";
             public const string TokenCompromised = "auth.token_compromised";
+            public const string SetupAlreadyCompleted = "auth.setup_already_completed";
+            public const string SetupRequired = "auth.setup_required";
         }
 
         public static class Errors

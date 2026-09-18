@@ -1,24 +1,50 @@
-
-import React, { useState } from "react";
-import { Box, Flex, Image, Text, VStack } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Box, Flex, Image, Spinner, Text, VStack } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AuthForm from "./components/AuthForm/AuthForm";
 import ChangePasswordForm from "./components/ChangePasswordForm/ChangePasswordForm";
+import SetupForm from "./components/SetupForm/SetupForm";
 import { Nullable } from "../../shared/utilities/nullable";
 import appIcon from "../../features/Navigation/Header/AppIcon.svg";
+import { getAuthStatus } from "../../api/auth/authApi";
 
 enum FormType {
+    Loading,
+    Setup,
     Auth,
     ChangePassword
 }
 
 const AuthPage: React.FC = () => {
-    const [formType, setFormType] = useState<FormType>(FormType.Auth);
+    const [formType, setFormType] = useState<FormType>(FormType.Loading);
+    const [setupUserName, setSetupUserName] = useState<string>("admin");
 
     const navigate = useNavigate();
     const location = useLocation();
     const rawFrom = location.state?.from;
     const from = rawFrom && !rawFrom.startsWith("/auth") ? rawFrom : "/";
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const checkStatus = async () => {
+            const status = await getAuthStatus();
+            if (!isMounted) return;
+
+            if (status?.isSetupRequired) {
+                setSetupUserName(status.userName || "admin");
+                setFormType(FormType.Setup);
+            } else {
+                setFormType(FormType.Auth);
+            }
+        };
+
+        checkStatus();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const onTokenReceived = () => {
         navigate(from, { replace: true });
@@ -63,6 +89,20 @@ const AuthPage: React.FC = () => {
                             Audex
                         </Text>
                     </Flex>
+
+                    {formType === FormType.Loading && (
+                        <Flex justify="center" align="center" minH="180px">
+                            <Spinner size="lg" color="action_primary" />
+                        </Flex>
+                    )}
+
+                    {formType === FormType.Setup && (
+                        <SetupForm
+                            userName={setupUserName}
+                            onTokenReceived={onTokenReceived}
+                        />
+                    )}
+
                     {formType === FormType.Auth && (
                         <AuthForm
                             onPasswordChangeRequired={onPasswordChangeRequired}

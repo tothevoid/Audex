@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.User;
 using Audex.Application.Interfaces.User;
 using Audex.Application.Tests.Fixtures;
@@ -121,6 +121,35 @@ namespace Audex.Application.Tests.Services.User
             Assert.Equal(CurrencyConstants.USD, updated.CurrencyId);
             Assert.Equal(current.UserName, updated.UserName);
             Assert.Equal(current.Password, updated.Password);
+        }
+
+        [Fact]
+        public async Task TestUpdatePassword_UpdatesUserPassword()
+        {
+            var current = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IUserProfileService>();
+                return await service.GetAsync();
+            });
+
+            Assert.NotNull(current);
+
+            var newHashedPassword = "HashedPasswordTest_" + Guid.NewGuid().ToString("N");
+
+            await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IUserProfileService>();
+                await service.UpdatePasswordAsync(current.Id, newHashedPassword);
+            });
+
+            var updated = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IUserProfileService>();
+                return await service.GetAsync();
+            });
+
+            Assert.NotNull(updated);
+            Assert.Equal(newHashedPassword, updated.Password);
         }
     }
 }

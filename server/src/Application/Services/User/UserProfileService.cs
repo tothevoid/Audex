@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Audex.Infrastructure.Interfaces.Database;
 using System.Linq;
 using System;
@@ -117,6 +117,19 @@ namespace Audex.Application.Services.User
                     await _currencyService.SyncRatesAsync(currency);
                 }
             }
+        }
+
+        public async Task UpdatePasswordAsync(Guid userId, string hashedPassword)
+        {
+            var user = await _userProfileRepo.GetByIdAsync(userId, disableTracking: false);
+            if (user == null)
+            {
+                return;
+            }
+
+            user.Password = hashedPassword;
+            _userProfileRepo.Update(user);
+            await _db.CommitAsync();
         }
 
         private IQueryable<UserProfile> GetFullHierarchyColumns(IQueryable<UserProfile> userProfileQuery)

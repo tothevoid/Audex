@@ -8,6 +8,7 @@ import {
     AuthResult,
     ChangePasswordResult
 } from '../../models/auth/AuthResult';
+import { AuthStatus } from '../../models/auth/AuthStatus';
 const basicUrl = `${config.api.URL}/Auth`;
 
 const parseAuthError = (err: unknown): AuthErrorCode => {
@@ -24,6 +25,48 @@ const parseAuthError = (err: unknown): AuthErrorCode => {
     }
 
     return AuthErrorCode.Unknown;
+};
+
+export const getAuthStatus = async (): Promise<Nullable<AuthStatus>> => {
+    try {
+        const response = await axios.get<AuthStatus>(`${basicUrl}/Status`);
+        return response.data;
+    } catch {
+        return null;
+    }
+};
+
+export const initialSetup = async (
+    userName: string,
+    password: string
+): Promise<AuthResult> => {
+    try {
+        const response = await axios.post(
+            `${basicUrl}/Setup`,
+            { userName, password },
+            { withCredentials: true }
+        );
+
+        const data = response.data;
+        if (data?.accessToken) {
+            setAccessToken(data.accessToken);
+            return {
+                success: true,
+                passwordChangeRequired: false,
+                token: data.accessToken
+            };
+        }
+
+        return {
+            success: false,
+            errorCode: AuthErrorCode.Unknown
+        };
+    } catch (err) {
+        return {
+            success: false,
+            errorCode: parseAuthError(err)
+        };
+    }
 };
 
 export const auth = async (

@@ -23,6 +23,41 @@ namespace Audex.WebApi.Controllers.Auth
             _authService = authService;
         }
 
+        [HttpGet("Status")]
+        public async Task<IActionResult> GetStatus()
+        {
+            var status = await _authService.GetAuthStatusAsync();
+            return Ok(status);
+        }
+
+        [HttpPost("Setup")]
+        public async Task<IActionResult> Setup([FromBody] InitialSetupModel setupData)
+        {
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var userAgent = Request.Headers.UserAgent.ToString();
+
+            var result = await _authService.InitialSetupAsync(setupData.UserName, setupData.Password, ipAddress, userAgent);
+
+            if (!result.IsSuccess || result.Data == null)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "Bad Request",
+                    Detail = result.ErrorMessage
+                });
+            }
+
+            var responseData = result.Data;
+
+            if (!string.IsNullOrEmpty(responseData.RefreshToken))
+            {
+                SetRefreshTokenCookie(responseData.RefreshToken, DateTime.UtcNow.AddDays(30));
+            }
+
+            return Ok(responseData);
+        }
+
         [HttpPost(nameof(Login))]
         public async Task<IActionResult> Login([FromBody] LoginModel loginData)
         {

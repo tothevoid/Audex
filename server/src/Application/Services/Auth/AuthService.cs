@@ -55,17 +55,41 @@ namespace Audex.Application.Services.Auth
             _localizer = localizer;
         }
 
-        public async Task<LoginResultDto> LoginAsync(string userName, string password, string? ipAddress = null, string? userAgent = null)
+        public async Task<AuthStatusDto> GetAuthStatusAsync()
         {
-            var user = await _userProfileService.GetByAuthAsync(userName, password);
+            var user = await _userProfileService.GetAsync();
+            var isSetupRequired = user == null || string.IsNullOrEmpty(user.Password);
 
-            if (user == null)
+            return new AuthStatusDto
             {
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.InvalidCredentials);
+                IsSetupRequired = isSetupRequired,
+                UserName = user?.UserName ?? "admin"
+            };
+        }
+
+        public async Task<LoginResultDto> InitialSetupAsync(string userName, string password, string? ipAddress = null, string? userAgent = null)
+        {
+            if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
+            {
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Errors.ValidationError);
                 return LoginResultDto.Failure(errorMessage);
             }
 
-            var isPasswordEmpty = string.IsNullOrEmpty(password) && string.IsNullOrEmpty(user.Password);
+            var user = await _userProfileService.GetByUserNameAsync(userName);
+
+            if (user == null)
+            {
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.UserNotFound);
+                return LoginResultDto.Failure(errorMessage);
+            }
+
+            if (!string.IsNullOrEmpty(user.Password))
+            {
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.SetupAlreadyCompleted);
+                return LoginResultDto.Failure(errorMessage);
+            }
+
+            await _userProfileService.UpdatePasswordAsync(user.Id, _passwordHasher.HashPassword(password));
 
             var (accessToken, rawRefreshToken, refreshTokenEntity) = CreateRefreshTokenEntity(user, ipAddress, userAgent);
 
@@ -76,7 +100,43 @@ namespace Audex.Application.Services.Auth
             {
                 AccessToken = accessToken,
                 RefreshToken = rawRefreshToken,
-                PasswordChangeRequired = isPasswordEmpty,
+                PasswordChangeRequired = false,
+                UserProfile = user
+            });
+        }
+
+        public async Task<LoginResultDto> LoginAsync(string userName, string password, string? ipAddress = null, string? userAgent = null)
+        {
+            if (string.IsNullOrEmpty(password))
+            {
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.InvalidCredentials);
+                return LoginResultDto.Failure(errorMessage);
+            }
+
+            var user = await _userProfileService.GetByAuthAsync(userName, password);
+
+            if (user == null)
+            {
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.InvalidCredentials);
+                return LoginResultDto.Failure(errorMessage);
+            }
+
+            if (string.IsNullOrEmpty(user.Password))
+            {
+                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.SetupRequired);
+                return LoginResultDto.Failure(errorMessage);
+            }
+
+            var (accessToken, rawRefreshToken, refreshTokenEntity) = CreateRefreshTokenEntity(user, ipAddress, userAgent);
+
+            await _refreshTokenRepo.AddAsync(refreshTokenEntity);
+            await _uow.CommitAsync();
+
+            return LoginResultDto.Success(new LoginResponseDto
+            {
+                AccessToken = accessToken,
+                RefreshToken = rawRefreshToken,
+                PasswordChangeRequired = false,
                 UserProfile = user
             });
         }
@@ -162,14 +222,7 @@ namespace Audex.Application.Services.Auth
                 throw new ArgumentException(nameof(user));
             }
 
-            var userEntity = await _userProfileRepo.GetByIdAsync(user.Id, disableTracking: false);
-            if (userEntity == null)
-            {
-                throw new ArgumentException(nameof(user));
-            }
-
-            userEntity.Password = _passwordHasher.HashPassword(newPassword);
-            _userProfileRepo.Update(userEntity);
+            await _userProfileService.UpdatePasswordAsync(user.Id, _passwordHasher.HashPassword(newPassword));
 
             // Revoke all sessions on password change
             await RevokeAllUserTokensAsync(user.Id);
