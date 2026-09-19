@@ -39,13 +39,13 @@ const DebtPayment: React.FC<Props> = ({
             _hover={{ bg: 'background_secondary' }}
         >
             {/* Left: Date & Payment Type Badge */}
-            <HStack gap={3} w={{ base: '100%', md: '230px' }} flexShrink={0}>
-                <HStack gap={1.5} color="text_secondary" fontSize="xs" w="95px" flexShrink={0}>
+            <HStack gap={3} w={{ base: '100%', md: '285px' }} flexShrink={0}>
+                <HStack gap={1.5} color="text_secondary" fontSize="xs" w="155px" flexShrink={0}>
                     <Icon size="xs" color="text_secondary">
                         <MdCalendarToday />
                     </Icon>
                     <Text fontWeight={500} color="text_secondary" whiteSpace="nowrap">
-                        {formatDate(date, i18n, false)}
+                        {formatDate(date, i18n, true)}
                     </Text>
                 </HStack>
 
