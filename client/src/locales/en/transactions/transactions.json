@@ -50,7 +50,7 @@
     "summary_net_balance": "Net Cashflow",
     "summary_daily_avg": "Daily Average",
 
-    "filter_search_placeholder": "Search by name, category, or account...",
+    "filter_search_placeholder": "Search by name...",
     "filter_all_types": "All types",
     "filter_income_only": "Income only",
     "filter_expense_only": "Expenses only",

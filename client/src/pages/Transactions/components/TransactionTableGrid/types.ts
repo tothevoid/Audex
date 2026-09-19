@@ -4,6 +4,7 @@ import { TransactionTypeEntity } from '../../../../models/transactions/Transacti
 import { formatDate } from '../../../../shared/utilities/formatters/dateFormatter';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import { i18n as I18nType } from 'i18next';
+import { ViewDisplayMode } from '../TransactionFilterBar/TransactionFilterBar';
 
 export interface FieldDiff {
     isModified: boolean;
@@ -70,7 +71,7 @@ export interface OutOfMonthItem {
     dateStr: string;
 }
 
-export interface TransactionTableGridProps {
+export interface TransactionsListHeaderProps {
     transactions: TransactionEntity[];
     accounts: AccountEntity[];
     transactionTypes: TransactionTypeEntity[];
@@ -79,4 +80,9 @@ export interface TransactionTableGridProps {
     selectedAccountId?: string;
     onCommitDiff: (diff: CommitDiffPayload) => Promise<void>;
     onRefresh: () => void;
+    viewDisplayMode: ViewDisplayMode;
+    onViewDisplayModeChange: (mode: ViewDisplayMode) => void;
 }
+
+export type TransactionTableGridProps = TransactionsListHeaderProps;
+

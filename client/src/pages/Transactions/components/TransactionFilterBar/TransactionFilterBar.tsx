@@ -1,9 +1,10 @@
 import React from 'react';
-import { Box, Flex, Icon, NativeSelect, Checkbox, SegmentGroup } from '@chakra-ui/react';
-import { MdViewAgenda, MdTableChart } from 'react-icons/md';
+import { Box, Button, Flex, HStack, NativeSelect } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { AccountEntity } from '../../../../models/accounts/AccountEntity';
-import { FilterBar, FilterBarSearch } from '../../../../shared/components/FilterBar';
+import { FilterBarSearch } from '../../../../shared/components/FilterBar';
+import MonthPicker from '../MonthPicker/MonthPicker';
+import SwitchButton from '../../../../shared/components/SwitchButton/SwitchButton';
 
 export type TypeFilterMode = 'all' | 'income' | 'expense';
 export type ViewDisplayMode = 'cards' | 'table';
@@ -18,8 +19,9 @@ interface Props {
     showSystem: boolean;
     onShowSystemChange: (show: boolean) => void;
     accounts: AccountEntity[];
-    viewDisplayMode: ViewDisplayMode;
-    onViewDisplayModeChange: (mode: ViewDisplayMode) => void;
+    year: number;
+    month: number;
+    onPageSwitched: (month: number, year: number) => void;
 }
 
 export const TransactionFilterBar: React.FC<Props> = ({
@@ -32,64 +34,67 @@ export const TransactionFilterBar: React.FC<Props> = ({
     showSystem,
     onShowSystemChange,
     accounts,
-    viewDisplayMode,
-    onViewDisplayModeChange,
+    year,
+    month,
+    onPageSwitched,
 }) => {
     const { t } = useTranslation();
 
     return (
-        <FilterBar>
-            {/* Display View Mode Switcher: Cards vs Table */}
-            <SegmentGroup.Root
-                size="sm"
-                value={viewDisplayMode}
-                onValueChange={(e) => onViewDisplayModeChange((e.value as ViewDisplayMode) || 'cards')}
+        <Box
+            backgroundColor="background_primary"
+            borderColor="border_primary"
+            borderWidth="1px"
+            borderRadius="xl"
+            p={3}
+            boxShadow="xs"
+            mb={4}
+        >
+            {/* Row 1: Date Navigation (Standalone) */}
+            <Flex align="center" gap={3} pb={3}>
+                <MonthPicker year={year} month={month} onPageSwitched={onPageSwitched} />
+            </Flex>
+
+            {/* Row 2: Search & All Other Filters (aligned together) */}
+            <Flex
+                align="center"
+                gap={3}
+                flexWrap="wrap"
+                pt={3}
+                borderTopWidth="1px"
+                borderColor="border_primary"
             >
-                <SegmentGroup.Indicator />
-                <SegmentGroup.Item value="cards">
-                    <Icon mr={1} size="xs">
-                        <MdViewAgenda />
-                    </Icon>
-                    <SegmentGroup.ItemText>{t('view_mode_cards')}</SegmentGroup.ItemText>
-                    <SegmentGroup.ItemHiddenInput />
-                </SegmentGroup.Item>
-                <SegmentGroup.Item value="table">
-                    <Icon mr={1} size="xs">
-                        <MdTableChart />
-                    </Icon>
-                    <SegmentGroup.ItemText>{t('view_mode_table')}</SegmentGroup.ItemText>
-                    <SegmentGroup.ItemHiddenInput />
-                </SegmentGroup.Item>
-            </SegmentGroup.Root>
+                {/* Search Input */}
+                <FilterBarSearch
+                    searchText={searchQuery}
+                    onSearchTextChanged={onSearchChange}
+                    placeholder={t('filter_search_placeholder')}
+                    maxW={{ base: 'full', sm: '260px', md: '280px' }}
+                />
 
-            {/* Search Input */}
-            <FilterBarSearch
-                searchText={searchQuery}
-                onSearchTextChanged={onSearchChange}
-                placeholder={t('filter_search_placeholder')}
-            />
-
-            <Flex gap={3} flexWrap="wrap" align="center">
-                {/* Type Filter Buttons / Segment */}
-                <SegmentGroup.Root
-                    size="sm"
-                    value={typeFilter}
-                    onValueChange={(e) => onTypeFilterChange((e.value as TypeFilterMode) || 'all')}
-                >
-                    <SegmentGroup.Indicator />
-                    <SegmentGroup.Item value="all">
-                        <SegmentGroup.ItemText>{t('filter_all_types')}</SegmentGroup.ItemText>
-                        <SegmentGroup.ItemHiddenInput />
-                    </SegmentGroup.Item>
-                    <SegmentGroup.Item value="income">
-                        <SegmentGroup.ItemText>{t('filter_income_only')}</SegmentGroup.ItemText>
-                        <SegmentGroup.ItemHiddenInput />
-                    </SegmentGroup.Item>
-                    <SegmentGroup.Item value="expense">
-                        <SegmentGroup.ItemText>{t('filter_expense_only')}</SegmentGroup.ItemText>
-                        <SegmentGroup.ItemHiddenInput />
-                    </SegmentGroup.Item>
-                </SegmentGroup.Root>
+                {/* Type Filter Buttons: Expenses / Income (Toggleable, default all when unselected) */}
+                <HStack gap={1.5}>
+                    <Button
+                        size="sm"
+                        variant={typeFilter === 'expense' ? 'solid' : 'outline'}
+                        colorPalette={typeFilter === 'expense' ? 'red' : undefined}
+                        borderColor={typeFilter === 'expense' ? undefined : 'border_primary'}
+                        color={typeFilter === 'expense' ? undefined : 'text_secondary'}
+                        onClick={() => onTypeFilterChange(typeFilter === 'expense' ? 'all' : 'expense')}
+                    >
+                        {t('summary_total_expenses')}
+                    </Button>
+                    <Button
+                        size="sm"
+                        variant={typeFilter === 'income' ? 'solid' : 'outline'}
+                        colorPalette={typeFilter === 'income' ? 'green' : undefined}
+                        borderColor={typeFilter === 'income' ? undefined : 'border_primary'}
+                        color={typeFilter === 'income' ? undefined : 'text_secondary'}
+                        onClick={() => onTypeFilterChange(typeFilter === 'income' ? 'all' : 'income')}
+                    >
+                        {t('summary_total_income')}
+                    </Button>
+                </HStack>
 
                 {/* Account Select Filter */}
                 <Box minW="150px">
@@ -112,20 +117,15 @@ export const TransactionFilterBar: React.FC<Props> = ({
                     </NativeSelect.Root>
                 </Box>
 
-                {/* Show System Checkbox */}
-                <Checkbox.Root
-                    checked={showSystem}
-                    onCheckedChange={(details) => onShowSystemChange(!!details.checked)}
+                {/* Show System Switch */}
+                <SwitchButton
+                    active={showSystem}
+                    onSwitch={onShowSystemChange}
+                    title={t('manager_transactions_show_system')}
                     size="sm"
-                >
-                    <Checkbox.HiddenInput />
-                    <Checkbox.Control />
-                    <Checkbox.Label color="text_primary" fontSize="xs">
-                        {t('manager_transactions_show_system')}
-                    </Checkbox.Label>
-                </Checkbox.Root>
+                />
             </Flex>
-        </FilterBar>
+        </Box>
     );
 };
 

@@ -9,7 +9,7 @@ import { BaseModalRef } from '../../../../shared/utilities/modalUtilities';
 import {
     CommitDiffPayload,
     RowDiff,
-    TransactionTableGridProps,
+    TransactionsListHeaderProps,
 } from './types';
 import {
     hasOutOfPeriodTransactions,
@@ -18,7 +18,7 @@ import {
     TransactionTableRow,
 } from './components';
 
-export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
+export const TransactionTableGrid: React.FC<TransactionsListHeaderProps> = ({
     transactions,
     accounts,
     transactionTypes,
@@ -27,6 +27,8 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
     selectedAccountId,
     onCommitDiff,
     onRefresh,
+    viewDisplayMode,
+    onViewDisplayModeChange,
 }) => {
     const { t } = useTranslation();
 
@@ -207,6 +209,8 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
                 onRefresh={onRefresh}
                 onResetAll={handleResetAll}
                 onCommit={handleCommit}
+                viewDisplayMode={viewDisplayMode}
+                onViewDisplayModeChange={onViewDisplayModeChange}
             />
 
             {/* Interactive Spreadsheet Grid */}

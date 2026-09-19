@@ -25,7 +25,7 @@
 
     "transaction_delete_title": "Удалить транзакцию",
 
-    "view_mode_cards": "Просмотр",
+    "view_mode_cards": "Карточки",
     "view_mode_table": "Таблица",
     "table_add_row": "Добавить строку",
     "table_commit_changes": "Сохранить изменения",
@@ -50,7 +50,7 @@
     "summary_net_balance": "Чистый результат",
     "summary_daily_avg": "Средний расход в день",
 
-    "filter_search_placeholder": "Поиск по названию, категории или счету...",
+    "filter_search_placeholder": "Поиск по названию...",
     "filter_all_types": "Все операции",
     "filter_income_only": "Только доходы",
     "filter_expense_only": "Только расходы",

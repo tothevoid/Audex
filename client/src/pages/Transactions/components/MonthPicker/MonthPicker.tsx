@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import "./Pagination.css"
+import "./MonthPicker.css"
 import { getMonthByIndex } from "../../../../shared/utilities/dateUtils"
 import { Calendar } from "../../../../shared/components/Calendar/Calendar"
 import { MdChevronLeft, MdChevronRight, MdCalendarMonth } from "react-icons/md"
@@ -16,7 +16,7 @@ type Props = {
     onPageSwitched: (month: number, year: number) => void
 }
 
-const Pagination: React.FC<Props> = (props: Props) => {
+const MonthPicker: React.FC<Props> = (props: Props) => {
     const [state, setState] = useState<State>({ isCalendarVisible: false })
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -96,4 +96,4 @@ const Pagination: React.FC<Props> = (props: Props) => {
     );
 }
 
-export default Pagination;
+export default MonthPicker;

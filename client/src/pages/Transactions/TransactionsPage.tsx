@@ -1,9 +1,11 @@
 import "./TransactionsPage.scss";
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Button, Icon } from '@chakra-ui/react';
+import { MdAdd } from 'react-icons/md';
 import { AccountEntity } from '../../models/accounts/AccountEntity';
-import Pagination from './components/Pagination/Pagination';
 import TransactionSummaryHeader from './components/TransactionSummaryHeader/TransactionSummaryHeader';
+import TransactionsListHeader from './components/TransactionsListHeader/TransactionsListHeader';
 import TransactionFilterBar, { TypeFilterMode, ViewDisplayMode } from './components/TransactionFilterBar/TransactionFilterBar';
 import TransactionCardsView from './components/TransactionCardsView';
 import TransactionTableGrid from './components/TransactionTableGrid/TransactionTableGrid';
@@ -191,19 +193,15 @@ const TransactionsPage: React.FC = () => {
             <SectionHeader
                 title={t("manager_transactions_title")}
                 size="2xl"
-                subtitle={`${filteredTransactions.length} ${t("entity_transaction_name_form_title").toLowerCase()}`}
                 onAdd={onAddTransactionClick}
                 addButtonTitle={t("manager_transactions_add_transaction")}
-                rightElement={
-                    <Pagination year={params.year} month={params.month} onPageSwitched={onPageSwitched} />
-                }
             />
 
-            {/* Top KPI Metrics Header */}
-            <TransactionSummaryHeader transactions={transactions} daysInMonth={daysInMonth} />
-
-            {/* Filter & Search Bar with View Mode Switcher */}
+            {/* Filter & Search Bar with Month Picker */}
             <TransactionFilterBar
+                year={params.year}
+                month={params.month}
+                onPageSwitched={onPageSwitched}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
                 typeFilter={typeFilter}
@@ -213,9 +211,33 @@ const TransactionsPage: React.FC = () => {
                 showSystem={params.showSystem}
                 onShowSystemChange={onShowSystemSwitched}
                 accounts={state.accounts}
-                viewDisplayMode={viewDisplayMode}
-                onViewDisplayModeChange={handleViewDisplayModeChange}
             />
+
+            {/* Monthly KPI Metrics Header (corresponds to selected month) */}
+            <TransactionSummaryHeader transactions={transactions} daysInMonth={daysInMonth} />
+
+            {/* View Action Bar (Always visible: Refresh + View Switcher) */}
+            {viewDisplayMode === 'cards' && (
+                <TransactionsListHeader
+                    viewDisplayMode={viewDisplayMode}
+                    onViewDisplayModeChange={handleViewDisplayModeChange}
+                    onRefresh={refetch}
+                    leftExtra={
+                        <Button
+                            size="sm"
+                            colorPalette="blue"
+                            onClick={onAddTransactionClick}
+                            px={3}
+                            borderRadius="lg"
+                        >
+                            <Icon mr={1}>
+                                <MdAdd size={18} />
+                            </Icon>
+                            {t('manager_transactions_add_transaction')}
+                        </Button>
+                    }
+                />
+            )}
 
             {/* MODE 1: CARDS VIEW MODE */}
             {viewDisplayMode === 'cards' && (
@@ -248,6 +270,8 @@ const TransactionsPage: React.FC = () => {
                     selectedAccountId={selectedAccountId}
                     onCommitDiff={handleCommitTableDiff}
                     onRefresh={refetch}
+                    viewDisplayMode={viewDisplayMode}
+                    onViewDisplayModeChange={handleViewDisplayModeChange}
                 />
             )}
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AccountEntity } from '../../../../models/accounts/AccountEntity';
-import { Box, Flex, Stack, Text, Progress, Badge } from '@chakra-ui/react';
+import { Box, Flex, Stack, Text, Progress } from '@chakra-ui/react';
 import ButtonGroup from '../../../../shared/components/ButtonGroup/ButtonGroup';
 import { useTranslation } from 'react-i18next';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, TooltipValueType } from 'recharts';
@@ -233,11 +233,6 @@ const TransactionStats: React.FC<TransactionStatsProps> = ({
                                                 <Text fontSize="xs" fontWeight={isSelected ? 700 : 600} color="text_primary">
                                                     {item.name}
                                                 </Text>
-                                                {isSelected && (
-                                                    <Badge size="xs" colorPalette="blue" variant="solid">
-                                                        {t('filter_active')}
-                                                    </Badge>
-                                                )}
                                             </Flex>
                                             <Flex align="center" gap={2}>
                                                 <Text fontSize="2xs" color="text_secondary">
