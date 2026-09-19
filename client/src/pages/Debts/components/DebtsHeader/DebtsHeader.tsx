@@ -5,6 +5,7 @@ import { MdSettings, MdBarChart } from "react-icons/md";
 import { BsWallet2, BsPeople, BsListCheck } from "react-icons/bs";
 import AddButton from "../../../../shared/components/AddButton/AddButton";
 import SectionHeader from "../../../../shared/components/SectionHeader";
+import FilterBlock, { FilterBlockDivider } from "../../../../shared/components/FilterBlock";
 import SwitchButton from "../../../../shared/components/SwitchButton/SwitchButton";
 import Placeholder from "../../../../shared/components/Placeholder/Placeholder";
 import DebtTagBadge from "../DebtTagBadge/DebtTagBadge";
@@ -159,58 +160,45 @@ export const DebtsHeader: React.FC<Props> = ({
             </Card.Root>
 
             {/* Dedicated Filter Block: Active switch + Tags */}
-            <Box
-                backgroundColor="background_primary"
-                borderColor="border_primary"
-                borderWidth="1px"
-                borderRadius="xl"
-                p={3}
-                boxShadow="xs"
-            >
-                <Flex
-                    alignItems="center"
-                    gap={4}
-                    flexWrap="wrap"
-                >
-                    <SwitchButton
-                        active={onlyActive}
-                        title={t("debts_page_only_active")}
-                        onSwitch={onOnlyActiveChange}
-                    />
+            <FilterBlock>
+                <SwitchButton
+                    active={onlyActive}
+                    title={t("debts_page_only_active")}
+                    onSwitch={onOnlyActiveChange}
+                />
 
-                    {tags && tags.length > 0 && (
-                        <>
-                            <Box h="20px" w="1px" bg="border_primary" display={{ base: "none", sm: "block" }} />
+                {tags && tags.length > 0 && (
+                    <>
+                        <FilterBlockDivider />
 
-                            <Flex gap={2} alignItems="center" wrap="wrap">
-                                <DebtTagBadge
-                                    name={t("debts_all_tags")}
-                                    isSelected={selectedTagFilter === null}
-                                    cursor="pointer"
-                                    onClick={() => onSelectedTagFilterChange(null)}
-                                    px={3}
-                                    py={1}
-                                />
-                                {tags.map((tag) => {
-                                    const isSelected = selectedTagFilter === tag.id;
-                                    return (
-                                        <DebtTagBadge
-                                            key={tag.id}
-                                            name={tag.name}
-                                            colorHex={tag.colorHex}
-                                            isSelected={isSelected}
-                                            cursor="pointer"
-                                            onClick={() => onSelectedTagFilterChange(isSelected ? null : tag.id)}
-                                            px={3}
-                                            py={1}
-                                        />
-                                    );
-                                })}
-                            </Flex>
-                        </>
-                    )}
-                </Flex>
-            </Box>
+                        <Flex gap={2} alignItems="center" wrap="wrap">
+                            <DebtTagBadge
+                                name={t("debts_all_tags")}
+                                isSelected={selectedTagFilter === null}
+                                cursor="pointer"
+                                onClick={() => onSelectedTagFilterChange(null)}
+                                px={3}
+                                py={1}
+                            />
+                            {tags.map((tag) => {
+                                const isSelected = selectedTagFilter === tag.id;
+                                return (
+                                    <DebtTagBadge
+                                        key={tag.id}
+                                        name={tag.name}
+                                        colorHex={tag.colorHex}
+                                        isSelected={isSelected}
+                                        cursor="pointer"
+                                        onClick={() => onSelectedTagFilterChange(isSelected ? null : tag.id)}
+                                        px={3}
+                                        py={1}
+                                    />
+                                );
+                            })}
+                        </Flex>
+                    </>
+                )}
+            </FilterBlock>
         </Box>
     );
 };

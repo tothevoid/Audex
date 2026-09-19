@@ -175,7 +175,7 @@ const CurrenciesTable: React.FC = () => {
             title={t("data_tab_currencies")}
             onAdd={onAdd}
             addButtonTitle={t("currencies_data_add")}
-            rightElement={
+            extra={
                 <RefreshButton isRefreshing={isSyncing} title={t("currencies_data_sync_rates")} onClick={onSyncRates} />
             }
         />

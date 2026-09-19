@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { DepositEntity } from "../../models/deposits/DepositEntity";
-import { SimpleGrid, Checkbox, Box } from "@chakra-ui/react";
+import { SimpleGrid, Box } from "@chakra-ui/react";
 import DepositStats from "./components/DepositStats/DepositStats";
 import Deposit from "./components/Deposit/Deposit";
 import DepositsRangeSlider from "./components/DepositsRangeSlider/DepositsRangeSlider";
@@ -12,6 +12,7 @@ import { useEntityModal } from "../../shared/hooks/useEntityModal";
 import { ConfirmModal } from "../../shared/modals/ConfirmModal/ConfirmModal";
 import AddButton from "../../shared/components/AddButton/AddButton";
 import SectionHeader from "../../shared/components/SectionHeader/SectionHeader";
+import FilterBlock from "../../shared/components/FilterBlock";
 import PageContainer from "../../shared/components/PageContainer/PageContainer";
 import { ActiveEntityMode } from "../../shared/enums/activeEntityMode";
 
@@ -102,20 +103,20 @@ const DepositsPage: React.FC = () => {
 			<DepositsRangeSlider onDepositsRangeChanged={onDepositsRangeChanged} refreshTrigger={rangeRefreshKey} />
 
 			{deposits.length > 0 ? (
-				<SectionHeader
-					title={t("header_deposits")}
-					onAdd={onAddClicked}
-					addButtonTitle={t("deposits_list_add_button")}
-					pt={4}
-					pb={2}
-					rightElement={
-						<Checkbox.Root checked={onlyActive} onCheckedChange={(details) => onCheckboxChanged(!!details.checked)} variant="solid">
-							<Checkbox.HiddenInput />
-							<Checkbox.Control />
-							<Checkbox.Label color="text_primary">{t("deposits_list_only_active")}</Checkbox.Label>
-						</Checkbox.Root>
-					}
-				/>
+				<>
+					<SectionHeader
+						title={t("header_deposits")}
+						onAdd={onAddClicked}
+						addButtonTitle={t("deposits_list_add_button")}
+						pt={4}
+						pb={2}
+					/>
+					<FilterBlock
+						active={onlyActive}
+						activeTitle={t("deposits_list_only_active")}
+						onActiveChange={onCheckboxChanged}
+					/>
+				</>
 			) : (
 				<Box mt={6}>
 					{getAddButtonWithoutDeposits()}

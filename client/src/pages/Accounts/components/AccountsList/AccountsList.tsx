@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import Account from '../Account/Account';
-import { Box, Checkbox, SimpleGrid } from '@chakra-ui/react';
+import { Box, SimpleGrid } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { AccountEntity } from '../../../../models/accounts/AccountEntity';
 import { BaseModalRef } from '../../../../shared/utilities/modalUtilities';
@@ -10,6 +10,7 @@ import Placeholder from '../../../../shared/components/Placeholder/Placeholder';
 import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
 import AddButton from '../../../../shared/components/AddButton/AddButton';
 import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
+import FilterBlock from '../../../../shared/components/FilterBlock';
 import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
 import AccountBalanceTransferModal from '../../modals/AccountBalanceTransferModal/AccountBalanceTransferModal';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
@@ -49,8 +50,8 @@ const AccountsList: React.FC<Props> = ({onAccountsChanged}) => {
 		onAccountsChanged();
 	}, [accounts, onAccountsChanged])
 
-	const onCheckboxChanged = async (checkboxChange: any) => {	
-		setAccountQueryParameters({onlyActive: !!checkboxChange.checked})
+	const onOnlyActiveChange = (active: boolean) => {	
+		setAccountQueryParameters({ onlyActive: active });
 	}
 
 	const getAddButton = () => {
@@ -91,14 +92,12 @@ const AccountsList: React.FC<Props> = ({onAccountsChanged}) => {
 			title={t("header_accounts")}
 			onAdd={onAddClicked}
 			addButtonTitle={t("accounts_page_summary_add")}
-			pb={4}
-			rightElement={
-				<Checkbox.Root checked={accountQueryParameters.onlyActive} onCheckedChange={onCheckboxChanged} variant="solid">
-					<Checkbox.HiddenInput />
-					<Checkbox.Control />
-					<Checkbox.Label color="text_primary">{t("accounts_list_only_active")}</Checkbox.Label>
-				</Checkbox.Root>
-			}
+			mb={4}
+		/>
+		<FilterBlock
+			active={accountQueryParameters.onlyActive}
+			activeTitle={t("accounts_list_only_active")}
+			onActiveChange={onOnlyActiveChange}
 		/>
 		{
 			accounts.length > 0 ?
