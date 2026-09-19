@@ -3,6 +3,7 @@ import React, { Fragment, useCallback, useEffect, useState } from "react";
 
 import { getDailyStats } from "../../../../api/brokers/brokerAccountSummaryApi";
 import { Card, SimpleGrid, Stack, Table, Text, Link, Flex } from "@chakra-ui/react";
+import { NavLink } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
 import { BrokerAccountDailySecurityStatsEntity, BrokerAccountDailyStatsEntity } from "../../../../models/brokers/BrokerAccountDailyStatsEntity";
 import { Nullable } from "../../../../shared/utilities/nullable";
@@ -68,15 +69,17 @@ const BrokerAccountDailyStats: React.FC<Props> = ({ brokerAccountId, currencyNam
 
 		return <Table.Row key={stat.security.id} color="text_primary" backgroundColor="background_primary">
 			<Table.Cell>
-				<Link color="text_primary" href={`/security/${stat.security.id}`}>
-					<Flex align="center" gap={2}>
-						<StoredIcon
-							src={iconUrl}
-							fallbackIcon={<HiOutlineBuildingOffice2 size={16} color="var(--chakra-colors-text_secondary)" />}
-							size="sm"
-						/>
-						{stat.security.ticker}
-					</Flex>
+				<Link asChild color="text_primary">
+					<NavLink to={`/security/${stat.security.id}`}>
+						<Flex align="center" gap={2}>
+							<StoredIcon
+								src={iconUrl}
+								fallbackIcon={<HiOutlineBuildingOffice2 size={16} color="var(--chakra-colors-text_secondary)" />}
+								size="sm"
+							/>
+							{stat.security.ticker}
+						</Flex>
+					</NavLink>
 				</Link>
 			</Table.Cell>
 			<Table.Cell>{formatMoneyByCurrencyCulture(stat.startPrice, currencyName)}</Table.Cell>

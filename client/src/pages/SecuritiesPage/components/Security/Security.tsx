@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
+import { NavLink } from 'react-router-dom';
 import { HiOutlineBuildingOffice2 } from 'react-icons/hi2';
 import { getIconUrl } from '../../../../api/securities/securityApi';
 import { SecurityEntity } from '../../../../models/securities/SecurityEntity';
@@ -34,7 +35,7 @@ const Security: React.FC<Props> = ({ security, onEditClicked, onDeleteClicked })
                             />
                             <Stack gap={0.5} minW={0} flex="1">
                                 <Link
-                                    href={securityLink}
+                                    asChild
                                     color="text_primary"
                                     fontWeight="700"
                                     fontSize="lg"
@@ -43,7 +44,7 @@ const Security: React.FC<Props> = ({ security, onEditClicked, onDeleteClicked })
                                     title={ticker}
                                     _hover={{ color: "status_success" }}
                                 >
-                                    {ticker}
+                                    <NavLink to={securityLink}>{ticker}</NavLink>
                                 </Link>
                                 <Text
                                     fontSize="xs"

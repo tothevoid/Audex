@@ -145,8 +145,8 @@ const Header = () => {
             >
                 <Flex flex={{ base: 1 }} justify="center" align={"center"}>
                     <Flex align="center" mr={2}>
-                        <Link href='/'>
-                            <AppIcon marginInline="10px" size="30px" color="text_primary" />
+                        <Link asChild>
+                            <NavLink to='/'><AppIcon marginInline="10px" size="30px" color="text_primary" /></NavLink>
                         </Link>
                         {import.meta.env.DEV && (
                             <Badge

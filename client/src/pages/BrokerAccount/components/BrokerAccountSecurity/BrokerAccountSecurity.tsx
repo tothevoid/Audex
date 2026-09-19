@@ -1,4 +1,5 @@
 import { Card, Flex, Link, Stack, Text, Box, Button } from '@chakra-ui/react';
+import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineBuildingOffice2 } from 'react-icons/hi2';
@@ -53,8 +54,8 @@ export const BrokerAccountSecurity = ({ brokerAccountSecurity }: Props) => {
                                 size="lg"
                             />
                             <Stack gap={0.5} minW={0} flex="1">
-                                <Link color="text_primary" href={securityLink} fontSize="lg" fontWeight="900" letterSpacing="tight" truncate title={security?.ticker}>
-                                    {security?.ticker}
+                                <Link asChild color="text_primary" fontSize="lg" fontWeight="900" letterSpacing="tight" truncate title={security?.ticker}>
+                                    <NavLink to={securityLink}>{security?.ticker}</NavLink>
                                 </Link>
                                 <Text fontSize="xs" color="gray.400" fontWeight="500" truncate title={security?.name}>
                                     {security?.name}

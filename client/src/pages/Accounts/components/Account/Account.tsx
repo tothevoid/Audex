@@ -1,4 +1,5 @@
 import { Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
+import { NavLink } from 'react-router-dom';
 import { AccountEntity } from '../../../../models/accounts/AccountEntity';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import { ACCOUNT_TYPE } from '../../../../shared/constants/accountType';
@@ -31,7 +32,7 @@ const Account = (props: Props) => {
                             <Stack gap={0.5} minW={0} flex="1">
                                 {isCash ? (
                                     <Link
-                                        href={accountLink}
+                                        asChild
                                         color="text_primary"
                                         fontWeight="700"
                                         fontSize="md"
@@ -41,7 +42,7 @@ const Account = (props: Props) => {
                                         textDecoration="none"
                                         _hover={{ color: "action_primary", textDecoration: "none" }}
                                     >
-                                        {name}
+                                        <NavLink to={accountLink!}>{name}</NavLink>
                                     </Link>
                                 ) : (
                                     <Text

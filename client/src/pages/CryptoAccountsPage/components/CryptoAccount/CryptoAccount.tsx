@@ -1,4 +1,5 @@
 import { Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
+import { NavLink } from 'react-router-dom';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { SiBinance } from 'react-icons/si';
 import { CryptoAccountEntity } from '../../../../models/crypto/CryptoAccountEntity';
@@ -46,17 +47,17 @@ const CryptoAccount = (props: Props) => {
                                 />
                                 <Stack gap={0.5} minW={0} flex="1">
                                     <Link
+                                        asChild
                                         fontSize="md"
                                         fontWeight="700"
                                         lineHeight="1.3"
                                         lineClamp={2}
                                         color="text_primary"
-                                        href={accountLink}
                                         textDecoration="none"
                                         _hover={{ color: "action_primary", textDecoration: "none" }}
                                         title={name}
                                     >
-                                        {name}
+                                        <NavLink to={accountLink}>{name}</NavLink>
                                     </Link>
                                 </Stack>
                             </HStack>

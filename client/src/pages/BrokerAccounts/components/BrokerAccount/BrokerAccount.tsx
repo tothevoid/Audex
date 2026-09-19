@@ -1,4 +1,5 @@
 import { Card, Flex, Link, Span, Stack, Text } from '@chakra-ui/react';
+import { NavLink } from 'react-router-dom';
 import { Fragment, useEffect, useState } from 'react';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
 import { BrokerAccountEntity } from '../../../../models/brokers/BrokerAccountEntity';
@@ -52,7 +53,9 @@ const BrokerAccount = (props: Props) => {
 								fallbackIcon={<BsBank size={16} color="var(--chakra-colors-text_secondary)" />}
 								size="sm"
 							/>
-							<Link fontSize="2xl" fontWeight={900} color="text_primary" href={accountLink} textDecoration="none" _hover={{ color: "action_primary", textDecoration: "none" }}>{name}</Link>
+							<Link asChild fontSize="2xl" fontWeight={900} color="text_primary" textDecoration="none" _hover={{ color: "action_primary", textDecoration: "none" }}>
+								<NavLink to={accountLink}>{name}</NavLink>
+							</Link>
 						</Flex>
 						<Text fontWeight={600}>{broker.name}</Text>
 						<Text fontWeight={600}>{type.name}</Text>
