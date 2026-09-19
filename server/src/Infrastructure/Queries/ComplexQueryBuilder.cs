@@ -16,7 +16,11 @@ namespace Audex.Infrastructure.Queries
 
         public ComplexQueryBuilder<TEntity> AddFilter(Expression<Func<TEntity, bool>> filter)
         {
-            _complexQuery.Filter = filter;
+            if (filter != null)
+            {
+                _complexQuery.Filters.Add(filter);
+            }
+
             return this;
         }
 

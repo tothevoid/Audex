@@ -98,9 +98,9 @@ namespace Audex.Infrastructure.Database
             IQueryable<TEntity> query =
                 complexQuery.TrackingEnabled ? _entities.AsQueryable() : _entities.AsQueryable().AsNoTracking();
 
-            if (complexQuery.Filter != null)
+            foreach (var filter in complexQuery.Filters)
             {
-                query = query.Where(complexQuery.Filter);
+                query = query.Where(filter);
             }
 
             while (complexQuery.OrderByExpressions.Count > 0)

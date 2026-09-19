@@ -15,7 +15,7 @@ namespace Audex.Infrastructure.Tests.Queries
             var query = builder.GetQuery();
 
             Assert.NotNull(query);
-            Assert.Null(query.Filter);
+            Assert.Empty(query.Filters);
             Assert.Null(query.Joins);
             Assert.Empty(query.OrderByExpressions);
             Assert.Equal(-1, query.RecordsLimit);
@@ -32,7 +32,23 @@ namespace Audex.Infrastructure.Tests.Queries
             builder.AddFilter(filter);
             var query = builder.GetQuery();
 
-            Assert.Equal(filter, query.Filter);
+            Assert.Single(query.Filters);
+            Assert.Equal(filter, query.Filters[0]);
+        }
+
+        [Fact]
+        public void AddFilter_MultipleFilters_AccumulatesInFiltersList()
+        {
+            var builder = new ComplexQueryBuilder<AccountType>();
+            Expression<Func<AccountType, bool>> filter1 = x => x.Active;
+            Expression<Func<AccountType, bool>> filter2 = x => x.Name != null;
+
+            builder.AddFilter(filter1).AddFilter(filter2);
+            var query = builder.GetQuery();
+
+            Assert.Equal(2, query.Filters.Count);
+            Assert.Equal(filter1, query.Filters[0]);
+            Assert.Equal(filter2, query.Filters[1]);
         }
 
         [Fact]

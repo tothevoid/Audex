@@ -11,7 +11,7 @@ namespace Audex.Infrastructure.Queries
     public class ComplexQuery<TEntity>
         where TEntity: class
     {
-        public Expression<Func<TEntity, bool>> Filter { get; set; }
+        public List<Expression<Func<TEntity, bool>>> Filters { get; set; } = new();
 
         public Func<IQueryable<TEntity>, IQueryable<TEntity>> Joins { get; set; }
 
