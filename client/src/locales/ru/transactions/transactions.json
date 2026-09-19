@@ -2,7 +2,7 @@
     "manager_transactions_title": "Транзакции",
     "manager_transactions_add_transaction": "Добавить транзакцию",
     "manager_transactions_no_transactions": "Нет транзакций в выбранном периоде",
-    "manager_transactions_empty": "Нет транзакций",
+    "manager_transactions_empty": "Транзакции не найдены",
     "manager_stats_title": "Статистика",
     "manager_stats_by_source": "По счёту",
     "manager_stats_by_type": "По категории",
@@ -23,5 +23,42 @@
     "entity_transaction_direction_income": "Доход",
     "entity_transaction_direction_outcome": "Расход",
 
-    "transaction_delete_title": "Удалить транзакцию"
+    "transaction_delete_title": "Удалить транзакцию",
+
+    "view_mode_cards": "Просмотр",
+    "view_mode_table": "Таблица",
+    "table_add_row": "Добавить строку",
+    "table_commit_changes": "Сохранить изменения",
+    "table_reset_changes": "Сбросить изменения",
+    "table_was": "Было:",
+    "table_changes_modified": "Изменено",
+    "table_changes_added": "Добавлено",
+    "table_changes_deleted": "Удалено",
+    "table_date_warning_title": "Предупреждение о дате транзакций",
+    "table_date_warning_message": "Следующие транзакции содержат дату за пределами выбранного месяца:",
+    "table_date_warning_confirm": "Сохранить всё равно",
+    "table_refresh_tooltip": "Обновить данные",
+    "table_actions_header": "Действия",
+    "table_duplicate_row": "Дублировать строку",
+    "table_delete_row": "Удалить строку",
+    "table_restore_row": "Восстановить строку",
+    "table_reset_row_tooltip": "Сбросить изменения этой строки",
+    "quick_add_name_placeholder": "Название операции...",
+
+    "summary_total_income": "Доходы",
+    "summary_total_expenses": "Расходы",
+    "summary_net_balance": "Чистый результат",
+    "summary_daily_avg": "Средний расход в день",
+
+    "filter_search_placeholder": "Поиск по названию, категории или счету...",
+    "filter_all_types": "Все операции",
+    "filter_income_only": "Только доходы",
+    "filter_expense_only": "Только расходы",
+    "filter_all_accounts": "Все счета",
+    "filter_active": "Активно",
+    "filter_no_category": "Без категории",
+
+    "stats_total_spent": "Всего расходов",
+    "stats_total_income": "Всего доходов",
+    "stats_no_data": "Нет данных по расходам для графика"
 }

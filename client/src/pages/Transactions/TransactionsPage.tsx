@@ -25,6 +25,7 @@ import { BaseModalRef } from "../../shared/utilities/modalUtilities";
 import { ACCOUNT_TYPE } from "../../shared/constants/accountType";
 import PageContainer from "../../shared/components/PageContainer/PageContainer";
 import { createCurrencyTransaction } from "../../api/transactions/currencyTransactionApi";
+import { createTransaction, updateTransaction, deleteTransaction } from "../../api/transactions/transactionApi";
 
 interface State {
     accounts: AccountEntity[];
@@ -175,16 +176,11 @@ const TransactionsPage: React.FC = () => {
         updated: TransactionEntity[];
         deletedIds: string[];
     }) => {
-        for (const addedItem of diff.added) {
-            await createTransactionEntity(addedItem);
-        }
-        for (const updatedItem of diff.updated) {
-            await updateTransactionEntity(updatedItem);
-        }
-        for (const deletedId of diff.deletedIds) {
-            const found = transactions.find((t) => t.id === deletedId);
-            if (found) await deleteTransactionEntity(found);
-        }
+        await Promise.all([
+            ...diff.added.map((addedItem) => createTransaction(addedItem)),
+            ...diff.updated.map((updatedItem) => updateTransaction(updatedItem)),
+            ...diff.deletedIds.map((deletedId) => deleteTransaction(deletedId)),
+        ]);
         await refetch();
     };
 

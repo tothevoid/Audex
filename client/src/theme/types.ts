@@ -28,6 +28,9 @@ export interface ThemeColors {
     status_info: string;
     status_info_bg: string;
     status_info_border: string;
+    status_warning: string;
+    status_warning_bg: string;
+    status_warning_border: string;
     pnl_positive: string;
     pnl_positive_bg: string;
     pnl_positive_border: string;

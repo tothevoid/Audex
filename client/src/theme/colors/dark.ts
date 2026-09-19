@@ -33,6 +33,9 @@ export const darkColors: ThemeColors = {
     status_info: '#60a5fa',
     status_info_bg: 'rgba(59, 130, 246, 0.12)',
     status_info_border: 'rgba(59, 130, 246, 0.3)',
+    status_warning: '#fbbf24',
+    status_warning_bg: 'rgba(245, 158, 11, 0.14)',
+    status_warning_border: 'rgba(245, 158, 11, 0.35)',
 
     // P&L
     pnl_positive: '#4ade80',

@@ -33,6 +33,9 @@ export const solarizedLightColors: ThemeColors = {
     status_info: '#2563eb',
     status_info_bg: 'rgba(37, 99, 235, 0.12)',
     status_info_border: 'rgba(37, 99, 235, 0.25)',
+    status_warning: '#d97706',
+    status_warning_bg: 'rgba(217, 119, 6, 0.12)',
+    status_warning_border: 'rgba(217, 119, 6, 0.3)',
 
     // P&L
     pnl_positive: '#15803d',
