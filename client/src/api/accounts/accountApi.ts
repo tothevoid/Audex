@@ -6,9 +6,14 @@ import { prepareAccount, prepareAccountRequest } from "./accountApiMapping";
 
 const basicUrl = `Account`;
 
-export const getAccounts = async (onlyActive: boolean = false): Promise<AccountEntity[]> =>  {
-	return await getAllEntitiesByConfig<unknown, AccountEntityResponse>(`${basicUrl}/GetAll`, 
-		{onlyActive})
+export interface AccountGetAllConfig {
+	onlyActive?: boolean;
+	currencyId?: string | null;
+	accountTypeId?: string | null;
+}
+
+export const getAccounts = async (config: AccountGetAllConfig = {}): Promise<AccountEntity[]> =>  {
+	return await getAllEntitiesByConfig<unknown, AccountEntityResponse>(`${basicUrl}/GetAll`, config)
 		.then((accountResponses: AccountEntityResponse[]) => accountResponses.map(prepareAccount));
 }
 

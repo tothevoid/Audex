@@ -32,7 +32,7 @@ const NewTransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
     const [state, setState] = useState<State>({ accounts: [] });
 
     const initAccounts = async () => {
-        const accounts = await getAccounts(true);
+        const accounts = await getAccounts({ onlyActive: true });
         setState((currentState) => {
             return { ...currentState, accounts };
         });

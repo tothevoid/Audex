@@ -3,7 +3,9 @@ import { AccountEntity } from "../../../models/accounts/AccountEntity";
 import { createAccount, getAccounts, updateAccount, deleteAccount } from "../../../api/accounts/accountApi";
 
 export interface AccountsQuery {
-	onlyActive: boolean
+	onlyActive: boolean;
+	currencyId?: string | null;
+	accountTypeId?: string | null;
 }
 
 export const useAccounts = (queryParameters: AccountsQuery) => {
@@ -16,7 +18,7 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 	const fetchData = useCallback(async () => {
 		setLoading(true)
 		try {
-			const accounts = await getAccounts(accountQueryParameters.onlyActive);
+			const accounts = await getAccounts(accountQueryParameters);
 			setAccounts(accounts);
 		} catch (err: any) {
 			setError(err.message || 'Ошибка загрузки данных')

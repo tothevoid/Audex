@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System;
@@ -27,7 +27,7 @@ namespace Audex.WebApi.Controllers.Accounts
         [HttpPost("GetAll")]
         public async Task<IEnumerable<AccountModel>> GetAll(AccountGetAllConfig getAllConfig)
         {
-            var accounts = await _accountService.GetAllAsync(getAllConfig.OnlyActive);
+            var accounts = await _accountService.GetAllAsync(getAllConfig.OnlyActive, getAllConfig.CurrencyId, getAllConfig.AccountTypeId);
             return _mapper.Map(accounts);
         }
 

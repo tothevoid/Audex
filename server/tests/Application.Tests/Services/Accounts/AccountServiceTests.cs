@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Accounts;
 using Audex.Application.Interfaces.Accounts;
 using Audex.Application.Tests.Fixtures;
@@ -361,6 +361,45 @@ namespace Audex.Application.Tests.Services.Accounts
             var usdSummary = summaries.FirstOrDefault(s => s.Name == "USD");
             Assert.NotNull(usdSummary);
             Assert.True(usdSummary.Summary >= 500m); // 150 + 350 active accounts
+        }
+
+        [Fact]
+        public async Task TestGetAll_FiltersByCurrencyAndAccountType()
+        {
+            var targetAccount = Guid.NewGuid();
+            var otherCurrencyAccount = Guid.NewGuid();
+            var otherTypeAccount = Guid.NewGuid();
+
+            await ExecuteScopeAsync(async sp =>
+            {
+                var accountsService = sp.GetRequiredService<IAccountService>();
+                await accountsService.AddAsync(CreateAccount(targetAccount, "Target Filter Acc", AccountTypeConstants.Cash, CurrencyConstants.USD, true));
+                await accountsService.AddAsync(CreateAccount(otherCurrencyAccount, "Other Currency Acc", AccountTypeConstants.Cash, CurrencyConstants.EUR, true));
+                await accountsService.AddAsync(CreateAccount(otherTypeAccount, "Other Type Acc", AccountTypeConstants.DebitCard, CurrencyConstants.USD, true));
+            });
+
+            await ExecuteScopeAsync(async sp =>
+            {
+                var accountsService = sp.GetRequiredService<IAccountService>();
+
+                // Filter by USD only
+                var usdAccounts = (await accountsService.GetAllAsync(false, currencyId: CurrencyConstants.USD)).ToList();
+                Assert.Contains(usdAccounts, a => a.Id == targetAccount);
+                Assert.Contains(usdAccounts, a => a.Id == otherTypeAccount);
+                Assert.DoesNotContain(usdAccounts, a => a.Id == otherCurrencyAccount);
+
+                // Filter by Cash only
+                var cashAccounts = (await accountsService.GetAllAsync(false, accountTypeId: AccountTypeConstants.Cash)).ToList();
+                Assert.Contains(cashAccounts, a => a.Id == targetAccount);
+                Assert.Contains(cashAccounts, a => a.Id == otherCurrencyAccount);
+                Assert.DoesNotContain(cashAccounts, a => a.Id == otherTypeAccount);
+
+                // Filter by both USD and Cash
+                var bothAccounts = (await accountsService.GetAllAsync(false, currencyId: CurrencyConstants.USD, accountTypeId: AccountTypeConstants.Cash)).ToList();
+                Assert.Contains(bothAccounts, a => a.Id == targetAccount);
+                Assert.DoesNotContain(bothAccounts, a => a.Id == otherCurrencyAccount);
+                Assert.DoesNotContain(bothAccounts, a => a.Id == otherTypeAccount);
+            });
         }
 
         private AccountDto CreateAccount(Guid id, string name, Guid typeId, Guid currencyId, bool active, decimal balance = 100) => new()

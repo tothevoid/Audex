@@ -2,6 +2,8 @@
     "accounts_page_summary_title": "Current balance",
     "accounts_page_summary_add": "Add account",
     "accounts_list_only_active": "Only active",
+    "accounts_filter_all_currencies": "All currencies",
+    "accounts_filter_all_types": "All types",
     "accounts_list_no_accounts": "No accounts",
 
     "entity_account_name_form_title": "account",

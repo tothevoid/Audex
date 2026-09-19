@@ -2,6 +2,8 @@
     "accounts_page_summary_title": "Текущий баланс",
     "accounts_page_summary_add": "Добавить счёт",
     "accounts_list_only_active": "Только активные",
+    "accounts_filter_all_currencies": "Все валюты",
+    "accounts_filter_all_types": "Все типы",
     "accounts_list_no_accounts": "Нет счетов",
 
     "entity_account_name_form_title": "Счёт",

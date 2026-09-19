@@ -9,17 +9,18 @@ import { useAccounts } from '../../hooks/useAccounts';
 import Placeholder from '../../../../shared/components/Placeholder/Placeholder';
 import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
 import AddButton from '../../../../shared/components/AddButton/AddButton';
-import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
-import FilterBlock from '../../../../shared/components/FilterBlock';
+import AccountsHeader from '../AccountsHeader/AccountsHeader';
+import { AccountCurrencySummary } from '../../../../models/accounts/accountsSummary';
 import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
 import AccountBalanceTransferModal from '../../modals/AccountBalanceTransferModal/AccountBalanceTransferModal';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
 
 interface Props {
-	onAccountsChanged: () => void
+	onAccountsChanged: () => void;
+	accountCurrencySummaries: AccountCurrencySummary[];
 }
 
-const AccountsList: React.FC<Props> = ({onAccountsChanged}) => {
+const AccountsList: React.FC<Props> = ({ onAccountsChanged, accountCurrencySummaries }) => {
 	const { t } = useTranslation();
 
 	const transferModalRef = useRef<BaseModalRef>(null);
@@ -51,8 +52,16 @@ const AccountsList: React.FC<Props> = ({onAccountsChanged}) => {
 	}, [accounts, onAccountsChanged])
 
 	const onOnlyActiveChange = (active: boolean) => {	
-		setAccountQueryParameters({ onlyActive: active });
-	}
+		setAccountQueryParameters(prev => ({ ...prev, onlyActive: active }));
+	};
+
+	const onCurrencyChange = (currencyId: string | null) => {
+		setAccountQueryParameters(prev => ({ ...prev, currencyId }));
+	};
+
+	const onAccountTypeChange = (accountTypeId: string | null) => {
+		setAccountQueryParameters(prev => ({ ...prev, accountTypeId }));
+	};
 
 	const getAddButton = () => {
 		return <AddButton buttonTitle={t("accounts_page_summary_add")} onClick={onAddClicked}/>
@@ -88,20 +97,19 @@ const AccountsList: React.FC<Props> = ({onAccountsChanged}) => {
 	}
 
 	return <Box>
-		<SectionHeader
-			title={t("header_accounts")}
-			onAdd={onAddClicked}
-			addButtonTitle={t("accounts_page_summary_add")}
-			mb={4}
-		/>
-		<FilterBlock
-			active={accountQueryParameters.onlyActive}
-			activeTitle={t("accounts_list_only_active")}
-			onActiveChange={onOnlyActiveChange}
+		<AccountsHeader
+			accountCurrencySummaries={accountCurrencySummaries}
+			onAddClicked={onAddClicked}
+			onlyActive={accountQueryParameters.onlyActive}
+			onOnlyActiveChange={onOnlyActiveChange}
+			selectedCurrencyId={accountQueryParameters.currencyId}
+			onCurrencyChange={onCurrencyChange}
+			selectedAccountTypeId={accountQueryParameters.accountTypeId}
+			onAccountTypeChange={onAccountTypeChange}
 		/>
 		{
 			accounts.length > 0 ?
-				<SimpleGrid pt={5} pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(350px, 3fr))'>
+				<SimpleGrid pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(350px, 3fr))'>
 				{
 					accounts.map((account: AccountEntity) => {
 						return <Account key={account.id} account={account} 

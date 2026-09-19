@@ -42,7 +42,7 @@ const DebtPaymentModal: React.FC<Props> = (props: Props) => {
 	const requestData = async () => {
 		const [debts, accounts] = await Promise.all([
 			getDebts(true),
-			getAccounts(false)
+			getAccounts({ onlyActive: false })
 		]);
 
 		setState((currentState) => {

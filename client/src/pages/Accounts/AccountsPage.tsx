@@ -1,26 +1,33 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getSummary } from "../../api/accounts/accountApi";
 import { AccountCurrencySummary } from "../../models/accounts/accountsSummary";
 import PageContainer from "../../shared/components/PageContainer/PageContainer";
 import AccountsList from "./components/AccountsList/AccountsList";
-import AccountsTotal from "./components/AccountsTotal/AccountsTotal";
 
 const AccountsPage: React.FC = () => {
-
 	const [accountCurrencySummaries, setAccountCurrencySummaries] = useState<AccountCurrencySummary[]>([]);
-	const requestAccountsData = async () => {
-		const accountCurrencySummaries = await getSummary();
-		setAccountCurrencySummaries(accountCurrencySummaries)
-	};
+
+	const requestAccountsData = useCallback(async () => {
+		const summaries = await getSummary();
+		setAccountCurrencySummaries(summaries);
+	}, []);
 
 	const onAccountsChanged = useCallback(async () => {
 		await requestAccountsData();
-	}, []);
+	}, [requestAccountsData]);
 
-	return <PageContainer>
-		<AccountsTotal accountCurrencySummaries={accountCurrencySummaries} />
-		<AccountsList onAccountsChanged={onAccountsChanged}/>
-	</PageContainer>
-}
+	useEffect(() => {
+		requestAccountsData();
+	}, [requestAccountsData]);
+
+	return (
+		<PageContainer>
+			<AccountsList
+				accountCurrencySummaries={accountCurrencySummaries}
+				onAccountsChanged={onAccountsChanged}
+			/>
+		</PageContainer>
+	);
+};
 
 export default AccountsPage;

@@ -72,7 +72,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
     useEffect(() => {
         const fetchData = async () => {
             // TODO: Filter by account type and currency
-            const accounts = await getAccounts(true);
+            const accounts = await getAccounts({ onlyActive: true });
             setAccounts(accounts);
 
             if (props.isGlobalBrokerAccount) {

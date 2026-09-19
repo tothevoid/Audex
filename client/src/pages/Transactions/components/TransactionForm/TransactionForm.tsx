@@ -82,7 +82,7 @@ const TransactionForm: React.FC<ModalProps> = (props: ModalProps) => {
 
 	const initCollections = async () => {
 		const transactionTypes = await getTransactionTypes(true);
-		const accounts = await getAccounts(true);
+		const accounts = await getAccounts({ onlyActive: true });
 
 		setState((currentState) => {
 			return {...currentState, transactionTypes, accounts}

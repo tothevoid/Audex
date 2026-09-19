@@ -29,16 +29,32 @@ namespace Audex.Application.Services.Accounts
             _transactionRepo = uow.CreateRepository<Transaction>();
         }
 
-        public async Task<IEnumerable<AccountDto>> GetAllAsync(bool onlyActive)
+        public async Task<IEnumerable<AccountDto>> GetAllAsync(bool onlyActive = false, Guid? currencyId = null, Guid? accountTypeId = null)
         {
-            var query = new ComplexQueryBuilder<Account>()
-                .AddFilter(onlyActive ? account => account.Active : null)
+            var builder = new ComplexQueryBuilder<Account>();
+
+            if (onlyActive)
+            {
+                builder.AddFilter(account => account.Active);
+            }
+
+            if (currencyId.HasValue)
+            {
+                builder.AddFilter(account => account.CurrencyId == currencyId.Value);
+            }
+
+            if (accountTypeId.HasValue)
+            {
+                builder.AddFilter(account => account.AccountTypeId == accountTypeId.Value);
+            }
+
+            var query = builder
                 .AddOrder(account => account.Name)
                 .AddJoins(GetFullHierarchyColumns)
                 .GetQuery();
 
-            var transactions = await _accountRepo.GetAllAsync(query);
-            return _mapper.Map(transactions);
+            var accounts = await _accountRepo.GetAllAsync(query);
+            return _mapper.Map(accounts);
         }
 
         public async Task<AccountDto> GetByIdAsync(Guid id)

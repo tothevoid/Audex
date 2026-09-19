@@ -66,7 +66,7 @@ const CurrencyTransactionForm: React.FC<Props> = (props: Props) => {
     }, [props.currencyTransaction, reset, getDefaultTransactionFormState]);
 
     useEffect(() => {
-        getAccounts(true).then(setAccounts);
+        getAccounts({ onlyActive: true }).then(setAccounts);
     }, []);
 
     const onCurrencyTransactionSaveClick = async (currencyTransaction: CurrencyTransactionFormInput) => {
