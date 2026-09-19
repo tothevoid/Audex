@@ -1,7 +1,7 @@
 import React from 'react';
 import { Badge, BadgeProps } from '@chakra-ui/react';
 
-export type AccentBadgeVariant = 'success' | 'danger' | 'info' | 'neutral' | 'primary';
+export type AccentBadgeVariant = 'success' | 'danger' | 'info' | 'neutral' | 'primary' | 'warning';
 
 export interface AccentBadgeProps extends Omit<BadgeProps, 'variant'> {
     variant?: AccentBadgeVariant;
@@ -35,6 +35,11 @@ export const AccentBadge: React.FC<AccentBadgeProps> = ({
             bg: 'status_info_bg',
             color: 'status_info',
             borderColor: 'status_info_border',
+        },
+        warning: {
+            bg: 'status_warning_bg',
+            color: 'status_warning',
+            borderColor: 'status_warning_border',
         },
         neutral: {
             bg: 'background_secondary',

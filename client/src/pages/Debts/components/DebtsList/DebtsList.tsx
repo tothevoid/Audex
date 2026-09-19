@@ -158,6 +158,7 @@ const DebtsList: React.FC<Props> = ({
         <Box>
             <DebtsHeader
                 hasDebts={debts.length > 0}
+                debts={debts}
                 tags={availableFilterTags}
                 onlyActive={onlyActive}
                 onOnlyActiveChange={setOnlyActive}
@@ -167,7 +168,7 @@ const DebtsList: React.FC<Props> = ({
                 onOpenTagManagerModal={onOpenTagManagerModal}
                 onOpenTagStatsModal={onOpenTagStatsModal}
             />
-            <SimpleGrid pt={5} pb={5} gap={6} templateColumns="repeat(auto-fill, minmax(300px, 4fr))">
+            <SimpleGrid pb={5} gap={6} templateColumns="repeat(auto-fill, minmax(300px, 4fr))">
                 {filteredDebts.map((debt: DebtEntity) => (
                     <Debt
                         key={debt.id}

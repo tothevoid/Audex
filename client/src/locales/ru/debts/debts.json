@@ -23,5 +23,13 @@
     "entity_debt_payment_is_percentage_payment": "Выплата процентов",
 
     "debts_payments_filter_debt": "Платежи по долгу: {{name}}",
-    "debts_payments_filter_clear": "Сбросить фильтр"
+    "debts_payments_filter_clear": "Сбросить фильтр",
+    "debt_payment_type_principal": "Основной долг",
+    "debt_payment_type_interest": "Проценты %",
+    "debt_payments_empty": "Платежей пока нет",
+    "debt_payments_header_title": "История выплат",
+    "debts_header_title": "Должники",
+    "debts_header_total_amount": "Одолжено",
+    "debts_header_active_count": "Активные должники",
+    "debts_header_total_count": "Всего должников"
 }

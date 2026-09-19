@@ -23,5 +23,13 @@
     "entity_debt_payment_is_percentage_payment": "Is percentage payment",
 
     "debts_payments_filter_debt": "Showing payments for: {{name}}",
-    "debts_payments_filter_clear": "Reset filter"
+    "debts_payments_filter_clear": "Reset filter",
+    "debt_payment_type_principal": "Principal",
+    "debt_payment_type_interest": "Interest %",
+    "debt_payments_empty": "No payments yet",
+    "debt_payments_header_title": "Payment history",
+    "debts_header_title": "Debtors",
+    "debts_header_total_amount": "Lent",
+    "debts_header_active_count": "Active debtors",
+    "debts_header_total_count": "Total debtors"
 }

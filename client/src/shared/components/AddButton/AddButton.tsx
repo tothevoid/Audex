@@ -1,18 +1,49 @@
-import { Button } from "@chakra-ui/react"
-import React from "react"
-import { MdAdd } from "react-icons/md"
+import { Button, ButtonProps, IconButton } from "@chakra-ui/react";
+import React from "react";
+import { MdAdd } from "react-icons/md";
 
-interface Props {
-    buttonTitle: string,
-    onClick: () => void
+export interface AddButtonProps extends Omit<ButtonProps, "onClick"> {
+    buttonTitle?: string;
+    onClick: () => void;
+    size?: ButtonProps["size"];
+    isCompact?: boolean;
 }
 
-const AddButton: React.FC<Props> = (props: Props) => {
+const AddButton: React.FC<AddButtonProps> = ({
+    buttonTitle,
+    onClick,
+    size = "md",
+    isCompact = false,
+    ...rest
+}) => {
+    const iconSize = size === "xs" || size === "2xs" ? 16 : 18;
+
+    if (isCompact) {
+        return (
+            <IconButton
+                size={size}
+                variant="solid"
+                aria-label={buttonTitle || "Add"}
+                title={buttonTitle}
+                onClick={onClick}
+                {...rest}
+            >
+                <MdAdd size={iconSize} />
+            </IconButton>
+        );
+    }
+
     return (
-        <Button variant="solid" onClick={() => props.onClick()}>
-            <MdAdd />{props.buttonTitle}
+        <Button
+            size={size}
+            variant="solid"
+            onClick={onClick}
+            {...rest}
+        >
+            <MdAdd size={iconSize} />
+            {buttonTitle}
         </Button>
     );
-}
+};
 
 export default AddButton;
