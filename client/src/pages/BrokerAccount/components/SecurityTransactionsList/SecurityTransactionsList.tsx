@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Box, Flex } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { SecurityTransactionEntity, SecurityTransactionEntityRequest } from '../../../../models/securities/SecurityTransactionEntity';
 import SecurityTransaction from '../SecurityTransaction/SecurityTransaction';
@@ -8,7 +8,7 @@ import { useSecurityTransactions } from '../../hooks/useSecurityTransactions';
 import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
 import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
-import AddButton from '../../../../shared/components/AddButton/AddButton';
+import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
 import { Nullable } from '../../../../shared/utilities/nullable';
 import CollectionPagination from '../../../../shared/components/CollectionPagination/CollectionPagination';
 import { getSecurityTransactionsPagination } from '../../../../api/securities/securityTransactionApi';
@@ -83,9 +83,13 @@ const SecurityTransactionsList: React.FC<Props> = (props) => {
 	const isGlobalBrokerAccount= !props.brokerAccountId;
 	
 	return <Box>
-		<Flex alignItems="center" gapX={5}>
-			<AddButton buttonTitle={t("entity_securities_transaction_page_summary_add")} onClick={onAddClicked}/>
-		</Flex>
+		<SectionHeader
+			title={t("broker_account_page_transactions_tab")}
+			size="lg"
+			onAdd={onAddClicked}
+			addButtonTitle={t("entity_securities_transaction_page_summary_add")}
+			my={4}
+		/>
 		<Box>
 		{
 			securityTransactions.map((security: SecurityTransactionEntity) => 

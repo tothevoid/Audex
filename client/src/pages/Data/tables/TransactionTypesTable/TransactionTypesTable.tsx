@@ -7,7 +7,7 @@ import { TransactionTypeEntity } from "../../../../models/transactions/Transacti
 import { createTransactionType, deleteTransactionType, getTransactionTypeIconUrl, getTransactionTypes, updateTransactionType } from "../../../../api/transactions/transactionTypeApi";
 import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
 import TransactionTypeModal from "../../modals/TransactionTypeModal/TransactionTypeModal";
-import AddButton from "../../../../shared/components/AddButton/AddButton";
+import SectionHeader from "../../../../shared/components/SectionHeader/SectionHeader";
 import DataTable, { ColumnDef } from "../../../../shared/components/DataTable/DataTable";
 import StoredIcon from "../../../../shared/components/StoredIcon";
 
@@ -177,9 +177,11 @@ const TransactionTypesTable: React.FC = () => {
     ], [t, state.transactionTypes]);
 
     return <Box color="text_primary">
-        <Box mb={4}>
-            <AddButton buttonTitle={t("transaction_type_data_add")} onClick={onAdd}/>
-        </Box>
+        <SectionHeader
+            title={t("data_tab_transaction_types")}
+            onAdd={onAdd}
+            addButtonTitle={t("transaction_type_data_add")}
+        />
         <DataTable
             data={state.transactionTypes}
             columns={columns}

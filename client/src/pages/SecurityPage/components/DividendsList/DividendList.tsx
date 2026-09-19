@@ -8,7 +8,7 @@ import { useDividends } from '../../hooks/useDividends';
 import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
 import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
-import AddButton from '../../../../shared/components/AddButton/AddButton';
+import SectionHeader from '../../../../shared/components/SectionHeader';
 import { Nullable } from '../../../../shared/utilities/nullable';
 import CollectionPagination from '../../../../shared/components/CollectionPagination/CollectionPagination';
 import { getDividendsPagination } from '../../../../api/securities/dividendApi';
@@ -79,7 +79,13 @@ const DividendList: React.FC<Props> = (props) => {
 
 	return (
 		<Fragment>
-			<AddButton buttonTitle={t("security_page_summary_add")} onClick={onAddClicked}/>
+			<SectionHeader
+				title={t("security_page_tabs_dividends")}
+				size="lg"
+				onAdd={onAddClicked}
+				addButtonTitle={t("security_page_summary_add")}
+				my={4}
+			/>
 			<Box>
 				{
 					dividends.map((security: DividendEntity) => 

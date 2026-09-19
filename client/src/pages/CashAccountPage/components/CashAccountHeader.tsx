@@ -1,10 +1,10 @@
 import React from "react";
-import { Badge, Card, Flex, HStack, Stack, Text } from "@chakra-ui/react";
+import { Badge, Card, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { AccountEntity } from "../../../models/accounts/AccountEntity";
 import { BsWallet2, BsArrowUpRight, BsArrowDownRight, BsBank } from "react-icons/bs";
 import { MdSwapHoriz } from "react-icons/md";
-import AddButton from "../../../shared/components/AddButton/AddButton";
+import SectionHeader from "../../../shared/components/SectionHeader";
 import StoredIcon from "../../../shared/components/StoredIcon";
 import { getBankIconUrl } from "../../../api/banks/bankApi";
 import { NumericMetricItem } from "../../../shared/components/MetricItem";
@@ -37,39 +37,26 @@ export const CashAccountHeader: React.FC<CashAccountHeaderProps> = ({
         >
             <Card.Body padding={4}>
                 {/* Header Top Bar: Account info & Add button */}
-                <Flex justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={3} mb={3}>
-                    <HStack gap={3} alignItems="center">
-                        {account?.bank?.iconKey ? (
-                            <StoredIcon
-                                src={getBankIconUrl(account.bank.iconKey)}
-                                fallbackIcon={<BsBank size={20} color="var(--chakra-colors-text_secondary)" />}
-                                size="md"
-                            />
-                        ) : null}
-                        <Stack gap={0}>
-                            <HStack gap={2} alignItems="center">
-                                <Text fontSize="xl" fontWeight={800} color="text_primary">
-                                    {account ? account.name : t("currency_transactions_title")}
-                                </Text>
-                                {account?.currency?.name && (
-                                    <Badge colorPalette="blue" size="sm" variant="subtle">
-                                        {account.currency.name}
-                                    </Badge>
-                                )}
-                            </HStack>
-                            {account?.accountType?.name && (
-                                <Text fontSize="xs" color="text_secondary">
-                                    {account.accountType.name} {account.bank ? `• ${account.bank.name}` : ''}
-                                </Text>
-                            )}
-                        </Stack>
-                    </HStack>
-
-                    <AddButton
-                        buttonTitle={t("currency_transactions_account_add_button")}
-                        onClick={onAddClicked}
-                    />
-                </Flex>
+                <SectionHeader
+                    leftElement={account?.bank?.iconKey ? (
+                        <StoredIcon
+                            src={getBankIconUrl(account.bank.iconKey)}
+                            fallbackIcon={<BsBank size={20} color="var(--chakra-colors-text_secondary)" />}
+                            size="md"
+                        />
+                    ) : null}
+                    title={account ? account.name : t("currency_transactions_title")}
+                    size="xl"
+                    onAdd={onAddClicked}
+                    addButtonTitle={t("currency_transactions_account_add_button")}
+                    extra={account?.currency?.name && (
+                        <Badge colorPalette="blue" size="sm" variant="subtle">
+                            {account.currency.name}
+                        </Badge>
+                    )}
+                    subtitle={account?.accountType?.name ? `${account.accountType.name}${account.bank ? ` • ${account.bank.name}` : ''}` : undefined}
+                    mb={3}
+                />
 
                 {/* Metrics list */}
                 <Flex

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Flex } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { useBrokerAccountTaxDeductions } from '../../hooks/useBrokerAccountTaxDeductions';
 import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
 import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
 import { useTranslation } from 'react-i18next';
 import { Nullable } from '../../../../shared/utilities/nullable';
-import AddButton from '../../../../shared/components/AddButton/AddButton';
+import SectionHeader from '../../../../shared/components/SectionHeader';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
 import BrokerAccountTaxDeduction from '../BrokerAccountTaxDeduction/BrokerAccountTaxDeduction';
 import { BrokerAccountTaxDeductionEntity } from '../../../../models/brokers/BrokerAccountTaxDeductionEntity';
@@ -67,9 +67,13 @@ const BrokerAccountTaxDeductionsList: React.FC<Props> = (props) => {
     const isGlobalBrokerAccount = !props.brokerAccountId;
 
     return <Box>
-        <Flex alignItems="center" gapX={5}>
-            <AddButton buttonTitle={t("broker_account_tax_deduction_modal_deduction_button")} onClick={onAddClicked}/>
-        </Flex>
+        <SectionHeader
+            title={t("broker_account_page_deduction_taxes_tab")}
+            size="lg"
+            onAdd={onAddClicked}
+            addButtonTitle={t("broker_account_tax_deduction_modal_deduction_button")}
+            my={4}
+        />
         <Box>
         {
             taxDeductions.map((taxDeduction: BrokerAccountTaxDeductionEntity) => 

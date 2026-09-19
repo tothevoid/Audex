@@ -1,7 +1,7 @@
-import { Box, Button, Checkbox, Icon, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Checkbox, Icon, Text } from "@chakra-ui/react";
 import { CurrencyEntity } from "../../../../models/currencies/CurrencyEntity";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MdAdd, MdDelete } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
 import { getCurrencies, updateCurrency, createCurrency, deleteCurrency, syncRates } from "../../../../api/currencies/currencyApi";
@@ -11,6 +11,7 @@ import { useUserProfile } from "../../../../features/UserProfileSettingsModal/ho
 import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
 import RefreshButton from "../../../../shared/components/RefreshButton/RefreshButton";
 import DataTable, { ColumnDef } from "../../../../shared/components/DataTable/DataTable";
+import SectionHeader from "../../../../shared/components/SectionHeader/SectionHeader";
 
 interface State {
     currencies: CurrencyEntity[],
@@ -170,15 +171,14 @@ const CurrenciesTable: React.FC = () => {
     ], [t, user, state.currencies]);
 
     return <Box color="text_primary">
-        <Stack direction="row" mb={4} gapX={2}>
-            <Button background="action_primary" onClick={onAdd}>
-                <Icon size='md'>
-                    <MdAdd/>
-                </Icon>
-                {t("currencies_data_add")}
-            </Button>
-            <RefreshButton isRefreshing={isSyncing} title={t("currencies_data_sync_rates")} onClick={onSyncRates} />
-        </Stack>
+        <SectionHeader
+            title={t("data_tab_currencies")}
+            onAdd={onAdd}
+            addButtonTitle={t("currencies_data_add")}
+            rightElement={
+                <RefreshButton isRefreshing={isSyncing} title={t("currencies_data_sync_rates")} onClick={onSyncRates} />
+            }
+        />
         <DataTable
             data={state.currencies}
             columns={columns}

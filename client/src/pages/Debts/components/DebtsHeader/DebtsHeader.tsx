@@ -1,9 +1,10 @@
 import React, { useMemo } from "react";
-import { Box, Card, Flex, Button, Text } from "@chakra-ui/react";
+import { Box, Card, Flex, Button } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { MdSettings, MdBarChart } from "react-icons/md";
 import { BsWallet2, BsPeople, BsListCheck } from "react-icons/bs";
 import AddButton from "../../../../shared/components/AddButton/AddButton";
+import SectionHeader from "../../../../shared/components/SectionHeader";
 import SwitchButton from "../../../../shared/components/SwitchButton/SwitchButton";
 import Placeholder from "../../../../shared/components/Placeholder/Placeholder";
 import DebtTagBadge from "../DebtTagBadge/DebtTagBadge";
@@ -67,56 +68,51 @@ export const DebtsHeader: React.FC<Props> = ({
             >
                 <Card.Body padding={4}>
                     {/* Top Bar: Title + Green Add Button + Modal actions */}
-                    <Flex justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={3}>
-                        <Flex alignItems="center" gap={2.5}>
-                            <Text fontSize="xl" fontWeight={800} color="text_primary">
-                                {t("debts_header_title")}
-                            </Text>
+                    <SectionHeader
+                        title={t("debts_header_title")}
+                        size="xl"
+                        onAdd={onAddClicked}
+                        addButtonTitle={t("debts_page_add_debt")}
+                        mb={0}
+                        gap={2.5}
+                        rightElement={
+                            <Flex alignItems="center" gap={2}>
+                                {onOpenTagStatsModal && (
+                                    <Button
+                                        size="xs"
+                                        variant="outline"
+                                        onClick={onOpenTagStatsModal}
+                                        color="text_primary"
+                                        borderColor="border_primary"
+                                        _hover={{
+                                            backgroundColor: "background_secondary",
+                                            borderColor: "action_primary",
+                                            color: "text_primary",
+                                        }}
+                                    >
+                                        <MdBarChart /> {t("debt_tag_stats_btn")}
+                                    </Button>
+                                )}
 
-                            <AddButton
-                                isCompact
-                                size="xs"
-                                buttonTitle={t("debts_page_add_debt")}
-                                onClick={onAddClicked}
-                            />
-                        </Flex>
-
-                        <Flex alignItems="center" gap={2}>
-                            {onOpenTagStatsModal && (
-                                <Button
-                                    size="xs"
-                                    variant="outline"
-                                    onClick={onOpenTagStatsModal}
-                                    color="text_primary"
-                                    borderColor="border_primary"
-                                    _hover={{
-                                        backgroundColor: "background_secondary",
-                                        borderColor: "action_primary",
-                                        color: "text_primary",
-                                    }}
-                                >
-                                    <MdBarChart /> {t("debt_tag_stats_btn")}
-                                </Button>
-                            )}
-
-                            {onOpenTagManagerModal && (
-                                <Button
-                                    size="xs"
-                                    variant="outline"
-                                    onClick={onOpenTagManagerModal}
-                                    color="text_primary"
-                                    borderColor="border_primary"
-                                    _hover={{
-                                        backgroundColor: "background_secondary",
-                                        borderColor: "action_primary",
-                                        color: "text_primary",
-                                    }}
-                                >
-                                    <MdSettings /> {t("debt_tag_manage_title")}
-                                </Button>
-                            )}
-                        </Flex>
-                    </Flex>
+                                {onOpenTagManagerModal && (
+                                    <Button
+                                        size="xs"
+                                        variant="outline"
+                                        onClick={onOpenTagManagerModal}
+                                        color="text_primary"
+                                        borderColor="border_primary"
+                                        _hover={{
+                                            backgroundColor: "background_secondary",
+                                            borderColor: "action_primary",
+                                            color: "text_primary",
+                                        }}
+                                    >
+                                        <MdSettings /> {t("debt_tag_manage_title")}
+                                    </Button>
+                                )}
+                            </Flex>
+                        }
+                    />
 
                     {/* Metrics list */}
                     {debts.length > 0 && (

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Box, Flex } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { useDividendPayments } from '../../hooks/useDividendPayments';
 import { DividendPaymentEntity } from '../../../../models/brokers/DividendPaymentEntity';
@@ -7,7 +7,7 @@ import DividendPayment from '../DividendPayment/DividendPayment';
 import DividendPaymentModal, { CreateDividendPaymentContext, EditDividendPaymentContext } from '../../modals/DividendPaymentModal/DividendPaymentModal';
 import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
 import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
-import AddButton from '../../../../shared/components/AddButton/AddButton';
+import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
 import { Nullable } from '../../../../shared/utilities/nullable';
 import CollectionPagination from '../../../../shared/components/CollectionPagination/CollectionPagination';
@@ -82,9 +82,13 @@ const DividendPaymentsList: React.FC<Props> = (props) => {
 	const isGlobalBrokerAccount = !props.brokerAccountId 
 
 	return <Box>
-		<Flex alignItems="center" gapX={5}>
-			<AddButton buttonTitle={t("broker_account_page_add_dividend_payment_button")} onClick={onAddClicked}/>
-		</Flex>
+		<SectionHeader
+			title={t("broker_account_page_dividends_tab")}
+			size="lg"
+			onAdd={onAddClicked}
+			addButtonTitle={t("broker_account_page_add_dividend_payment_button")}
+			my={4}
+		/>
 		<Box>
 		{
 			dividendPayments.map((dividendPayment: DividendPaymentEntity) => 

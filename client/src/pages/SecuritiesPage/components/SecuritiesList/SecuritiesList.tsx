@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Flex, SimpleGrid } from '@chakra-ui/react';
+import { SimpleGrid } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import Security from '../Security/Security';
 import { SecurityEntity } from '../../../../models/securities/SecurityEntity';
@@ -7,6 +7,7 @@ import SecurityModal from '../../modals/SecurityModal/SecurityModal';
 import { useSecurities } from '../../hooks/useSecurities';
 import Placeholder from '../../../../shared/components/Placeholder/Placeholder';
 import AddButton from '../../../../shared/components/AddButton/AddButton';
+import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
 import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
 import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
@@ -49,9 +50,12 @@ const SecuritiesList: React.FC = () => {
         }
 
         return (
-            <Flex justifyContent="space-between" alignItems="center" pb={3}>
-                {addButton}
-            </Flex>
+            <SectionHeader
+                title={t("header_securities")}
+                onAdd={onAddClicked}
+                addButtonTitle={t("security_page_summary_add")}
+                pb={4}
+            />
         );
     };
 

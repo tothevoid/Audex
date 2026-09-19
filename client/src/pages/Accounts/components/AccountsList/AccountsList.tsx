@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import Account from '../Account/Account';
-import { Box, Checkbox, Flex, SimpleGrid } from '@chakra-ui/react';
+import { Box, Checkbox, SimpleGrid } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { AccountEntity } from '../../../../models/accounts/AccountEntity';
 import { BaseModalRef } from '../../../../shared/utilities/modalUtilities';
@@ -9,6 +9,7 @@ import { useAccounts } from '../../hooks/useAccounts';
 import Placeholder from '../../../../shared/components/Placeholder/Placeholder';
 import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
 import AddButton from '../../../../shared/components/AddButton/AddButton';
+import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
 import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
 import AccountBalanceTransferModal from '../../modals/AccountBalanceTransferModal/AccountBalanceTransferModal';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
@@ -86,16 +87,19 @@ const AccountsList: React.FC<Props> = ({onAccountsChanged}) => {
 	}
 
 	return <Box>
-		<Flex justifyContent="space-between" alignItems="center" pb={5}>
-			<Box>
+		<SectionHeader
+			title={t("header_accounts")}
+			onAdd={onAddClicked}
+			addButtonTitle={t("accounts_page_summary_add")}
+			pb={4}
+			rightElement={
 				<Checkbox.Root checked={accountQueryParameters.onlyActive} onCheckedChange={onCheckboxChanged} variant="solid">
 					<Checkbox.HiddenInput />
 					<Checkbox.Control />
 					<Checkbox.Label color="text_primary">{t("accounts_list_only_active")}</Checkbox.Label>
 				</Checkbox.Root>
-			</Box>
-			{accounts.length > 0 && getAddButton()}
-		</Flex>
+			}
+		/>
 		{
 			accounts.length > 0 ?
 				<SimpleGrid pt={5} pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(350px, 3fr))'>

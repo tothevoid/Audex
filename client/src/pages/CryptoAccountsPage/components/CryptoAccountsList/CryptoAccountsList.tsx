@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Flex, SimpleGrid } from '@chakra-ui/react';
+import { SimpleGrid } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import CryptoAccount from '../CryptoAccount/CryptoAccount';
 import { CryptoAccountEntity } from '../../../../models/crypto/CryptoAccountEntity';
@@ -9,6 +9,7 @@ import Placeholder from '../../../../shared/components/Placeholder/Placeholder';
 import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
 import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
 import AddButton from '../../../../shared/components/AddButton/AddButton';
+import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
 
 interface Props {
@@ -52,7 +53,7 @@ const CryptoAccountsList: React.FC<Props> = (props: Props) => {
     });
 
     const getHeader = () => {
-        const addButton = (
+        const placeholderAddButton = (
             <AddButton
                 buttonTitle={t("crypto_accounts_page_add")}
                 onClick={onAddClicked}
@@ -60,12 +61,15 @@ const CryptoAccountsList: React.FC<Props> = (props: Props) => {
         );
 
         return cryptoAccounts.length ? (
-            <Flex justifyContent="space-between" alignItems="center" pb={4}>
-                {addButton}
-            </Flex>
+            <SectionHeader
+                title={t("header_cryptoaccounts")}
+                onAdd={onAddClicked}
+                addButtonTitle={t("crypto_accounts_page_add")}
+                pb={4}
+            />
         ) : (
             <Placeholder text={t("crypto_accounts_page_no_crypto_accounts")}>
-                {addButton}
+                {placeholderAddButton}
             </Placeholder>
         );
     };

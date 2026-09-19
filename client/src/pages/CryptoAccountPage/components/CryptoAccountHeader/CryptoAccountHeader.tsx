@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Flex, HStack, Stack, Text } from "@chakra-ui/react";
+import { Card, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { CryptoAccountEntity } from "../../../../models/crypto/CryptoAccountEntity";
 import { BsWallet2 } from "react-icons/bs";
@@ -7,8 +7,7 @@ import { SiBinance } from "react-icons/si";
 import { NumericMetricItem } from "../../../../shared/components/MetricItem";
 import { getCryptoProviderIconUrl } from "../../../../api/crypto/cryptoProviderApi";
 import StoredIcon from "../../../../shared/components/StoredIcon/StoredIcon";
-
-import AddButton from "../../../../shared/components/AddButton/AddButton";
+import SectionHeader from "../../../../shared/components/SectionHeader";
 import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { getCurrencies } from "../../../../api/currencies/currencyApi";
 
@@ -57,32 +56,21 @@ export const CryptoAccountHeader: React.FC<CryptoAccountHeaderProps> = ({
         >
             <Card.Body padding={4}>
                 {/* Header Top Bar */}
-                <Flex justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={3} mb={3}>
-                    <HStack gap={3} alignItems="center">
-                        <Stack gap={0}>
-                            <HStack gap={2} alignItems="center">
-                                {cryptoAccount?.cryptoProvider && (
-                                    <StoredIcon
-                                        src={cryptoAccount.cryptoProvider.iconKey ? getCryptoProviderIconUrl(cryptoAccount.cryptoProvider.iconKey) : undefined}
-                                        fallbackIcon={<SiBinance size={16} color="var(--chakra-colors-text_secondary)" />}
-                                        size="sm"
-                                        title={providerName}
-                                    />
-                                )}
-                                <Text fontSize="xl" fontWeight={800} color="text_primary">
-                                    {headerTitle}
-                                </Text>
-                            </HStack>
-                        </Stack>
-                    </HStack>
-
-                    {onAddClicked && (
-                        <AddButton
-                            buttonTitle={t("add_crypto_account_cryptocurrency_title")}
-                            onClick={onAddClicked}
+                <SectionHeader
+                    leftElement={cryptoAccount?.cryptoProvider && (
+                        <StoredIcon
+                            src={cryptoAccount.cryptoProvider.iconKey ? getCryptoProviderIconUrl(cryptoAccount.cryptoProvider.iconKey) : undefined}
+                            fallbackIcon={<SiBinance size={16} color="var(--chakra-colors-text_secondary)" />}
+                            size="sm"
+                            title={providerName}
                         />
                     )}
-                </Flex>
+                    title={headerTitle}
+                    size="xl"
+                    onAdd={onAddClicked}
+                    addButtonTitle={t("add_crypto_account_cryptocurrency_title")}
+                    mb={3}
+                />
 
                 {/* Metrics list */}
                 <Flex

@@ -9,7 +9,7 @@ import { createBank, deleteBank, getBankIconUrl, getBanks, updateBank } from "..
 import { BankEntity } from "../../../../models/banks/BankEntity";
 import BankModal from "../../modals/BankModal/BankModal";
 import { BsBank } from "react-icons/bs";
-import AddButton from "../../../../shared/components/AddButton/AddButton";
+import SectionHeader from "../../../../shared/components/SectionHeader/SectionHeader";
 import DataTable, { ColumnDef } from "../../../../shared/components/DataTable/DataTable";
 import StoredIcon from "../../../../shared/components/StoredIcon";
 
@@ -179,9 +179,11 @@ const BanksTable: React.FC = () => {
     ], [t, state.banks]);
 
     return <Box color="text_primary">
-        <Box mb={4}>
-            <AddButton buttonTitle={t("entity_bank_add")} onClick={onAdd}/>
-        </Box>
+        <SectionHeader
+            title={t("data_tab_banks")}
+            onAdd={onAdd}
+            addButtonTitle={t("entity_bank_add")}
+        />
         <DataTable
             data={state.banks}
             columns={columns}

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Box, Flex } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { useBrokerAccountFundTransfers } from '../../hooks/useBrokerAccountFundTransfers';
 import BrokerAccountFundTransfer from '../BrokerAccountFundTransfer/BrokerAccountFundTransfer';
 import { BrokerAccountFundTransferEntity } from '../../../../models/brokers/BrokerAccountFundTransfer';
@@ -8,7 +8,7 @@ import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
 import { useTranslation } from 'react-i18next';
 import BrokerAccountFundTransferModal, { CreateBrokerAccountFundTransferContext, EditBrokerAccountFundTransferContext } from '../../../BrokerAccounts/modals/BrokerAccountFundTransferModal/BrokerAccountFundTransferModal';
 import { Nullable } from '../../../../shared/utilities/nullable';
-import AddButton from '../../../../shared/components/AddButton/AddButton';
+import SectionHeader from '../../../../shared/components/SectionHeader';
 import { getBrokerAccountFundsTransferPagination } from '../../../../api/brokers/brokerAccountFundsTransferApi';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
 import CollectionPagination from '../../../../shared/components/CollectionPagination/CollectionPagination';
@@ -86,9 +86,13 @@ const BrokerAccountFundTransfersList: React.FC<Props> = (props) => {
     const isGlobalBrokerAccount = !props.brokerAccountId;
 
     return <Box>
-        <Flex alignItems="center" gapX={5}>
-			<AddButton buttonTitle={t("broker_account_page_transfer_button")} onClick={onAddClicked}/>
-		</Flex>
+        <SectionHeader
+            title={t("broker_account_page_transfers_tab")}
+            size="lg"
+            onAdd={onAddClicked}
+            addButtonTitle={t("broker_account_page_transfer_button")}
+            my={4}
+        />
         <Box>
         {
             fundTransfers.map((fundTransfer: BrokerAccountFundTransferEntity) => 

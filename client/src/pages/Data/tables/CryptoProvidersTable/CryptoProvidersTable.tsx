@@ -1,6 +1,6 @@
 import { Box, Button, Icon, Text } from "@chakra-ui/react";
 import { useMemo } from "react";
-import { MdAdd, MdDelete, MdEdit } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 import { SiBinance } from "react-icons/si";
 import { useTranslation } from "react-i18next";
 import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
@@ -12,6 +12,7 @@ import { getCryptoProviderIconUrl } from "../../../../api/crypto/cryptoProviderA
 import DataTable, { ColumnDef } from "../../../../shared/components/DataTable/DataTable";
 import StoredIcon from "../../../../shared/components/StoredIcon";
 import { useEntityModal } from "../../../../shared/hooks/useEntityModal";
+import SectionHeader from "../../../../shared/components/SectionHeader/SectionHeader";
 
 const CryptoProvidersTable: React.FC = () => {
 	const { t } = useTranslation();
@@ -97,14 +98,11 @@ const CryptoProvidersTable: React.FC = () => {
 	], [t, onEditClicked, onDeleteClicked]);
 
 	return <Box color="text_primary">
-		<Box mb={4}>
-			<Button background="action_primary" onClick={onAddClicked}>
-				<Icon size='md'>
-					<MdAdd/>
-				</Icon>
-				{t("entity_crypto_provider_add")}
-			</Button>
-		</Box>
+		<SectionHeader
+			title={t("data_tab_crypto_providers")}
+			onAdd={onAddClicked}
+			addButtonTitle={t("entity_crypto_provider_add")}
+		/>
 		<DataTable
 			data={cryptoProviders}
 			columns={columns}

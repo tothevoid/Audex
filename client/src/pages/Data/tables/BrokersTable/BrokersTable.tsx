@@ -1,6 +1,6 @@
 import { Box, Button, Icon, Text } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MdAdd, MdDelete, MdEdit } from "react-icons/md";
+import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
 import { BrokerEntity } from "../../../../models/brokers/BrokerEntity";
@@ -8,6 +8,7 @@ import { createBroker, deleteBroker, getBrokers, updateBroker } from "../../../.
 import BrokerModal from "../../modals/BrokerModal/BrokerModal";
 import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
 import DataTable, { ColumnDef } from "../../../../shared/components/DataTable/DataTable";
+import SectionHeader from "../../../../shared/components/SectionHeader/SectionHeader";
 
 interface State {
     brokers: BrokerEntity[],
@@ -145,14 +146,11 @@ const BrokersTable: React.FC = () => {
     ], [t, state.brokers]);
 
     return <Box color="text_primary">
-        <Box mb={4}>
-            <Button background="action_primary" onClick={onAdd}>
-                <Icon size='md'>
-                    <MdAdd/>
-                </Icon>
-                {t("entity_broker_add")}
-            </Button>
-        </Box>
+        <SectionHeader
+            title={t("data_tab_brokers")}
+            onAdd={onAdd}
+            addButtonTitle={t("entity_broker_add")}
+        />
         <DataTable
             data={state.brokers}
             columns={columns}

@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { Flex, SimpleGrid } from '@chakra-ui/react';
+import { SimpleGrid } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import BrokerAccount from '../BrokerAccount/BrokerAccount';
 import { BrokerAccountEntity } from '../../../../models/brokers/BrokerAccountEntity';
@@ -9,6 +9,7 @@ import Placeholder from '../../../../shared/components/Placeholder/Placeholder';
 import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
 import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
 import AddButton from '../../../../shared/components/AddButton/AddButton';
+import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
 
 const BrokerAccountsList: React.FC = () => {
@@ -51,17 +52,26 @@ const BrokerAccountsList: React.FC = () => {
 	}
 
 	const getHeader = () => {
-		const addButton = <AddButton buttonTitle={t("broker_accounts_page_summary_add")} 
-			onClick={onAddClicked}/>;
+		const placeholderAddButton = (
+			<AddButton
+				buttonTitle={t("broker_accounts_page_summary_add")}
+				onClick={onAddClicked}
+			/>
+		);
 
-		return brokerAccounts.length ?
-			<Flex justifyContent="space-between" alignItems="center" pb={5}>
-				{addButton}
-			</Flex>:
+		return brokerAccounts.length ? (
+			<SectionHeader
+				title={t("header_broker_account")}
+				onAdd={onAddClicked}
+				addButtonTitle={t("broker_accounts_page_summary_add")}
+				pb={4}
+			/>
+		) : (
 			<Placeholder text={t("broker_accounts_page_no_accounts")}>
-				{addButton}
+				{placeholderAddButton}
 			</Placeholder>
-	}
+		);
+	};
 
 	return (
 		<Fragment>

@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect } from "react";
-import { Box, Flex, Badge, Button, Text } from "@chakra-ui/react";
+import { Box, Flex, Badge, Button } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { DebtPaymentEntity } from "../../../../models/debts/DebtPaymentEntity";
 import { useDebtPayments } from "../../hooks/useDebtPayments";
@@ -9,6 +9,7 @@ import { useEntityModal } from "../../../../shared/hooks/useEntityModal";
 import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
 import { ActiveEntityMode } from "../../../../shared/enums/activeEntityMode";
 import AddButton from "../../../../shared/components/AddButton/AddButton";
+import SectionHeader from "../../../../shared/components/SectionHeader";
 import CollectionPagination from "../../../../shared/components/CollectionPagination/CollectionPagination";
 import PlaceholderWrapper from "../../../../shared/components/Placeholder/PlaceholderWrapper";
 import { getDebtPaymentsPagination } from "../../../../api/debts/debtPaymentApi";
@@ -89,33 +90,25 @@ const DebtsPaymentsList: React.FC<Props> = ({
 
     return (
         <Fragment>
-            <Flex justifyContent="space-between" alignItems="center" my={4} flexWrap="wrap" gap={2}>
-                <Flex alignItems="center" gap={2.5} flexWrap="wrap">
-                    <Text fontSize="lg" fontWeight={700} color="text_primary">
-                        {t("debt_payments_header_title")}
-                    </Text>
-
-                    <AddButton
-                        isCompact
-                        size="xs"
-                        buttonTitle={t("debts_page_add_payment")}
-                        onClick={onAddClicked}
-                    />
-
-                    {selectedDebtName && (
-                        <Flex alignItems="center" gap={1.5} ml={1}>
-                            <Badge colorPalette="blue" px={2.5} py={0.5} borderRadius="full" fontSize="xs">
-                                {t("debts_payments_filter_debt", { name: selectedDebtName })}
-                            </Badge>
-                            {onClearDebtFilter && (
-                                <Button size="xs" variant="ghost" onClick={onClearDebtFilter} color="text_secondary" px={1.5} h="22px">
-                                    <MdClose /> {t("debts_payments_filter_clear")}
-                                </Button>
-                            )}
-                        </Flex>
-                    )}
-                </Flex>
-            </Flex>
+            <SectionHeader
+                title={t("debt_payments_header_title")}
+                size="lg"
+                onAdd={onAddClicked}
+                addButtonTitle={t("debts_page_add_payment")}
+                my={4}
+                extra={selectedDebtName && (
+                    <Flex alignItems="center" gap={1.5} ml={1}>
+                        <Badge colorPalette="blue" px={2.5} py={0.5} borderRadius="full" fontSize="xs">
+                            {t("debts_payments_filter_debt", { name: selectedDebtName })}
+                        </Badge>
+                        {onClearDebtFilter && (
+                            <Button size="xs" variant="ghost" onClick={onClearDebtFilter} color="text_secondary" px={1.5} h="22px">
+                                <MdClose /> {t("debts_payments_filter_clear")}
+                            </Button>
+                        )}
+                    </Flex>
+                )}
+            />
 
             <PlaceholderWrapper
                 hasData={debtPayments.length > 0}

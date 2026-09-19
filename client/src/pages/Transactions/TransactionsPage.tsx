@@ -7,7 +7,6 @@ import TransactionSummaryHeader from './components/TransactionSummaryHeader/Tran
 import TransactionFilterBar, { TypeFilterMode, ViewDisplayMode } from './components/TransactionFilterBar/TransactionFilterBar';
 import TransactionCardsView from './components/TransactionCardsView';
 import TransactionTableGrid from './components/TransactionTableGrid/TransactionTableGrid';
-import { Box, Flex, Text } from '@chakra-ui/react';
 import { getAccountsByTypes } from '../../api/accounts/accountApi';
 import { getTransactionTypes } from '../../api/transactions/transactionTypeApi';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +19,7 @@ import { useEntityModal } from "../../shared/hooks/useEntityModal";
 import { ActiveEntityMode } from "../../shared/enums/activeEntityMode";
 import { ConfirmModal } from "../../shared/modals/ConfirmModal/ConfirmModal";
 import TransactionModal from "./modals/TransactionModal/TransactionModal";
-import AddButton from "../../shared/components/AddButton/AddButton";
+import SectionHeader from "../../shared/components/SectionHeader/SectionHeader";
 import { BaseModalRef } from "../../shared/utilities/modalUtilities";
 import { ACCOUNT_TYPE } from "../../shared/constants/accountType";
 import PageContainer from "../../shared/components/PageContainer/PageContainer";
@@ -189,18 +188,16 @@ const TransactionsPage: React.FC = () => {
     return (
         <PageContainer color="text_primary">
             {/* Page Header */}
-            <Flex justifyContent="space-between" alignItems="center" mb={4} flexWrap="wrap" gap={2}>
-                <Box>
-                    <Text fontSize="2xl" fontWeight={700} color="text_primary">
-                        {t("manager_transactions_title")}
-                    </Text>
-                    <Text fontSize="xs" color="text_secondary">
-                        {filteredTransactions.length} {t("entity_transaction_name_form_title").toLowerCase()}
-                    </Text>
-                </Box>
-                <Pagination year={params.year} month={params.month} onPageSwitched={onPageSwitched} />
-                <AddButton buttonTitle={t("manager_transactions_add_transaction")} onClick={onAddTransactionClick} />
-            </Flex>
+            <SectionHeader
+                title={t("manager_transactions_title")}
+                size="2xl"
+                subtitle={`${filteredTransactions.length} ${t("entity_transaction_name_form_title").toLowerCase()}`}
+                onAdd={onAddTransactionClick}
+                addButtonTitle={t("manager_transactions_add_transaction")}
+                rightElement={
+                    <Pagination year={params.year} month={params.month} onPageSwitched={onPageSwitched} />
+                }
+            />
 
             {/* Top KPI Metrics Header */}
             <TransactionSummaryHeader transactions={transactions} daysInMonth={daysInMonth} />

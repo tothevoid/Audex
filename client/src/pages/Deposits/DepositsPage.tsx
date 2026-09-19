@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { DepositEntity } from "../../models/deposits/DepositEntity";
-import { Flex, SimpleGrid, Checkbox, Box} from "@chakra-ui/react";
+import { SimpleGrid, Checkbox, Box } from "@chakra-ui/react";
 import DepositStats from "./components/DepositStats/DepositStats";
 import Deposit from "./components/Deposit/Deposit";
 import DepositsRangeSlider from "./components/DepositsRangeSlider/DepositsRangeSlider";
@@ -11,6 +11,7 @@ import Placeholder from "../../shared/components/Placeholder/Placeholder";
 import { useEntityModal } from "../../shared/hooks/useEntityModal";
 import { ConfirmModal } from "../../shared/modals/ConfirmModal/ConfirmModal";
 import AddButton from "../../shared/components/AddButton/AddButton";
+import SectionHeader from "../../shared/components/SectionHeader/SectionHeader";
 import PageContainer from "../../shared/components/PageContainer/PageContainer";
 import { ActiveEntityMode } from "../../shared/enums/activeEntityMode";
 
@@ -40,10 +41,6 @@ const DepositsPage: React.FC = () => {
 
 	const getAddButton = () => {
 		return <AddButton onClick={onAddClicked} buttonTitle={t("deposits_list_add_button")} />
-	}
-
-	const getAddButtonWithDeposits = () => {
-		return getAddButton();
 	}
 
 	const getAddButtonWithoutDeposits = () => {
@@ -105,14 +102,20 @@ const DepositsPage: React.FC = () => {
 			<DepositsRangeSlider onDepositsRangeChanged={onDepositsRangeChanged} refreshTrigger={rangeRefreshKey} />
 
 			{deposits.length > 0 ? (
-				<Flex gap={4} direction="row" alignItems="center" pt={4}>
-					{getAddButtonWithDeposits()}
-					<Checkbox.Root checked={onlyActive} onCheckedChange={(details) => onCheckboxChanged(!!details.checked)} variant="solid">
-						<Checkbox.HiddenInput />
-						<Checkbox.Control />
-						<Checkbox.Label color="text_primary">{t("deposits_list_only_active")}</Checkbox.Label>
-					</Checkbox.Root>
-				</Flex>
+				<SectionHeader
+					title={t("header_deposits")}
+					onAdd={onAddClicked}
+					addButtonTitle={t("deposits_list_add_button")}
+					pt={4}
+					pb={2}
+					rightElement={
+						<Checkbox.Root checked={onlyActive} onCheckedChange={(details) => onCheckboxChanged(!!details.checked)} variant="solid">
+							<Checkbox.HiddenInput />
+							<Checkbox.Control />
+							<Checkbox.Label color="text_primary">{t("deposits_list_only_active")}</Checkbox.Label>
+						</Checkbox.Root>
+					}
+				/>
 			) : (
 				<Box mt={6}>
 					{getAddButtonWithoutDeposits()}
