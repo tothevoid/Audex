@@ -1,10 +1,8 @@
 import { Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
 import { AccountEntity } from '../../../../models/accounts/AccountEntity';
 import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import { getBankIconUrl } from '../../../../api/banks/bankApi';
 import { ACCOUNT_TYPE } from '../../../../shared/constants/accountType';
-import { BsCurrencyExchange, BsBank } from "react-icons/bs";
-import StoredIcon from '../../../../shared/components/StoredIcon';
+import AccountIcon from '../../../../shared/components/AccountIcon';
 import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
 import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
 import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
@@ -19,26 +17,6 @@ interface Props {
 const Account = (props: Props) => {
     const { name, balance, currency, bank, accountType } = props.account;
 
-    const renderIcon = () => {
-        if (accountType?.id === ACCOUNT_TYPE.CASH) {
-            return (
-                <StoredIcon
-                    fallbackIcon={<BsCurrencyExchange size={22} color="var(--chakra-colors-text_secondary)" />}
-                    size="lg"
-                />
-            );
-        }
-
-        const iconUrl = bank?.iconKey ? getBankIconUrl(bank.iconKey) : undefined;
-        return (
-            <StoredIcon
-                src={iconUrl}
-                fallbackIcon={<BsBank size={22} color="var(--chakra-colors-text_secondary)" />}
-                size="lg"
-            />
-        );
-    };
-
     const isCash = accountType?.id === ACCOUNT_TYPE.CASH;
     const accountLink = isCash ? `../cash_account/${props.account.id}` : undefined;
     const bankName = bank?.name;
@@ -49,7 +27,7 @@ const Account = (props: Props) => {
                 <Stack gap={3}>
                     <Flex justify="space-between" align="flex-start" gap={2}>
                         <HStack gap={3} align="flex-start" minW={0} flex="1">
-                            {renderIcon()}
+                            <AccountIcon account={props.account} size="lg" />
                             <Stack gap={0.5} minW={0} flex="1">
                                 {isCash ? (
                                     <Link
