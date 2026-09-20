@@ -1,131 +1,149 @@
-import { Field, Input, Stack} from "@chakra-ui/react"
-import React, { RefObject, useEffect, useMemo, useState } from "react"
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, { RefObject, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getSecurityValidationSchema, SecurityFormInput } from "./SecurityValidationSchema";
 import { SecurityEntity } from "../../../../models/securities/SecurityEntity";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
-import { getSecurityTypes } from "../../../../api/securities/securityTypeApi";
-import { getIconUrl } from "../../../../api/securities/securityApi";
-import { getCurrencies } from "../../../../api/currencies/currencyApi";
+import { SecurityTypeEntity } from "../../../../models/securities/SecurityTypeEntity";
 import { CurrencyEntity } from "../../../../models/currencies/CurrencyEntity";
 import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import { SecurityTypeEntity } from "../../../../models/securities/SecurityTypeEntity";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
+import BaseModal from "../../../../shared/modals/BaseModal/BaseModal";
+import { getSecurityTypes } from "../../../../api/securities/securityTypeApi";
+import { getCurrencies } from "../../../../api/currencies/currencyApi";
+import { MarketSecurityInfoEntity } from "../../../../models/securities/SecurityEntity";
+import { SecurityFormInput } from "./SecurityValidationSchema";
+import SecuritySearchForm from "./components/SecuritySearchForm";
+import SecurityDetailsForm from "./components/SecurityDetailsForm";
 import { generateGuid } from "../../../../shared/utilities/idUtilities";
-import ImageInput from "../../../../shared/components/Form/ImageInput/ImageInput";
 
 interface ModalProps {
-    modalRef: RefObject<BaseModalRef | null>,
-    security?: SecurityEntity | null,
+    modalRef: RefObject<BaseModalRef | null>;
+    security?: SecurityEntity | null;
     onSaved: (security: SecurityEntity, icon: File | null) => void;
-};
-
-interface State {
-    securityTypes: SecurityTypeEntity[]
-    currencies: CurrencyEntity[]
 }
 
-const SecurityModal: React.FC<ModalProps> = (props: ModalProps) => {
-    const [icon, setIcon] = useState<File | null>(null);
-    const [iconUrl, setIconUrl] = useState<string | null>(null);
-    const [state, setState] = useState<State>({securityTypes: [], currencies: []})
+interface State {
+    securityTypes: SecurityTypeEntity[];
+    currencies: CurrencyEntity[];
+}
+
+const SecurityModal: React.FC<ModalProps> = ({
+    modalRef,
+    security,
+    onSaved
+}) => {
+    const { t } = useTranslation();
+    const isEditMode = !!security;
+
+    const [step, setStep] = useState<"search" | "details">(isEditMode ? "details" : "search");
+    const [initialFormData, setInitialFormData] = useState<Partial<SecurityFormInput>>({});
+    const [state, setState] = useState<State>({ securityTypes: [], currencies: [] });
 
     useEffect(() => {
         const initData = async () => {
-            await requestData();
-        }
+            const securityTypes = await getSecurityTypes();
+            const currencies = await getCurrencies();
+            setState({ securityTypes, currencies });
+        };
         initData();
     }, []);
 
+    const resetModal = React.useCallback(() => {
+        if (security) {
+            setStep("details");
+            setInitialFormData({
+                id: security.id,
+                name: security.name,
+                ticker: security.ticker,
+                isin: security.isin ?? "",
+                type: security.type,
+                currency: security.currency
+            });
+        } else {
+            setStep("search");
+            setInitialFormData({
+                id: generateGuid(),
+                name: "",
+                ticker: "",
+                isin: "",
+                type: undefined,
+                currency: undefined
+            });
+        }
+    }, [security]);
+
     useEffect(() => {
-        const url = getIconUrl(props.security?.iconKey);
-        setIconUrl(url);
-    }, [props.security]);
+        resetModal();
+    }, [resetModal]);
 
-    const requestData = async () => {
-        const securityTypes = await getSecurityTypes();
-        const currencies = await getCurrencies();
-
-        setState((currentState) => {
-            return {...currentState, securityTypes, currencies }
-        })
+    const handleClose = () => {
+        resetModal();
+        modalRef?.current?.closeModal();
     };
 
-    const { t } = useTranslation();
-    const validationSchema = useMemo(() => getSecurityValidationSchema(t), [t]);
+    const handleMarketFound = (marketInfo: MarketSecurityInfoEntity) => {
+        const matchedType = state.securityTypes.find(type => type.id === marketInfo.typeId)
+            ?? state.securityTypes[0];
 
-    const { register, handleSubmit, control, formState: { errors }, reset} = useForm<SecurityFormInput>({
-        resolver: zodResolver(validationSchema),
-        mode: "onBlur",
-        defaultValues: {
-            id: props.security?.id ?? generateGuid(),
-            name: props.security?.name ?? "",
-            ticker: props.security?.ticker ?? "",
-            type: props.security?.type,
-            currency: props.security?.currency
-        }
-    });
+        const matchedCurrency = state.currencies.find(c => c.id === marketInfo.currencyId)
+            ?? state.currencies[0];
 
-    useEffect(() => {
-        if (props.security) {
-            reset(props.security);
-        }
-    }, [props.security, reset])
+        setInitialFormData({
+            id: generateGuid(),
+            ticker: marketInfo.ticker,
+            name: marketInfo.name,
+            isin: marketInfo.isin ?? "",
+            type: matchedType,
+            currency: matchedCurrency
+        });
+        setStep("details");
+    };
 
-    const onSubmit = (security: SecurityFormInput) => {
-        props.onSaved({ ...security, 
-            // TODO: Remove system fields
-            iconKey: props.security?.iconKey, 
-            priceFetchedAt: props.security?.priceFetchedAt, 
-            actualPrice: props.security?.actualPrice } as SecurityEntity, icon);
-        props.modalRef?.current?.closeModal();
-    }
+    const handleManualEntry = (query?: string) => {
+        const tkr = (query ?? "").trim().toUpperCase();
+        setInitialFormData({
+            id: generateGuid(),
+            ticker: tkr,
+            name: tkr,
+            isin: "",
+            type: state.securityTypes[0],
+            currency: state.currencies[0]
+        });
+        setStep("details");
+    };
 
-    const onImageSelected = (url: string, image: File) => {
-        setIcon(image);
-        setIconUrl(url);
-    }
-    
-    const onVisibilityChanged = (open: boolean) => {
-        if (!open) {
-            setIcon(null);
-            setIconUrl(null);
-        }
-    }
+    const handleSave = (savedSecurity: SecurityEntity, icon: File | null) => {
+        onSaved(savedSecurity, icon);
+        handleClose();
+    };
 
-    return <BaseFormModal visibilityChanged={onVisibilityChanged} ref={props.modalRef} title={t("entity_security_form_title")} submitHandler={handleSubmit(onSubmit)}>
-        <Stack marginBlock={2} gapX={4} alignItems={"center"} direction={"row"}>
-            <ImageInput imageUrl={iconUrl} onImageSelected={onImageSelected} />
-            <Field.Root invalid={!!errors.ticker}>
-                <Field.Label>{t("entity_security_ticker")}</Field.Label>
-                <Input {...register("ticker")} autoComplete="off" placeholder='NVDA' />
-                <Field.ErrorText>{errors.ticker?.message}</Field.ErrorText>
-            </Field.Root>
-        </Stack>
-        <Field.Root invalid={!!errors.name}>
-            <Field.Label>{t("entity_security_name")}</Field.Label>
-            <Input {...register("name")} autoComplete="off" placeholder='Debit card' />
-            <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
-        </Field.Root>
-        <Field.Root mt={4} invalid={!!errors.type}>
-            <Field.Label>{t("entity_security_type")}</Field.Label>
-            <CollectionSelect name="type" control={control} placeholder="Select type"
-                collection={state.securityTypes} 
-                labelSelector={(currency => currency.name)} 
-                valueSelector={(currency => currency.id)}/>
-            <Field.ErrorText>{errors.type?.message}</Field.ErrorText>
-        </Field.Root>
-        <Field.Root mt={4} invalid={!!errors.currency}>
-            <Field.Label>{t("entity_security_currency")}</Field.Label>
-            <CollectionSelect name="currency" control={control} placeholder="Select currency"
-                collection={state.currencies} 
-                labelSelector={(currency => currency.name)} 
-                valueSelector={(currency => currency.id)}/>
-            <Field.ErrorText>{errors.currency?.message}</Field.ErrorText>
-        </Field.Root>
-    </BaseFormModal>
-}
+    const title = step === "search"
+        ? t("entity_security_search_title")
+        : t("entity_security_form_title");
+
+    return (
+        <BaseModal
+            ref={modalRef}
+            title={title}
+            maxW="540px"
+        >
+            {step === "search" && !isEditMode ? (
+                <SecuritySearchForm
+                    onFound={handleMarketFound}
+                    onManual={handleManualEntry}
+                    onCancel={handleClose}
+                />
+            ) : (
+                <SecurityDetailsForm
+                    key={initialFormData.id ?? initialFormData.ticker ?? "new"}
+                    initialValues={initialFormData}
+                    security={security}
+                    securityTypes={state.securityTypes}
+                    currencies={state.currencies}
+                    onSave={handleSave}
+                    onCancel={handleClose}
+                    onBackToSearch={!isEditMode ? () => setStep("search") : undefined}
+                />
+            )}
+        </BaseModal>
+    );
+};
 
 export default SecurityModal;

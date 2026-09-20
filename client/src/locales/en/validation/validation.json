@@ -30,6 +30,6 @@
     "validation_passwords_must_match": "Passwords must match",
     "validation_same_account": "Source and destination accounts cannot be the same",
     "validation_percentage_range": "Percentage must be between 0 and 100",
-    "validation_cron_required": "Cron expression is required",
+    "validation_cron_required": "Specify Cron expression",
     "validation_cron_invalid": "Invalid Cron expression (minutes 0-59, hours 0-23)"
 }
