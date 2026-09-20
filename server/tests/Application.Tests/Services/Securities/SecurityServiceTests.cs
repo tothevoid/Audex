@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Securities;
 using Audex.Application.Tests.Fixtures;
@@ -6,6 +6,7 @@ using Audex.Infrastructure.Constants;
 
 namespace Audex.Application.Tests.Services.Securities
 {
+    [Trait("Category", "S3")]
     public class SecurityServiceTests : TestBase
     {
         public SecurityServiceTests(ServiceProviderFixture serviceProviderFixture) : base(serviceProviderFixture)
@@ -294,6 +295,101 @@ namespace Audex.Application.Tests.Services.Securities
             Assert.NotNull(iconFile);
             Assert.NotNull(iconFile.Stream);
             Assert.Equal("image/png", iconFile.ContentType);
+        }
+
+        [Fact]
+        public async Task TestAddWithIsinAndFindByIsin()
+        {
+            var typeId = await CreateSecurityType("Equity");
+            var isin = "RU0009029540";
+
+            var dto = new SecurityDto
+            {
+                Name = "Сбербанк",
+                Ticker = "SBER",
+                Isin = isin,
+                TypeId = typeId,
+                CurrencyId = CurrencyConstants.RUB,
+                ActualPrice = 280m
+            };
+
+            var added = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ISecurityService>();
+                return await service.AddAsync(dto, null);
+            });
+
+            Assert.NotNull(added);
+            Assert.Equal(isin, added.Isin);
+
+            var found = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ISecurityService>();
+                return await service.FindByIsinAsync(isin);
+            });
+
+            Assert.NotNull(found);
+            Assert.Equal(added.Id, found.Id);
+            Assert.Equal("SBER", found.Ticker);
+            Assert.Equal(isin, found.Isin);
+        }
+
+        [Fact]
+        public async Task TestSearchMarket()
+        {
+            var info = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ISecurityService>();
+                return await service.SearchMarketAsync("SBER");
+            });
+
+            // If Market API is accessible, verify parsed content
+            if (info != null)
+            {
+                Assert.Equal("SBER", info.Ticker);
+                Assert.False(string.IsNullOrEmpty(info.Name));
+                Assert.Equal("RU0009029540", info.Isin);
+                Assert.Equal(SecurityTypeConstants.Stock, info.TypeId);
+                Assert.Equal(CurrencyConstants.RUB, info.CurrencyId);
+            }
+        }
+
+        [Fact]
+        public async Task AddAsync_WhenTickerAlreadyExists_ShouldThrowInvalidOperationException()
+        {
+            var typeId = await CreateSecurityType("EquityUnique");
+            var dto1 = new SecurityDto
+            {
+                Name = "Тестовая Бумага 1",
+                Ticker = "TEST_DUP",
+                TypeId = typeId,
+                CurrencyId = CurrencyConstants.RUB,
+                ActualPrice = 100m
+            };
+
+            await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ISecurityService>();
+                await service.AddAsync(dto1, null);
+            });
+
+            var dto2 = new SecurityDto
+            {
+                Name = "Тестовая Бумага 2",
+                Ticker = "test_dup",
+                TypeId = typeId,
+                CurrencyId = CurrencyConstants.RUB,
+                ActualPrice = 120m
+            };
+
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            {
+                await ExecuteScopeAsync(async sp =>
+                {
+                    var service = sp.GetRequiredService<ISecurityService>();
+                    await service.AddAsync(dto2, null);
+                });
+            });
         }
 
         private static Microsoft.AspNetCore.Http.IFormFile CreateDummyFormFile()

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using Audex.Application.DTO.Securities;
@@ -25,6 +25,12 @@ namespace Audex.Application.Services.Securities
         {
             var securityTypes = await _securityTypeRepo.GetAllAsync();
             return _mapper.Map(securityTypes);
+        }
+
+        public async Task<SecurityTypeDto> GetByIdAsync(Guid id)
+        {
+            var securityType = await _securityTypeRepo.GetByIdAsync(id);
+            return _mapper.Map(securityType);
         }
 
         public async Task UpdateAsync(SecurityTypeDto securityTypeDto)

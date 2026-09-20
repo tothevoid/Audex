@@ -20,6 +20,6 @@ namespace Audex.Application.Interfaces.Integrations.Stock
 
         Task<IEnumerable<SecurityCandleDto>> GetCandlesAsync(SecurityDto security, DateOnly from, DateOnly to, int interval = 24);
 
-        Task<MoexSecurityInfoDto?> FindSecurityInfoAsync(string query);
+        Task<MarketSecurityInfoDto?> FindSecurityInfoAsync(string query);
     }
 }

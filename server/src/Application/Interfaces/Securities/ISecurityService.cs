@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+#nullable enable
+using Microsoft.AspNetCore.Http;
 using Audex.Application.DTO.FileStorage;
 using Audex.Application.DTO.Securities;
 using System;
@@ -11,6 +12,8 @@ namespace Audex.Application.Interfaces.Securities
     {
         Task<IEnumerable<SecurityDto>> GetAllAsync(bool disableTracking = true);
         Task<SecurityDto> FindByTickerAsync(string ticker);
+        Task<SecurityDto?> FindByIsinAsync(string isin);
+        Task<MarketSecurityInfoDto?> SearchMarketAsync(string query);
 
         Task<IEnumerable<SecurityDto>> FindByTickersAsync(IEnumerable<string> tickers);
 

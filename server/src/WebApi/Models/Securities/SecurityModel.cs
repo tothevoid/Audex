@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Text.Json.Serialization;
 using Audex.Infrastructure.Entities.Currencies;
 using Audex.Shared.Entities;
@@ -16,6 +17,9 @@ namespace Audex.WebApi.Models.Securities
 
         [JsonPropertyName("ticker")]
         public string Ticker { get; set; }
+
+        [JsonPropertyName("isin")]
+        public string? Isin { get; set; }
 
         [JsonPropertyName("type")]
         public SecurityTypeModel Type { get; set; }

@@ -331,7 +331,7 @@ namespace Audex.Application.Integrations.Stock.Moex
             return candles;
         }
 
-        public async Task<MoexSecurityInfoDto?> FindSecurityInfoAsync(string query)
+        public async Task<MarketSecurityInfoDto?> FindSecurityInfoAsync(string query)
         {
             if (string.IsNullOrWhiteSpace(query))
             {
@@ -356,7 +356,7 @@ namespace Audex.Application.Integrations.Stock.Moex
             return await response.Content.ReadFromJsonAsync<MoexResponse>();
         }
 
-        private static MoexSecurityInfoDto? ParseSecurityInfo(MoexResponse? moexResponse, string query)
+        private static MarketSecurityInfoDto? ParseSecurityInfo(MoexResponse? moexResponse, string query)
         {
             if (moexResponse?.Securities?.Columns == null || moexResponse.Securities.Data == null)
             {
@@ -409,7 +409,7 @@ namespace Audex.Application.Integrations.Stock.Moex
                 ? shortName
                 : (!string.IsNullOrWhiteSpace(fullName) ? fullName : secId);
 
-            return new MoexSecurityInfoDto
+            return new MarketSecurityInfoDto
             {
                 Ticker = secId,
                 Name = displayName,

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Securities;
 using Audex.Application.Tests.Fixtures;
@@ -30,6 +30,26 @@ namespace Audex.Application.Tests.Services.Securities
 
             Assert.NotNull(all);
             Assert.Contains(all, t => t.Id == typeId && t.Name == "Stock");
+        }
+
+        [Fact]
+        public async Task TestGetById()
+        {
+            var typeId = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ISecurityTypeService>();
+                return await service.AddAsync(new SecurityTypeDto { Name = "Crypto ETF" });
+            });
+
+            var result = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ISecurityTypeService>();
+                return await service.GetByIdAsync(typeId);
+            });
+
+            Assert.NotNull(result);
+            Assert.Equal(typeId, result.Id);
+            Assert.Equal("Crypto ETF", result.Name);
         }
 
         [Fact]

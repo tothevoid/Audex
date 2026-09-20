@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System;
@@ -70,6 +70,18 @@ namespace Audex.WebApi.Controllers.Securities
         {
             var history = await _securityService.GetTickerHistoryAsync(ticker, period);
             return _mapper.Map(history);
+        }
+
+        [HttpGet(nameof(SearchMarket))]
+        public async Task<ActionResult<MarketSecurityInfoDto>> SearchMarket([FromQuery] string query)
+        {
+            var info = await _securityService.SearchMarketAsync(query);
+            if (info == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(info);
         }
 
         [HttpPut]

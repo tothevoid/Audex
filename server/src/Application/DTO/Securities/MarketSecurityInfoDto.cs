@@ -3,7 +3,7 @@ using System;
 
 namespace Audex.Application.DTO.Securities
 {
-    public class MoexSecurityInfoDto
+    public class MarketSecurityInfoDto
     {
         public string Ticker { get; set; } = string.Empty;
 

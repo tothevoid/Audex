@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,18 +7,25 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Audex.Application.DTO.FileStorage;
 using Audex.Application.DTO.Securities;
+using Audex.Application.Interfaces.Currencies;
 using Audex.Application.Interfaces.FileStorage;
 using Audex.Application.Interfaces.Integrations.Stock;
 using Audex.Application.Interfaces.Securities;
 using Audex.Application.Mappings;
 using Audex.Infrastructure.Entities.Brokers;
+using Audex.Infrastructure.Entities.Currencies;
 using Audex.Infrastructure.Entities.Securities;
 using Audex.Infrastructure.Interfaces.Database;
 
 namespace Audex.Application.Services.Securities
 {
-    public class SecurityService(IUnitOfWork uow, ApplicationMapper mapper, IStockConnector stockConnector, 
-        IFileStorageService fileStorageService) : ISecurityService
+    public class SecurityService(
+        IUnitOfWork uow,
+        ApplicationMapper mapper,
+        IStockConnector stockConnector,
+        IFileStorageService fileStorageService,
+        ISecurityTypeService securityTypeService,
+        ICurrencyService currencyService) : ISecurityService
     {
         private readonly IUnitOfWork _db = uow;
 
@@ -25,6 +33,9 @@ namespace Audex.Application.Services.Securities
         private readonly IRepository<BrokerAccountSecurity> _brokerAccountSecurityRepo = uow.CreateRepository<BrokerAccountSecurity>();
         private readonly IRepository<SecurityTransaction> _securityTransactionsRepo = uow.CreateRepository<SecurityTransaction>();
         private readonly IRepository<DividendPayment> _dividendPaymentRepo = uow.CreateRepository<DividendPayment>();
+
+        private readonly ISecurityTypeService _securityTypeService = securityTypeService;
+        private readonly ICurrencyService _currencyService = currencyService;
 
         private readonly IStockConnector _stockConnector = stockConnector;
         private readonly ApplicationMapper _mapper = mapper;
@@ -39,6 +50,50 @@ namespace Audex.Application.Services.Securities
         public async Task<SecurityDto> FindByTickerAsync(string ticker)
         {
             return (await FindByTickersAsync([ticker])).FirstOrDefault();
+        }
+
+        public async Task<SecurityDto?> FindByIsinAsync(string isin)
+        {
+            if (string.IsNullOrWhiteSpace(isin))
+            {
+                return null;
+            }
+
+            var trimmedIsin = isin.Trim().ToUpper();
+            var security = await _securityRepo.FindAsync(
+                s => s.Isin != null && s.Isin.ToUpper() == trimmedIsin,
+                include: GetFullHierarchyColumns);
+
+            return security != null ? _mapper.Map(security) : null;
+        }
+
+        public async Task<MarketSecurityInfoDto?> SearchMarketAsync(string query)
+        {
+            var info = await _stockConnector.FindSecurityInfoAsync(query);
+            if (info == null)
+            {
+                return null;
+            }
+
+            if (info.TypeId != Guid.Empty)
+            {
+                var securityType = await _securityTypeService.GetByIdAsync(info.TypeId);
+                if (securityType != null)
+                {
+                    info.TypeName = securityType.Name;
+                }
+            }
+
+            if (info.CurrencyId != Guid.Empty)
+            {
+                var currency = await _currencyService.GetByIdAsync(info.CurrencyId);
+                if (currency != null)
+                {
+                    info.CurrencyName = currency.Name;
+                }
+            }
+
+            return info;
         }
 
         public async Task<IEnumerable<SecurityDto>> FindByTickersAsync(IEnumerable<string> tickers)
@@ -172,8 +227,17 @@ namespace Audex.Application.Services.Securities
 
         public async Task<SecurityDto> AddAsync(SecurityDto securityDto, IFormFile securityIcon)
         {
+            if (string.IsNullOrWhiteSpace(securityDto.Ticker))
+            {
+                throw new ArgumentException("Ticker cannot be empty.", nameof(securityDto));
+            }
+
+            var trimmedTicker = securityDto.Ticker.Trim();
+            await ValidateTickerUniquenessAsync(trimmedTicker);
+
             var security = _mapper.Map(securityDto);
             security.Id = Guid.NewGuid();
+            security.Ticker = trimmedTicker;
             
             if (securityIcon != null)
             {
@@ -190,8 +254,18 @@ namespace Audex.Application.Services.Securities
 
         public async Task<SecurityDto> UpdateAsync(SecurityDto securityTypeDto, IFormFile securityIcon)
         {
+            var trimmedTicker = securityTypeDto.Ticker?.Trim();
+            if (!string.IsNullOrWhiteSpace(trimmedTicker))
+            {
+                await ValidateTickerUniquenessAsync(trimmedTicker, securityTypeDto.Id);
+            }
+
             var existingSecurity = await _securityRepo.GetByIdAsync(securityTypeDto.Id);
             var security = _mapper.Map(securityTypeDto);
+            if (!string.IsNullOrWhiteSpace(trimmedTicker))
+            {
+                security.Ticker = trimmedTicker;
+            }
 
             if (securityIcon != null)
             {
@@ -234,6 +308,23 @@ namespace Audex.Application.Services.Securities
         public async Task<string> GetIconUrlAsync(string iconKey)
         {
             return await _fileStorageService.GetFileUrlAsync(_iconsBucket, iconKey);
+        }
+
+        private async Task ValidateTickerUniquenessAsync(string ticker, Guid? currentId = null)
+        {
+            if (string.IsNullOrWhiteSpace(ticker))
+            {
+                return;
+            }
+
+            var upperTicker = ticker.ToUpper();
+            var duplicate = await _securityRepo.FindAsync(
+                s => (!currentId.HasValue || s.Id != currentId.Value) && s.Ticker.ToUpper() == upperTicker);
+
+            if (duplicate != null)
+            {
+                throw new InvalidOperationException($"Security with ticker '{ticker}' already exists.");
+            }
         }
 
         private IQueryable<Security> GetFullHierarchyColumns(IQueryable<Security> securityQuery)

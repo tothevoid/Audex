@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using Audex.Application.DTO.Currencies;
 using Audex.Infrastructure.Entities.Currencies;
 using Audex.Shared.Entities;
@@ -10,6 +11,8 @@ namespace Audex.Application.DTO.Securities
         public string Name { get; set; }
 
         public string Ticker { get; set; }
+
+        public string? Isin { get; set; }
 
         public SecurityTypeDto Type { get; set; }
 
