@@ -97,7 +97,11 @@ const SecuritiesList: React.FC = () => {
                 confirmActionName={t("modals_delete_button")}
                 ref={confirmModalRef}
             />
-            <SecurityModal security={activeEntity} modalRef={modalRef} onSaved={onSecuritySaved} />
+            <SecurityModal
+                security={activeEntity}
+                modalRef={modalRef}
+                onSaved={onSecuritySaved}
+            />
         </Fragment>
     );
 };

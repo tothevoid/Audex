@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Audex.Application.DTO.FileStorage;
 using Audex.Application.DTO.Securities;
-using Audex.Application.Interfaces.Currencies;
 using Audex.Application.Interfaces.FileStorage;
 using Audex.Application.Interfaces.Integrations.Stock;
 using Audex.Application.Interfaces.Securities;
@@ -23,9 +22,7 @@ namespace Audex.Application.Services.Securities
         IUnitOfWork uow,
         ApplicationMapper mapper,
         IStockConnector stockConnector,
-        IFileStorageService fileStorageService,
-        ISecurityTypeService securityTypeService,
-        ICurrencyService currencyService) : ISecurityService
+        IFileStorageService fileStorageService) : ISecurityService
     {
         private readonly IUnitOfWork _db = uow;
 
@@ -33,9 +30,6 @@ namespace Audex.Application.Services.Securities
         private readonly IRepository<BrokerAccountSecurity> _brokerAccountSecurityRepo = uow.CreateRepository<BrokerAccountSecurity>();
         private readonly IRepository<SecurityTransaction> _securityTransactionsRepo = uow.CreateRepository<SecurityTransaction>();
         private readonly IRepository<DividendPayment> _dividendPaymentRepo = uow.CreateRepository<DividendPayment>();
-
-        private readonly ISecurityTypeService _securityTypeService = securityTypeService;
-        private readonly ICurrencyService _currencyService = currencyService;
 
         private readonly IStockConnector _stockConnector = stockConnector;
         private readonly ApplicationMapper _mapper = mapper;
@@ -69,31 +63,7 @@ namespace Audex.Application.Services.Securities
 
         public async Task<MarketSecurityInfoDto?> SearchMarketAsync(string query)
         {
-            var info = await _stockConnector.FindSecurityInfoAsync(query);
-            if (info == null)
-            {
-                return null;
-            }
-
-            if (info.TypeId != Guid.Empty)
-            {
-                var securityType = await _securityTypeService.GetByIdAsync(info.TypeId);
-                if (securityType != null)
-                {
-                    info.TypeName = securityType.Name;
-                }
-            }
-
-            if (info.CurrencyId != Guid.Empty)
-            {
-                var currency = await _currencyService.GetByIdAsync(info.CurrencyId);
-                if (currency != null)
-                {
-                    info.CurrencyName = currency.Name;
-                }
-            }
-
-            return info;
+            return await _stockConnector.FindSecurityInfoAsync(query);
         }
 
         public async Task<IEnumerable<SecurityDto>> FindByTickersAsync(IEnumerable<string> tickers)

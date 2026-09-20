@@ -15,11 +15,7 @@ namespace Audex.Application.DTO.Securities
 
         public Guid TypeId { get; set; }
 
-        public string TypeName { get; set; } = string.Empty;
-
         public Guid CurrencyId { get; set; }
-
-        public string CurrencyName { get; set; } = string.Empty;
 
         public decimal? LastPrice { get; set; }
     }
