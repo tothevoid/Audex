@@ -34,18 +34,36 @@ const Security: React.FC<Props> = ({ security, onEditClicked, onDeleteClicked })
                                 size="lg"
                             />
                             <Stack gap={0.5} minW={0} flex="1">
-                                <Link
-                                    asChild
-                                    color="text_primary"
-                                    fontWeight="700"
-                                    fontSize="lg"
-                                    letterSpacing="tight"
-                                    truncate
-                                    title={ticker}
-                                    _hover={{ color: "status_success" }}
-                                >
-                                    <NavLink to={securityLink}>{ticker}</NavLink>
-                                </Link>
+                                <HStack gap={2} align="center">
+                                    <Link
+                                        asChild
+                                        color="text_primary"
+                                        fontWeight="700"
+                                        fontSize="lg"
+                                        letterSpacing="tight"
+                                        truncate
+                                        title={ticker}
+                                        _hover={{ color: "status_success" }}
+                                    >
+                                        <NavLink to={securityLink}>{ticker}</NavLink>
+                                    </Link>
+                                    {security.isin && (
+                                        <Text
+                                            fontSize="2xs"
+                                            color="text_secondary"
+                                            px={1.5}
+                                            py={0.5}
+                                            borderRadius="sm"
+                                            backgroundColor="background_secondary"
+                                            borderWidth="1px"
+                                            borderColor="border_primary"
+                                            fontWeight="600"
+                                            letterSpacing="wide"
+                                        >
+                                            {security.isin}
+                                        </Text>
+                                    )}
+                                </HStack>
                                 <Text
                                     fontSize="xs"
                                     color="text_secondary"

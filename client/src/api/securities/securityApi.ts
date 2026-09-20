@@ -2,7 +2,7 @@ import { SecurityHistory } from '../../models/securities/SecurityHistory';
 import { SecurityHistoryPeriod } from '../../models/securities/SecurityHistoryPeriod';
 import { createEntityWithIcon, deleteEntity, getAllEntities, getEntity, getEntityById, updateEntityWithIcon } from '../basicApi';
 import { SecurityStats } from '../../models/securities/SecurityStats';
-import { SecurityEntity, SecurityEntityRequest, SecurityEntityResponse } from '../../models/securities/SecurityEntity';
+import { SecurityEntity, SecurityEntityRequest, SecurityEntityResponse, MarketSecurityInfoEntity } from '../../models/securities/SecurityEntity';
 import { prepareSecurity, prepareSecurityEntityRequest } from './securityApiMapping';
 import { Nullable } from '../../shared/utilities/nullable';
 import { getStoredIconUrl } from '../iconApi';
@@ -47,6 +47,11 @@ export const updateSecurity = async (modifiedSecurity: SecurityEntity, file: Fil
 
 export const deleteSecurity = async (securityId: string): Promise<boolean> => {
     return await deleteEntity(basicUrl, securityId);
+}
+
+export const searchMarketSecurity = async (query: string): Promise<MarketSecurityInfoEntity | null> => {
+    return getEntity<MarketSecurityInfoEntity>(`${basicUrl}/SearchMarket?query=${encodeURIComponent(query)}`)
+        .then(result => result ?? null);
 }
 
 export const getIconUrl = (iconKey: Nullable<string>): string => {

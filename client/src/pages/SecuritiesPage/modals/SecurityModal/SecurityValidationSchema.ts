@@ -5,6 +5,7 @@ export const getSecurityValidationSchema = (t: TFunction) => z.object({
     id: z.string().optional(),
     name: z.string().min(1, t("validation_field_required")),
     ticker: z.string().min(1, t("validation_field_required")),
+    isin: z.string().optional(),
     type: z.object({
         id: z.string().min(1, t("validation_field_required")),
         name: z.string()
