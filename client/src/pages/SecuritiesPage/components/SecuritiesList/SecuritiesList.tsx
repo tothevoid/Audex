@@ -54,7 +54,6 @@ const SecuritiesList: React.FC = () => {
                 title={t("header_securities")}
                 onAdd={onAddClicked}
                 addButtonTitle={t("security_page_summary_add")}
-                pb={4}
             />
         );
     };
@@ -81,7 +80,7 @@ const SecuritiesList: React.FC = () => {
     return (
         <Fragment>
             {getHeader()}
-            <SimpleGrid pt={2} pb={5} gap={4} templateColumns="repeat(auto-fill, minmax(320px, 1fr))">
+            <SimpleGrid pb={5} gap={4} templateColumns="repeat(auto-fill, minmax(320px, 1fr))">
                 {securities.map((security: SecurityEntity) => (
                     <Security
                         key={security.id}

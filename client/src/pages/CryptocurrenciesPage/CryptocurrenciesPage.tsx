@@ -56,7 +56,6 @@ const CryptocurrenciesPage: React.FC = () => {
                 title={t("header_cryptocurrencies")}
                 onAdd={onAddClicked}
                 addButtonTitle={t("cryptocurrencies_page_add")}
-                pb={4}
             />
         ) : (
             <Placeholder text={t("cryptocurrencies_page_no_cryptocurrencies")}>
@@ -80,7 +79,7 @@ const CryptocurrenciesPage: React.FC = () => {
 
     return <Fragment>
         {getHeader()}
-        <SimpleGrid pt={5} pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(300px, 3fr))'>
+        <SimpleGrid pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(300px, 3fr))'>
             {
                 cryptocurrencies.map((cryptocurrency: CryptocurrencyEntity) => 
                     <Cryptocurrency key={cryptocurrency.id} 

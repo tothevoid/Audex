@@ -65,7 +65,6 @@ const CryptoAccountsList: React.FC<Props> = (props: Props) => {
                 title={t("header_cryptoaccounts")}
                 onAdd={onAddClicked}
                 addButtonTitle={t("crypto_accounts_page_add")}
-                pb={4}
             />
         ) : (
             <Placeholder text={t("crypto_accounts_page_no_crypto_accounts")}>
@@ -77,7 +76,7 @@ const CryptoAccountsList: React.FC<Props> = (props: Props) => {
     return (
         <Fragment>
             {getHeader()}
-            <SimpleGrid pt={2} pb={5} gap={4} templateColumns="repeat(auto-fill, minmax(400px, 3fr))">
+            <SimpleGrid pb={5} gap={4} templateColumns="repeat(auto-fill, minmax(400px, 3fr))">
                 {cryptoAccounts.map((cryptoAccount: CryptoAccountEntity) => (
                     <CryptoAccount
                         cryptoAccount={cryptoAccount}

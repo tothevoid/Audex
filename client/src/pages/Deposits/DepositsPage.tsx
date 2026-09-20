@@ -109,7 +109,6 @@ const DepositsPage: React.FC = () => {
 						onAdd={onAddClicked}
 						addButtonTitle={t("deposits_list_add_button")}
 						pt={4}
-						pb={2}
 					/>
 					<FilterBlock
 						active={onlyActive}
@@ -122,7 +121,7 @@ const DepositsPage: React.FC = () => {
 					{getAddButtonWithoutDeposits()}
 				</Box>
 			)}
-			<SimpleGrid pt={5} pb={5} gap={6} templateColumns='repeat(auto-fill, minmax(300px, 4fr))'>
+			<SimpleGrid pb={5} gap={6} templateColumns='repeat(auto-fill, minmax(300px, 4fr))'>
 				{
 					deposits.map((deposit: DepositEntity) => 
 						<Deposit key={deposit.id} deposit={deposit} 

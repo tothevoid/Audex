@@ -71,7 +71,7 @@ const CryptoAccountCryptocurrenciesList: React.FC<Props> = (props: Props) => {
 			/>
 
 			{cryptoAccountCryptocurrencies.length > 0 ? (
-				<SimpleGrid pt={2} pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(350px, 3fr))'>
+				<SimpleGrid pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(350px, 3fr))'>
 					{cryptoAccountCryptocurrencies.map((cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => (
 						<CryptoAccountCryptocurrency
 							onReloadCryptoAccountCryptocurrencies={reloadCryptoAccountCryptocurrencies}

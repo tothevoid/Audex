@@ -32,7 +32,6 @@ export const CashAccountHeader: React.FC<CashAccountHeaderProps> = ({
             backgroundColor="background_primary"
             borderColor="border_primary"
             borderRadius="xl"
-            mb={4}
             boxShadow="sm"
         >
             <Card.Body padding={4}>

@@ -64,7 +64,6 @@ const BrokerAccountsList: React.FC = () => {
 				title={t("header_broker_account")}
 				onAdd={onAddClicked}
 				addButtonTitle={t("broker_accounts_page_summary_add")}
-				pb={4}
 			/>
 		) : (
 			<Placeholder text={t("broker_accounts_page_no_accounts")}>
@@ -76,7 +75,7 @@ const BrokerAccountsList: React.FC = () => {
 	return (
 		<Fragment>
 			{getHeader()}
-			<SimpleGrid pt={5} pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(400px, 3fr))'>
+			<SimpleGrid pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(400px, 3fr))'>
 				{
 					brokerAccounts.map((brokerAccount: BrokerAccountEntity) => 
 						<BrokerAccount brokerAccount={brokerAccount}
