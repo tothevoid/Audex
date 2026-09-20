@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -85,6 +85,64 @@ namespace Audex.Application.Tests.Integrations.Stock
 
             // Assert
             Assert.Single(result);
+        }
+
+        [Fact]
+        public async Task FindSecurityInfo_WhenFixingAndExactTickerPresent_ShouldPickExactTicker()
+        {
+            // Arrange
+            var jsonResponse = @"{
+                ""securities"": {
+                    ""columns"": [""secid"", ""shortname"", ""name"", ""isin"", ""is_traded"", ""type"", ""group""],
+                    ""data"": [
+                        [""FIXSBER"", ""Фиксинг МосБиржи SBER"", ""Фиксинг МосБиржи обыкновенных акций ПАО Сбербанк"", null, 1, ""stock_index_pf"", ""stock_index""],
+                        [""SBER"", ""Сбербанк"", ""Сбербанк России ПАО ао"", ""RU0009029540"", 1, ""common_share"", ""stock_shares""]
+                    ]
+                }
+            }";
+
+            var handler = new MockHttpMessageHandler(jsonResponse);
+            var httpClient = new HttpClient(handler);
+            var factory = new StubHttpClientFactory(httpClient);
+            var connector = new MoexConnector(factory);
+
+            // Act
+            var result = await connector.FindSecurityInfoAsync("SBER");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("SBER", result.Ticker);
+            Assert.Equal("Сбербанк", result.Name);
+            Assert.Equal("RU0009029540", result.Isin);
+            Assert.Equal(SecurityTypeConstants.Stock, result.TypeId);
+        }
+
+        [Fact]
+        public async Task FindSecurityInfo_WhenPreciousMetal_ShouldHavePreciousMetalTypeAndFullName()
+        {
+            // Arrange
+            var jsonResponse = @"{
+                ""securities"": {
+                    ""columns"": [""secid"", ""shortname"", ""name"", ""isin"", ""is_traded"", ""type"", ""group""],
+                    ""data"": [
+                        [""GLDRUB_TOM"", ""GLDRUB_TOM"", ""GLD/RUB_TOM - GLD/РУБ"", null, 1, ""gold_metal"", ""currency_metal""]
+                    ]
+                }
+            }";
+
+            var handler = new MockHttpMessageHandler(jsonResponse);
+            var httpClient = new HttpClient(handler);
+            var factory = new StubHttpClientFactory(httpClient);
+            var connector = new MoexConnector(factory);
+
+            // Act
+            var result = await connector.FindSecurityInfoAsync("GLDRUB_TOM");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("GLDRUB_TOM", result.Ticker);
+            Assert.Equal("GLD/RUB_TOM - GLD/РУБ", result.Name);
+            Assert.Equal(SecurityTypeConstants.PreciousMetal, result.TypeId);
         }
 
         private class StubHttpClientFactory(HttpClient client) : IHttpClientFactory

@@ -1,4 +1,5 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -275,6 +276,13 @@ namespace Audex.Application.Integrations.Stock.Moex
                 : defaultValue;
         }
 
+        private static string GetStringValue(object[] row, int index, string defaultValue = "")
+        {
+            return index >= 0 && index < row.Length && row[index] != null
+                ? Convert.ToString(row[index]) ?? defaultValue
+                : defaultValue;
+        }
+
         private static async Task<List<SecurityCandleDto>> FetchCandlesBatchAsync(string query, HttpClient httpClient)
         {
             var result = await httpClient.GetAsync(query);
@@ -321,6 +329,132 @@ namespace Audex.Application.Integrations.Stock.Moex
             }
 
             return candles;
+        }
+
+        public async Task<MoexSecurityInfoDto?> FindSecurityInfoAsync(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return null;
+            }
+
+            var trimmedQuery = query.Trim();
+            var moexResponse = await FetchSecuritySearchResponseAsync(trimmedQuery);
+            return ParseSecurityInfo(moexResponse, trimmedQuery);
+        }
+
+        private async Task<MoexResponse?> FetchSecuritySearchResponseAsync(string query)
+        {
+            var httpClient = httpClientFactory.CreateClient();
+            var url = MoexUrlFactory.GetSearchSecurityQuery(query);
+            var response = await httpClient.GetAsync(url);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            return await response.Content.ReadFromJsonAsync<MoexResponse>();
+        }
+
+        private static MoexSecurityInfoDto? ParseSecurityInfo(MoexResponse? moexResponse, string query)
+        {
+            if (moexResponse?.Securities?.Columns == null || moexResponse.Securities.Data == null)
+            {
+                return null;
+            }
+
+            var columnsIndexes = GetColumnIndexMapping(moexResponse.Securities.Columns);
+            int secIdIdx = columnsIndexes.GetValueOrDefault("secid", -1);
+            int shortNameIdx = columnsIndexes.GetValueOrDefault("shortname", -1);
+            int nameIdx = columnsIndexes.GetValueOrDefault("name", -1);
+            int isinIdx = columnsIndexes.GetValueOrDefault("isin", -1);
+            int isTradedIdx = columnsIndexes.GetValueOrDefault("is_traded", -1);
+            int groupIdx = columnsIndexes.GetValueOrDefault("group", -1);
+            int typeIdx = columnsIndexes.GetValueOrDefault("type", -1);
+
+            var rows = moexResponse.Securities.Data.ToList();
+            if (rows.Count == 0)
+            {
+                return null;
+            }
+
+            bool IsTraded(object[] r) => isTradedIdx >= 0 && Convert.ToInt32(r[isTradedIdx]?.ToString() ?? "0") == 1;
+            bool IsSecIdMatch(object[] r) => string.Equals(GetStringValue(r, secIdIdx), query, StringComparison.OrdinalIgnoreCase);
+            bool IsIsinMatch(object[] r) => isinIdx >= 0 && string.Equals(GetStringValue(r, isinIdx), query, StringComparison.OrdinalIgnoreCase);
+            bool IsStandard(object[] r) =>
+                IsStandardSecurity(GetStringValue(r, groupIdx), GetStringValue(r, typeIdx));
+
+            int GetMatchScore(object[] r)
+            {
+                bool isTraded = IsTraded(r);
+                if (IsSecIdMatch(r)) return isTraded ? 60 : 50;
+                if (IsIsinMatch(r)) return isTraded ? 40 : 30;
+                if (isTraded && IsStandard(r)) return 20;
+                if (isTraded) return 10;
+                return 0;
+            }
+
+            var bestRow = rows.MaxBy(GetMatchScore)!;
+
+            string secId = GetStringValue(bestRow, secIdIdx, query.ToUpper());
+            string shortName = GetStringValue(bestRow, shortNameIdx);
+            string fullName = GetStringValue(bestRow, nameIdx, shortName);
+            string? isin = isinIdx >= 0 && bestRow[isinIdx] != null ? Convert.ToString(bestRow[isinIdx]) : null;
+            string group = GetStringValue(bestRow, groupIdx).ToLower();
+            string type = GetStringValue(bestRow, typeIdx).ToLower();
+
+            Guid typeId = DetermineSecurityTypeId(group, type);
+
+            string displayName = !string.IsNullOrWhiteSpace(shortName) && shortName != secId
+                ? shortName
+                : (!string.IsNullOrWhiteSpace(fullName) ? fullName : secId);
+
+            return new MoexSecurityInfoDto
+            {
+                Ticker = secId,
+                Name = displayName,
+                FullName = fullName,
+                Isin = isin,
+                TypeId = typeId,
+                CurrencyId = CurrencyConstants.RUB
+            };
+        }
+
+        private static readonly string[] StandardSecurityKeywords = ["stock", "bond", "share", "metal", "currency", "etf", "unit"];
+        private static readonly string[] ExcludedSecurityKeywords = ["index", "option", "futures"];
+
+        private static bool IsStandardSecurity(string group, string type)
+        {
+            var combined = $"{group} {type}".ToLower();
+            return StandardSecurityKeywords.Any(combined.Contains)
+                && !ExcludedSecurityKeywords.Any(combined.Contains);
+        }
+
+        private static Guid DetermineSecurityTypeId(string group, string type)
+        {
+            var combined = $"{group} {type}";
+
+            if (combined.Contains("bond"))
+            {
+                return SecurityTypeConstants.Bond;
+            }
+
+            if (combined.Contains("etf") || combined.Contains("ppif") || combined.Contains("unit"))
+            {
+                return SecurityTypeConstants.InvestmentFundUnit;
+            }
+
+            if (combined.Contains("metal"))
+            {
+                return SecurityTypeConstants.PreciousMetal;
+            }
+
+            if (combined.Contains("currency"))
+            {
+                return SecurityTypeConstants.Currency;
+            }
+
+            return SecurityTypeConstants.Stock;
         }
     }
 }

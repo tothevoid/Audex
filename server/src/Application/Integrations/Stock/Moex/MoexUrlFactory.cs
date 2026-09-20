@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Audex.Application.DTO.Securities;
@@ -82,6 +82,13 @@ namespace Audex.Application.Integrations.Stock.Moex
                 .AddInterval(interval)
                 .AddRange(from, to)
                 .AddStart(start)
+                .Build();
+        }
+
+        public static string GetSearchSecurityQuery(string query)
+        {
+            return new MoexSearchSecuritiesUrlBuilder(query)
+                .RemoveMeta()
                 .Build();
         }
     }

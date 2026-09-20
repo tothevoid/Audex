@@ -1,4 +1,5 @@
-﻿using Audex.Application.DTO.Securities;
+#nullable enable
+using Audex.Application.DTO.Securities;
 using Audex.Application.Integrations.Stock;
 using System;
 using System.Collections.Generic;
@@ -18,5 +19,7 @@ namespace Audex.Application.Interfaces.Integrations.Stock
         Task<IEnumerable<MarketDataRow>> GetExtendedValuesByTickersAsync(IEnumerable<SecurityDto> tickers);
 
         Task<IEnumerable<SecurityCandleDto>> GetCandlesAsync(SecurityDto security, DateOnly from, DateOnly to, int interval = 24);
+
+        Task<MoexSecurityInfoDto?> FindSecurityInfoAsync(string query);
     }
 }
