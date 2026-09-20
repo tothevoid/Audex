@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Audex.Infrastructure.Entities.Brokers;
 using System.Collections.Generic;
 using Audex.Infrastructure.Entities.Currencies;
@@ -11,6 +11,8 @@ namespace Audex.Infrastructure.Entities.Securities
         public string Name { get; set; }
 
         public string Ticker { get; set; }
+
+        public string Isin { get; set; }
 
         public SecurityType Type { get; set; }
 
