@@ -1,5 +1,6 @@
 import httpClient from "./httpClient";
 import { PaginationConfig } from "../shared/models/PaginationConfig";
+import { OperationResult } from "../shared/models/OperationResult";
 import { Nullable } from "../shared/utilities/nullable";
 import { logPromiseError } from "../shared/utilities/webApiUtilities";
 
@@ -94,6 +95,13 @@ export const getEntityByConfig = async <T>(basicUrl: string, body: unknown): Pro
 export const getEntityById = async <T>(basicUrl: string, id: string): Promise<T | void> => {
     return getEntity(`${basicUrl}/GetById?id=${id}`);
 };
+const parseErrorMessage = (e: any): string => {
+    return e?.response?.data?.detail 
+        || e?.response?.data?.errorMessage 
+        || e?.response?.data?.title 
+        || e?.message 
+        || "An unexpected error occurred";
+};
 
 const generateForm = <T>(entity: T, entityField: string, iconField: string, file: Nullable<File>) => {
     if (entityField === iconField) {
@@ -106,6 +114,149 @@ const generateForm = <T>(entity: T, entityField: string, iconField: string, file
         formData.append(iconField, file);
     }
     return formData;
+};
+
+export const createEntityResult = async <TRequest, TResponse, TMapped = TResponse>(
+    basicUrl: string,
+    addedEntity: TRequest,
+    mapResponse?: (response: TResponse) => TMapped
+): Promise<OperationResult<TMapped>> => {
+    try {
+        const response = await httpClient.put<OperationResult<TResponse>>(basicUrl, addedEntity);
+        if (response.data?.isSuccess) {
+            return {
+                isSuccess: true,
+                data: response.data.data 
+                    ? (mapResponse ? mapResponse(response.data.data) : (response.data.data as unknown as TMapped))
+                    : undefined
+            };
+        }
+        return {
+            isSuccess: false,
+            errorMessage: response.data?.errorMessage
+        };
+    } catch (e: any) {
+        logPromiseError(e);
+        return {
+            isSuccess: false,
+            errorMessage: parseErrorMessage(e)
+        };
+    }
+};
+
+export const createEntityWithIconResult = async <TRequest, TResponse, TMapped = TResponse>(
+    basicUrl: string,
+    addedEntity: TRequest,
+    entityFieldName: string,
+    iconFieldName: string,
+    file: Nullable<File>,
+    mapResponse?: (response: TResponse) => TMapped
+): Promise<OperationResult<TMapped>> => {
+    try {
+        const formData = generateForm(addedEntity, entityFieldName, iconFieldName, file);
+        const response = await httpClient.put<OperationResult<TResponse>>(basicUrl, formData);
+
+        if (response.data?.isSuccess) {
+            return {
+                isSuccess: true,
+                data: response.data.data 
+                    ? (mapResponse ? mapResponse(response.data.data) : (response.data.data as unknown as TMapped))
+                    : undefined
+            };
+        }
+
+        return {
+            isSuccess: false,
+            errorMessage: response.data?.errorMessage
+        };
+    } catch (e: any) {
+        logPromiseError(e);
+        return {
+            isSuccess: false,
+            errorMessage: parseErrorMessage(e)
+        };
+    }
+};
+
+export const updateEntityResult = async <TRequest, TResponse, TMapped = TResponse>(
+    basicUrl: string,
+    modifiedEntity: TRequest,
+    mapResponse?: (response: TResponse) => TMapped
+): Promise<OperationResult<TMapped>> => {
+    try {
+        const response = await httpClient.patch<OperationResult<TResponse>>(basicUrl, modifiedEntity);
+        if (response.data?.isSuccess) {
+            return {
+                isSuccess: true,
+                data: response.data.data 
+                    ? (mapResponse ? mapResponse(response.data.data) : (response.data.data as unknown as TMapped))
+                    : undefined
+            };
+        }
+        return {
+            isSuccess: false,
+            errorMessage: response.data?.errorMessage
+        };
+    } catch (e: any) {
+        logPromiseError(e);
+        return {
+            isSuccess: false,
+            errorMessage: parseErrorMessage(e)
+        };
+    }
+};
+
+export const updateEntityWithIconResult = async <TRequest, TResponse, TMapped = TResponse>(
+    basicUrl: string,
+    modifiedEntity: TRequest,
+    entityFieldName: string,
+    iconFieldName: string,
+    file: Nullable<File>,
+    mapResponse?: (response: TResponse) => TMapped
+): Promise<OperationResult<TMapped>> => {
+    try {
+        const formData = generateForm(modifiedEntity, entityFieldName, iconFieldName, file);
+        const response = await httpClient.patch<OperationResult<TResponse>>(basicUrl, formData);
+
+        if (response.data?.isSuccess) {
+            return {
+                isSuccess: true,
+                data: response.data.data 
+                    ? (mapResponse ? mapResponse(response.data.data) : (response.data.data as unknown as TMapped))
+                    : undefined
+            };
+        }
+
+        return {
+            isSuccess: false,
+            errorMessage: response.data?.errorMessage
+        };
+    } catch (e: any) {
+        logPromiseError(e);
+        return {
+            isSuccess: false,
+            errorMessage: parseErrorMessage(e)
+        };
+    }
+};
+
+export const deleteEntityResult = async (basicUrl: string, recordId: string): Promise<OperationResult<boolean>> => {
+    if (!recordId) {
+        return { isSuccess: false, errorMessage: "Invalid id" };
+    }
+    try {
+        const response = await httpClient.delete<OperationResult<boolean>>(`${basicUrl}?id=${recordId}`);
+        if (typeof response.data?.isSuccess === "boolean") {
+            return response.data;
+        }
+        return { isSuccess: true, data: true };
+    } catch (e: any) {
+        logPromiseError(e);
+        return {
+            isSuccess: false,
+            errorMessage: parseErrorMessage(e)
+        };
+    }
 };
 
 export const sendCreateRequest = async <TRequest, TResponse>(
