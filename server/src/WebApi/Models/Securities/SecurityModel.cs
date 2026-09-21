@@ -1,8 +1,6 @@
 #nullable enable
 using System;
 using System.Text.Json.Serialization;
-using Audex.Infrastructure.Entities.Currencies;
-using Audex.Shared.Entities;
 using Audex.WebApi.Models.Currencies;
 
 namespace Audex.WebApi.Models.Securities
@@ -22,7 +20,7 @@ namespace Audex.WebApi.Models.Securities
         public string? Isin { get; set; }
 
         [JsonPropertyName("type")]
-        public SecurityTypeModel Type { get; set; }
+        public SecurityTypeModel? Type { get; set; }
 
         [JsonPropertyName("typeId")]
         public Guid TypeId { get; set; }
@@ -34,10 +32,10 @@ namespace Audex.WebApi.Models.Securities
         public DateTime? PriceFetchedAt { get; set; }
 
         [JsonPropertyName("iconKey")]
-        public string IconKey { get; set; }
+        public string? IconKey { get; set; }
 
         [JsonPropertyName("currency")]
-        public Currency Currency { get; set; }
+        public CurrencyModel? Currency { get; set; }
 
         [JsonPropertyName("currencyId")]
         public Guid CurrencyId { get; set; }

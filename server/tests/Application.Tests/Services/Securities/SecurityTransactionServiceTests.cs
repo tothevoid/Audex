@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Brokers;
@@ -285,7 +285,7 @@ namespace Audex.Application.Tests.Services.Securities
                     CurrencyId = CurrencyConstants.USD,
                     ActualPrice = 400m
                 }, null);
-                return sec.Id;
+                return sec.Data!.Id;
             });
 
             var brokerId = await ExecuteScopeAsync(async sp =>

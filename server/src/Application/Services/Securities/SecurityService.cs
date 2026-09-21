@@ -5,10 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Audex.Application.Constants;
+using Audex.Application.DTO.Common;
 using Audex.Application.DTO.FileStorage;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.FileStorage;
 using Audex.Application.Interfaces.Integrations.Stock;
+using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Securities;
 using Audex.Application.Mappings;
 using Audex.Infrastructure.Entities.Brokers;
@@ -22,7 +25,8 @@ namespace Audex.Application.Services.Securities
         IUnitOfWork uow,
         ApplicationMapper mapper,
         IStockConnector stockConnector,
-        IFileStorageService fileStorageService) : ISecurityService
+        IFileStorageService fileStorageService,
+        ILocalizationService localizer) : ISecurityService
     {
         private readonly IUnitOfWork _db = uow;
 
@@ -34,6 +38,7 @@ namespace Audex.Application.Services.Securities
         private readonly IStockConnector _stockConnector = stockConnector;
         private readonly ApplicationMapper _mapper = mapper;
         private readonly IFileStorageService _fileStorageService = fileStorageService;
+        private readonly ILocalizationService _localizer = localizer;
         private const string _iconsBucket = "security";
 
         public async Task<IEnumerable<SecurityDto>> GetAllAsync(bool disableTracking = true)
@@ -195,15 +200,19 @@ namespace Audex.Application.Services.Securities
             };
         }
 
-        public async Task<SecurityDto> AddAsync(SecurityDto securityDto, IFormFile securityIcon)
+        public async Task<OperationResultDto<SecurityDto>> AddAsync(SecurityDto securityDto, IFormFile? securityIcon)
         {
             if (string.IsNullOrWhiteSpace(securityDto.Ticker))
             {
-                throw new ArgumentException("Ticker cannot be empty.", nameof(securityDto));
+                return OperationResultDto<SecurityDto>.Failure("Ticker cannot be empty.");
             }
 
             var trimmedTicker = securityDto.Ticker.Trim();
-            await ValidateTickerUniquenessAsync(trimmedTicker);
+            var tickerError = await ValidateTickerUniquenessAsync(trimmedTicker);
+            if (tickerError != null)
+            {
+                return OperationResultDto<SecurityDto>.Failure(tickerError);
+            }
 
             var security = _mapper.Map(securityDto);
             security.Id = Guid.NewGuid();
@@ -219,19 +228,29 @@ namespace Audex.Application.Services.Securities
             await _securityRepo.AddAsync(security);
             await _db.CommitAsync();
 
-            return await GetByIdAsync(security.Id);
+            var created = await GetByIdAsync(security.Id);
+            return OperationResultDto<SecurityDto>.Success(created);
         }
 
-        public async Task<SecurityDto> UpdateAsync(SecurityDto securityTypeDto, IFormFile securityIcon)
+        public async Task<OperationResultDto<SecurityDto>> UpdateAsync(SecurityDto securityDto, IFormFile? securityIcon)
         {
-            var trimmedTicker = securityTypeDto.Ticker?.Trim();
+            var trimmedTicker = securityDto.Ticker?.Trim();
             if (!string.IsNullOrWhiteSpace(trimmedTicker))
             {
-                await ValidateTickerUniquenessAsync(trimmedTicker, securityTypeDto.Id);
+                var tickerError = await ValidateTickerUniquenessAsync(trimmedTicker, securityDto.Id);
+                if (tickerError != null)
+                {
+                    return OperationResultDto<SecurityDto>.Failure(tickerError);
+                }
             }
 
-            var existingSecurity = await _securityRepo.GetByIdAsync(securityTypeDto.Id);
-            var security = _mapper.Map(securityTypeDto);
+            var existingSecurity = await _securityRepo.GetByIdAsync(securityDto.Id);
+            if (existingSecurity == null)
+            {
+                return OperationResultDto<SecurityDto>.Failure(await _localizer.GetForUserAsync(LocalizationKeys.Errors.EntityNotFound));
+            }
+
+            var security = _mapper.Map(securityDto);
             if (!string.IsNullOrWhiteSpace(trimmedTicker))
             {
                 security.Ticker = trimmedTicker;
@@ -242,12 +261,12 @@ namespace Audex.Application.Services.Securities
                 security.IconKey = $"{security.Id}_{Guid.NewGuid():N}";
                 await _fileStorageService.UploadFileAsync(_iconsBucket, securityIcon, security.IconKey);
             }
-            else if (string.IsNullOrEmpty(securityTypeDto.IconKey))
+            else if (string.IsNullOrEmpty(securityDto.IconKey))
             {
                 security.IconKey = null;
             }
 
-            if (!string.IsNullOrEmpty(existingSecurity?.IconKey) && existingSecurity.IconKey != security.IconKey)
+            if (!string.IsNullOrEmpty(existingSecurity.IconKey) && existingSecurity.IconKey != security.IconKey)
             {
                 await _fileStorageService.DeleteFileAsync(_iconsBucket, existingSecurity.IconKey);
             }
@@ -255,7 +274,8 @@ namespace Audex.Application.Services.Securities
             _securityRepo.Update(security);
             await _db.CommitAsync();
 
-            return await GetByIdAsync(security.Id);
+            var updated = await GetByIdAsync(security.Id);
+            return OperationResultDto<SecurityDto>.Success(updated);
         }
 
         public async Task DeleteAsync(Guid id)
@@ -280,11 +300,11 @@ namespace Audex.Application.Services.Securities
             return await _fileStorageService.GetFileUrlAsync(_iconsBucket, iconKey);
         }
 
-        private async Task ValidateTickerUniquenessAsync(string ticker, Guid? currentId = null)
+        private async Task<string?> ValidateTickerUniquenessAsync(string ticker, Guid? currentId = null)
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
-                return;
+                return await _localizer.GetForUserAsync(LocalizationKeys.Errors.ValidationError);
             }
 
             var upperTicker = ticker.ToUpper();
@@ -293,8 +313,10 @@ namespace Audex.Application.Services.Securities
 
             if (duplicate != null)
             {
-                throw new InvalidOperationException($"Security with ticker '{ticker}' already exists.");
+                return await _localizer.GetForUserAsync(LocalizationKeys.Errors.SecurityTickerAlreadyExists, null, ticker);
             }
+
+            return null;
         }
 
         private IQueryable<Security> GetFullHierarchyColumns(IQueryable<Security> securityQuery)

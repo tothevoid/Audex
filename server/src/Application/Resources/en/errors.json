@@ -1,5 +1,6 @@
 {
   "general_error": "An unexpected error occurred",
   "entity_not_found": "Requested entity was not found",
-  "validation_error": "One or more validation errors occurred"
+  "validation_error": "One or more validation errors occurred",
+  "security_ticker_already_exists": "Security with ticker '{0}' already exists"
 }

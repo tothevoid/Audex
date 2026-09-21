@@ -1,5 +1,6 @@
 #nullable enable
 using Microsoft.AspNetCore.Http;
+using Audex.Application.DTO.Common;
 using Audex.Application.DTO.FileStorage;
 using Audex.Application.DTO.Securities;
 using System;
@@ -20,8 +21,8 @@ namespace Audex.Application.Interfaces.Securities
         Task<SecurityDto> GetByIdAsync(Guid id, bool loadHierarchy = true, bool disableTracking = true);
         Task<SecurityStatsDto> GetStatsAsync(Guid securityId);
         Task<SecurityHistoryDto> GetTickerHistoryAsync(string ticker, SecurityHistoryPeriod period = SecurityHistoryPeriod.Day1);
-        Task<SecurityDto> AddAsync(SecurityDto security, IFormFile securityIcon);
-        Task<SecurityDto> UpdateAsync(SecurityDto security, IFormFile securityIcon);
+        Task<OperationResultDto<SecurityDto>> AddAsync(SecurityDto security, IFormFile? securityIcon);
+        Task<OperationResultDto<SecurityDto>> UpdateAsync(SecurityDto security, IFormFile? securityIcon);
         Task<FileStreamDto> GetIconStreamAsync(string iconKey);
         Task<string> GetIconUrlAsync(string iconKey);
         Task DeleteAsync(Guid id);

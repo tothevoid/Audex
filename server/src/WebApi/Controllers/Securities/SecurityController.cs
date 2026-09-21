@@ -1,8 +1,10 @@
+#nullable enable
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System;
 using System.Text.Json;
+using Audex.Application.DTO.Common;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Securities;
 using Audex.WebApi.Mappings;
@@ -85,17 +87,27 @@ namespace Audex.WebApi.Controllers.Securities
         }
 
         [HttpPut]
-        public async Task<SecurityDto> Add([FromForm] string securityJson, [FromForm] IFormFile securityIcon)
+        public async Task<OperationResultDto<SecurityDto>> Add([FromForm] string securityJson, [FromForm] IFormFile? securityIcon = null)
         {
             var security = JsonSerializer.Deserialize<SecurityModel>(securityJson);
+            if (security == null)
+            {
+                return OperationResultDto<SecurityDto>.Failure("Invalid security data.");
+            }
+
             var securityDto = _mapper.Map(security);
             return await _securityService.AddAsync(securityDto, securityIcon);
         }
 
         [HttpPatch]
-        public async Task<SecurityDto> Update([FromForm] string securityJson, [FromForm] IFormFile securityIcon)
+        public async Task<OperationResultDto<SecurityDto>> Update([FromForm] string securityJson, [FromForm] IFormFile? securityIcon = null)
         {
             var security = JsonSerializer.Deserialize<SecurityModel>(securityJson);
+            if (security == null)
+            {
+                return OperationResultDto<SecurityDto>.Failure("Invalid security data.");
+            }
+
             var securityDto = _mapper.Map(security);
             return await _securityService.UpdateAsync(securityDto, securityIcon);
         }

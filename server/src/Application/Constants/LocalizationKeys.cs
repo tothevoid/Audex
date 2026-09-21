@@ -134,6 +134,7 @@ namespace Audex.Application.Constants
             public const string GeneralError = "errors.general_error";
             public const string EntityNotFound = "errors.entity_not_found";
             public const string ValidationError = "errors.validation_error";
+            public const string SecurityTickerAlreadyExists = "errors.security_ticker_already_exists";
         }
     }
 }

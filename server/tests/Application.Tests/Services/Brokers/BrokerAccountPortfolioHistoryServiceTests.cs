@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Accounts;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.DTO.Securities;
@@ -201,7 +201,7 @@ namespace Audex.Application.Tests.Services.Brokers
                     CurrencyId = CurrencyConstants.USD,
                     ActualPrice = 150m
                 }, null);
-                return sec.Id;
+                return sec.Data!.Id;
             });
 
             return (brokerAccountId, accountId, securityId);

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Brokers;
@@ -261,7 +261,7 @@ namespace Audex.Application.Tests.Services.Brokers
                     CurrencyId = CurrencyConstants.USD,
                     ActualPrice = 100m
                 }, null);
-                return sec.Id;
+                return sec.Data!.Id;
             });
 
             var today = DateOnly.FromDateTime(DateTime.Now);

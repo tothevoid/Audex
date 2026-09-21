@@ -27,11 +27,7 @@ namespace Audex.Application.Tests.Services.Securities
                 ActualPrice = 220m
             };
 
-            var added = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                return await service.AddAsync(dto, null);
-            });
+            var added = await AddSecurityAsync(dto);
 
             Assert.NotNull(added);
             Assert.NotEqual(Guid.Empty, added.Id);
@@ -61,18 +57,10 @@ namespace Audex.Application.Tests.Services.Securities
                 ActualPrice = 450m
             };
 
-            var added = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                return await service.AddAsync(dto, null);
-            });
+            var added = await AddSecurityAsync(dto);
 
             added.ActualPrice = 480m;
-            var updated = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                return await service.UpdateAsync(added, null);
-            });
+            var updated = await UpdateSecurityAsync(added);
 
             Assert.NotNull(updated);
             Assert.Equal(480m, updated.ActualPrice);
@@ -92,11 +80,7 @@ namespace Audex.Application.Tests.Services.Securities
                 ActualPrice = 450m
             };
 
-            var added = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                return await service.AddAsync(dto, null);
-            });
+            var added = await AddSecurityAsync(dto);
 
             await ExecuteScopeAsync(async sp =>
             {
@@ -127,11 +111,7 @@ namespace Audex.Application.Tests.Services.Securities
                 ActualPrice = 400m
             };
 
-            await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                await service.AddAsync(dto, null);
-            });
+            await AddSecurityAsync(dto);
 
             var found = await ExecuteScopeAsync(async sp =>
             {
@@ -168,11 +148,7 @@ namespace Audex.Application.Tests.Services.Securities
                 IconKey = "security-sample-icon"
             };
 
-            var added = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                return await service.AddAsync(dto, null);
-            });
+            var added = await AddSecurityAsync(dto);
 
             await ExecuteScopeAsync(async sp =>
             {
@@ -205,19 +181,10 @@ namespace Audex.Application.Tests.Services.Securities
                 IconKey = "security-initial-icon"
             };
 
-            var added = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                return await service.AddAsync(dto, null);
-            });
+            var added = await AddSecurityAsync(dto);
 
             added.IconKey = null;
-
-            var updated = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                return await service.UpdateAsync(added, null);
-            });
+            var updated = await UpdateSecurityAsync(added);
 
             Assert.NotNull(updated);
             Assert.Null(updated.IconKey);
@@ -239,11 +206,7 @@ namespace Audex.Application.Tests.Services.Securities
                 ActualPrice = 200m
             };
 
-            var added = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                return await service.AddAsync(dto, formFile);
-            });
+            var added = await AddSecurityAsync(dto, formFile);
 
             Assert.NotNull(added.IconKey);
             Assert.StartsWith(added.Id.ToString(), added.IconKey);
@@ -267,20 +230,12 @@ namespace Audex.Application.Tests.Services.Securities
                 ActualPrice = 250m
             };
 
-            var added = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                return await service.AddAsync(dto, formFile1);
-            });
+            var added = await AddSecurityAsync(dto, formFile1);
 
             var initialKey = added.IconKey;
             Assert.NotNull(initialKey);
 
-            var updated = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                return await service.UpdateAsync(added, formFile2);
-            });
+            var updated = await UpdateSecurityAsync(added, formFile2);
 
             Assert.NotNull(updated.IconKey);
             Assert.NotEqual(initialKey, updated.IconKey);
@@ -313,11 +268,7 @@ namespace Audex.Application.Tests.Services.Securities
                 ActualPrice = 280m
             };
 
-            var added = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                return await service.AddAsync(dto, null);
-            });
+            var added = await AddSecurityAsync(dto);
 
             Assert.NotNull(added);
             Assert.Equal(isin, added.Isin);
@@ -355,7 +306,7 @@ namespace Audex.Application.Tests.Services.Securities
         }
 
         [Fact]
-        public async Task AddAsync_WhenTickerAlreadyExists_ShouldThrowInvalidOperationException()
+        public async Task AddAsync_WhenTickerAlreadyExists_ShouldReturnFailure()
         {
             var typeId = await CreateSecurityType("EquityUnique");
             var dto1 = new SecurityDto
@@ -367,11 +318,7 @@ namespace Audex.Application.Tests.Services.Securities
                 ActualPrice = 100m
             };
 
-            await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ISecurityService>();
-                await service.AddAsync(dto1, null);
-            });
+            await AddSecurityAsync(dto1);
 
             var dto2 = new SecurityDto
             {
@@ -382,13 +329,74 @@ namespace Audex.Application.Tests.Services.Securities
                 ActualPrice = 120m
             };
 
-            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            var result = await ExecuteScopeAsync(async sp =>
             {
-                await ExecuteScopeAsync(async sp =>
-                {
-                    var service = sp.GetRequiredService<ISecurityService>();
-                    await service.AddAsync(dto2, null);
-                });
+                var service = sp.GetRequiredService<ISecurityService>();
+                return await service.AddAsync(dto2, null);
+            });
+
+            Assert.False(result.IsSuccess);
+            Assert.NotNull(result.ErrorMessage);
+            Assert.Contains("test_dup", result.ErrorMessage);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_WhenTickerAlreadyExists_ShouldReturnFailure()
+        {
+            var typeId = await CreateSecurityType("EquityUniqueUpdate");
+            var dto1 = new SecurityDto
+            {
+                Name = "Первая Бумага",
+                Ticker = "TICKER_ONE",
+                TypeId = typeId,
+                CurrencyId = CurrencyConstants.RUB,
+                ActualPrice = 100m
+            };
+
+            var dto2 = new SecurityDto
+            {
+                Name = "Вторая Бумага",
+                Ticker = "TICKER_TWO",
+                TypeId = typeId,
+                CurrencyId = CurrencyConstants.RUB,
+                ActualPrice = 200m
+            };
+
+            await AddSecurityAsync(dto1);
+            var added2 = await AddSecurityAsync(dto2);
+
+            added2.Ticker = "ticker_one";
+
+            var result = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ISecurityService>();
+                return await service.UpdateAsync(added2, null);
+            });
+
+            Assert.False(result.IsSuccess);
+            Assert.NotNull(result.ErrorMessage);
+            Assert.Contains("ticker_one", result.ErrorMessage);
+        }
+
+        private async Task<SecurityDto> AddSecurityAsync(SecurityDto dto, Microsoft.AspNetCore.Http.IFormFile? icon = null)
+        {
+            return await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ISecurityService>();
+                var res = await service.AddAsync(dto, icon);
+                Assert.True(res.IsSuccess);
+                return res.Data!;
+            });
+        }
+
+        private async Task<SecurityDto> UpdateSecurityAsync(SecurityDto dto, Microsoft.AspNetCore.Http.IFormFile? icon = null)
+        {
+            return await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ISecurityService>();
+                var res = await service.UpdateAsync(dto, icon);
+                Assert.True(res.IsSuccess);
+                return res.Data!;
             });
         }
 

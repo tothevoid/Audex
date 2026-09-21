@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Securities;
 using Audex.Application.Tests.Fixtures;
@@ -136,7 +136,7 @@ namespace Audex.Application.Tests.Services.Securities
                     CurrencyId = CurrencyConstants.USD,
                     ActualPrice = 100m
                 }, null);
-                return sec.Id;
+                return sec.Data!.Id;
             });
         }
     }
