@@ -64,6 +64,7 @@ This document contains guidelines, coding standards, and architectural patterns 
   - Provide `GetAll(...)` for summary/aggregate view across all accounts.
   - Provide `GetByBrokerAccount(..., Guid brokerAccountId)` for a single account view.
 - **Error Responses**: Exception handling must return standard RFC 7807 JSON `ProblemDetails` payloads.
+- **Operation Result Pattern (`OperationResultDto<T>`)**: For mutating operations where business validation or domain conflicts can occur (e.g. unique constraint checks like ticker uniqueness), application services and controller action methods return `OperationResultDto<T>` (`IsSuccess`, `Data`, `ErrorMessage`) rather than throwing raw unhandled exceptions. Localized error messages must be retrieved using `await _localizer.GetForUserAsync(...)`.
 
 ### Backend Localization & i18n Architecture (`ILocalizationService`)
 - **Prohibition of Hardcoded Strings**: User-facing texts, notifications, error messages, export reports, and scheduled task names/descriptions MUST NOT be hardcoded in backend code.
@@ -198,6 +199,7 @@ This document contains guidelines, coding standards, and architectural patterns 
       ? `${basicUrl}/GetByBrokerAccount?date=${date}&brokerAccountId=${brokerAccountId}`
       : `${basicUrl}/GetAll?date=${date}`;
   ```
+- **Operation Result API Functions**: For mutating endpoints returning `OperationResultDto<T>`, use universal wrappers in `client/src/api/basicApi.ts` (`createEntityWithIconResult`, `updateEntityWithIconResult`, `createEntityResult`, `updateEntityResult`, `deleteEntityResult`) with optional response mapping callbacks (`mapResponse`). Keep low-level multipart form construction (`generateForm`) encapsulated inside `basicApi.ts`.
 
 ### Client Commands
 - **Build**: `cd client && npm run build`
