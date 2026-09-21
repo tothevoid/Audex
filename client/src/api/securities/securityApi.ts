@@ -1,11 +1,19 @@
 import { SecurityHistory } from '../../models/securities/SecurityHistory';
 import { SecurityHistoryPeriod } from '../../models/securities/SecurityHistoryPeriod';
-import { createEntityWithIcon, deleteEntity, getAllEntities, getEntity, getEntityById, updateEntityWithIcon } from '../basicApi';
+import { 
+    createEntityWithIconResult, 
+    deleteEntity, 
+    getAllEntities, 
+    getEntity, 
+    getEntityById, 
+    updateEntityWithIconResult 
+} from '../basicApi';
 import { SecurityStats } from '../../models/securities/SecurityStats';
-import { SecurityEntity, SecurityEntityRequest, SecurityEntityResponse, MarketSecurityInfoEntity } from '../../models/securities/SecurityEntity';
+import { SecurityEntity, SecurityEntityResponse, MarketSecurityInfoEntity } from '../../models/securities/SecurityEntity';
 import { prepareSecurity, prepareSecurityEntityRequest } from './securityApiMapping';
 import { Nullable } from '../../shared/utilities/nullable';
 import { getStoredIconUrl } from '../iconApi';
+import { OperationResult } from '../../shared/models/OperationResult';
 
 const basicUrl = `Security`;
 const ENTITY_NAME = "securityJson"
@@ -34,16 +42,33 @@ export const getTickerHistory = async (
     );
 };
 
-export const createSecurity = async (addedSecurity: SecurityEntity, file: File | null): Promise<SecurityEntity | void> => {
-    return await createEntityWithIcon<SecurityEntityRequest, SecurityEntityResponse>(basicUrl,
-        prepareSecurityEntityRequest(addedSecurity), ENTITY_NAME, ICON_NAME, file)
-        .then((securityResponse: SecurityEntityResponse | void) => securityResponse && prepareSecurity(securityResponse));
-}
+export const createSecurity = async (
+    addedSecurity: SecurityEntity,
+    file: File | null
+): Promise<OperationResult<SecurityEntity>> => {
+    return await createEntityWithIconResult(
+        basicUrl,
+        prepareSecurityEntityRequest(addedSecurity),
+        ENTITY_NAME,
+        ICON_NAME,
+        file,
+        prepareSecurity
+    );
+};
 
-export const updateSecurity = async (modifiedSecurity: SecurityEntity, file: File | null): Promise<SecurityEntity | void> => {
-    return await updateEntityWithIcon<SecurityEntityRequest, SecurityEntityResponse>(basicUrl, prepareSecurityEntityRequest(modifiedSecurity), ENTITY_NAME, ICON_NAME, file)
-        .then((securityResponse: SecurityEntityResponse | void) => securityResponse && prepareSecurity(securityResponse));
-}
+export const updateSecurity = async (
+    modifiedSecurity: SecurityEntity,
+    file: File | null
+): Promise<OperationResult<SecurityEntity>> => {
+    return await updateEntityWithIconResult(
+        basicUrl,
+        prepareSecurityEntityRequest(modifiedSecurity),
+        ENTITY_NAME,
+        ICON_NAME,
+        file,
+        prepareSecurity
+    );
+};
 
 export const deleteSecurity = async (securityId: string): Promise<boolean> => {
     return await deleteEntity(basicUrl, securityId);

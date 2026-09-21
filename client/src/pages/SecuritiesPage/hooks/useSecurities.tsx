@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { SecurityEntity } from "../../../models/securities/SecurityEntity";
 import { createSecurity, deleteSecurity, getSecurities, updateSecurity } from "../../../api/securities/securityApi";
+import { OperationResult } from "../../../shared/models/OperationResult";
 
 export const useSecurities = () => {
 	const [securities, setSecurities] = useState<SecurityEntity[]>([]);
@@ -24,22 +25,20 @@ export const useSecurities = () => {
 		fetchData();
 	}, [fetchData])
 
-	const createSecurityEntity = async (createdSecurity: SecurityEntity, icon: File | null) => {
-		const addedSecurity = await createSecurity(createdSecurity, icon);
-		if (!addedSecurity) {
-			return;
+	const createSecurityEntity = async (createdSecurity: SecurityEntity, icon: File | null): Promise<OperationResult<SecurityEntity>> => {
+		const result = await createSecurity(createdSecurity, icon);
+		if (result.isSuccess) {
+			await fetchData();
 		}
-
-		await fetchData();
+		return result;
 	}
 
-	const updateSecurityEntity = async (updatedSecurity: SecurityEntity, icon: File | null) => {
-		const securityResponse = await updateSecurity(updatedSecurity, icon);
-		if (!securityResponse) {
-			return;
+	const updateSecurityEntity = async (updatedSecurity: SecurityEntity, icon: File | null): Promise<OperationResult<SecurityEntity>> => {
+		const result = await updateSecurity(updatedSecurity, icon);
+		if (result.isSuccess) {
+			await fetchData();
 		}
-	
-		await fetchData();
+		return result;
 	}
 
 	const deleteSecurityEntity = async (deletedSecurity: SecurityEntity) => {

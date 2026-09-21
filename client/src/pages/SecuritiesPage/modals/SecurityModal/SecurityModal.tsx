@@ -12,11 +12,12 @@ import { SecurityFormInput } from "./SecurityValidationSchema";
 import SecuritySearchForm from "./components/SecuritySearchForm";
 import SecurityDetailsForm from "./components/SecurityDetailsForm";
 import { generateGuid } from "../../../../shared/utilities/idUtilities";
+import { OperationResult } from "../../../../shared/models/OperationResult";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>;
     security?: SecurityEntity | null;
-    onSaved: (security: SecurityEntity, icon: File | null) => void;
+    onSaved: (security: SecurityEntity, icon: File | null) => Promise<OperationResult<SecurityEntity>>;
 }
 
 interface State {
@@ -109,9 +110,12 @@ const SecurityModal: React.FC<ModalProps> = ({
         setStep("details");
     };
 
-    const handleSave = (savedSecurity: SecurityEntity, icon: File | null) => {
-        onSaved(savedSecurity, icon);
-        handleClose();
+    const handleSave = async (savedSecurity: SecurityEntity, icon: File | null): Promise<OperationResult<SecurityEntity>> => {
+        const result = await onSaved(savedSecurity, icon);
+        if (result.isSuccess) {
+            handleClose();
+        }
+        return result;
     };
 
     const title = step === "search"

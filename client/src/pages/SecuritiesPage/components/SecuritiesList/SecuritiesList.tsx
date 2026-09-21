@@ -59,13 +59,17 @@ const SecuritiesList: React.FC = () => {
     };
 
     const onSecuritySaved = async (security: SecurityEntity, file: File | null) => {
+        let result;
         if (mode === ActiveEntityMode.Add) {
-            await createSecurityEntity(security, file);
+            result = await createSecurityEntity(security, file);
         } else {
-            await updateSecurityEntity(security, file);
+            result = await updateSecurityEntity(security, file);
         }
 
-        onActionEnded();
+        if (result.isSuccess) {
+            onActionEnded();
+        }
+        return result;
     };
 
     const onDeleteConfirmed = async () => {
