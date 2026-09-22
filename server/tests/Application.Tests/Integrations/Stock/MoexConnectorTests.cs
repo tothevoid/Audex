@@ -145,6 +145,37 @@ namespace Audex.Application.Tests.Integrations.Stock
             Assert.Equal(SecurityTypeConstants.PreciousMetal, result.TypeId);
         }
 
+        [Fact]
+        public async Task FindSecurityInfo_WhenQueriedByIsin_ShouldPickTradedStockOverObsoleteEntry()
+        {
+            // Arrange: Real MOEX ISS response for RU0009029540 containing both traded SBER and non-traded RU0009029540
+            var jsonResponse = @"{
+                ""securities"": {
+                    ""columns"": [""secid"", ""shortname"", ""name"", ""isin"", ""is_traded"", ""type"", ""group""],
+                    ""data"": [
+                        [""SBER"", ""Сбербанк"", ""Сбербанк России ПАО ао"", ""RU0009029540"", 1, ""common_share"", ""stock_shares""],
+                        [""RU0009029540"", ""Сбербанк"", ""ао АК Сберегательного банка РФ"", ""RU0009029540"", 0, ""common_share"", ""stock_shares""],
+                        [""SBER-001D"", ""Сбербанк-1"", ""АК Сберегательный банк РФ ао"", ""RU0009029540"", 0, ""common_share"", ""stock_shares""]
+                    ]
+                }
+            }";
+
+            var handler = new MockHttpMessageHandler(jsonResponse);
+            var httpClient = new HttpClient(handler);
+            var factory = new StubHttpClientFactory(httpClient);
+            var connector = new MoexConnector(factory);
+
+            // Act
+            var result = await connector.FindSecurityInfoAsync("RU0009029540");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("SBER", result.Ticker);
+            Assert.Equal("Сбербанк", result.Name);
+            Assert.Equal("RU0009029540", result.Isin);
+            Assert.Equal(SecurityTypeConstants.Stock, result.TypeId);
+        }
+
         private class StubHttpClientFactory(HttpClient client) : IHttpClientFactory
         {
             public HttpClient CreateClient(string name) => client;

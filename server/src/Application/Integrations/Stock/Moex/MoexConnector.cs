@@ -378,21 +378,14 @@ namespace Audex.Application.Integrations.Stock.Moex
                 return null;
             }
 
-            bool IsTraded(object[] r) => isTradedIdx >= 0 && Convert.ToInt32(r[isTradedIdx]?.ToString() ?? "0") == 1;
-            bool IsSecIdMatch(object[] r) => string.Equals(GetStringValue(r, secIdIdx), query, StringComparison.OrdinalIgnoreCase);
-            bool IsIsinMatch(object[] r) => isinIdx >= 0 && string.Equals(GetStringValue(r, isinIdx), query, StringComparison.OrdinalIgnoreCase);
-            bool IsStandard(object[] r) =>
-                IsStandardSecurity(GetStringValue(r, groupIdx), GetStringValue(r, typeIdx));
+            bool IsTraded(object[] row) => isTradedIdx >= 0 && Convert.ToInt32(row[isTradedIdx]?.ToString() ?? "0") == 1;
+            bool IsSecIdMatch(object[] row) => string.Equals(GetStringValue(row, secIdIdx), query, StringComparison.OrdinalIgnoreCase);
+            bool IsIsinMatch(object[] row) => isinIdx >= 0 && string.Equals(GetStringValue(row, isinIdx), query, StringComparison.OrdinalIgnoreCase);
+            bool IsStandard(object[] row) =>
+                IsStandardSecurity(GetStringValue(row, groupIdx), GetStringValue(row, typeIdx));
 
-            int GetMatchScore(object[] r)
-            {
-                bool isTraded = IsTraded(r);
-                if (IsSecIdMatch(r)) return isTraded ? 60 : 50;
-                if (IsIsinMatch(r)) return isTraded ? 40 : 30;
-                if (isTraded && IsStandard(r)) return 20;
-                if (isTraded) return 10;
-                return 0;
-            }
+            int GetMatchScore(object[] row) =>
+                CalculateMatchScore(IsTraded(row), IsSecIdMatch(row), IsIsinMatch(row), IsStandard(row));
 
             var bestRow = rows.MaxBy(GetMatchScore)!;
 
@@ -455,6 +448,41 @@ namespace Audex.Application.Integrations.Stock.Moex
             }
 
             return SecurityTypeConstants.Stock;
+        }
+
+        private static int CalculateMatchScore(bool isTraded, bool isSecIdMatch, bool isIsinMatch, bool isStandardSecurity)
+        {
+            int baseScore;
+            if (isSecIdMatch && isIsinMatch)
+            {
+                baseScore = 50;
+            }
+            else if (isSecIdMatch && isStandardSecurity)
+            {
+                baseScore = 45;
+            }
+            else if (isIsinMatch && isStandardSecurity)
+            {
+                baseScore = 40;
+            }
+            else if (isSecIdMatch)
+            {
+                baseScore = 35;
+            }
+            else if (isIsinMatch)
+            {
+                baseScore = 30;
+            }
+            else if (isStandardSecurity)
+            {
+                baseScore = 15;
+            }
+            else
+            {
+                baseScore = 5;
+            }
+
+            return baseScore * (isTraded ? 2 : 1);
         }
     }
 }
