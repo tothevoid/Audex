@@ -1,10 +1,11 @@
-﻿using Audex.Application.DTO.Brokers;
+using Audex.Application.DTO.Brokers;
 using Audex.Application.Interfaces.Brokers;
 using Audex.Application.Interfaces.Integrations.Stock;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Audex.Application.Interfaces.Securities;
 using Audex.Application.Interfaces.User;
 using Audex.Infrastructure.Entities.Brokers;
 
@@ -19,6 +20,7 @@ namespace Audex.Application.Services.Brokers
         private readonly IDividendPaymentService _dividendPaymentService;
         private readonly IStockConnector _stockConnector;
         private readonly IBrokerAccountTaxDeductionService _taxDeductionService;
+        private readonly ISecurityTransactionService _securityTransactionService;
 
         public BrokerAccountSummaryService(
             IBrokerAccountSecurityService brokerAccountSecurityService,
@@ -27,7 +29,8 @@ namespace Audex.Application.Services.Brokers
             IDividendPaymentService dividendPaymentService,
             IStockConnector stockConnector,
             IUserProfileService userProfileService,
-            IBrokerAccountTaxDeductionService taxDeductionService)
+            IBrokerAccountTaxDeductionService taxDeductionService,
+            ISecurityTransactionService securityTransactionService)
         {
             _brokerAccountSecurityService = brokerAccountSecurityService;
             _fundsTransferService = fundsTransferService;
@@ -36,6 +39,7 @@ namespace Audex.Application.Services.Brokers
             _dividendPaymentService = dividendPaymentService;
             _userProfileService = userProfileService;
             _taxDeductionService = taxDeductionService;
+            _securityTransactionService = securityTransactionService;
         }
 
         public async Task<BrokerAccountSummaryDto> GetSummaryAsync()
@@ -102,6 +106,9 @@ namespace Audex.Application.Services.Brokers
                 portfolioValues.TaxDeductions += portfolioValue.TaxDeductions;
                 portfolioValues.ProfitAndLoss += portfolioValue.ProfitAndLoss;
                 portfolioValues.MainCurrencyAmount += portfolioValue.MainCurrencyAmount;
+                portfolioValues.BrokerCommissions += portfolioValue.BrokerCommissions;
+                portfolioValues.StockExchangeCommissions += portfolioValue.StockExchangeCommissions;
+                portfolioValues.TransactionTaxes += portfolioValue.TransactionTaxes;
             }
 
             return portfolioValues;
@@ -120,6 +127,7 @@ namespace Audex.Application.Services.Brokers
             var depositedAmount = transfers.Sum(transfer => transfer.Income ? transfer.Amount : transfer.Amount * -1);
 
             var dividends = await _dividendPaymentService.GetEarningsByBrokerAccountAsync(brokerAccount.Id);
+            var commissionsAndTaxes = await _securityTransactionService.GetCommissionsAndTaxesAsync(brokerAccount.Id);
 
             var currentAmount = currentSecuritiesValue + mainCurrencyAmount;
 
@@ -129,7 +137,10 @@ namespace Audex.Application.Services.Brokers
                 DividendsIncome = dividends,
                 TaxDeductions = taxDeductions,
                 ProfitAndLoss = currentAmount - depositedAmount + taxDeductions,
-                MainCurrencyAmount = mainCurrencyAmount
+                MainCurrencyAmount = mainCurrencyAmount,
+                BrokerCommissions = commissionsAndTaxes.BrokerCommissions,
+                StockExchangeCommissions = commissionsAndTaxes.StockExchangeCommissions,
+                TransactionTaxes = commissionsAndTaxes.TransactionTaxes
             };
         }
 

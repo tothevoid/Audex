@@ -143,6 +143,28 @@ namespace Audex.Application.Services.Securities
             return await GetFilteredPagination();
         }
 
+        public async Task<(decimal BrokerCommissions, decimal StockExchangeCommissions, decimal TransactionTaxes)> GetCommissionsAndTaxesAsync(Guid? brokerAccountId = null)
+        {
+            Expression<Func<SecurityTransaction, bool>> filter = brokerAccountId.HasValue
+                ? transaction => transaction.BrokerAccountId == brokerAccountId.Value
+                : null;
+
+            var transactions = await _securityTransactionRepo.GetAllAsync(filter: filter, disableTracking: true);
+
+            decimal brokerCommissions = 0;
+            decimal stockExchangeCommissions = 0;
+            decimal transactionTaxes = 0;
+
+            foreach (var transaction in transactions)
+            {
+                brokerCommissions += transaction.BrokerCommission;
+                stockExchangeCommissions += transaction.StockExchangeCommission;
+                transactionTaxes += transaction.Tax;
+            }
+
+            return (brokerCommissions, stockExchangeCommissions, transactionTaxes);
+        }
+
         private async Task<PaginationConfigDto> GetFilteredPagination(Expression<Func<SecurityTransaction, bool>> filter = null)
         {
             int pageSize = 10;
@@ -173,8 +195,22 @@ namespace Audex.Application.Services.Securities
         public async Task UpdateAsync(SecurityTransactionDto securityDto)
         {
             await HandleModifiedTransaction(securityDto);
-            var securityTransaction = _mapper.Map(securityDto);
-            _securityTransactionRepo.Update(securityTransaction);
+
+            var existing = await _securityTransactionRepo.GetByIdAsync(securityDto.Id);
+            if (existing != null)
+            {
+                existing.Price = securityDto.Price;
+                existing.Quantity = securityDto.Quantity;
+                existing.BrokerCommission = securityDto.BrokerCommission;
+                existing.StockExchangeCommission = securityDto.StockExchangeCommission;
+                existing.Tax = securityDto.Tax;
+                existing.Date = securityDto.Date;
+                existing.IsSell = securityDto.IsSell;
+                existing.BrokerAccountId = securityDto.BrokerAccountId;
+                existing.SecurityId = securityDto.SecurityId;
+
+                _securityTransactionRepo.Update(existing);
+            }
             await _db.CommitAsync();
         }
 
@@ -190,7 +226,8 @@ namespace Audex.Application.Services.Securities
         {
             return await _brokerAccountSecurityRepo.FindAsync(brokerAccountSecurity =>
                 brokerAccountSecurity.BrokerAccountId == securityTransaction.BrokerAccountId &&
-                brokerAccountSecurity.SecurityId == securityTransaction.SecurityId);
+                brokerAccountSecurity.SecurityId == securityTransaction.SecurityId,
+                disableTracking: false);
         }
 
         private async Task GenerateBrokerAccountSecurity(SecurityTransactionDto securityTransaction)
@@ -278,7 +315,7 @@ namespace Audex.Application.Services.Securities
         private async Task ApplyTransactionChanges(BrokerAccountSecurity brokerAccountSecurity,
             SecurityTransactionDto modifiedSecurityTransaction)
         {
-            var committedSecurityTransaction = await _securityTransactionRepo.GetByIdAsync(modifiedSecurityTransaction.Id);
+            var committedSecurityTransaction = await _securityTransactionRepo.GetByIdAsync(modifiedSecurityTransaction.Id, disableTracking: true);
             var committedSecurityTransactionDto = _mapper.Map(committedSecurityTransaction);
 
             if (committedSecurityTransactionDto.BrokerAccountId != modifiedSecurityTransaction.BrokerAccountId ||
