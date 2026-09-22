@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,5 +19,7 @@ namespace Audex.Infrastructure.Entities.User
         public Currency Currency { get; set; }
 
         public string LanguageCode { get; set; }
+
+        public string TimeZoneId { get; set; } = "Europe/Moscow";
     }
 }

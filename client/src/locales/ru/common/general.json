@@ -53,6 +53,8 @@
     "user_profile_settings_language_placeholder": "Выберите язык",
     "user_profile_settings_theme": "Тема оформления",
     "user_profile_settings_theme_placeholder": "Выберите тему",
+    "user_profile_settings_timezone": "Часовой пояс",
+    "user_profile_settings_timezone_placeholder": "Выберите часовой пояс",
 
     "theme_toggle_title": "Переключить тему",
     "theme_light": "Светлая (Песочная)",

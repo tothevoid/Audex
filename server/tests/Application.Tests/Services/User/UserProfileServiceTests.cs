@@ -101,6 +101,7 @@ namespace Audex.Application.Tests.Services.User
                 Id = current.Id,
                 UserName = current.UserName,
                 LanguageCode = "en-US",
+                TimeZoneId = "Asia/Yekaterinburg",
                 CurrencyId = CurrencyConstants.USD
             };
 
@@ -118,6 +119,7 @@ namespace Audex.Application.Tests.Services.User
 
             Assert.NotNull(updated);
             Assert.Equal("en-US", updated.LanguageCode);
+            Assert.Equal("Asia/Yekaterinburg", updated.TimeZoneId);
             Assert.Equal(CurrencyConstants.USD, updated.CurrencyId);
             Assert.Equal(current.UserName, updated.UserName);
             Assert.Equal(current.Password, updated.Password);

@@ -1,4 +1,4 @@
-﻿using Audex.Infrastructure.Constants;
+using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Entities.Securities;
 using Audex.Infrastructure.Entities.User;
 using Audex.Infrastructure.Interfaces.Utilitary;
@@ -18,6 +18,7 @@ namespace Audex.Infrastructure.Data
                     Id = UserProfileConstants.UserProfileId, 
                     CurrencyId = CurrencyConstants.USD, 
                     LanguageCode = DefaultLanguageCode,
+                    TimeZoneId = "Europe/Moscow",
                     UserName = "admin"
                 }
             };

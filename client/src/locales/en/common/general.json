@@ -53,6 +53,8 @@
     "user_profile_settings_language_placeholder": "Select language",
     "user_profile_settings_theme": "Theme",
     "user_profile_settings_theme_placeholder": "Select theme",
+    "user_profile_settings_timezone": "Time zone",
+    "user_profile_settings_timezone_placeholder": "Select time zone",
 
     "theme_toggle_title": "Switch theme",
     "theme_light": "Light",

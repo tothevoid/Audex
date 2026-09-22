@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Audex.Application.DTO.Currencies;
 using Audex.Shared.Entities;
 
@@ -15,5 +15,7 @@ namespace Audex.Application.DTO.User
         public CurrencyDto Currency { get; set; }
 
         public string LanguageCode { get; set; }
+
+        public string TimeZoneId { get; set; } = "Europe/Moscow";
     }
 }

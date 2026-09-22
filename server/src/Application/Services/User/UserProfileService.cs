@@ -101,6 +101,11 @@ namespace Audex.Application.Services.User
                 existingUser.LanguageCode = newUserStateDto.LanguageCode;
             }
 
+            if (!string.IsNullOrEmpty(newUserStateDto.TimeZoneId))
+            {
+                existingUser.TimeZoneId = newUserStateDto.TimeZoneId;
+            }
+
             if (newUserStateDto.CurrencyId != Guid.Empty)
             {
                 existingUser.CurrencyId = newUserStateDto.CurrencyId;
