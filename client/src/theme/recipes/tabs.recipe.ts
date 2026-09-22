@@ -18,6 +18,10 @@ export const tabsSlotRecipe = defineSlotRecipe({
                 bg: "action_primary",
                 color: "white",
                 shadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
+                _hover: {
+                    bg: "action_primary",
+                    color: "white",
+                },
             },
         },
     },
@@ -44,6 +48,10 @@ export const tabsSlotRecipe = defineSlotRecipe({
                         bg: "action_primary",
                         color: "white",
                         shadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
+                        _hover: {
+                            bg: "action_primary",
+                            color: "white",
+                        },
                     },
                 },
             },
