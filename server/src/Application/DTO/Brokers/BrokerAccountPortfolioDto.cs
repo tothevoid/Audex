@@ -1,4 +1,4 @@
-﻿namespace Audex.Application.DTO.Brokers
+namespace Audex.Application.DTO.Brokers
 {
     public class BrokerAccountPortfolioDto
     {
@@ -11,5 +11,11 @@
         public decimal ProfitAndLoss { get;set; }
 
         public decimal MainCurrencyAmount { get; set;}
+
+        public decimal BrokerCommissions { get; set; }
+
+        public decimal StockExchangeCommissions { get; set; }
+
+        public decimal TransactionTaxes { get; set; }
     }
 }

@@ -5,11 +5,21 @@ using Audex.Shared.Entities;
 
 namespace Audex.Application.DTO.Securities
 {
-    public class SecurityDto: BaseEntity
+    public class SecurityDto : BaseEntity
     {
-        public string Name { get; set; }
+        private string _name = string.Empty;
+        public string Name
+        {
+            get => _name;
+            set => _name = value?.Trim() ?? string.Empty;
+        }
 
-        public string Ticker { get; set; }
+        private string _ticker = string.Empty;
+        public string Ticker
+        {
+            get => _ticker;
+            set => _ticker = value?.Trim() ?? string.Empty;
+        }
 
         public string? Isin { get; set; }
 

@@ -43,6 +43,11 @@ using Audex.Application.Services.DatabaseBackup;
 using Audex.Application.Interfaces.Scheduler;
 using Audex.Application.Services.Scheduler;
 using Audex.Application.Jobs;
+using Audex.Application.Interfaces.Common;
+using Audex.Application.Services.Common;
+using Audex.Application.Interfaces.Brokers.Statements;
+using Audex.Application.Services.Brokers.Statements;
+using Audex.Application.Services.Brokers.Statements.Vtb;
 
 namespace Audex.Application.Extensions
 {
@@ -51,6 +56,7 @@ namespace Audex.Application.Extensions
         public static IServiceCollection AddApplicationServices(
             this IServiceCollection services)
         {
+            services.AddMemoryCache();
             services.AddSingleton<ApplicationMapper>();
             services.AddTransient<ITransactionsService, TransactionsService>();
             services.AddTransient<IAccountService, AccountService>();
@@ -95,6 +101,13 @@ namespace Audex.Application.Extensions
             services.AddTransient<IAllAssetsReportService, AllAssetsReportService>();
             services.AddTransient<IBrokerAccountPortfolioHistoryService, BrokerAccountPortfolioHistoryService>();
             services.AddSingleton<IPullQuotationsService, PullQuotationsService>();
+            services.AddSingleton<ITimeZoneService, TimeZoneService>();
+
+            services.AddSingleton<VtbStatementRowParser>();
+            services.AddSingleton<IBrokerStatementImporter, VtbBrokerStatementImporter>();
+            services.AddSingleton<IBrokerStatementImporterRegistry, BrokerStatementImporterRegistry>();
+            services.AddTransient<IBrokerStatementDiffEngine, BrokerStatementDiffEngine>();
+            services.AddTransient<IBrokerStatementImportService, BrokerStatementImportService>();
 
             //TODO: make factory
             //TODO: possible change AddTransient to AddSingleton

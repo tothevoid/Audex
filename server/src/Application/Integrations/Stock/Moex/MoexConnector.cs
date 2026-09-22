@@ -87,7 +87,7 @@ namespace Audex.Application.Integrations.Stock.Moex
         private static async Task<MoexResponse> FetchTickersDataAsync(HttpClient httpClient, string query)
         {
             var result = await httpClient.GetAsync(query);
-            return await result.Content.ReadFromJsonAsync<MoexResponse>();
+            return await result.Content.ReadFromJsonAsync<MoexResponse>() ?? new MoexResponse();
         }
 
         private static async Task<IEnumerable<MarketDataRow>> FetchAndApplySecuritiesAsync(HttpClient httpClient, string query)

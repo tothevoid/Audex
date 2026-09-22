@@ -36,5 +36,54 @@ namespace Audex.Application.Services.Common
                 .ThenBy(timeZone => timeZone.DisplayName)
                 .ToList();
         }
+
+        public TimeZoneInfo ResolveTimeZone(string timeZoneId)
+        {
+            if (string.IsNullOrWhiteSpace(timeZoneId))
+            {
+                throw new ArgumentException("Time zone ID cannot be null or whitespace.", nameof(timeZoneId));
+            }
+
+            try
+            {
+                return TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
+            }
+            catch
+            {
+                if (TimeZoneInfo.TryConvertIanaIdToWindowsId(timeZoneId, out var windowsTimeZoneId))
+                {
+                    try
+                    {
+                        return TimeZoneInfo.FindSystemTimeZoneById(windowsTimeZoneId);
+                    }
+                    catch
+                    {
+                        // Fall through
+                    }
+                }
+
+                if (TimeZoneInfo.TryConvertWindowsIdToIanaId(timeZoneId, out var ianaTimeZoneId))
+                {
+                    try
+                    {
+                        return TimeZoneInfo.FindSystemTimeZoneById(ianaTimeZoneId);
+                    }
+                    catch
+                    {
+                        // Fall through
+                    }
+                }
+
+                throw new TimeZoneNotFoundException($"Time zone '{timeZoneId}' was not found.");
+            }
+        }
+
+        public DateTime ConvertToUtc(DateTime localDateTime, TimeZoneInfo timeZone)
+        {
+            var unspecifiedDateTime = DateTime.SpecifyKind(localDateTime, DateTimeKind.Unspecified);
+            var utcOffset = timeZone.GetUtcOffset(unspecifiedDateTime);
+            var dateTimeOffset = new DateTimeOffset(unspecifiedDateTime, utcOffset);
+            return dateTimeOffset.UtcDateTime;
+        }
     }
 }

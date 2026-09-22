@@ -11,10 +11,10 @@ namespace Audex.WebApi.Models.Securities
         public Guid Id { get; set; }
 
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [JsonPropertyName("ticker")]
-        public string Ticker { get; set; }
+        public string Ticker { get; set; } = string.Empty;
 
         [JsonPropertyName("isin")]
         public string? Isin { get; set; }

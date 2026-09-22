@@ -129,12 +129,21 @@ namespace Audex.Application.Constants
             public const string SetupRequired = "auth.setup_required";
         }
 
+        public static class Securities
+        {
+            public const string TickerAlreadyExists = "securities.ticker_already_exists";
+        }
+
+        public static class Statements
+        {
+            public const string ImportSessionExpired = "statements.import_session_expired";
+        }
+
         public static class Errors
         {
             public const string GeneralError = "errors.general_error";
             public const string EntityNotFound = "errors.entity_not_found";
             public const string ValidationError = "errors.validation_error";
-            public const string SecurityTickerAlreadyExists = "errors.security_ticker_already_exists";
         }
     }
 }

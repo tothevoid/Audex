@@ -46,7 +46,7 @@ namespace Audex.Application.Services.Securities
             var securities = await _securityRepo.GetAllAsync(include: GetFullHierarchyColumns, disableTracking: disableTracking);
             return _mapper.Map(securities);
         }
-        public async Task<SecurityDto> FindByTickerAsync(string ticker)
+        public async Task<SecurityDto?> FindByTickerAsync(string ticker)
         {
             return (await FindByTickersAsync([ticker])).FirstOrDefault();
         }
@@ -207,8 +207,7 @@ namespace Audex.Application.Services.Securities
                 return OperationResultDto<SecurityDto>.Failure("Ticker cannot be empty.");
             }
 
-            var trimmedTicker = securityDto.Ticker.Trim();
-            var tickerError = await ValidateTickerUniquenessAsync(trimmedTicker);
+            var tickerError = await ValidateTickerUniquenessAsync(securityDto.Ticker);
             if (tickerError != null)
             {
                 return OperationResultDto<SecurityDto>.Failure(tickerError);
@@ -216,7 +215,6 @@ namespace Audex.Application.Services.Securities
 
             var security = _mapper.Map(securityDto);
             security.Id = Guid.NewGuid();
-            security.Ticker = trimmedTicker;
             
             if (securityIcon != null)
             {
@@ -234,47 +232,49 @@ namespace Audex.Application.Services.Securities
 
         public async Task<OperationResultDto<SecurityDto>> UpdateAsync(SecurityDto securityDto, IFormFile? securityIcon)
         {
-            var trimmedTicker = securityDto.Ticker?.Trim();
-            if (!string.IsNullOrWhiteSpace(trimmedTicker))
-            {
-                var tickerError = await ValidateTickerUniquenessAsync(trimmedTicker, securityDto.Id);
-                if (tickerError != null)
-                {
-                    return OperationResultDto<SecurityDto>.Failure(tickerError);
-                }
-            }
-
             var existingSecurity = await _securityRepo.GetByIdAsync(securityDto.Id);
             if (existingSecurity == null)
             {
                 return OperationResultDto<SecurityDto>.Failure(await _localizer.GetForUserAsync(LocalizationKeys.Errors.EntityNotFound));
             }
 
-            var security = _mapper.Map(securityDto);
-            if (!string.IsNullOrWhiteSpace(trimmedTicker))
+            if (string.IsNullOrWhiteSpace(securityDto.Ticker))
             {
-                security.Ticker = trimmedTicker;
+                return OperationResultDto<SecurityDto>.Failure(await _localizer.GetForUserAsync(LocalizationKeys.Errors.ValidationError));
             }
+
+            if (!string.Equals(securityDto.Ticker, existingSecurity.Ticker, StringComparison.OrdinalIgnoreCase))
+            {
+                var tickerError = await ValidateTickerUniquenessAsync(securityDto.Ticker, securityDto.Id);
+                if (tickerError != null)
+                {
+                    return OperationResultDto<SecurityDto>.Failure(tickerError);
+                }
+            }
+
+            var oldIconKey = existingSecurity.IconKey;
+
+            _mapper.Update(securityDto, existingSecurity);
 
             if (securityIcon != null)
             {
-                security.IconKey = $"{security.Id}_{Guid.NewGuid():N}";
-                await _fileStorageService.UploadFileAsync(_iconsBucket, securityIcon, security.IconKey);
+                existingSecurity.IconKey = $"{existingSecurity.Id}_{Guid.NewGuid():N}";
+                await _fileStorageService.UploadFileAsync(_iconsBucket, securityIcon, existingSecurity.IconKey);
             }
             else if (string.IsNullOrEmpty(securityDto.IconKey))
             {
-                security.IconKey = null;
+                existingSecurity.IconKey = null;
             }
 
-            if (!string.IsNullOrEmpty(existingSecurity.IconKey) && existingSecurity.IconKey != security.IconKey)
+            if (!string.IsNullOrEmpty(oldIconKey) && oldIconKey != existingSecurity.IconKey)
             {
-                await _fileStorageService.DeleteFileAsync(_iconsBucket, existingSecurity.IconKey);
+                await _fileStorageService.DeleteFileAsync(_iconsBucket, oldIconKey);
             }
 
-            _securityRepo.Update(security);
+            _securityRepo.Update(existingSecurity);
             await _db.CommitAsync();
 
-            var updated = await GetByIdAsync(security.Id);
+            var updated = await GetByIdAsync(existingSecurity.Id);
             return OperationResultDto<SecurityDto>.Success(updated);
         }
 
@@ -313,7 +313,7 @@ namespace Audex.Application.Services.Securities
 
             if (duplicate != null)
             {
-                return await _localizer.GetForUserAsync(LocalizationKeys.Errors.SecurityTickerAlreadyExists, null, ticker);
+                return await _localizer.GetForUserAsync(LocalizationKeys.Securities.TickerAlreadyExists, null, ticker);
             }
 
             return null;

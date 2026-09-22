@@ -1,4 +1,4 @@
-﻿using Audex.Application.DTO.Securities;
+using Audex.Application.DTO.Securities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,6 +15,7 @@ namespace Audex.Application.Interfaces.Securities
         Task<IEnumerable<SecurityTransactionsHistoryDto>> GetTransactionsHistoryAsync(Guid securityId);
         Task<PaginationConfigDto> GetPaginationAsync(Guid brokerAccountId);
         Task<PaginationConfigDto> GetPaginationAsync();
+        Task<(decimal BrokerCommissions, decimal StockExchangeCommissions, decimal TransactionTaxes)> GetCommissionsAndTaxesAsync(Guid? brokerAccountId = null);
         Task<Guid> AddAsync(SecurityTransactionDto securityTransaction);
         Task UpdateAsync(SecurityTransactionDto securityTransaction);
         Task DeleteAsync(Guid id);

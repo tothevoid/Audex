@@ -14,16 +14,20 @@ namespace Audex.Application.DTO.Common
         [JsonPropertyName("errorMessage")]
         public string? ErrorMessage { get; set; }
 
+        [JsonPropertyName("errorCode")]
+        public string? ErrorCode { get; set; }
+
         public static OperationResultDto<T> Success(T data) => new()
         {
             IsSuccess = true,
             Data = data
         };
 
-        public static OperationResultDto<T> Failure(string errorMessage) => new()
+        public static OperationResultDto<T> Failure(string errorMessage, string? errorCode = null) => new()
         {
             IsSuccess = false,
-            ErrorMessage = errorMessage
+            ErrorMessage = errorMessage,
+            ErrorCode = errorCode
         };
     }
 }

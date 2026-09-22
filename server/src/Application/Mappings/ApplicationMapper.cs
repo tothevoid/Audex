@@ -63,6 +63,10 @@ namespace Audex.Application.Mappings
         public partial SecurityDto Map(Security entity);
         public partial IEnumerable<SecurityDto> Map(IEnumerable<Security> entities);
 
+        [MapperIgnoreTarget(nameof(Security.Id))]
+        [MapperIgnoreTarget(nameof(Security.IconKey))]
+        public partial void Update(SecurityDto dto, Security entity);
+
         public partial SecurityType Map(SecurityTypeDto dto);
         public partial SecurityTypeDto Map(SecurityType entity);
         public partial IEnumerable<SecurityTypeDto> Map(IEnumerable<SecurityType> entities);

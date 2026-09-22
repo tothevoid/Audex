@@ -12,7 +12,7 @@ namespace Audex.Application.Interfaces.Securities
     public interface ISecurityService
     {
         Task<IEnumerable<SecurityDto>> GetAllAsync(bool disableTracking = true);
-        Task<SecurityDto> FindByTickerAsync(string ticker);
+        Task<SecurityDto?> FindByTickerAsync(string ticker);
         Task<SecurityDto?> FindByIsinAsync(string isin);
         Task<MarketSecurityInfoDto?> SearchMarketAsync(string query);
 
