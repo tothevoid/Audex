@@ -7,6 +7,15 @@ export const formatTime = (date: Date, format: i18n) => {
 	}).format(date);
 };
 
+export const formatTimeWithSeconds = (date: Date, format: i18n) => {
+	return new Intl.DateTimeFormat(format.language, {
+		hour: "2-digit",
+		minute: "2-digit",
+		second: "2-digit"
+	}).format(date);
+};
+
+
 export const formatDate = (date: Date, format: i18n, showYear: boolean = true,) => {
 	return new Intl.DateTimeFormat(format.language, {
 		year: showYear ? "numeric" : undefined,

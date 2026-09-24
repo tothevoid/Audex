@@ -1,12 +1,36 @@
 import React from "react";
 import { Badge, Box, Card, Checkbox, Flex, HStack, Text, VStack } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
+import { i18n as I18nInstance } from "i18next";
 import { BsExclamationTriangle } from "react-icons/bs";
 import {
     BrokerStatementDiffItemEntity,
     StatementDiscrepancyField
 } from "../../../../../models/brokers/BrokerStatementImportModels";
-import { formatDiffDate, formatTradeDate } from "../statementDateUtilities";
+import { Nullable } from "../../../../../shared/utilities/nullable";
+import { formatShortDateTime, formatTimeWithSeconds } from "../../../../../shared/utilities/formatters/dateFormatter";
+
+const formatTradeDate = (dateString: string, i18n: I18nInstance): string => {
+    if (!dateString) return "";
+    return formatShortDateTime(new Date(dateString), i18n, true);
+};
+
+const formatDiffDate = (
+    databaseDateString: Nullable<string> | undefined,
+    statementDateString: string | undefined,
+    i18n: I18nInstance
+): string => {
+    if (!databaseDateString || !statementDateString) return "";
+
+    const databaseDate = new Date(databaseDateString);
+    const statementDate = new Date(statementDateString);
+
+    if (databaseDate.toDateString() === statementDate.toDateString()) {
+        return `${formatTimeWithSeconds(databaseDate, i18n)} ➔ ${formatTimeWithSeconds(statementDate, i18n)}`;
+    }
+
+    return `${formatShortDateTime(databaseDate, i18n, true)} ➔ ${formatShortDateTime(statementDate, i18n, true)}`;
+};
 
 interface Props {
     diffItem: BrokerStatementDiffItemEntity;
@@ -44,8 +68,8 @@ export const StatementTransactionDiffCard: React.FC<Props> = ({
                 diffItem.hasWarning
                     ? "orange.400"
                     : isSelected
-                    ? "action_primary"
-                    : "border_primary"
+                        ? "action_primary"
+                        : "border_primary"
             }
             borderWidth="1px"
             borderRadius="md"
