@@ -24,7 +24,7 @@ const SecurityTransaction = (props: Props) => {
         <CardBody>
             <Flex justifyContent="space-between" alignItems="center">
                 <Stack direction={'row'} alignItems="center">
-                    <Text textAlign={'center'} w={200} rounded={10} padding={1} background={bgColorTheme} color="white">{formatDateTime(date, i18n, false)}</Text>
+                    <Text textAlign={'center'} w={225} rounded={10} padding={1} background={bgColorTheme} color="white">{formatDateTime(date, i18n, true)}</Text>
                     {
                         props.isGlobalBrokerAccount &&
                         <Text textAlign={'center'} w={150} rounded={10} padding={1} background={bgColorTheme} color="white">{props.securityTransaction.brokerAccount?.name}</Text>
