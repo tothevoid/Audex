@@ -6,6 +6,26 @@ This document contains guidelines, coding standards, and architectural patterns 
 
 ---
 
+## 🧹 Clean Code & Engineering Standards
+
+### 1. No Abbreviated or Single-Letter Variable Names
+- **Meaningful Identifiers**: NEVER use abbreviated or single-letter variable names (e.g. `tz`, `tx`, `r`, `t`, `i`, `g`, `sec`, `dto`).
+- **Expressive Naming**: All variables, parameters, lambda arguments, and properties MUST have full, descriptive names reflecting their domain meaning (e.g. `timeZone`, `transaction`, `row`, `importer`, `security`, `group`, `userProfile`).
+
+### 2. Method Decomposition & Single Responsibility
+- **Logical Chunking**: Structure method bodies into logically cohesive blocks separated by clear intent.
+- **Avoid Oversized Methods**: Avoid bloated or monolithic methods. Decompose complex workflows into small, focused private/static helper methods or domain services with clear responsibilities and descriptive names.
+
+### 3. Clean Namespace Usings on Backend
+- **Avoid Fully-Qualified Type Paths**: Do NOT use fully-qualified namespace paths in code (e.g. `services.AddSingleton<Audex.Application.Interfaces.Common.ITimeZoneService, Audex.Application.Services.Common.TimeZoneService>()`).
+- **Use `using` Directives**: Always place corresponding `using` directives at the top of the C# file and use clean, unqualified type names in declarations and registrations.
+
+### 4. Leverage & Reuse Existing Codebase
+- **Explore Before Creating**: Always inspect the existing codebase before writing new functionality. Check whether helper functions, utilities, or models already exist (e.g. in `shared/utilities`, `dateUtils`, formatters, base repositories, or common services).
+- **No Redundant Boilerplate**: Reuse established patterns, shared components, and utilities rather than duplicating logic across modules.
+
+---
+
 ## 🛠️ Server (Backend) Rules & Architecture
 
 ### Stack & Solution Structure
@@ -208,16 +228,16 @@ This document contains guidelines, coding standards, and architectural patterns 
 ---
 
 ## 🔄 Verification Commands & Workflow
-- **Mandatory Pre-Verification Build Check**: BEFORE reporting completion and before asking the user about test execution or adjustments, ALWAYS verify that the modified components compile and build without errors:
-  - **Server Changes (`server/`)**: Automatically run `dotnet build` in `server/` to ensure zero compilation errors.
-  - **Client Changes (`client/`)**: Automatically run `npm run build` in `client/` to ensure zero TypeScript and bundling errors.
-  - **Both / Full-Stack Changes**: Automatically run both `dotnet build` in `server/` and `npm run build` in `client/`.
+- **Scope-Dependent Pre-Verification Build Check**: BEFORE reporting completion and before asking the user about test execution or adjustments, run build verification STRICTLY according to the scope of modified files:
+  - **Documentation / Markdown Changes Only (`MoneyManager.Docs/`, `docs/`, `*.md`)**: NEVER run any build commands (`dotnet build` or `npm run build`) or test suites. Report completion immediately.
+  - **Server Changes Only (`server/`)**: Automatically run `dotnet build` in `server/` to ensure zero compilation errors. Do NOT build the client (`npm run build`).
+  - **Client Changes Only (`client/`)**: Automatically run `npm run build` in `client/` to ensure zero TypeScript and bundling errors. Do NOT build the server (`dotnet build`).
+  - **Both / Full-Stack Changes (`server/` AND `client/`)**: Run both `dotnet build` in `server/` and `npm run build` in `client/`.
   If the build fails, fix all compilation/build errors before reporting to the user.
+- **Strict Verification Scope Isolation**: NEVER run verification commands (build or tests) for a component (client, server, or docs) if no source code changes were made to that component.
 - **Confirmation Before Long Test Suites**: Once the build succeeds, prompt the user before running long unit/integration test suites: ask whether any adjustments/corrections are needed or if we should proceed to running the test suites (`dotnet test`).
 - **Selective Test Execution**: Once confirmed by the user, execute tests selectively based on the scope of changes made during the task:
   - **Server / Application Changes**: Run `dotnet test` in `server/`.
   - **S3 / File Storage Changes**: Run `dotnet test --filter "Category=S3"` (or full `dotnet test`) in `server/`.
   - **Auth Changes**: Run `dotnet test --filter "Category=Auth"` (or full `dotnet test`) in `server/`.
   - **Full-Stack Changes**: Run `dotnet test` in `server/`.
-
-Do NOT run verification commands for a component (client or server) if no changes were made to that component.
