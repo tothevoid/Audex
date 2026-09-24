@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Audex.Infrastructure.Interfaces.Database;
@@ -36,6 +36,7 @@ namespace Audex.Infrastructure.Database
         public async Task CommitAsync()
         {
             await _applicationDbContext.SaveChangesAsync();
+            _applicationDbContext.ChangeTracker.Clear();
         }
 
         public void Dispose(bool disposing)

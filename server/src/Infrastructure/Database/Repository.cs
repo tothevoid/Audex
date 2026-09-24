@@ -146,8 +146,9 @@ namespace Audex.Infrastructure.Database
             var entry = _context.Entry(entity);
             if (entry.State == EntityState.Detached)
             {
-                _entities.Update(entity);
+                _entities.Attach(entity);
             }
+            entry.State = EntityState.Modified;
         }
 
         public async Task DeleteAsync(Guid id)
