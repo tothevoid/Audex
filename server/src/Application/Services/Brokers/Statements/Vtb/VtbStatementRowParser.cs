@@ -51,14 +51,13 @@ namespace Audex.Application.Services.Brokers.Statements.Vtb
                 matchKeywords: ["Дата и время заключения", "Дата заключения", "Дата сделки"],
                 applyValue: (cell, transaction, context) =>
                 {
-                    var (tradeDateTime, rawDateString) = ExcelCellParser.ParseDateTime(
+                    var (tradeDateTime, _) = ExcelCellParser.ParseDateTime(
                         cell,
                         context.TimeZone,
                         context.TimeZoneService,
                         RussianCulture);
 
                     transaction.TradeDateTime = tradeDateTime;
-                    transaction.RawDateTimeString = rawDateString;
                 }),
 
             new VtbColumnDefinition(

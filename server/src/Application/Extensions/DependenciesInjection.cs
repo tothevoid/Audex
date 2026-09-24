@@ -107,6 +107,7 @@ namespace Audex.Application.Extensions
             services.AddSingleton<IBrokerStatementImporter, VtbBrokerStatementImporter>();
             services.AddSingleton<IBrokerStatementImporterRegistry, BrokerStatementImporterRegistry>();
             services.AddTransient<IBrokerStatementDiffEngine, BrokerStatementDiffEngine>();
+            services.AddSingleton<IBrokerStatementSessionCache, BrokerStatementSessionCache>();
             services.AddTransient<IBrokerStatementImportService, BrokerStatementImportService>();
 
             //TODO: make factory
