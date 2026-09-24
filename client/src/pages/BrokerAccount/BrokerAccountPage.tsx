@@ -9,6 +9,8 @@ import BrokerAccountTabs, { ChangeAction } from "./components/BrokerAccountTabs/
 import BrokerAccountHeader from "./components/BrokerAccountHeader/BrokerAccountHeader";
 import { getPortfolioValues } from "../../api/brokers/brokerAccountSummaryApi";
 import { BrokerAccountPortfolioEntity } from "../../models/brokers/BrokerAccountPortfolioEntity";
+import { BrokerStatementImportModal } from "./modals/BrokerStatementImportModal/BrokerStatementImportModal";
+import { BaseModalRef } from "../../shared/utilities/modalUtilities";
 
 interface State {
     brokerAccount: BrokerAccountEntity | null,
@@ -17,6 +19,7 @@ interface State {
 
 const BrokerAccountPage: React.FC = () => {
     const securitiesRef = useRef<BrokerAccountSecuritiesListRef>(null);
+    const importModalRef = useRef<BaseModalRef>(null);
 
     const { brokerAccountId } = useParams();
 
@@ -130,10 +133,16 @@ const BrokerAccountPage: React.FC = () => {
                 onPullQuotations={pullQuotations}
                 lastPullDate={lastPullDate}
                 isReloading={state.isReloading}
+                onImportStatement={() => importModalRef.current?.openModal()}
             />
         )}
         <BrokerAccountSecuritiesList ref={securitiesRef} brokerAccountId={state.brokerAccount.id}/>
         <BrokerAccountTabs currencyName={state?.brokerAccount?.currency?.name} brokerAccountId={brokerAccountId} onActionTriggered={onActionTriggered}/>
+        <BrokerStatementImportModal
+            ref={importModalRef}
+            defaultBrokerAccountId={brokerAccountId}
+            onImportSuccess={onTransactionsChanged}
+        />
     </Fragment>
 }
 

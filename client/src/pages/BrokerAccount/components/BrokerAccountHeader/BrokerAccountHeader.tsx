@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Card, Flex, HStack, Text, Icon } from "@chakra-ui/react";
 import { formatShortDateTime } from "../../../../shared/utilities/formatters/dateFormatter";
 import { BrokerAccountPortfolioEntity } from "../../../../models/brokers/BrokerAccountPortfolioEntity";
-import { BsWallet2, BsPiggyBank, BsArrowUpRight, BsArrowDownRight, BsClockHistory, BsBank } from "react-icons/bs";
+import { BsWallet2, BsPiggyBank, BsArrowUpRight, BsArrowDownRight, BsClockHistory, BsBank, BsFileEarmarkSpreadsheet, BsPercent } from "react-icons/bs";
 import { MdRefresh } from "react-icons/md";
 import { TbReceiptTax } from "react-icons/tb";
 import { NumericMetricItem } from "../../../../shared/components/MetricItem";
@@ -16,6 +16,7 @@ interface Props {
     onPullQuotations: () => void;
     lastPullDate: Date | null;
     isReloading: boolean;
+    onImportStatement?: () => void;
 }
 
 const BrokerAccountHeader: React.FC<Props> = ({
@@ -24,7 +25,8 @@ const BrokerAccountHeader: React.FC<Props> = ({
     portfolio,
     onPullQuotations,
     lastPullDate,
-    isReloading
+    isReloading,
+    onImportStatement
 }) => {
     const { t, i18n } = useTranslation();
 
@@ -53,39 +55,67 @@ const BrokerAccountHeader: React.FC<Props> = ({
                         {name}
                     </Text>
 
-                    {/* Integrated Sync Date & Refresh Pill Button */}
-                    <HStack
-                        as="button"
-                        onClick={isReloading ? undefined : onPullQuotations}
-                        px={3}
-                        py={1.5}
-                        borderRadius="md"
-                        backgroundColor="background_secondary"
-                        borderColor="border_primary"
-                        borderWidth="1px"
-                        color="text_secondary"
-                        cursor={isReloading ? "not-allowed" : "pointer"}
-                        opacity={isReloading ? 0.6 : 1}
-                        transition="all 0.2s"
-                        _hover={isReloading ? {} : { backgroundColor: "background_primary", borderColor: "action_primary" }}
-                        alignItems="center"
-                        gap={2}
-                    >
-                        <Icon color="text_secondary">
-                            <BsClockHistory size={13} />
-                        </Icon>
-                        {lastPullDate && (
-                            <Text fontSize="xs" fontWeight={500} color="text_secondary">
-                                {formatPullDate()}
-                            </Text>
+                    <HStack gap={2}>
+                        {onImportStatement && (
+                            <HStack
+                                as="button"
+                                onClick={onImportStatement}
+                                px={3}
+                                py={1.5}
+                                borderRadius="md"
+                                backgroundColor="background_secondary"
+                                borderColor="border_primary"
+                                borderWidth="1px"
+                                color="text_secondary"
+                                cursor="pointer"
+                                transition="all 0.2s"
+                                _hover={{ backgroundColor: "background_primary", borderColor: "action_primary" }}
+                                alignItems="center"
+                                gap={2}
+                            >
+                                <Icon color="action_primary">
+                                    <BsFileEarmarkSpreadsheet size={13} />
+                                </Icon>
+                                <Text fontSize="xs" fontWeight={600} color="text_primary">
+                                    {t("broker_statement_open_button")}
+                                </Text>
+                            </HStack>
                         )}
-                        <Icon
-                            transition="transform 0.3s ease"
-                            animation={isReloading ? "loading-spin 1.5s linear infinite" : "none"}
-                            color="action_primary"
+
+                        {/* Integrated Sync Date & Refresh Pill Button */}
+                        <HStack
+                            as="button"
+                            onClick={isReloading ? undefined : onPullQuotations}
+                            px={3}
+                            py={1.5}
+                            borderRadius="md"
+                            backgroundColor="background_secondary"
+                            borderColor="border_primary"
+                            borderWidth="1px"
+                            color="text_secondary"
+                            cursor={isReloading ? "not-allowed" : "pointer"}
+                            opacity={isReloading ? 0.6 : 1}
+                            transition="all 0.2s"
+                            _hover={isReloading ? {} : { backgroundColor: "background_primary", borderColor: "action_primary" }}
+                            alignItems="center"
+                            gap={2}
                         >
-                            <MdRefresh size={16} />
-                        </Icon>
+                            <Icon color="text_secondary">
+                                <BsClockHistory size={13} />
+                            </Icon>
+                            {lastPullDate && (
+                                <Text fontSize="xs" fontWeight={500} color="text_secondary">
+                                    {formatPullDate()}
+                                </Text>
+                            )}
+                            <Icon
+                                transition="transform 0.3s ease"
+                                animation={isReloading ? "loading-spin 1.5s linear infinite" : "none"}
+                                color="action_primary"
+                            >
+                                <MdRefresh size={16} />
+                            </Icon>
+                        </HStack>
                     </HStack>
                 </Flex>
 
@@ -150,6 +180,38 @@ const BrokerAccountHeader: React.FC<Props> = ({
                         currency={currencyName}
                         size="sm"
                     />
+
+                    <NumericMetricItem
+                        icon={<BsPercent size={15} />}
+                        iconBg="rgba(249, 115, 22, 0.15)"
+                        iconColor="orange.400"
+                        label={t("broker_account_page_broker_commissions")}
+                        value={portfolio.brokerCommissions ?? 0}
+                        currency={currencyName}
+                        size="sm"
+                    />
+
+                    <NumericMetricItem
+                        icon={<BsPercent size={15} />}
+                        iconBg="rgba(236, 72, 153, 0.15)"
+                        iconColor="pink.400"
+                        label={t("broker_account_page_exchange_commissions")}
+                        value={portfolio.stockExchangeCommissions ?? 0}
+                        currency={currencyName}
+                        size="sm"
+                    />
+
+                    {Boolean(portfolio.transactionTaxes) && (
+                        <NumericMetricItem
+                            icon={<TbReceiptTax size={15} />}
+                            iconBg="rgba(239, 68, 68, 0.15)"
+                            iconColor="red.400"
+                            label={t("broker_account_page_transaction_taxes")}
+                            value={portfolio.transactionTaxes ?? 0}
+                            currency={currencyName}
+                            size="sm"
+                        />
+                    )}
                 </Flex>
             </Card.Body>
         </Card.Root>

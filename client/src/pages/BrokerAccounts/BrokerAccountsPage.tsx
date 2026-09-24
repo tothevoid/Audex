@@ -9,6 +9,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getPortfolioValues } from "../../api/brokers/brokerAccountSummaryApi";
 import { BrokerAccountPortfolioEntity } from "../../models/brokers/BrokerAccountPortfolioEntity";
+import { BrokerStatementImportModal } from "../BrokerAccount/modals/BrokerStatementImportModal/BrokerStatementImportModal";
+import { BaseModalRef } from "../../shared/utilities/modalUtilities";
 
 interface State {
     isReloading: boolean
@@ -17,6 +19,7 @@ interface State {
 const BrokerAccountsPage: React.FC = () => {
     const { t } = useTranslation();
     const securitiesRef = useRef<BrokerAccountSecuritiesListRef>(null);
+    const importModalRef = useRef<BaseModalRef>(null);
     const { user } = useUserProfile();
     // TODO: Currency can be different for each account
     const currencyName = user?.currency.name ?? "USD";
@@ -104,12 +107,17 @@ const BrokerAccountsPage: React.FC = () => {
                 lastPullDate={lastPullDate}
                 isReloading={state.isReloading}
                 onPullQuotations={pullQuotations} 
+                onImportStatement={() => importModalRef.current?.openModal()}
             />
         }
         <BrokerAccountSecuritiesList ref={securitiesRef} />
         <BrokerAccountTabs 
             currencyName={currencyName} 
             onActionTriggered={onActionTriggered}/>
+        <BrokerStatementImportModal
+            ref={importModalRef}
+            onImportSuccess={onTransactionsChanged}
+        />
     </Fragment>
 }
 

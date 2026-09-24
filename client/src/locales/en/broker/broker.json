@@ -48,6 +48,9 @@
     "broker_account_page_dividends_earnings": "Dividends earnings",
     "broker_account_page_deduction_taxes": "Tax deductions",
     "broker_account_page_securities_profit_and_loss": "Securities P&L",
+    "broker_account_page_broker_commissions": "Broker Commission",
+    "broker_account_page_exchange_commissions": "Exchange Commission",
+    "broker_account_page_transaction_taxes": "Transaction Taxes",
     "broker_account_page_last_pull_date": "Last updated: {{date}}",
 
     "broker_account_portfolio_history_date_select": "Select Date",

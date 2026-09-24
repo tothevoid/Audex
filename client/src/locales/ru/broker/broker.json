@@ -48,6 +48,9 @@
     "broker_account_page_dividends_earnings": "Доход от дивидендов",
     "broker_account_page_deduction_taxes": "Налоговые вычеты",
     "broker_account_page_securities_profit_and_loss": "P&L ценных бумаг",
+    "broker_account_page_broker_commissions": "Комиссия брокера",
+    "broker_account_page_exchange_commissions": "Комиссия биржи",
+    "broker_account_page_transaction_taxes": "Налоги со сделок",
     "broker_account_page_last_pull_date": "Обновлено: {{date}}",
 
     "broker_account_portfolio_history_date_select": "Выбрать дату",

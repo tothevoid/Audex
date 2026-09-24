@@ -6,6 +6,7 @@ import accounts from './accounts/accounts.json';
 import broker from './broker/broker.json';
 import brokerTransfers from './broker/transfers.json';
 import brokerTaxes from './broker/taxes.json';
+import brokerStatements from './broker/statements.json';
 import securities from './securities/securities.json';
 import dividends from './securities/dividends.json';
 import debts from './debts/debts.json';
@@ -28,6 +29,7 @@ const en = {
     ...broker,
     ...brokerTransfers,
     ...brokerTaxes,
+    ...brokerStatements,
     ...securities,
     ...dividends,
     ...debts,
