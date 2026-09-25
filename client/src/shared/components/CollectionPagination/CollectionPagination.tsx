@@ -1,12 +1,15 @@
 import React, { Fragment, useEffect, useState } from 'react';
-
 import { ButtonGroup, Flex, IconButton, Pagination } from '@chakra-ui/react';
-import { LuChevronLeft, LuChevronRight } from "react-icons/lu"
+import { LuChevronLeft, LuChevronRight } from "react-icons/lu";
 import { PaginationConfig } from '../../models/PaginationConfig';
 
 interface Props {
-	getPaginationConfig: () => Promise<PaginationConfig | void>;
-	onPageChanged: (pageSize: number, currentPage: number) => void;
+	getPaginationConfig?: () => Promise<PaginationConfig | void>;
+	onPageChanged?: (pageSize: number, currentPage: number) => void;
+	count?: number;
+	page?: number;
+	pageSize?: number;
+	onPageChange?: (page: number, pageSize: number) => void;
 	size?: "xs" | "sm" | "md" | "lg";
 }
 
@@ -15,48 +18,70 @@ interface State {
 	recordsQuantity: number;
 }
 
-const CollectionPagination: React.FC<Props> = ({ getPaginationConfig, onPageChanged, size = "md" }) => {
+const CollectionPagination: React.FC<Props> = ({
+	getPaginationConfig,
+	onPageChanged,
+	count,
+	page = 1,
+	pageSize: controlledPageSize,
+	onPageChange: controlledOnPageChange,
+	size = "md"
+}) => {
+	const isControlled = count !== undefined;
 	const [state, setState] = useState<State>({ pageSize: -1, recordsQuantity: -1 });
 
 	useEffect(() => {
-		const initData = async () => {
+		if (isControlled || !getPaginationConfig) {
+			return;
+		}
+
+		const initializeData = async () => {
 			await requestPaginationConfig();
 		};
-		initData();
-	}, [getPaginationConfig]);
+
+		initializeData();
+	}, [getPaginationConfig, isControlled]);
 
 	const requestPaginationConfig = async () => {
-		const paginationConfig = await getPaginationConfig();
+		if (!getPaginationConfig) {
+			return;
+		}
 
+		const paginationConfig = await getPaginationConfig();
 		if (!paginationConfig) {
 			return;
 		}
 
-		setState(currentState => ({
-			...currentState,
+		setState({
 			pageSize: paginationConfig.pageSize,
 			recordsQuantity: paginationConfig.recordsQuantity
-		}));
-		onPageChanged(paginationConfig.pageSize, 0);
+		});
+
+		onPageChanged?.(paginationConfig.pageSize, 0);
 	};
 
-	const onPageChange = (page: number, pageSize: number) => {
-		onPageChanged(pageSize, page);
+	const handlePageChange = (newPage: number, newPageSize: number) => {
+		if (controlledOnPageChange) {
+			controlledOnPageChange(newPage, newPageSize);
+		} else if (onPageChanged) {
+			onPageChanged(newPageSize, newPage);
+		}
 	};
 
-	const { pageSize, recordsQuantity } = state;
+	const effectivePageSize = isControlled ? (controlledPageSize ?? 10) : state.pageSize;
+	const effectiveTotalCount = isControlled ? count : state.recordsQuantity;
 
-	if (pageSize <= 0 || recordsQuantity <= pageSize) {
+	if (effectivePageSize <= 0 || effectiveTotalCount <= effectivePageSize) {
 		return <Fragment />;
 	}
 
 	return (
 		<Flex justifyContent="center">
 			<Pagination.Root
-				onPageChange={({ page, pageSize }) => onPageChange(page, pageSize)}
-				count={recordsQuantity}
-				pageSize={pageSize}
-				defaultPage={1}
+				{...(isControlled ? { page } : { defaultPage: 1 })}
+				onPageChange={({ page: nextPage, pageSize: nextPageSize }) => handlePageChange(nextPage, nextPageSize)}
+				count={effectiveTotalCount}
+				pageSize={effectivePageSize}
 			>
 				<ButtonGroup variant="ghost" size={size}>
 					<Pagination.PrevTrigger asChild>
@@ -65,13 +90,13 @@ const CollectionPagination: React.FC<Props> = ({ getPaginationConfig, onPageChan
 						</IconButton>
 					</Pagination.PrevTrigger>
 					<Pagination.Items
-						render={page => (
+						render={pageItem => (
 							<IconButton
 								color="text_primary"
 								size={size}
 								variant={{ base: "ghost", _selected: "outline" }}
 							>
-								{page.value}
+								{pageItem.value}
 							</IconButton>
 						)}
 					/>

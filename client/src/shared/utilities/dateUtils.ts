@@ -29,6 +29,18 @@ export const convertToDateOnly = (date: Date | string): string => {
     return `${year}-${month}-${day}`;
 };
 
+export const parseIsoDateOnly = (dateString?: string | null): Date | null => {
+    if (!dateString) {
+        return null;
+    }
+    const parts = dateString.split("-").map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) {
+        return null;
+    }
+    const [year, month, day] = parts;
+    return new Date(year, month - 1, day);
+};
+
 export const getMonthsNames = (i18n: i18n) => {
     const formatter = new Intl.DateTimeFormat(i18n.language, { month: 'long' });
 

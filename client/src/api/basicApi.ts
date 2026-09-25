@@ -1,5 +1,6 @@
 import httpClient from "./httpClient";
 import { PaginationConfig } from "../shared/models/PaginationConfig";
+import { PagedResult } from "../shared/models/PagedResult";
 import { OperationResult } from "../shared/models/OperationResult";
 import { Nullable } from "../shared/utilities/nullable";
 import { logPromiseError } from "../shared/utilities/webApiUtilities";
@@ -18,6 +19,14 @@ export const getAllEntitiesByConfig = async <TInput, TOutput>(basicUrl: string, 
         .catch(logPromiseError);
 
     return entities ?? [] as TOutput[];
+};
+
+export const getPagedEntities = async <TInput, TOutput>(basicUrl: string, data: TInput): Promise<PagedResult<TOutput>> => {
+    const pagedResult = await httpClient.post<PagedResult<TOutput>>(basicUrl, data)
+        .then((response) => response.data)
+        .catch(logPromiseError);
+
+    return pagedResult ?? { items: [], totalCount: 0, pageIndex: 0, pageSize: 0 };
 };
 
 export const createEntity = async <TRequest, TResponse>(basicUrl: string, addedEntity: TRequest): Promise<TResponse | void> => {

@@ -72,6 +72,16 @@
     "security_type_bond": "Bond",
     "security_type_currency": "Currency",
     "security_type_etf": "ETF",
-    "security_type_crypto": "Crypto"
+    "security_type_crypto": "Crypto",
+
+    "security_transactions_filter_title": "Filters",
+    "security_transactions_filter_security": "Security",
+    "security_transactions_filter_security_all": "All securities",
+    "security_transactions_filter_broker_account": "Broker account",
+    "security_transactions_filter_broker_account_all": "All broker accounts",
+    "security_transactions_filter_date_from": "Date from",
+    "security_transactions_filter_date_to": "Date to",
+    "security_transactions_filter_reset": "Reset",
+    "security_transactions_empty": "No transactions found"
 }
 

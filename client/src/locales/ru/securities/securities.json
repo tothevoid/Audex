@@ -72,6 +72,16 @@
     "security_type_bond": "Облигация",
     "security_type_currency": "Валюта",
     "security_type_etf": "ETF",
-    "security_type_crypto": "Криптовалюта"
+    "security_type_crypto": "Криптовалюта",
+
+    "security_transactions_filter_title": "Фильтры",
+    "security_transactions_filter_security": "Ценная бумага",
+    "security_transactions_filter_security_all": "Все ценные бумаги",
+    "security_transactions_filter_broker_account": "Брокерский счёт",
+    "security_transactions_filter_broker_account_all": "Все брокерские счета",
+    "security_transactions_filter_date_from": "Дата с",
+    "security_transactions_filter_date_to": "Дата по",
+    "security_transactions_filter_reset": "Сбросить",
+    "security_transactions_empty": "Сделки не найдены"
 }
 

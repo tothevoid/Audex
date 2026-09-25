@@ -1,9 +1,9 @@
-﻿using Audex.WebApi.Models.Common;
+using Audex.Shared.Common;
 using System;
 
 namespace Audex.WebApi.Models.Securities
 {
-    public class GetAllDividendsQuery: BasePageableQuery
+    public class GetAllDividendsQuery : BasePageable
     {
         public Guid SecurityId { get; set; }
     }

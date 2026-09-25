@@ -1,26 +1,22 @@
 import { SecurityTransactionEntity, SecurityTransactionEntityRequest, SecurityTransactionEntityResponse } from '../../models/securities/SecurityTransactionEntity';
 import { SecurityTransactionsHistory } from '../../models/securities/SecurityTransactionsHistory';
 import { SecurityTransactionsRequest } from '../../models/securities/SecurityTransactionsRequest';
-import { PaginationConfig } from '../../shared/models/PaginationConfig';
-import { Nullable } from '../../shared/utilities/nullable';
-import { createEntity, deleteEntity, getAllEntities, getAllEntitiesByConfig, getPagination, updateEntity } from '../basicApi';
+import { PagedResult } from '../../shared/models/PagedResult';
+import { createEntity, deleteEntity, getAllEntities, getPagedEntities, updateEntity } from '../basicApi';
 import { prepareSecurityTransaction } from './securityTransactionApiMapping';
 
 const basicUrl = `SecurityTransaction`;
 
-export const getSecurityTransactions = async (request: SecurityTransactionsRequest): Promise<SecurityTransactionEntity[]> => {
-    return await getAllEntitiesByConfig<SecurityTransactionsRequest, SecurityTransactionEntityResponse> (`${basicUrl}/GetAll`, request)
-        .then((securityTransactions: SecurityTransactionEntityResponse[]) => {
-            return securityTransactions.map(prepareSecurityTransaction)
-        })
-};
+export const getSecurityTransactions = async (request: SecurityTransactionsRequest): Promise<PagedResult<SecurityTransactionEntity>> => {
+    const pagedResult = await getPagedEntities<SecurityTransactionsRequest, SecurityTransactionEntityResponse>(
+        `${basicUrl}/GetAll`,
+        request
+    );
 
-export const getSecurityTransactionsPagination = async (brokerAccountId: Nullable<string>): Promise<PaginationConfig | void> => {
-    const url = brokerAccountId ?
-        `${basicUrl}/GetPaginationByBrokerAccount?brokerAccountId=${brokerAccountId}` :
-        `${basicUrl}/GetPagination`;
-    
-    return getPagination(url);
+    return {
+        ...pagedResult,
+        items: (pagedResult.items ?? []).map(prepareSecurityTransaction)
+    };
 };
 
 export const getTransactionsBySecurity = async (securityId: string): Promise<SecurityTransactionsHistory[]> => {

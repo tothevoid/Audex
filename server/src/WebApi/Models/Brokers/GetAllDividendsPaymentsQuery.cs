@@ -1,9 +1,9 @@
-﻿using Audex.WebApi.Models.Common;
+using Audex.Shared.Common;
 using System;
 
 namespace Audex.WebApi.Models.Brokers
 {
-    public class GetAllDividendsPaymentsQuery: BasePageableQuery
+    public class GetAllDividendsPaymentsQuery : BasePageable
     {
         public Guid? BrokerAccountId { get; set; }
     }
