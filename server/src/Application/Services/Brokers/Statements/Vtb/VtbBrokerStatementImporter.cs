@@ -59,17 +59,20 @@ namespace Audex.Application.Services.Brokers.Statements.Vtb
             var firstRowNumber = worksheet.FirstRowUsed()?.RowNumber() ?? 1;
             var lastRowNumber = worksheet.LastRowUsed()?.RowNumber() ?? firstRowNumber;
 
+            bool hasProcessedSecuritiesTable = false;
+            bool hasProcessedCurrenciesTable = false;
+
             for (int currentRowNumber = firstRowNumber; currentRowNumber <= lastRowNumber; currentRowNumber++)
             {
                 var row = worksheet.Row(currentRowNumber);
 
                 var sectionTitle = FindSectionTitle(row);
-                if (sectionTitle == null || IsSettledSecuritiesSection(sectionTitle))
+                if (sectionTitle == null)
                 {
                     continue;
                 }
 
-                if (IsSecuritiesSection(sectionTitle))
+                if (!hasProcessedSecuritiesTable && IsSecuritiesSection(sectionTitle))
                 {
                     currentRowNumber = ParseTable(
                         worksheet,
@@ -78,8 +81,9 @@ namespace Audex.Application.Services.Brokers.Statements.Vtb
                         isCurrencyTable: false,
                         timeZone,
                         transactions);
+                    hasProcessedSecuritiesTable = true;
                 }
-                else if (IsCurrenciesSection(sectionTitle))
+                else if (!hasProcessedCurrenciesTable && IsCurrenciesSection(sectionTitle))
                 {
                     currentRowNumber = ParseTable(
                         worksheet,
@@ -88,6 +92,7 @@ namespace Audex.Application.Services.Brokers.Statements.Vtb
                         isCurrencyTable: true,
                         timeZone,
                         transactions);
+                    hasProcessedCurrenciesTable = true;
                 }
             }
         }
@@ -200,10 +205,5 @@ namespace Audex.Application.Services.Brokers.Statements.Vtb
             text.Contains("сделки с иностранной валютой", StringComparison.OrdinalIgnoreCase) ||
             text.Contains("сделки с валютой", StringComparison.OrdinalIgnoreCase) ||
             text.Contains("сделки с драгоценными металлами", StringComparison.OrdinalIgnoreCase);
-
-        private static bool IsSettledSecuritiesSection(string text) =>
-            IsSecuritiesSection(text) &&
-            (text.Contains("завершенные", StringComparison.OrdinalIgnoreCase) ||
-             text.Contains("обязательства прекращены", StringComparison.OrdinalIgnoreCase));
     }
 }

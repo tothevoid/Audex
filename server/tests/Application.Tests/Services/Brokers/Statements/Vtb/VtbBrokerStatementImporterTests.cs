@@ -220,8 +220,8 @@ namespace Audex.Application.Tests.Services.Brokers.Statements.Vtb
             using var workbook = new XLWorkbook();
             var ws = workbook.Worksheets.Add("Отчет");
 
-            // Header matching user's VTB screenshot for currency deals
-            ws.Cell(1, 1).Value = "Завершенные в отчетном периоде сделки с иностранной валютой (обязательства прекращены)";
+            // Header matching concluded currency deals table
+            ws.Cell(1, 1).Value = "Сделки с иностранной валютой";
 
             ws.Cell(2, 1).Value = "Финансовый инструмент";
             ws.Cell(2, 2).Value = "Дата и время заключения сделки";
@@ -332,8 +332,8 @@ namespace Audex.Application.Tests.Services.Brokers.Statements.Vtb
 
             ws.Cell(9, 1).Value = "Итого:";
 
-            // Section 3: Settled currency deals (MUST be parsed!)
-            ws.Cell(11, 1).Value = "Завершенные в отчетном периоде сделки с иностранной валютой (обязательства прекращены)";
+            // Section 3: Concluded currency deals
+            ws.Cell(11, 1).Value = "Сделки с иностранной валютой";
             ws.Cell(12, 1).Value = "Финансовый инструмент";
             ws.Cell(12, 2).Value = "Дата и время заключения сделки";
             ws.Cell(12, 3).Value = "Вид сделки";
@@ -375,6 +375,92 @@ namespace Audex.Application.Tests.Services.Brokers.Statements.Vtb
             Assert.Null(gold.Isin);
             Assert.Equal("GLDRUB_TOM", gold.Ticker);
             Assert.Equal("CB742554787", gold.TradeNumber);
+        }
+
+        [Fact]
+        public async Task ParseAsync_Should_Deduplicate_Currency_Deals_Present_In_Both_Concluded_And_Settled_Tables()
+        {
+            // Arrange
+            var importer = new VtbBrokerStatementImporter();
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Отчет");
+
+            // Section 1: Concluded currency deals
+            worksheet.Cell(1, 1).Value = "Сделки с иностранной валютой";
+            worksheet.Cell(2, 1).Value = "Финансовый инструмент";
+            worksheet.Cell(2, 2).Value = "Дата и время заключения сделки";
+            worksheet.Cell(2, 3).Value = "Вид сделки";
+            worksheet.Cell(2, 4).Value = "Количество (шт.)";
+            worksheet.Cell(2, 5).Value = "Цена";
+            worksheet.Cell(2, 6).Value = "Валюта расчетов";
+            worksheet.Cell(2, 7).Value = "Сумма сделки в валюте расчетов";
+            worksheet.Cell(2, 8).Value = "Комиссия Банка за расчет по сделке";
+            worksheet.Cell(2, 9).Value = "Комиссия Банка за заключение сделки";
+            worksheet.Cell(2, 10).Value = "Дата исполнения";
+            worksheet.Cell(2, 11).Value = "№ заявки";
+            worksheet.Cell(2, 12).Value = "№ сделки";
+
+            worksheet.Cell(3, 1).Value = "GLDRUB_TOM";
+            worksheet.Cell(3, 2).Value = "10.06.2026 11:47:58";
+            worksheet.Cell(3, 3).Value = "Покупка";
+            worksheet.Cell(3, 4).Value = "1,0";
+            worksheet.Cell(3, 5).Value = "9 596,0";
+            worksheet.Cell(3, 6).Value = "RUR";
+            worksheet.Cell(3, 7).Value = "9 596,00";
+            worksheet.Cell(3, 8).Value = "1,00";
+            worksheet.Cell(3, 9).Value = "23,99";
+            worksheet.Cell(3, 10).Value = "11.06.2026";
+            worksheet.Cell(3, 11).Value = "40039143864";
+            worksheet.Cell(3, 12).Value = "CB745436299";
+
+            worksheet.Cell(4, 1).Value = "Итого:";
+
+            // Section 2: Settled currency deals with the EXACT same trade
+            worksheet.Cell(6, 1).Value = "Завершенные в отчетном периоде сделки с иностранной валютой (обязательства прекращены)";
+            worksheet.Cell(7, 1).Value = "Финансовый инструмент";
+            worksheet.Cell(7, 2).Value = "Дата и время заключения сделки";
+            worksheet.Cell(7, 3).Value = "Вид сделки";
+            worksheet.Cell(7, 4).Value = "Количество (шт.)";
+            worksheet.Cell(7, 5).Value = "Цена";
+            worksheet.Cell(7, 6).Value = "Валюта расчетов";
+            worksheet.Cell(7, 7).Value = "Сумма сделки в валюте расчетов";
+            worksheet.Cell(7, 8).Value = "Комиссия Банка за расчет по сделке";
+            worksheet.Cell(7, 9).Value = "Комиссия Банка за заключение сделки";
+            worksheet.Cell(7, 10).Value = "Дата исполнения";
+            worksheet.Cell(7, 11).Value = "№ заявки";
+            worksheet.Cell(7, 12).Value = "№ сделки";
+
+            worksheet.Cell(8, 1).Value = "GLDRUB_TOM";
+            worksheet.Cell(8, 2).Value = "10.06.2026 11:47:58";
+            worksheet.Cell(8, 3).Value = "Покупка";
+            worksheet.Cell(8, 4).Value = "1,0";
+            worksheet.Cell(8, 5).Value = "9 596,0";
+            worksheet.Cell(8, 6).Value = "RUR";
+            worksheet.Cell(8, 7).Value = "9 596,00";
+            worksheet.Cell(8, 8).Value = "1,00";
+            worksheet.Cell(8, 9).Value = "23,99";
+            worksheet.Cell(8, 10).Value = "11.06.2026";
+            worksheet.Cell(8, 11).Value = "40039143864";
+            worksheet.Cell(8, 12).Value = "CB745436299";
+
+            worksheet.Cell(9, 1).Value = "Итого:";
+
+            using var memoryStream = new MemoryStream();
+            workbook.SaveAs(memoryStream);
+            memoryStream.Position = 0;
+
+            // Act
+            var transactions = await importer.ParseAsync(memoryStream, "Europe/Moscow");
+
+            // Assert: Must deduplicate to exactly 1 transaction
+            Assert.NotNull(transactions);
+            Assert.Single(transactions);
+
+            var deal = transactions[0];
+            Assert.Equal("GLDRUB_TOM", deal.Ticker);
+            Assert.Equal(1, deal.Quantity);
+            Assert.Equal(9596.0m, deal.Price);
+            Assert.Equal("CB745436299", deal.TradeNumber);
         }
     }
 }
