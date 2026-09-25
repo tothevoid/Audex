@@ -27,6 +27,8 @@ export const StatementConfigStep: React.FC<Props> = ({
     const { t } = useTranslation();
     const { user } = useUserProfile();
 
+    const isAccountLocked = Boolean(defaultBrokerAccountId);
+
     const [importers, setImporters] = useState<BrokerStatementImporterEntity[]>([]);
     const [timeZones, setTimeZones] = useState<TimeZoneEntity[]>([]);
     const [brokerAccounts, setBrokerAccounts] = useState<BrokerAccountEntity[]>([]);
@@ -85,13 +87,15 @@ export const StatementConfigStep: React.FC<Props> = ({
                 }
             }
 
-            if (!selectedAccountId && loadedAccounts.length > 0) {
+            if (defaultBrokerAccountId) {
+                setSelectedAccountId(defaultBrokerAccountId);
+            } else if (!selectedAccountId && loadedAccounts.length > 0) {
                 setSelectedAccountId(loadedAccounts[0].id);
             }
         };
 
         loadReferenceData();
-    }, []);
+    }, [defaultBrokerAccountId]);
 
     const handleAnalyzeClicked = () => {
         if (!selectedFile) {
@@ -169,10 +173,15 @@ export const StatementConfigStep: React.FC<Props> = ({
                 <BaseSelect<BrokerAccountEntity>
                     collection={brokerAccounts}
                     selectedValue={selectedAccount}
-                    onSelected={(account) => account && setSelectedAccountId(account.id)}
+                    onSelected={(account) => {
+                        if (!isAccountLocked && account) {
+                            setSelectedAccountId(account.id);
+                        }
+                    }}
                     labelSelector={(account) => account.name}
                     valueSelector={(account) => account.id}
                     placeholder={t("broker_statement_select_account_placeholder")}
+                    isDisabled={isAccountLocked}
                 />
             </Box>
 

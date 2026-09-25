@@ -33,12 +33,14 @@ export const BrokerStatementImportModal = forwardRef<BaseModalRef, Props>(
         const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
         const [statementConfig, setStatementConfig] = useState<StatementConfig | null>(null);
         const [analysisResult, setAnalysisResult] = useState<Nullable<BrokerStatementAnalysisResultEntity>>(null);
+        const [modalSessionKey, setModalSessionKey] = useState<number>(0);
 
         useImperativeHandle(ref, () => ({
             openModal: () => {
                 setStep(1);
                 setStatementConfig(null);
                 setAnalysisResult(null);
+                setModalSessionKey((previousKey) => previousKey + 1);
                 onOpen();
             },
             closeModal: onClose
@@ -100,6 +102,7 @@ export const BrokerStatementImportModal = forwardRef<BaseModalRef, Props>(
                             <Dialog.Body pb={6}>
                                 {step === 1 && (
                                     <StatementConfigStep
+                                        key={modalSessionKey}
                                         defaultBrokerAccountId={defaultBrokerAccountId}
                                         isAnalyzing={isAnalyzing}
                                         onSubmit={handleConfigSubmit}

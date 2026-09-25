@@ -14,11 +14,13 @@ export interface BaseSelectProps<T, IsClearable extends boolean = false> {
 }
 
 export const selectChakraStyles: ChakraStylesConfig = {
-    control: (provided) => ({
+    control: (provided, state) => ({
         ...provided,
-        backgroundColor: "background_primary",
+        backgroundColor: state.isDisabled ? "background_secondary" : "background_primary",
         borderColor: "border_primary",
-        color: "text_primary",
+        color: state.isDisabled ? "text_secondary" : "text_primary",
+        opacity: state.isDisabled ? 0.7 : 1,
+        cursor: state.isDisabled ? "not-allowed" : "default",
         _hover: {
             borderColor: "border_primary",
         },
@@ -32,9 +34,9 @@ export const selectChakraStyles: ChakraStylesConfig = {
                 ? "background_secondary"
                 : "background_primary",
     }),
-    singleValue: (provided) => ({
+    singleValue: (provided, state) => ({
         ...provided,
-        color: "text_primary",
+        color: state.isDisabled ? "text_secondary" : "text_primary",
     }),
     menuList: (provided) => ({
         ...provided,
