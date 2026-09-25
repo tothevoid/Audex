@@ -182,7 +182,8 @@ namespace Audex.Application.Tests.Services.Brokers.Statements
             await ExecuteScopeAsync(async scopeProvider =>
             {
                 var transactionService = scopeProvider.GetRequiredService<ISecurityTransactionService>();
-                var transactions = (await transactionService.GetAllAsync(brokerAccountId, 10, 1)).ToList();
+                var filter = new SecurityTransactionsFilterDto { BrokerAccountId = brokerAccountId, RecordsQuantity = 10, PageIndex = 1 };
+                var transactions = (await transactionService.GetAllAsync(filter)).Items.ToList();
                 Assert.Single(transactions);
                 Assert.Equal(securityId, transactions[0].SecurityId);
                 Assert.Equal(250m, transactions[0].Price);
@@ -276,7 +277,8 @@ namespace Audex.Application.Tests.Services.Brokers.Statements
             await ExecuteScopeAsync(async scopeProvider =>
             {
                 var transactionService = scopeProvider.GetRequiredService<ISecurityTransactionService>();
-                var transactions = (await transactionService.GetAllAsync(brokerAccountId, 10, 1)).ToList();
+                var filter = new SecurityTransactionsFilterDto { BrokerAccountId = brokerAccountId, RecordsQuantity = 10, PageIndex = 1 };
+                var transactions = (await transactionService.GetAllAsync(filter)).Items.ToList();
                 Assert.Single(transactions);
                 Assert.Equal(220m, transactions[0].Price);
                 Assert.Equal(2m, transactions[0].BrokerCommission);
@@ -371,7 +373,8 @@ namespace Audex.Application.Tests.Services.Brokers.Statements
                 Assert.Equal("RU0009029540", createdSecurity.Isin);
 
                 var transactionService = scopeProvider.GetRequiredService<ISecurityTransactionService>();
-                var transactions = (await transactionService.GetAllAsync(brokerAccountId, 10, 1)).ToList();
+                var filter = new SecurityTransactionsFilterDto { BrokerAccountId = brokerAccountId, RecordsQuantity = 10, PageIndex = 1 };
+                var transactions = (await transactionService.GetAllAsync(filter)).Items.ToList();
                 Assert.Single(transactions);
                 Assert.Equal(createdSecurity.Id, transactions[0].SecurityId);
                 Assert.Equal(300m, transactions[0].Price);

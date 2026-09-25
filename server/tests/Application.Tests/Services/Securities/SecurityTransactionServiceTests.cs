@@ -39,10 +39,12 @@ namespace Audex.Application.Tests.Services.Securities
 
             Assert.NotEqual(Guid.Empty, addedId);
 
-            var all = await ExecuteScopeAsync(async sp =>
+            var all = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ISecurityTransactionService>();
-                return await service.GetAllAsync(brokerAccountId, 10, 1);
+                var service = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                var filter = new SecurityTransactionsFilterDto { BrokerAccountId = brokerAccountId, RecordsQuantity = 10, PageIndex = 1 };
+                var result = await service.GetAllAsync(filter);
+                return result.Items;
             });
 
             Assert.NotNull(all);
@@ -85,10 +87,12 @@ namespace Audex.Application.Tests.Services.Securities
                 });
             });
 
-            var all = await ExecuteScopeAsync(async sp =>
+            var all = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ISecurityTransactionService>();
-                return await service.GetAllAsync(brokerAccountId, 10, 1);
+                var service = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                var filter = new SecurityTransactionsFilterDto { BrokerAccountId = brokerAccountId, RecordsQuantity = 10, PageIndex = 1 };
+                var result = await service.GetAllAsync(filter);
+                return result.Items;
             });
 
             var updated = all.FirstOrDefault(st => st.Id == addedId);
@@ -127,7 +131,9 @@ namespace Audex.Application.Tests.Services.Securities
             var listAfterDelete = await ExecuteScopeAsync(async sp =>
             {
                 var service = sp.GetRequiredService<ISecurityTransactionService>();
-                return await service.GetAllAsync(brokerAccountId, 10, 1);
+                var filter = new SecurityTransactionsFilterDto { BrokerAccountId = brokerAccountId, RecordsQuantity = 10, PageIndex = 1 };
+                var result = await service.GetAllAsync(filter);
+                return result.Items;
             });
 
             Assert.DoesNotContain(listAfterDelete, st => st.Id == addedId);
@@ -264,6 +270,170 @@ namespace Audex.Application.Tests.Services.Securities
             Assert.Equal(12, msftAll.ActualQuantity); // 6 + 6
             Assert.Equal(2204m, msftAll.PurchasePriceSum); // 1004 + 1200
             Assert.Equal(477m, msftAll.SellPriceSum);
+        }
+
+        [Fact]
+        public async Task TestGetAllAndPaginationWithFilters()
+        {
+            var (securityIdFirst, brokerAccountIdFirst) = await SetupDependencies();
+
+            var securityTypeId = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISecurityTypeService>();
+                return await service.AddAsync(new SecurityTypeDto { Name = "SecTx Stock 2" });
+            });
+
+            var securityIdSecond = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISecurityService>();
+                var addedSecurity = await service.AddAsync(new SecurityDto
+                {
+                    Name = "Apple",
+                    Ticker = "AAPL",
+                    TypeId = securityTypeId,
+                    CurrencyId = CurrencyConstants.USD,
+                    ActualPrice = 180m
+                }, null);
+                return addedSecurity.Data!.Id;
+            });
+
+            var brokerId = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<IBrokerService>();
+                return await service.AddAsync(new BrokerDto { Name = "SecTx Broker 2" });
+            });
+
+            var brokerAccountTypeId = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<IBrokerAccountTypeService>();
+                return await service.AddAsync(new BrokerAccountTypeDto { Name = "Standard Broker Acc 2" });
+            });
+
+            var brokerAccountIdSecond = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<IBrokerAccountService>();
+                return await service.AddAsync(new BrokerAccountDto
+                {
+                    Name = "SecTx Broker Acc 2",
+                    BrokerId = brokerId,
+                    TypeId = brokerAccountTypeId,
+                    CurrencyId = CurrencyConstants.USD
+                });
+            });
+
+            var transactionFirstId = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                return await service.AddAsync(new SecurityTransactionDto
+                {
+                    SecurityId = securityIdFirst,
+                    BrokerAccountId = brokerAccountIdFirst,
+                    Quantity = 5,
+                    Price = 100m,
+                    Date = new DateTime(2026, 1, 10, 12, 0, 0, DateTimeKind.Utc),
+                    IsSell = false
+                });
+            });
+
+            var transactionSecondId = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                return await service.AddAsync(new SecurityTransactionDto
+                {
+                    SecurityId = securityIdSecond,
+                    BrokerAccountId = brokerAccountIdFirst,
+                    Quantity = 3,
+                    Price = 150m,
+                    Date = new DateTime(2026, 2, 15, 12, 0, 0, DateTimeKind.Utc),
+                    IsSell = false
+                });
+            });
+
+            var transactionThirdId = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                return await service.AddAsync(new SecurityTransactionDto
+                {
+                    SecurityId = securityIdFirst,
+                    BrokerAccountId = brokerAccountIdSecond,
+                    Quantity = 10,
+                    Price = 120m,
+                    Date = new DateTime(2026, 3, 20, 12, 0, 0, DateTimeKind.Utc),
+                    IsSell = false
+                });
+            });
+
+            // 1. Filter by SecurityId
+            var securityFilterResult = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                var filter = new SecurityTransactionsFilterDto
+                {
+                    SecurityId = securityIdFirst,
+                    RecordsQuantity = 10,
+                    PageIndex = 1
+                };
+                return await service.GetAllAsync(filter);
+            });
+
+            Assert.Contains(securityFilterResult.Items, item => item.Id == transactionFirstId);
+            Assert.Contains(securityFilterResult.Items, item => item.Id == transactionThirdId);
+            Assert.DoesNotContain(securityFilterResult.Items, item => item.Id == transactionSecondId);
+            Assert.Equal(2, securityFilterResult.TotalCount);
+
+            // 2. Filter by BrokerAccountId
+            var brokerAccountFilterResult = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                var filter = new SecurityTransactionsFilterDto
+                {
+                    BrokerAccountId = brokerAccountIdFirst,
+                    RecordsQuantity = 10,
+                    PageIndex = 1
+                };
+                return await service.GetAllAsync(filter);
+            });
+
+            Assert.Contains(brokerAccountFilterResult.Items, item => item.Id == transactionFirstId);
+            Assert.Contains(brokerAccountFilterResult.Items, item => item.Id == transactionSecondId);
+            Assert.DoesNotContain(brokerAccountFilterResult.Items, item => item.Id == transactionThirdId);
+            Assert.Equal(2, brokerAccountFilterResult.TotalCount);
+
+            // 3. Filter by Date range
+            var dateFilterResult = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                var filter = new SecurityTransactionsFilterDto
+                {
+                    StartDate = new DateOnly(2026, 2, 1),
+                    EndDate = new DateOnly(2026, 2, 28),
+                    RecordsQuantity = 10,
+                    PageIndex = 1
+                };
+                return await service.GetAllAsync(filter);
+            });
+
+            Assert.Single(dateFilterResult.Items);
+            Assert.Contains(dateFilterResult.Items, item => item.Id == transactionSecondId);
+            Assert.Equal(1, dateFilterResult.TotalCount);
+
+            // 4. Combined filter
+            var combinedFilterResult = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                var filter = new SecurityTransactionsFilterDto
+                {
+                    SecurityId = securityIdFirst,
+                    BrokerAccountId = brokerAccountIdFirst,
+                    RecordsQuantity = 10,
+                    PageIndex = 1
+                };
+                return await service.GetAllAsync(filter);
+            });
+
+            Assert.Single(combinedFilterResult.Items);
+            Assert.Contains(combinedFilterResult.Items, item => item.Id == transactionFirstId);
+            Assert.Equal(1, combinedFilterResult.TotalCount);
         }
 
         private async Task<(Guid securityId, Guid brokerAccountId)> SetupDependencies()

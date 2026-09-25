@@ -1,9 +1,9 @@
-using Audex.Shared.Common;
 using System;
+using Audex.Shared.Common;
 
-namespace Audex.WebApi.Models.Securities
+namespace Audex.Application.DTO.Securities
 {
-    public class GetAllSecuritiesTransactionsQuery : BasePageable
+    public class SecurityTransactionsFilterDto : BasePageable
     {
         public Guid? BrokerAccountId { get; set; }
 

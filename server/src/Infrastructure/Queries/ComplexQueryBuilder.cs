@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using Audex.Shared.Common;
 using Audex.Shared.Entities;
 
 namespace Audex.Infrastructure.Queries
@@ -52,6 +53,24 @@ namespace Audex.Infrastructure.Queries
 
             _complexQuery.RecordsLimit = recordsQuantity;
             _complexQuery.RecordsOffset = (pageIndex - 1) * recordsQuantity;
+
+            return this;
+        }
+
+        public ComplexQueryBuilder<TEntity> AddPagination(
+            BasePageable pageable,
+            Expression<Func<TEntity, object>> orderBy = null,
+            bool isDescending = false)
+        {
+            if (pageable != null && pageable.PageIndex > 0 && pageable.RecordsQuantity > 0)
+            {
+                return AddPagination(pageable.PageIndex, pageable.RecordsQuantity, orderBy, isDescending);
+            }
+
+            if (orderBy != null)
+            {
+                AddOrder(orderBy, isDescending);
+            }
 
             return this;
         }

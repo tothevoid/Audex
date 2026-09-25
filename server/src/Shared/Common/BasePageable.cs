@@ -1,6 +1,6 @@
-﻿namespace Audex.WebApi.Models.Common
+namespace Audex.Shared.Common
 {
-    public class BasePageableQuery
+    public class BasePageable
     {
         public int RecordsQuantity { get; set; }
 

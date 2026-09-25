@@ -4,7 +4,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Audex.Application.DTO.Common;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Brokers;
 using Audex.Application.Interfaces.Securities;
@@ -14,6 +13,7 @@ using Audex.Infrastructure.Entities.Brokers;
 using Audex.Infrastructure.Entities.Securities;
 using Audex.Infrastructure.Interfaces.Database;
 using Audex.Infrastructure.Queries;
+using Audex.Shared.Common;
 
 namespace Audex.Application.Services.Securities
 {
@@ -42,23 +42,37 @@ namespace Audex.Application.Services.Securities
             _dividendPaymentRepo = uow.CreateRepository<DividendPayment>();
         }
 
-        public async Task<IEnumerable<SecurityTransactionDto>> GetAllAsync(Guid? brokerAccountId,
-            int recordsQuantity, int pageIndex)
+        public async Task<PagedResult<SecurityTransactionDto>> GetAllAsync(SecurityTransactionsFilterDto filter)
         {
-            var query = new ComplexQueryBuilder<SecurityTransaction>()
+            var query = CreateFilteredQueryBuilder(filter)
                 .AddJoins(GetFullHierarchyColumns)
-                .AddPagination(pageIndex, recordsQuantity,
-                    securityTransaction => securityTransaction.Date,
-                    true);
-
-            if (brokerAccountId != null)
-            {
-                query.AddFilter(GetBaseFilter((Guid) brokerAccountId));
-            }
+                .AddPagination(filter, securityTransaction => securityTransaction.Date, true);
 
             var brokerAccountSecurities = await _securityTransactionRepo
                 .GetAllAsync(query.GetQuery());
-            return _mapper.Map(brokerAccountSecurities);
+            var items = _mapper.Map(brokerAccountSecurities).ToList();
+
+            var pageIndex = filter != null && filter.PageIndex > 0 ? filter.PageIndex : 1;
+            var pageSize = filter != null && filter.RecordsQuantity > 0 ? filter.RecordsQuantity : (items.Count > 0 ? items.Count : 10);
+
+            int totalCount;
+            if (pageIndex == 1 && items.Count < pageSize)
+            {
+                totalCount = items.Count;
+            }
+            else
+            {
+                var filterQuery = CreateFilteredQueryBuilder(filter);
+                totalCount = await _securityTransactionRepo.GetCountAsync(filterQuery.GetQuery());
+            }
+
+            return new PagedResult<SecurityTransactionDto>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
         }
 
         public async Task<Dictionary<string, SecurityTransactionsSummaryDto>> GetSummaryTillSpecificDateAsync(DateOnly date, Guid? brokerAccountId)
@@ -132,17 +146,6 @@ namespace Audex.Application.Services.Securities
             return convertedTransactions;
         }
 
-        public async Task<PaginationConfigDto> GetPaginationAsync(Guid brokerAccountId)
-        {
-            var filter = GetBaseFilter(brokerAccountId);
-            return await GetFilteredPagination(filter);
-        }
-
-        public async Task<PaginationConfigDto> GetPaginationAsync()
-        {
-            return await GetFilteredPagination();
-        }
-
         public async Task<(decimal BrokerCommissions, decimal StockExchangeCommissions, decimal TransactionTaxes)> GetCommissionsAndTaxesAsync(Guid? brokerAccountId = null)
         {
             Expression<Func<SecurityTransaction, bool>> filter = brokerAccountId.HasValue
@@ -165,21 +168,38 @@ namespace Audex.Application.Services.Securities
             return (brokerCommissions, stockExchangeCommissions, transactionTaxes);
         }
 
-        private async Task<PaginationConfigDto> GetFilteredPagination(Expression<Func<SecurityTransaction, bool>> filter = null)
+        private static ComplexQueryBuilder<SecurityTransaction> CreateFilteredQueryBuilder(SecurityTransactionsFilterDto filter)
         {
-            int pageSize = 10;
-            var recordsQuantity = await _securityTransactionRepo.GetCountAsync(filter);
+            var builder = new ComplexQueryBuilder<SecurityTransaction>();
 
-            return new PaginationConfigDto()
+            if (filter == null)
             {
-                PageSize = pageSize,
-                RecordsQuantity = recordsQuantity
-            };
-        }
+                return builder;
+            }
 
-        private Expression<Func<SecurityTransaction, bool>> GetBaseFilter(Guid brokerAccountId)
-        {
-            return transaction => transaction.BrokerAccountId == brokerAccountId;
+            if (filter.BrokerAccountId.HasValue && filter.BrokerAccountId.Value != Guid.Empty)
+            {
+                builder.AddFilter(transaction => transaction.BrokerAccountId == filter.BrokerAccountId.Value);
+            }
+
+            if (filter.SecurityId.HasValue && filter.SecurityId.Value != Guid.Empty)
+            {
+                builder.AddFilter(transaction => transaction.SecurityId == filter.SecurityId.Value);
+            }
+
+            if (filter.StartDate.HasValue)
+            {
+                var startDateTime = filter.StartDate.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+                builder.AddFilter(transaction => transaction.Date >= startDateTime);
+            }
+
+            if (filter.EndDate.HasValue)
+            {
+                var endDateTime = filter.EndDate.Value.AddDays(1).ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+                builder.AddFilter(transaction => transaction.Date < endDateTime);
+            }
+
+            return builder;
         }
 
         public async Task<Guid> AddAsync(SecurityTransactionDto securityDto)

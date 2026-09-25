@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System;
@@ -6,7 +6,7 @@ using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Securities;
 using Audex.WebApi.Mappings;
 using Audex.WebApi.Models.Securities;
-using Audex.WebApi.Models.Common;
+using Audex.Shared.Common;
 using Microsoft.AspNetCore.Authorization;
 
 namespace Audex.WebApi.Controllers.Securities
@@ -27,27 +27,12 @@ namespace Audex.WebApi.Controllers.Securities
         }
 
         [HttpPost(nameof(GetAll))]
-        public async Task<IEnumerable<SecurityTransactionModel>> GetAll(GetAllSecuritiesTransactionsQuery request)
+        public async Task<PagedResult<SecurityTransactionModel>> GetAll(GetAllSecuritiesTransactionsQuery request)
         {
-            var securityTransactions = await _securityTransactionService
-                .GetAllAsync(request.BrokerAccountId, request.RecordsQuantity, request.PageIndex);
-            return _mapper.Map(securityTransactions);
-        }
-
-        [HttpGet(nameof(GetPaginationByBrokerAccount))]
-        public async Task<PaginationConfigModel> GetPaginationByBrokerAccount([FromQuery] Guid brokerAccountId)
-        {
-            var pagination = await _securityTransactionService
-                .GetPaginationAsync(brokerAccountId);
-            return _mapper.Map(pagination);
-        }
-
-        [HttpGet(nameof(GetPagination))]
-        public async Task<PaginationConfigModel> GetPagination()
-        {
-            var pagination = await _securityTransactionService
-                .GetPaginationAsync();
-            return _mapper.Map(pagination);
+            var filter = _mapper.Map(request);
+            var pagedResult = await _securityTransactionService
+                .GetAllAsync(filter);
+            return _mapper.Map(pagedResult);
         }
 
         [HttpGet(nameof(GetTransactionsHistory))]

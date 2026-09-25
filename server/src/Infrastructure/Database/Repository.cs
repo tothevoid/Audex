@@ -141,6 +141,21 @@ namespace Audex.Infrastructure.Database
             return await query.CountAsync();
         }
 
+        public async Task<int> GetCountAsync(ComplexQuery<TEntity> complexQuery)
+        {
+            IQueryable<TEntity> query = _entities.AsQueryable().AsNoTracking();
+
+            if (complexQuery != null)
+            {
+                foreach (var filter in complexQuery.Filters)
+                {
+                    query = query.Where(filter);
+                }
+            }
+
+            return await query.CountAsync();
+        }
+
         public void Update(TEntity entity)
         {
             var entry = _context.Entry(entity);

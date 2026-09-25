@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -27,6 +27,7 @@ namespace Audex.Infrastructure.Interfaces.Database
             Expression<Func<TEntity, bool>> filter = null);
 
         Task<int> GetCountAsync(Expression<Func<TEntity, bool>> filter = null);
+        Task<int> GetCountAsync(ComplexQuery<TEntity> complexQuery);
 
         Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> predicate,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> include = null,

@@ -5,6 +5,7 @@ using Audex.Application.DTO.Accounts;
 using Audex.Application.DTO.Banks;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.DTO.Common;
+using Audex.Shared.Common;
 using Audex.Application.DTO.Crypto;
 using Audex.Application.DTO.Currencies;
 using Audex.Application.DTO.Dashboard;
@@ -112,6 +113,8 @@ namespace Audex.WebApi.Mappings
         public partial SecurityTransactionDto Map(SecurityTransactionModel model);
         public partial SecurityTransactionModel Map(SecurityTransactionDto dto);
         public partial IEnumerable<SecurityTransactionModel> Map(IEnumerable<SecurityTransactionDto> dtos);
+        public partial PagedResult<SecurityTransactionModel> Map(PagedResult<SecurityTransactionDto> dto);
+        public partial SecurityTransactionsFilterDto Map(GetAllSecuritiesTransactionsQuery query);
 
         public partial UserProfileDto Map(UserProfileModel model);
         public partial UserProfileModel Map(UserProfileDto dto);
