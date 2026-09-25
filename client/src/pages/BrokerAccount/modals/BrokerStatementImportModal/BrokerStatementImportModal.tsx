@@ -1,15 +1,11 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
 import {
-    Button,
     CloseButton,
     Dialog,
-    HStack,
     Portal,
-    Text,
     useDisclosure
 } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { BsArrowLeft } from "react-icons/bs";
 import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
 import { Nullable } from "../../../../shared/utilities/nullable";
 import { analyzeBrokerStatement } from "../../../../api/brokers/brokerStatementImportApi";
@@ -99,38 +95,23 @@ export const BrokerStatementImportModal = forwardRef<BaseModalRef, Props>(
                                 </Dialog.Title>
                             </Dialog.Header>
 
-                            <Dialog.Body pb={6}>
-                                {step === 1 && (
-                                    <StatementConfigStep
-                                        key={modalSessionKey}
-                                        defaultBrokerAccountId={defaultBrokerAccountId}
-                                        isAnalyzing={isAnalyzing}
-                                        onSubmit={handleConfigSubmit}
-                                    />
-                                )}
-                                {step === 2 && analysisResult && (
-                                    <StatementAnalysisResultStep
-                                        analysisResult={analysisResult}
-                                        onImportSuccess={onImportSuccess}
-                                        onReanalyzeRequested={handleReanalyzeRequested}
-                                    />
-                                )}
-                            </Dialog.Body>
-
-                            <Dialog.Footer gap={3}>
-                                {step === 1 ? (
-                                    <Button onClick={onClose} variant="outline">
-                                        {t("modals_cancel_button")}
-                                    </Button>
-                                ) : (
-                                    <Button variant="outline" onClick={() => setStep(1)}>
-                                        <HStack gap={1.5}>
-                                            <BsArrowLeft size={13} />
-                                            <Text>{t("broker_statement_btn_back")}</Text>
-                                        </HStack>
-                                    </Button>
-                                )}
-                            </Dialog.Footer>
+                            {step === 1 && (
+                                <StatementConfigStep
+                                    key={modalSessionKey}
+                                    defaultBrokerAccountId={defaultBrokerAccountId}
+                                    isAnalyzing={isAnalyzing}
+                                    onSubmit={handleConfigSubmit}
+                                    onCancel={onClose}
+                                />
+                            )}
+                            {step === 2 && analysisResult && (
+                                <StatementAnalysisResultStep
+                                    analysisResult={analysisResult}
+                                    onImportSuccess={onImportSuccess}
+                                    onReanalyzeRequested={handleReanalyzeRequested}
+                                    onBack={() => setStep(1)}
+                                />
+                            )}
 
                             <Dialog.CloseTrigger asChild>
                                 <CloseButton onClick={onClose} size="sm" color="text_primary" />

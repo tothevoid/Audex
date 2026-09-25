@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import {
     Box,
     Button,
     CloseButton,
+    Dialog,
     Flex,
     HStack,
     Spinner,
@@ -11,7 +12,7 @@ import {
     VStack
 } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { BsCheckCircle, BsExclamationTriangle } from "react-icons/bs";
+import { BsArrowLeft, BsCheckCircle, BsExclamationTriangle } from "react-icons/bs";
 import { GrTransaction } from "react-icons/gr";
 import { HiOutlineDocumentReport } from "react-icons/hi";
 import { applyStatementDiffs } from "../../../../../api/brokers/brokerStatementImportApi";
@@ -27,12 +28,14 @@ interface Props {
     analysisResult: BrokerStatementAnalysisResultEntity;
     onImportSuccess: () => Promise<void> | void;
     onReanalyzeRequested: () => void;
+    onBack: () => void;
 }
 
 export const StatementAnalysisResultStep: React.FC<Props> = ({
     analysisResult,
     onImportSuccess,
-    onReanalyzeRequested
+    onReanalyzeRequested,
+    onBack
 }) => {
     const { t } = useTranslation();
 
@@ -140,9 +143,11 @@ export const StatementAnalysisResultStep: React.FC<Props> = ({
     const showCheckbox = activeFilter === "all" || activeFilter === "new" || activeFilter === "discrepancies";
 
     return (
-        <VStack gap={4} align="stretch">
-            {applyFeedback && (
-                <Box
+        <Fragment>
+            <Dialog.Body pb={6}>
+                <VStack gap={4} align="stretch">
+                    {applyFeedback && (
+                        <Box
                     p={3}
                     borderRadius="md"
                     backgroundColor="pnl_positive_bg"
@@ -294,33 +299,43 @@ export const StatementAnalysisResultStep: React.FC<Props> = ({
                     </Box>
                 </Tabs.Content>
             </Tabs.Root>
-
-            {/* Apply / Done actions — owned by this step, not the parent footer */}
-            <Flex justify="flex-end">
-                {selectedDiffIds.size > 0 ? (
-                    <Button variant="solid" onClick={handleApplyClicked} disabled={isApplying}>
-                        {isApplying ? (
-                            <HStack gap={2}>
-                                <Spinner size="xs" />
-                                <Text>{t("broker_statement_applying")}</Text>
-                            </HStack>
-                        ) : (
-                            <HStack gap={1.5}>
-                                <BsCheckCircle size={13} />
-                                <Text>
-                                    {t("broker_statement_btn_apply")} ({selectedDiffIds.size})
-                                </Text>
-                            </HStack>
-                        )}
-                    </Button>
-                ) : (
-                    applyFeedback && (
-                        <Text fontSize="sm" color="pnl_positive" fontWeight={500}>
-                            ✓ {t("broker_statement_btn_done")}
-                        </Text>
-                    )
-                )}
-            </Flex>
         </VStack>
+    </Dialog.Body>
+
+    <Dialog.Footer justifyContent="space-between" width="100%">
+        <Button variant="outline" onClick={onBack}>
+            <HStack gap={1.5}>
+                <BsArrowLeft size={13} />
+                <Text>{t("broker_statement_btn_back")}</Text>
+            </HStack>
+        </Button>
+
+        <HStack gap={3}>
+            {selectedDiffIds.size > 0 ? (
+                <Button variant="solid" onClick={handleApplyClicked} disabled={isApplying}>
+                    {isApplying ? (
+                        <HStack gap={2}>
+                            <Spinner size="xs" />
+                            <Text>{t("broker_statement_applying")}</Text>
+                        </HStack>
+                    ) : (
+                        <HStack gap={1.5}>
+                            <BsCheckCircle size={13} />
+                            <Text>
+                                {t("broker_statement_btn_apply")} ({selectedDiffIds.size})
+                            </Text>
+                        </HStack>
+                    )}
+                </Button>
+            ) : (
+                applyFeedback && (
+                    <Text fontSize="sm" color="pnl_positive" fontWeight={500}>
+                        ✓ {t("broker_statement_btn_done")}
+                    </Text>
+                )
+            )}
+        </HStack>
+    </Dialog.Footer>
+</Fragment>
     );
 };

@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Box, Button, HStack, Spinner, Text, VStack } from "@chakra-ui/react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
+import { Box, Button, Dialog, HStack, Spinner, Text, VStack } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BsFileEarmarkSpreadsheet, BsUpload } from "react-icons/bs";
 import { getBrokerAccounts } from "../../../../../api/brokers/brokerAccountApi";
@@ -17,12 +17,14 @@ interface Props {
     defaultBrokerAccountId?: Nullable<string>;
     isAnalyzing: boolean;
     onSubmit: (config: StatementConfig) => void;
+    onCancel: () => void;
 }
 
 export const StatementConfigStep: React.FC<Props> = ({
     defaultBrokerAccountId,
     isAnalyzing,
-    onSubmit
+    onSubmit,
+    onCancel
 }) => {
     const { t } = useTranslation();
     const { user } = useUserProfile();
@@ -149,117 +151,123 @@ export const StatementConfigStep: React.FC<Props> = ({
     const fileSizeInKilobytes = selectedFile ? (selectedFile.size / 1024).toFixed(1) : null;
 
     return (
-        <VStack gap={4} align="stretch">
-            {/* Importer Selector */}
-            <Box>
-                <Text fontSize="sm" fontWeight={600} mb={1.5} color="text_primary">
-                    {t("broker_statement_field_importer")}
-                </Text>
-                <BaseSelect<BrokerStatementImporterEntity>
-                    collection={importers}
-                    selectedValue={selectedImporter}
-                    onSelected={(importer) => importer && setSelectedImporterId(importer.id)}
-                    labelSelector={(importer) => importer.name}
-                    valueSelector={(importer) => importer.id}
-                    placeholder={t("broker_statement_select_importer_placeholder")}
-                />
-            </Box>
-
-            {/* Broker Account Selector */}
-            <Box>
-                <Text fontSize="sm" fontWeight={600} mb={1.5} color="text_primary">
-                    {t("broker_statement_field_broker_account")}
-                </Text>
-                <BaseSelect<BrokerAccountEntity>
-                    collection={brokerAccounts}
-                    selectedValue={selectedAccount}
-                    onSelected={(account) => {
-                        if (!isAccountLocked && account) {
-                            setSelectedAccountId(account.id);
-                        }
-                    }}
-                    labelSelector={(account) => account.name}
-                    valueSelector={(account) => account.id}
-                    placeholder={t("broker_statement_select_account_placeholder")}
-                    isDisabled={isAccountLocked}
-                />
-            </Box>
-
-            {/* Time Zone Selector */}
-            <Box>
-                <Text fontSize="sm" fontWeight={600} mb={1.5} color="text_primary">
-                    {t("broker_statement_field_timezone")}
-                </Text>
-                <BaseSelect<TimeZoneEntity>
-                    collection={timeZones}
-                    selectedValue={selectedTimeZone}
-                    onSelected={(timeZone) => timeZone && setSelectedTimeZoneId(timeZone.id)}
-                    labelSelector={(timeZone) => timeZone.displayName}
-                    valueSelector={(timeZone) => timeZone.id}
-                    placeholder={t("broker_statement_select_timezone_placeholder")}
-                />
-            </Box>
-
-            {/* File Drag and Drop Area */}
-            <Box>
-                <Text fontSize="sm" fontWeight={600} mb={1.5} color="text_primary">
-                    {t("broker_statement_field_file")}
-                </Text>
-                <Box
-                    onDragOver={(event) => event.preventDefault()}
-                    onDrop={handleDrop}
-                    borderWidth="2px"
-                    borderStyle="dashed"
-                    borderColor={selectedFile ? "action_primary" : "border_primary"}
-                    borderRadius="xl"
-                    p={6}
-                    textAlign="center"
-                    backgroundColor="background_secondary"
-                    cursor="pointer"
-                    transition="all 0.2s"
-                    _hover={{ borderColor: "action_primary" }}
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept={supportedExtensions}
-                        style={{ display: "none" }}
-                        onChange={handleFileChange}
-                    />
-                    <VStack gap={2}>
-                        <Box color="action_primary" fontSize="32px">
-                            {selectedFile ? <BsFileEarmarkSpreadsheet /> : <BsUpload />}
-                        </Box>
-                        <Text
-                            fontSize="sm"
-                            fontWeight={600}
-                            color="text_primary"
-                            maxW="100%"
-                            wordBreak="break-word"
-                            overflowWrap="anywhere"
-                            textAlign="center"
-                            px={2}
-                        >
-                            {selectedFile ? selectedFile.name : t("broker_statement_drop_file_here")}
+        <Fragment>
+            <Dialog.Body pb={6}>
+                <VStack gap={4} align="stretch">
+                    {/* Importer Selector */}
+                    <Box>
+                        <Text fontSize="sm" fontWeight={600} mb={1.5} color="text_primary">
+                            {t("broker_statement_field_importer")}
                         </Text>
-                        {fileSizeInKilobytes && (
-                            <Text fontSize="xs" color="text_secondary">
-                                {fileSizeInKilobytes} KB
-                            </Text>
-                        )}
-                    </VStack>
-                </Box>
-            </Box>
+                        <BaseSelect<BrokerStatementImporterEntity>
+                            collection={importers}
+                            selectedValue={selectedImporter}
+                            onSelected={(importer) => importer && setSelectedImporterId(importer.id)}
+                            labelSelector={(importer) => importer.name}
+                            valueSelector={(importer) => importer.id}
+                            placeholder={t("broker_statement_select_importer_placeholder")}
+                        />
+                    </Box>
 
-            {validationError && (
-                <Text fontSize="xs" color="loss" fontWeight={500}>
-                    {validationError}
-                </Text>
-            )}
+                    {/* Broker Account Selector */}
+                    <Box>
+                        <Text fontSize="sm" fontWeight={600} mb={1.5} color="text_primary">
+                            {t("broker_statement_field_broker_account")}
+                        </Text>
+                        <BaseSelect<BrokerAccountEntity>
+                            collection={brokerAccounts}
+                            selectedValue={selectedAccount}
+                            onSelected={(account) => {
+                                if (!isAccountLocked && account) {
+                                    setSelectedAccountId(account.id);
+                                }
+                            }}
+                            labelSelector={(account) => account.name}
+                            valueSelector={(account) => account.id}
+                            placeholder={t("broker_statement_select_account_placeholder")}
+                            isDisabled={isAccountLocked}
+                        />
+                    </Box>
 
-            {/* Analyze action — owned by this step */}
-            <HStack justify="flex-end">
+                    {/* Time Zone Selector */}
+                    <Box>
+                        <Text fontSize="sm" fontWeight={600} mb={1.5} color="text_primary">
+                            {t("broker_statement_field_timezone")}
+                        </Text>
+                        <BaseSelect<TimeZoneEntity>
+                            collection={timeZones}
+                            selectedValue={selectedTimeZone}
+                            onSelected={(timeZone) => timeZone && setSelectedTimeZoneId(timeZone.id)}
+                            labelSelector={(timeZone) => timeZone.displayName}
+                            valueSelector={(timeZone) => timeZone.id}
+                            placeholder={t("broker_statement_select_timezone_placeholder")}
+                        />
+                    </Box>
+
+                    {/* File Drag and Drop Area */}
+                    <Box>
+                        <Text fontSize="sm" fontWeight={600} mb={1.5} color="text_primary">
+                            {t("broker_statement_field_file")}
+                        </Text>
+                        <Box
+                            onDragOver={(event) => event.preventDefault()}
+                            onDrop={handleDrop}
+                            borderWidth="2px"
+                            borderStyle="dashed"
+                            borderColor={selectedFile ? "action_primary" : "border_primary"}
+                            borderRadius="xl"
+                            p={6}
+                            textAlign="center"
+                            backgroundColor="background_secondary"
+                            cursor="pointer"
+                            transition="all 0.2s"
+                            _hover={{ borderColor: "action_primary" }}
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept={supportedExtensions}
+                                style={{ display: "none" }}
+                                onChange={handleFileChange}
+                            />
+                            <VStack gap={2}>
+                                <Box color="action_primary" fontSize="32px">
+                                    {selectedFile ? <BsFileEarmarkSpreadsheet /> : <BsUpload />}
+                                </Box>
+                                <Text
+                                    fontSize="sm"
+                                    fontWeight={600}
+                                    color="text_primary"
+                                    maxW="100%"
+                                    wordBreak="break-word"
+                                    overflowWrap="anywhere"
+                                    textAlign="center"
+                                    px={2}
+                                >
+                                    {selectedFile ? selectedFile.name : t("broker_statement_drop_file_here")}
+                                </Text>
+                                {fileSizeInKilobytes && (
+                                    <Text fontSize="xs" color="text_secondary">
+                                        {fileSizeInKilobytes} KB
+                                    </Text>
+                                )}
+                            </VStack>
+                        </Box>
+                    </Box>
+
+                    {validationError && (
+                        <Text fontSize="xs" color="loss" fontWeight={500}>
+                            {validationError}
+                        </Text>
+                    )}
+                </VStack>
+            </Dialog.Body>
+
+            <Dialog.Footer gap={3}>
+                <Button onClick={onCancel} variant="outline">
+                    {t("modals_cancel_button")}
+                </Button>
                 <Button variant="solid" onClick={handleAnalyzeClicked} disabled={isAnalyzing}>
                     {isAnalyzing ? (
                         <HStack gap={2}>
@@ -270,7 +278,7 @@ export const StatementConfigStep: React.FC<Props> = ({
                         t("broker_statement_analyze_button")
                     )}
                 </Button>
-            </HStack>
-        </VStack>
+            </Dialog.Footer>
+        </Fragment>
     );
 };
