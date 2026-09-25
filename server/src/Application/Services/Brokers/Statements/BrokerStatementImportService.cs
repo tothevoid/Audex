@@ -248,7 +248,7 @@ namespace Audex.Application.Services.Brokers.Statements
                 return null;
             }
 
-            var marketInfo = await _stockConnector.FindSecurityInfoAsync(query);
+            var marketInfo = await _securityService.SearchMarketAsync(query);
             if (marketInfo == null)
             {
                 return null;

@@ -13,6 +13,7 @@ using Audex.Application.Interfaces.FileStorage;
 using Audex.Application.Interfaces.Integrations.Stock;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Securities;
+using Audex.Application.Integrations.Stock.Moex.Model;
 using Audex.Application.Mappings;
 using Audex.Infrastructure.Entities.Brokers;
 using Audex.Infrastructure.Entities.Currencies;
@@ -68,7 +69,18 @@ namespace Audex.Application.Services.Securities
 
         public async Task<MarketSecurityInfoDto?> SearchMarketAsync(string query)
         {
-            return await _stockConnector.FindSecurityInfoAsync(query);
+            var marketInfo = await _stockConnector.FindSecurityInfoAsync(query);
+            if (marketInfo == null)
+            {
+                return null;
+            }
+
+            if (!marketInfo.LastPrice.HasValue || marketInfo.LastPrice.Value <= 0)
+            {
+                marketInfo.LastPrice = await FetchActualPriceAsync(marketInfo.Ticker, marketInfo.TypeId);
+            }
+
+            return marketInfo;
         }
 
         public async Task<IEnumerable<SecurityDto>> FindByTickersAsync(IEnumerable<string> tickers)
@@ -215,6 +227,13 @@ namespace Audex.Application.Services.Securities
 
             var security = _mapper.Map(securityDto);
             security.Id = Guid.NewGuid();
+
+            var actualMarketPrice = await FetchActualPriceAsync(security.Ticker, security.TypeId);
+            if (actualMarketPrice.HasValue && actualMarketPrice.Value > 0)
+            {
+                security.ActualPrice = actualMarketPrice.Value;
+                security.PriceFetchedAt = DateTime.UtcNow;
+            }
             
             if (securityIcon != null)
             {
@@ -228,6 +247,40 @@ namespace Audex.Application.Services.Securities
 
             var created = await GetByIdAsync(security.Id);
             return OperationResultDto<SecurityDto>.Success(created);
+        }
+
+        private async Task<decimal?> FetchActualPriceAsync(string ticker, Guid typeId)
+        {
+            try
+            {
+                var marketDataRows = await _stockConnector.GetValuesByTickersAsync([
+                    new SecurityDto
+                    {
+                        Ticker = ticker,
+                        TypeId = typeId
+                    }
+                ]);
+
+                var latestMarketRow = marketDataRows
+                    .Where(marketRow => (marketRow.LastValue ?? marketRow.MarketPrice) != null)
+                    .OrderByDescending(marketRow => marketRow.Date)
+                    .FirstOrDefault();
+
+                if (latestMarketRow != null)
+                {
+                    var price = latestMarketRow.GetLastValue();
+                    if (price > 0)
+                    {
+                        return price;
+                    }
+                }
+            }
+            catch
+            {
+                // Fall back if exchange connector fails or quotation is unavailable
+            }
+
+            return null;
         }
 
         public async Task<OperationResultDto<SecurityDto>> UpdateAsync(SecurityDto securityDto, IFormFile? securityIcon)

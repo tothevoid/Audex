@@ -1,8 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Securities;
+using Audex.Application.Interfaces.Integrations.Stock;
 using Audex.Application.Interfaces.Securities;
+using Audex.Application.Integrations.Stock.Moex.Model;
 using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
+using Audex.Tests.Shared.Mock;
 
 namespace Audex.Application.Tests.Services.Securities
 {
@@ -376,6 +379,42 @@ namespace Audex.Application.Tests.Services.Securities
             Assert.False(result.IsSuccess);
             Assert.NotNull(result.ErrorMessage);
             Assert.Contains("ticker_one", result.ErrorMessage);
+        }
+
+        [Fact]
+        public async Task TestAdd_WhenStockConnectorHasQuotation_ShouldSetActualPriceFromConnector()
+        {
+            var typeId = await CreateSecurityType("PreciousMetal");
+
+            await ExecuteScopeAsync(sp =>
+            {
+                var stockConnector = (MockStockConnector)sp.GetRequiredService<IStockConnector>();
+                stockConnector.GetValuesByTickersHandler = tickers =>
+                {
+                    var rows = tickers.Select(t => new MarketDataRow
+                    {
+                        Ticker = t.Ticker,
+                        LastValue = 9930.10m,
+                        Date = DateTime.UtcNow
+                    });
+                    return Task.FromResult<IEnumerable<MarketDataRow>>(rows.ToList());
+                };
+                return Task.CompletedTask;
+            });
+
+            var dto = new SecurityDto
+            {
+                Name = "Золото",
+                Ticker = $"GLD_{Guid.NewGuid():N}"[..8],
+                TypeId = typeId,
+                CurrencyId = CurrencyConstants.RUB,
+                ActualPrice = 9386.80m
+            };
+
+            var added = await AddSecurityAsync(dto);
+
+            Assert.NotNull(added);
+            Assert.Equal(9930.10m, added.ActualPrice);
         }
 
         private async Task<SecurityDto> AddSecurityAsync(SecurityDto dto, Microsoft.AspNetCore.Http.IFormFile? icon = null)

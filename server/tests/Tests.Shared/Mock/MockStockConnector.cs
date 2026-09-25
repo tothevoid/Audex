@@ -15,11 +15,19 @@ namespace Audex.Tests.Shared.Mock
         public Dictionary<string, MarketSecurityInfoDto> Securities { get; } = new(StringComparer.OrdinalIgnoreCase);
 
         public Func<string, Task<MarketSecurityInfoDto?>>? FindSecurityInfoHandler { get; set; }
+        public Func<IEnumerable<SecurityDto>, Task<IEnumerable<MarketDataRow>>>? GetValuesByTickersHandler { get; set; }
 
         public int FindCallsCount { get; private set; }
 
-        public Task<IEnumerable<MarketDataRow>> GetValuesByTickersAsync(IEnumerable<SecurityDto> tickers) =>
-            Task.FromResult(Enumerable.Empty<MarketDataRow>());
+        public Task<IEnumerable<MarketDataRow>> GetValuesByTickersAsync(IEnumerable<SecurityDto> tickers)
+        {
+            if (GetValuesByTickersHandler != null)
+            {
+                return GetValuesByTickersHandler(tickers);
+            }
+
+            return Task.FromResult(Enumerable.Empty<MarketDataRow>());
+        }
 
         public Task<IEnumerable<SecurityHistoryValueDto>> GetTickerHistoryAsync(SecurityDto security, DateOnly from, DateOnly to, int interval = 24) =>
             Task.FromResult(Enumerable.Empty<SecurityHistoryValueDto>());
