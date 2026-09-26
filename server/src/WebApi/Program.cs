@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +31,6 @@ builder.Services.AddInfrastructureManagerClient(builder.Configuration);
 
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
-builder.Services.AddMvc();
 
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
