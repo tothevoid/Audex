@@ -1,4 +1,6 @@
-﻿namespace Audex.WebApi.Models.Brokers
+using System.Collections.Generic;
+
+namespace Audex.WebApi.Models.Brokers
 {
     public class BrokerAccountMonthTransferModel
     {
@@ -7,5 +9,8 @@
         public decimal TotalDeposited { get; set; }
 
         public decimal TotalWithdrawn { get; set; }
+
+        public List<BrokerAccountTransferAccountValueModel> AccountValues { get; set; } = new();
     }
 }
+

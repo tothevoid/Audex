@@ -1,8 +1,4 @@
-﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Audex.Application.DTO.Brokers
 {
@@ -13,5 +9,8 @@ namespace Audex.Application.DTO.Brokers
         public decimal TotalDeposited { get; set; }
 
         public decimal TotalWithdrawn { get; set; }
+
+        public List<BrokerAccountTransferAccountValueDto> AccountValues { get; set; } = new();
     }
 }
+

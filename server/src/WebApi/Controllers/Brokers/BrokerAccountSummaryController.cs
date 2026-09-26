@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System;
@@ -41,28 +41,28 @@ namespace Audex.WebApi.Controllers.Brokers
         }
 
         [HttpGet(nameof(GetMonthTransfersHistory))]
-        public async Task<IEnumerable<BrokerAccountDayTransferModel>> GetMonthTransfersHistory(int month, int year)
+        public async Task<BrokerAccountMonthTransfersHistoryModel> GetMonthTransfersHistory(int month, int year)
         {
             var brokerAccount = await _brokerAccountSummaryService.GetMonthTransfersHistoryAsync(month, year);
             return _mapper.Map(brokerAccount);
         }
 
         [HttpGet(nameof(GetMonthTransfersHistoryByBrokerAccount))]
-        public async Task<IEnumerable<BrokerAccountDayTransferModel>> GetMonthTransfersHistoryByBrokerAccount(Guid brokerAccountId, int month, int year)
+        public async Task<BrokerAccountMonthTransfersHistoryModel> GetMonthTransfersHistoryByBrokerAccount(Guid brokerAccountId, int month, int year)
         {
             var brokerAccount = await _brokerAccountSummaryService.GetMonthTransfersHistoryByBrokerAccountAsync(brokerAccountId, month, year);
             return _mapper.Map(brokerAccount);
         }
 
         [HttpGet(nameof(GetYearTransfersHistory))]
-        public async Task<IEnumerable<BrokerAccountMonthTransferModel>> GetYearTransfersHistory(int year)
+        public async Task<BrokerAccountYearTransfersHistoryModel> GetYearTransfersHistory(int year)
         {
             var brokerAccount = await _brokerAccountSummaryService.GetYearTransfersHistoryAsync(year);
             return _mapper.Map(brokerAccount);
         }
 
         [HttpGet(nameof(GetYearTransfersHistoryByBrokerAccount))]
-        public async Task<IEnumerable<BrokerAccountMonthTransferModel>> GetYearTransfersHistoryByBrokerAccount(Guid brokerAccountId, int year)
+        public async Task<BrokerAccountYearTransfersHistoryModel> GetYearTransfersHistoryByBrokerAccount(Guid brokerAccountId, int year)
         {
             var brokerAccount = await _brokerAccountSummaryService.GetYearTransfersHistoryByBrokerAccountAsync(brokerAccountId, year);
             return _mapper.Map(brokerAccount);
@@ -94,6 +94,13 @@ namespace Audex.WebApi.Controllers.Brokers
         {
             var brokerAccount = await _brokerAccountSummaryService.GetPortfolioValuesAsync();
             return _mapper.Map(brokerAccount);
+        }
+
+        [HttpGet(nameof(GetTransfersAvailableDates))]
+        public async Task<BrokerAccountTransfersAvailableDatesModel> GetTransfersAvailableDates([FromQuery] Guid? brokerAccountId)
+        {
+            var dates = await _brokerAccountSummaryService.GetTransfersAvailableDatesAsync(brokerAccountId);
+            return _mapper.Map(dates);
         }
 
     }

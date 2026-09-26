@@ -201,6 +201,19 @@ namespace Audex.WebApi.Mappings
         public partial BrokerAccountDayTransferDto Map(BrokerAccountDayTransferModel model);
         public partial IEnumerable<BrokerAccountDayTransferModel> Map(IEnumerable<BrokerAccountDayTransferDto> dtos);
 
+        public partial BrokerAccountTransferAccountValueModel Map(BrokerAccountTransferAccountValueDto dto);
+        public partial BrokerAccountTransferAccountValueDto Map(BrokerAccountTransferAccountValueModel model);
+        public partial IEnumerable<BrokerAccountTransferAccountValueModel> Map(IEnumerable<BrokerAccountTransferAccountValueDto> dtos);
+
+        public partial BrokerAccountTransfersAvailableDatesModel Map(BrokerAccountTransfersAvailableDatesDto dto);
+        public partial BrokerAccountTransfersAvailableDatesDto Map(BrokerAccountTransfersAvailableDatesModel model);
+
+        public partial BrokerAccountMonthTransfersHistoryModel Map(BrokerAccountMonthTransfersHistoryDto dto);
+        public partial BrokerAccountMonthTransfersHistoryDto Map(BrokerAccountMonthTransfersHistoryModel model);
+
+        public partial BrokerAccountYearTransfersHistoryModel Map(BrokerAccountYearTransfersHistoryDto dto);
+        public partial BrokerAccountYearTransfersHistoryDto Map(BrokerAccountYearTransfersHistoryModel model);
+
         public partial BrokerAccountDailyStatsModel Map(BrokerAccountDailyStatsDto dto);
         public partial BrokerAccountDailyStatsDto Map(BrokerAccountDailyStatsModel model);
 

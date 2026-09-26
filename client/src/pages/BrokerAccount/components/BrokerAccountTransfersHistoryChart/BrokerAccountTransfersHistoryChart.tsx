@@ -1,174 +1,316 @@
-
-import React, { useEffect, useMemo, useState } from "react";
-
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { BrokerAccountDayTransferEntity } from "../../../../models/brokers/BrokerAccountDayTransferEntity";
 import { BrokerAccountMonthTransferEntity } from "../../../../models/brokers/BrokerAccountMonthTransferEntity";
-import { getMonthTransfersHistory, getYearTransfersHistory } from "../../../../api/brokers/brokerAccountSummaryApi";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, CartesianGrid } from "recharts";
-import { Box, Flex, SimpleGrid } from "@chakra-ui/react";
+import { BrokerAccountMonthTransfersHistoryEntity } from "../../../../models/brokers/BrokerAccountMonthTransfersHistoryEntity";
+import { BrokerAccountYearTransfersHistoryEntity } from "../../../../models/brokers/BrokerAccountYearTransfersHistoryEntity";
+import { BrokerAccountTransfersAvailableDatesEntity } from "../../../../models/brokers/BrokerAccountTransfersAvailableDatesEntity";
+import { BrokerAccountEntity } from "../../../../models/brokers/BrokerAccountEntity";
+import {
+    getMonthTransfersHistory,
+    getYearTransfersHistory,
+    getTransfersAvailableDates
+} from "../../../../api/brokers/brokerAccountSummaryApi";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { Box, Card, Flex, HStack, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import i18n from "../../../../i18n";
-import BaseSelect from "../../../../shared/components/BaseSelect/BaseSelect";
-import { getChartLabelConfig } from "../../../../shared/utilities/chartUtilities";
+import { CHART_THEME_COLORS, getChartColor } from "../../../../shared/constants/chartColors";
 import { Nullable } from "../../../../shared/utilities/nullable";
-import MoneyCard from "../../../../shared/components/MoneyCard/MoneyCard";
+import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
+import { MdHistory } from "react-icons/md";
+import { AccountItem, MONTH_RANGE, TransfersChartRow, TransfersHistoryFilterState, YEAR_RANGE } from "./types";
+import TransfersHistoryFilterBar from "./TransfersHistoryFilterBar";
+import TransfersHistoryPeriodStats from "./TransfersHistoryPeriodStats";
+import TransfersHistoryTooltip from "./TransfersHistoryTooltip";
+import TransfersHistoryLegend from "./TransfersHistoryLegend";
 
 interface Props {
-    brokerAccountId: Nullable<string>;
-    currencyName: string
+    brokerAccountId?: Nullable<string>;
+    selectedAccountId?: Nullable<string>;
+    onAccountChange?: (accountId: Nullable<string>) => void;
+    brokerAccounts?: BrokerAccountEntity[];
+    currencyName: string;
 }
 
-const YEAR_RANGE = "YEAR_RANGE";
-const MONTH_RANGE = "MONTH_RANGE";
-
-interface RangeType {
-    label: string;
-    value: string;
-}
-
-interface NumericOption {
-    label: string
-    value: number
-}
-
-interface ChartDataItem {
-    name: string
-    income: number
-    withdraw: number
-};
-
-const BrokerAccountTransfersHistoryChart: React.FC<Props> = ({ brokerAccountId, currencyName }) => {
+const BrokerAccountTransfersHistoryChart: React.FC<Props> = ({
+    brokerAccountId,
+    selectedAccountId,
+    onAccountChange,
+    brokerAccounts = [],
+    currencyName
+}) => {
     const { t } = useTranslation();
 
-    const rangeTypes: RangeType[] = useMemo(
-        () => [
-            { label: t("transfers_history_chart_range_year"), value: YEAR_RANGE },
-            { label: t("transfers_history_chart_range_month"), value: MONTH_RANGE }
-        ],
-        [i18n.language, t]
-    );
+    const effectiveAccountId = brokerAccountId ?? selectedAccountId;
 
-    const months: NumericOption[] = useMemo(
-        () => Array.from({ length: 12 }, (_, i) => ({
-            label: new Date(0, i).toLocaleString(i18n.language, { month: "short" }),
-            value: i + 1
-        })),
-        [i18n.language]
-    );
+    const [availableDates, setAvailableDates] = useState<BrokerAccountTransfersAvailableDatesEntity | null>(null);
+    const [currentFilter, setCurrentFilter] = useState<TransfersHistoryFilterState>({
+        rangeType: { label: t("transfers_history_chart_range_year"), value: YEAR_RANGE },
+        year: new Date().getFullYear(),
+        month: new Date().getMonth() + 1,
+        accountId: effectiveAccountId
+    });
 
-    const years: NumericOption[] = useMemo(
-        () => Array.from({ length: 5 }, (_, i) => ({
-            label: (new Date().getFullYear() - i).toString(),
-            value: new Date().getFullYear() - i
-        })),
-        []
-    );
+    const [periodHistory, setPeriodHistory] = useState<Nullable<BrokerAccountMonthTransfersHistoryEntity | BrokerAccountYearTransfersHistoryEntity>>(null);
+    const [hoveredAccountId, setHoveredAccountId] = useState<Nullable<string>>(null);
 
-    const [transfers, setTransfers] = useState<Array<BrokerAccountDayTransferEntity | BrokerAccountMonthTransferEntity>>([]);
-   
-    const [chartData, setChartData] = useState<ChartDataItem[]>([]);
-
-    const [selectedRangeType, selectRangeType] = useState<RangeType>(rangeTypes[0]);
-    const [selectedYear, selectYear] = useState<NumericOption>(years[0]);
-    const [selectedMonth, selectMonth] = useState<NumericOption>(months[0]);
-
-    const [depositedByPeriod, setDepositedByPeriod] = useState<number>(0);
-    const [withdrawnByPeriod, setWithdrawnByPeriod] = useState<number>(0);
-
+    // Fetch available dates from database when effective account changes
     useEffect(() => {
-        const fetchTransfers = async () => {
-            if (selectedRangeType?.value === MONTH_RANGE) {
-                const data = await getMonthTransfersHistory(brokerAccountId,
-                    selectedMonth.value, selectedYear.value);
-                setTransfers(data);
-            } else {
-                const data = await getYearTransfersHistory(brokerAccountId,
-                    selectedYear.value);
-                setTransfers(data);
+        let isMounted = true;
+        const fetchDates = async () => {
+            const data = await getTransfersAvailableDates(effectiveAccountId);
+            if (isMounted && data) {
+                setAvailableDates(data);
             }
         };
-        fetchTransfers();
-    }, [brokerAccountId, selectedMonth, selectedYear, selectedRangeType]);
 
+        fetchDates();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [effectiveAccountId]);
+
+    // Handle single filter change event from child component
+    const handleFilterChange = useCallback(
+        (newFilter: TransfersHistoryFilterState) => {
+            setCurrentFilter(newFilter);
+            if (onAccountChange && newFilter.accountId !== selectedAccountId) {
+                onAccountChange(newFilter.accountId);
+            }
+        },
+        [onAccountChange, selectedAccountId]
+    );
+
+    // Fetch pre-aggregated transfers data from backend
     useEffect(() => {
-        let deposited = 0;
-        let withdrawn = 0;
-
-        let data: ChartDataItem[] = [];
-        if (selectedRangeType?.value === MONTH_RANGE) {
-            data = (transfers as BrokerAccountDayTransferEntity[]).map(tr => {
-                deposited += tr.totalDeposited;
-                withdrawn += tr.totalWithdrawn
-
-                return {
-                    name: tr.dayIndex?.toString(),
-                    income: tr.totalDeposited,
-                    withdraw: tr.totalWithdrawn
-                };
-            });
-        } else {
-            data = (transfers as BrokerAccountMonthTransferEntity[]).map(tr => {
-                deposited += tr.totalDeposited;
-                withdrawn += tr.totalWithdrawn
-
-                return {
-                    name: new Date(selectedYear.value, tr.monthIndex - 1, 1)
-                        .toLocaleString(i18n.language, { month: "long" }),
-                    income: tr.totalDeposited,
-                    withdraw: tr.totalWithdrawn
+        let isMounted = true;
+        const fetchHistory = async () => {
+            const targetAccountId = brokerAccountId ?? currentFilter.accountId;
+            if (currentFilter.rangeType.value === MONTH_RANGE) {
+                const data = await getMonthTransfersHistory(targetAccountId, currentFilter.month, currentFilter.year);
+                if (isMounted) {
+                    setPeriodHistory(data ?? null);
                 }
-            });
+            } else {
+                const data = await getYearTransfersHistory(targetAccountId, currentFilter.year);
+                if (isMounted) {
+                    setPeriodHistory(data ?? null);
+                }
+            }
+        };
+
+        fetchHistory();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [brokerAccountId, currentFilter.accountId, currentFilter.rangeType.value, currentFilter.year, currentFilter.month]);
+
+    // Calculate chart rows, account list and period totals from backend response
+    const { chartData, accountList, depositedByPeriod, withdrawnByPeriod } = useMemo(() => {
+        if (!periodHistory) {
+            return {
+                chartData: [],
+                accountList: [],
+                depositedByPeriod: 0,
+                withdrawnByPeriod: 0
+            };
         }
 
-        setDepositedByPeriod(deposited);
-        setWithdrawnByPeriod(withdrawn);
-        setChartData(data);
-    }, [selectedRangeType, transfers, selectedYear]);
-   
-    const onRangeSelected = (range: RangeType) => selectRangeType(range);
-    const onYearSelected = (year: NumericOption) => selectYear(year);
-    const onMonthSelected = (month: NumericOption) => selectMonth(month);
+        const isMonth = currentFilter.rangeType.value === MONTH_RANGE;
+        const rawItems = isMonth
+            ? (periodHistory as BrokerAccountMonthTransfersHistoryEntity).days ?? []
+            : (periodHistory as BrokerAccountYearTransfersHistoryEntity).months ?? [];
+
+        const rows: TransfersChartRow[] = rawItems.map((item) => {
+            const name = isMonth
+                ? String((item as BrokerAccountDayTransferEntity).dayIndex)
+                : new Date(currentFilter.year, (item as BrokerAccountMonthTransferEntity).monthIndex - 1, 1).toLocaleString(i18n.language, { month: "short" });
+
+            const row: TransfersChartRow = {
+                name,
+                totalIncome: item.totalDeposited,
+                totalWithdraw: item.totalWithdrawn,
+                accountValues: item.accountValues ?? []
+            };
+
+            if (item.accountValues && item.accountValues.length > 0) {
+                item.accountValues.forEach((accountValue) => {
+                    row[`income_${accountValue.accountId}`] = accountValue.deposited;
+                    row[`withdraw_${accountValue.accountId}`] = accountValue.withdrawn;
+                });
+            }
+
+            return row;
+        });
+
+        const accounts: AccountItem[] = (periodHistory.accounts ?? []).map((accountValue, accountIndex) => ({
+            id: accountValue.accountId,
+            name: accountValue.accountName || t("filter_no_category"),
+            color: getChartColor(accountIndex),
+            deposited: accountValue.deposited,
+            withdrawn: accountValue.withdrawn
+        }));
+
+        return {
+            chartData: rows,
+            accountList: accounts,
+            depositedByPeriod: periodHistory.totalDeposited,
+            withdrawnByPeriod: periodHistory.totalWithdrawn
+        };
+    }, [periodHistory, currentFilter.rangeType.value, currentFilter.year, i18n.language, t]);
 
     return (
-        <Box style={{ width: '100%', height: 650, marginBlock: 20 }}>
-            <Flex mb={4} gap={4} width={550}>
-                <BaseSelect placeholder="Select range"
-                    selectedValue={selectedRangeType}
-                    collection={rangeTypes}
-                    onSelected={onRangeSelected}
-                    labelSelector={(range => range.label)} 
-                    valueSelector={(range => range.value)}/>
-                <BaseSelect placeholder="Year"
-                    selectedValue={selectedYear}
-                    collection={years}
-                    onSelected={onYearSelected}
-                    labelSelector={(range => range.label)} 
-                    valueSelector={(range => range.value)}/>
-                {
-                    selectedRangeType.value === MONTH_RANGE && <BaseSelect placeholder="Month"
-                        selectedValue={selectedMonth}
-                        collection={months}
-                        onSelected={onMonthSelected}
-                        labelSelector={(range => range.label)} 
-                        valueSelector={(range => range.value)}/>
-                }
+        <Card.Root
+            backgroundColor="background_primary"
+            borderColor="border_primary"
+            borderRadius="xl"
+            boxShadow="sm"
+            p={5}
+        >
+            {/* Header: Title */}
+            <Flex justifyContent="space-between" alignItems="center" mb={4}>
+                <HStack gap={2.5}>
+                    <Box
+                        w="32px"
+                        h="32px"
+                        borderRadius="md"
+                        backgroundColor="status_info_bg"
+                        color="status_info"
+                        display="flex"
+                        alignItems="center"
+                        justifyContent="center"
+                    >
+                        <MdHistory size={18} />
+                    </Box>
+                    <Text fontSize="md" fontWeight={700} color="text_primary">
+                        {t("transfers_history_chart_title")}
+                    </Text>
+                </HStack>
             </Flex>
-            <SimpleGrid columns={2} gap={4}>
-                <MoneyCard title={t("broker_account_stats_deposited")} value={depositedByPeriod} currency={currencyName}/>
-                <MoneyCard title={t("broker_account_stats_withdrawn")} value={withdrawnByPeriod} currency={currencyName}/>
-            </SimpleGrid>
-            <ResponsiveContainer height={500}>
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--chakra-colors-border_primary)" />
-                    <XAxis dataKey="name" stroke="var(--chakra-colors-text_secondary)" />
-                    <YAxis stroke="var(--chakra-colors-text_secondary)" />
-                    <Tooltip contentStyle={getChartLabelConfig()} />
-                    <Legend />
-                    <Bar dataKey="income" fill="var(--chakra-colors-gain)" name={t('broker_account_stats_deposited')} />
-                    <Bar dataKey="withdraw" fill="var(--chakra-colors-loss)" name={t('broker_account_stats_withdrawn')} />
-                </BarChart>
-            </ResponsiveContainer>
-        </Box>
+
+            {/* Self-contained Filter Component */}
+            <TransfersHistoryFilterBar
+                brokerAccountId={brokerAccountId}
+                brokerAccounts={brokerAccounts}
+                availableDates={availableDates}
+                onFilterChange={handleFilterChange}
+            />
+
+            {/* Period Summary Metric Strip under Filter */}
+            <TransfersHistoryPeriodStats
+                depositedByPeriod={depositedByPeriod}
+                withdrawnByPeriod={withdrawnByPeriod}
+                currencyName={currencyName}
+            />
+
+            {/* Recharts BarChart */}
+            <Box width="100%" height="380px" mt={2}>
+                <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData} margin={{ top: 15, right: 20, left: 10, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke={CHART_THEME_COLORS.grid} vertical={false} />
+                        <XAxis
+                            dataKey="name"
+                            tickLine={false}
+                            axisLine={{ stroke: CHART_THEME_COLORS.axisLine }}
+                            tick={{ fill: CHART_THEME_COLORS.axisText, fontSize: 11 }}
+                            dy={6}
+                        />
+                        <YAxis
+                            width={80}
+                            tickLine={false}
+                            axisLine={{ stroke: CHART_THEME_COLORS.axisLine }}
+                            tick={{ fill: CHART_THEME_COLORS.axisText, fontSize: 11 }}
+                            tickFormatter={(amountValue: number) => formatMoneyByCurrencyCulture(amountValue, currencyName, 0)}
+                            dx={-4}
+                        />
+                        <Tooltip
+                            content={
+                                <TransfersHistoryTooltip
+                                    selectedRangeTypeValue={currentFilter.rangeType.value}
+                                    selectedYearValue={currentFilter.year}
+                                    selectedMonthValue={currentFilter.month}
+                                    accountList={accountList}
+                                    currencyName={currencyName}
+                                />
+                            }
+                            cursor={{ fill: CHART_THEME_COLORS.cursorFill, opacity: 0.3 }}
+                        />
+
+                        {accountList.length > 0 ? (
+                            accountList.map((account, accountIndex) => {
+                                const isHovered = hoveredAccountId === account.id;
+                                const hasAnyHover = hoveredAccountId !== null;
+                                const opacity = hasAnyHover ? (isHovered ? 1 : 0.25) : 0.9;
+
+                                return (
+                                    <Bar
+                                        key={`income_${account.id}`}
+                                        dataKey={`income_${account.id}`}
+                                        name={`${account.name} (${t("broker_account_stats_deposited")})`}
+                                        stackId="income"
+                                        fill={account.color}
+                                        fillOpacity={opacity}
+                                        maxBarSize={36}
+                                        radius={accountIndex === accountList.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                                        onMouseEnter={() => setHoveredAccountId(account.id)}
+                                        onMouseLeave={() => setHoveredAccountId(null)}
+                                    />
+                                );
+                            })
+                        ) : (
+                            <Bar
+                                dataKey="totalIncome"
+                                name={t("broker_account_stats_deposited")}
+                                fill="var(--chakra-colors-gain)"
+                                maxBarSize={36}
+                                radius={[4, 4, 0, 0]}
+                            />
+                        )}
+
+                        {accountList.length > 0 ? (
+                            accountList.map((account, accountIndex) => {
+                                const isHovered = hoveredAccountId === account.id;
+                                const hasAnyHover = hoveredAccountId !== null;
+                                const opacity = hasAnyHover ? (isHovered ? 0.8 : 0.2) : 0.6;
+
+                                return (
+                                    <Bar
+                                        key={`withdraw_${account.id}`}
+                                        dataKey={`withdraw_${account.id}`}
+                                        name={`${account.name} (${t("broker_account_stats_withdrawn")})`}
+                                        stackId="withdraw"
+                                        fill={account.color}
+                                        fillOpacity={opacity}
+                                        maxBarSize={36}
+                                        radius={accountIndex === accountList.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                                        onMouseEnter={() => setHoveredAccountId(account.id)}
+                                        onMouseLeave={() => setHoveredAccountId(null)}
+                                    />
+                                );
+                            })
+                        ) : (
+                            <Bar
+                                dataKey="totalWithdraw"
+                                name={t("broker_account_stats_withdrawn")}
+                                fill="var(--chakra-colors-loss)"
+                                maxBarSize={36}
+                                radius={[4, 4, 0, 0]}
+                            />
+                        )}
+                    </BarChart>
+                </ResponsiveContainer>
+            </Box>
+
+            {/* Interactive Accounts Legend Pills */}
+            <TransfersHistoryLegend
+                accountList={accountList}
+                hoveredAccountId={hoveredAccountId}
+                onHoverChanged={setHoveredAccountId}
+                currencyName={currencyName}
+            />
+        </Card.Root>
     );
 };
 

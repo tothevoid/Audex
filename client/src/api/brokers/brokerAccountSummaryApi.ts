@@ -1,10 +1,11 @@
 import { BrokerAccountDailyStatsEntity } from '../../models/brokers/BrokerAccountDailyStatsEntity';
-import { BrokerAccountDayTransferEntity } from '../../models/brokers/BrokerAccountDayTransferEntity';
-import { BrokerAccountMonthTransferEntity } from '../../models/brokers/BrokerAccountMonthTransferEntity';
+import { BrokerAccountMonthTransfersHistoryEntity } from '../../models/brokers/BrokerAccountMonthTransfersHistoryEntity';
+import { BrokerAccountYearTransfersHistoryEntity } from '../../models/brokers/BrokerAccountYearTransfersHistoryEntity';
 import { BrokerAccountPortfolioEntity } from '../../models/brokers/BrokerAccountPortfolioEntity';
 import { BrokerAccountSummaryEntity } from '../../models/brokers/BrokerAccountSummaryEntity';
+import { BrokerAccountTransfersAvailableDatesEntity } from '../../models/brokers/BrokerAccountTransfersAvailableDatesEntity';
 import { Nullable } from '../../shared/utilities/nullable';
-import { getAllEntities, getEntity } from '../basicApi';
+import { getEntity } from '../basicApi';
 import { prepareBrokerAccountsSecurityStats, prepareDailyStats } from './brokerAccountSummaryApiMapping';
 
 const basicUrl = `BrokerAccountSummary`;
@@ -18,18 +19,18 @@ export const getBrokerAccountStats = async (brokerAccountId: Nullable<string>): 
         .then((data: BrokerAccountSummaryEntity | void) => data && prepareBrokerAccountsSecurityStats(data));
 }
 
-export const getMonthTransfersHistory = async (brokerAccountId: Nullable<string>, month: number, year: number): Promise<BrokerAccountDayTransferEntity[]> => {
+export const getMonthTransfersHistory = async (brokerAccountId: Nullable<string>, month: number, year: number): Promise<BrokerAccountMonthTransfersHistoryEntity | void> => {
     const url = brokerAccountId ? 
         `${basicUrl}/GetMonthTransfersHistoryByBrokerAccount?brokerAccountId=${brokerAccountId}&month=${month}&year=${year}` :
         `${basicUrl}/GetMonthTransfersHistory?month=${month}&year=${year}`;
-    return await getAllEntities<BrokerAccountDayTransferEntity>(url)
+    return await getEntity<BrokerAccountMonthTransfersHistoryEntity>(url);
 }
 
-export const getYearTransfersHistory = async (brokerAccountId: Nullable<string>, year: number): Promise<BrokerAccountMonthTransferEntity[]> => {
+export const getYearTransfersHistory = async (brokerAccountId: Nullable<string>, year: number): Promise<BrokerAccountYearTransfersHistoryEntity | void> => {
     const url = brokerAccountId ? 
         `${basicUrl}/GetYearTransfersHistoryByBrokerAccount?brokerAccountId=${brokerAccountId}&year=${year}` :
         `${basicUrl}/GetYearTransfersHistory?year=${year}`;
-    return await getAllEntities<BrokerAccountMonthTransferEntity>(url);
+    return await getEntity<BrokerAccountYearTransfersHistoryEntity>(url);
 }
 
 export const getDailyStats = async (brokerAccountId: Nullable<string>): Promise<BrokerAccountDailyStatsEntity | void> => {
@@ -48,4 +49,12 @@ export const getPortfolioValues = async (brokerAccountId: Nullable<string> = nul
 
     return await getEntity<BrokerAccountPortfolioEntity>(url)
         .then((data: BrokerAccountPortfolioEntity | void) => data);
+}
+
+export const getTransfersAvailableDates = async (brokerAccountId: Nullable<string> = null): Promise<BrokerAccountTransfersAvailableDatesEntity | void> => {
+    const url = brokerAccountId ?
+        `${basicUrl}/GetTransfersAvailableDates?brokerAccountId=${brokerAccountId}`:
+        `${basicUrl}/GetTransfersAvailableDates`;
+
+    return await getEntity<BrokerAccountTransfersAvailableDatesEntity>(url);
 }

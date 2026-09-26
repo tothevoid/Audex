@@ -11,6 +11,14 @@
     "broker_account_transfer_modal_operation_deposit": "Пополнение",
     "broker_account_transfer_modal_operation_withdraw": "Вывод",
 
+
+    "transfers_history_chart_title": "Динамика переводов",
+    "transfers_history_chart_all_accounts": "Все счета",
     "transfers_history_chart_range_year": "Год",
-    "transfers_history_chart_range_month": "Месяц"
+    "transfers_history_chart_range_month": "Месяц",
+    "transfers_history_chart_period_deposited": "Внесено за период",
+    "transfers_history_chart_period_withdrawn": "Выведено за период",
+    "transfers_history_chart_net_flow": "Чистый приток",
+    "transfers_history_chart_no_transfers": "Нет данных о переводах за выбранный период"
 }
+

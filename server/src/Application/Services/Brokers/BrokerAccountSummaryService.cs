@@ -239,94 +239,203 @@ namespace Audex.Application.Services.Brokers
             return securityStats;
         }
 
-        public async Task<IEnumerable<BrokerAccountDayTransferDto>> GetMonthTransfersHistoryAsync(int month, int year)
+        public async Task<BrokerAccountMonthTransfersHistoryDto> GetMonthTransfersHistoryAsync(int month, int year)
         {
             var transfers = (await _fundsTransferService.GetAllAsync()).ToList();
-
-            return GetMonthTransfersHistoryByBrokerAccount(transfers, month, year);
+            return GetMonthTransfersHistoryByBrokerAccount(transfers, month, year, allBrokerAccounts: true);
         }
 
-        public async Task<IEnumerable<BrokerAccountDayTransferDto>> GetMonthTransfersHistoryByBrokerAccountAsync(Guid brokerAccountId, int month, int year)
+        public async Task<BrokerAccountMonthTransfersHistoryDto> GetMonthTransfersHistoryByBrokerAccountAsync(Guid brokerAccountId, int month, int year)
         {
             var transfers = (await _fundsTransferService.GetAllAsync(brokerAccountId)).ToList();
-
-            return GetMonthTransfersHistoryByBrokerAccount(transfers, month, year);
+            return GetMonthTransfersHistoryByBrokerAccount(transfers, month, year, allBrokerAccounts: false);
         }
 
-        private IEnumerable<BrokerAccountDayTransferDto> GetMonthTransfersHistoryByBrokerAccount(List<BrokerAccountFundsTransferDto> transfers,
-            int month, int year)
+        private BrokerAccountMonthTransfersHistoryDto GetMonthTransfersHistoryByBrokerAccount(
+            List<BrokerAccountFundsTransferDto> transfers,
+            int month,
+            int year,
+            bool allBrokerAccounts)
         {
-            //TODO: Add db month and year filter
-            //TODO: fix GetMonthTransfersHistory & GetYearTransfersHistory code duplication
             var filteredTransfers = transfers
                 .Where(transfer => transfer.Date.Year == year && transfer.Date.Month == month);
 
-            var maxDay = new DateOnly(year, month, 1).AddMonths(1).AddDays(-1).Day;
+            var daysInMonth = DateTime.DaysInMonth(year, month);
+            var aggregation = AggregateTransfers(
+                filteredTransfers,
+                daysInMonth,
+                transfer => transfer.Date.Day,
+                allBrokerAccounts);
 
-            var distributions = Enumerable.Range(1, maxDay).ToDictionary(k => k, v => new TransfersHistory());
-
-            foreach (var transfer in filteredTransfers)
+            var days = aggregation.Distributions.Select(pair => new BrokerAccountDayTransferDto
             {
-                var distribution = distributions[transfer.Date.Day];
+                DayIndex = pair.Key,
+                TotalDeposited = pair.Value.TotalDeposited,
+                TotalWithdrawn = pair.Value.TotalWithdrawn,
+                AccountValues = pair.Value.AccountValues.Values.ToList()
+            }).ToList();
 
-                if (transfer.Income)
-                {
-                    distribution.TotalDeposited += transfer.Amount;
-                }
-                else
-                {
-                    distribution.TotalWithdrawn += transfer.Amount;
-                }
-            }
-
-            return distributions.Select(distribution => new BrokerAccountDayTransferDto()
+            return new BrokerAccountMonthTransfersHistoryDto
             {
-                DayIndex = distribution.Key,
-                TotalDeposited = distribution.Value.TotalDeposited,
-                TotalWithdrawn = distribution.Value.TotalWithdrawn
-            });
+                TotalDeposited = aggregation.TotalDeposited,
+                TotalWithdrawn = aggregation.TotalWithdrawn,
+                Accounts = aggregation.Accounts,
+                Days = days
+            };
         }
 
-        public async Task<IEnumerable<BrokerAccountMonthTransferDto>> GetYearTransfersHistoryAsync(int year)
+        public async Task<BrokerAccountYearTransfersHistoryDto> GetYearTransfersHistoryAsync(int year)
         {
             var transfers = (await _fundsTransferService.GetAllAsync()).ToList();
-            return GetYearTransfersHistoryByBrokerAccount(transfers, year);
+            return GetYearTransfersHistoryByBrokerAccount(transfers, year, allBrokerAccounts: true);
         }
 
-        public async Task<IEnumerable<BrokerAccountMonthTransferDto>> GetYearTransfersHistoryByBrokerAccountAsync(Guid brokerAccountId, int year)
+        public async Task<BrokerAccountYearTransfersHistoryDto> GetYearTransfersHistoryByBrokerAccountAsync(Guid brokerAccountId, int year)
         {
             var transfers = (await _fundsTransferService.GetAllAsync(brokerAccountId)).ToList();
-            return GetYearTransfersHistoryByBrokerAccount(transfers, year);
+            return GetYearTransfersHistoryByBrokerAccount(transfers, year, allBrokerAccounts: false);
         }
 
-        private IEnumerable<BrokerAccountMonthTransferDto> GetYearTransfersHistoryByBrokerAccount(List<BrokerAccountFundsTransferDto> transfers, 
-            int year)
+        private BrokerAccountYearTransfersHistoryDto GetYearTransfersHistoryByBrokerAccount(
+            List<BrokerAccountFundsTransferDto> transfers, 
+            int year,
+            bool allBrokerAccounts)
         {
-            //TODO: Add db year filter
-            var filteredTransfers = transfers.Where(transfer => transfer.Date.Year == year);
+            var filteredTransfers = transfers
+                .Where(transfer => transfer.Date.Year == year);
 
-            var distributions = Enumerable.Range(1, 12).ToDictionary(k => k, v => new TransfersHistory());
+            var aggregation = AggregateTransfers(
+                filteredTransfers,
+                12,
+                transfer => transfer.Date.Month,
+                allBrokerAccounts);
 
-            foreach (var transfer in filteredTransfers)
+            var months = aggregation.Distributions.Select(pair => new BrokerAccountMonthTransferDto
             {
-                var distribution = distributions[transfer.Date.Month];
+                MonthIndex = pair.Key,
+                TotalDeposited = pair.Value.TotalDeposited,
+                TotalWithdrawn = pair.Value.TotalWithdrawn,
+                AccountValues = pair.Value.AccountValues.Values.ToList()
+            }).ToList();
+
+            return new BrokerAccountYearTransfersHistoryDto
+            {
+                TotalDeposited = aggregation.TotalDeposited,
+                TotalWithdrawn = aggregation.TotalWithdrawn,
+                Accounts = aggregation.Accounts,
+                Months = months
+            };
+        }
+
+        private static TransfersAggregationResult AggregateTransfers(
+            IEnumerable<BrokerAccountFundsTransferDto> transfers,
+            int slotsCount,
+            Func<BrokerAccountFundsTransferDto, int> slotSelector,
+            bool allBrokerAccounts)
+        {
+            var distributions = Enumerable.Range(1, slotsCount).ToDictionary(slotIndex => slotIndex, _ => new TransfersHistory());
+            var periodAccountsMap = new Dictionary<Guid, BrokerAccountTransferAccountValueDto>();
+            decimal totalDeposited = 0m;
+            decimal totalWithdrawn = 0m;
+
+            foreach (var transfer in transfers)
+            {
+                var slotIndex = slotSelector(transfer);
+                if (!distributions.TryGetValue(slotIndex, out var distribution))
+                {
+                    continue;
+                }
+
+                var accountId = allBrokerAccounts ? transfer.BrokerAccountId : transfer.AccountId;
+                var accountName = allBrokerAccounts
+                    ? transfer.BrokerAccount?.Name ?? string.Empty
+                    : transfer.Account?.Name ?? string.Empty;
+
+                if (!distribution.AccountValues.TryGetValue(accountId, out var slotAccountValue))
+                {
+                    slotAccountValue = new BrokerAccountTransferAccountValueDto
+                    {
+                        AccountId = accountId,
+                        AccountName = accountName
+                    };
+                    distribution.AccountValues[accountId] = slotAccountValue;
+                }
+
+                if (!periodAccountsMap.TryGetValue(accountId, out var periodAccountValue))
+                {
+                    periodAccountValue = new BrokerAccountTransferAccountValueDto
+                    {
+                        AccountId = accountId,
+                        AccountName = accountName
+                    };
+                    periodAccountsMap[accountId] = periodAccountValue;
+                }
 
                 if (transfer.Income)
                 {
                     distribution.TotalDeposited += transfer.Amount;
+                    slotAccountValue.Deposited += transfer.Amount;
+
+                    totalDeposited += transfer.Amount;
+                    periodAccountValue.Deposited += transfer.Amount;
                 }
                 else
                 {
                     distribution.TotalWithdrawn += transfer.Amount;
+                    slotAccountValue.Withdrawn += transfer.Amount;
+
+                    totalWithdrawn += transfer.Amount;
+                    periodAccountValue.Withdrawn += transfer.Amount;
                 }
             }
 
-            return distributions.Select(distribution => new BrokerAccountMonthTransferDto()
+            return new TransfersAggregationResult
             {
-                MonthIndex = distribution.Key,
-                TotalDeposited = distribution.Value.TotalDeposited,
-                TotalWithdrawn = distribution.Value.TotalWithdrawn
-            });
+                TotalDeposited = totalDeposited,
+                TotalWithdrawn = totalWithdrawn,
+                Accounts = periodAccountsMap.Values.ToList(),
+                Distributions = distributions
+            };
+        }
+
+        public async Task<BrokerAccountTransfersAvailableDatesDto> GetTransfersAvailableDatesAsync(Guid? brokerAccountId)
+        {
+            var transfers = brokerAccountId.HasValue
+                ? (await _fundsTransferService.GetAllAsync(brokerAccountId.Value)).ToList()
+                : (await _fundsTransferService.GetAllAsync()).ToList();
+
+            if (transfers.Count == 0)
+            {
+                var currentYear = DateTime.UtcNow.Year;
+                var currentMonth = DateTime.UtcNow.Month;
+                return new BrokerAccountTransfersAvailableDatesDto
+                {
+                    AvailableYears = new List<int> { currentYear },
+                    AvailableMonthsByYear = new Dictionary<int, List<int>>
+                    {
+                        { currentYear, new List<int> { currentMonth } }
+                    }
+                };
+            }
+
+            var availableYears = transfers
+                .Select(transfer => transfer.Date.Year)
+                .Distinct()
+                .OrderByDescending(year => year)
+                .ToList();
+
+            var availableMonthsByYear = transfers
+                .GroupBy(transfer => transfer.Date.Year)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Select(transfer => transfer.Date.Month).Distinct().OrderBy(month => month).ToList()
+                );
+
+            return new BrokerAccountTransfersAvailableDatesDto
+            {
+                AvailableYears = availableYears,
+                AvailableMonthsByYear = availableMonthsByYear
+            };
         }
 
         private BrokerAccountTransfersStatsDto GetTransfersStats(List<BrokerAccountFundsTransferDto> transfers)
@@ -375,11 +484,21 @@ namespace Audex.Application.Services.Brokers
             };
         }
 
+        private class TransfersAggregationResult
+        {
+            public decimal TotalDeposited { get; set; }
+            public decimal TotalWithdrawn { get; set; }
+            public List<BrokerAccountTransferAccountValueDto> Accounts { get; set; } = new();
+            public Dictionary<int, TransfersHistory> Distributions { get; set; } = new();
+        }
+
         private class TransfersHistory
         {
             public decimal TotalDeposited { get; set; }
             public decimal TotalWithdrawn { get; set; }
+            public Dictionary<Guid, BrokerAccountTransferAccountValueDto> AccountValues { get; set; } = new();
         }
+
 
     }
 }

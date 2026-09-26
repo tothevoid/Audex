@@ -1,4 +1,4 @@
-﻿using Audex.Application.DTO.Brokers;
+using Audex.Application.DTO.Brokers;
 using Audex.Application.Services.Brokers;
 using System;
 using System.Collections.Generic;
@@ -22,12 +22,15 @@ namespace Audex.Application.Interfaces.Brokers
 
         Task<BrokerAccountPortfolioDto> GetPortfolioValuesAsync();
 
-        Task<IEnumerable<BrokerAccountDayTransferDto>> GetMonthTransfersHistoryAsync(int month, int year);
+        Task<BrokerAccountMonthTransfersHistoryDto> GetMonthTransfersHistoryAsync(int month, int year);
 
-        Task<IEnumerable<BrokerAccountDayTransferDto>> GetMonthTransfersHistoryByBrokerAccountAsync(Guid brokerAccountId, int month, int year);
+        Task<BrokerAccountMonthTransfersHistoryDto> GetMonthTransfersHistoryByBrokerAccountAsync(Guid brokerAccountId, int month, int year);
 
-        Task<IEnumerable<BrokerAccountMonthTransferDto>> GetYearTransfersHistoryAsync(int year);
+        Task<BrokerAccountYearTransfersHistoryDto> GetYearTransfersHistoryAsync(int year);
 
-        Task<IEnumerable<BrokerAccountMonthTransferDto>> GetYearTransfersHistoryByBrokerAccountAsync(Guid brokerAccountId, int year);
+        Task<BrokerAccountYearTransfersHistoryDto> GetYearTransfersHistoryByBrokerAccountAsync(Guid brokerAccountId, int year);
+
+        Task<BrokerAccountTransfersAvailableDatesDto> GetTransfersAvailableDatesAsync(Guid? brokerAccountId);
     }
 }
+

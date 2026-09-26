@@ -11,6 +11,14 @@
     "broker_account_transfer_modal_operation_deposit": "Deposit",
     "broker_account_transfer_modal_operation_withdraw": "Withdraw",
 
+
+    "transfers_history_chart_title": "Transfers Dynamics",
+    "transfers_history_chart_all_accounts": "All accounts",
     "transfers_history_chart_range_year": "Year",
-    "transfers_history_chart_range_month": "Month"
+    "transfers_history_chart_range_month": "Month",
+    "transfers_history_chart_period_deposited": "Deposited for period",
+    "transfers_history_chart_period_withdrawn": "Withdrawn for period",
+    "transfers_history_chart_net_flow": "Net cashflow",
+    "transfers_history_chart_no_transfers": "No transfers data for selected period"
 }
+

@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Accounts;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.Interfaces.Accounts;
@@ -81,7 +81,10 @@ namespace Audex.Application.Tests.Services.Brokers
             });
 
             Assert.NotNull(monthHistory);
-            Assert.NotEmpty(monthHistory);
+            Assert.NotEmpty(monthHistory.Days);
+            Assert.Equal(5000m, monthHistory.TotalDeposited);
+            Assert.Equal(0m, monthHistory.TotalWithdrawn);
+            Assert.Contains(monthHistory.Accounts, account => account.AccountId == accountId && account.Deposited == 5000m);
 
             var yearHistory = await ExecuteScopeAsync(async sp =>
             {
@@ -90,7 +93,43 @@ namespace Audex.Application.Tests.Services.Brokers
             });
 
             Assert.NotNull(yearHistory);
-            Assert.NotEmpty(yearHistory);
+            Assert.NotEmpty(yearHistory.Months);
+            Assert.Equal(5000m, yearHistory.TotalDeposited);
+            Assert.Equal(0m, yearHistory.TotalWithdrawn);
+            Assert.Contains(yearHistory.Accounts, account => account.AccountId == accountId && account.Deposited == 5000m);
+            Assert.Contains(yearHistory.Months, month => month.AccountValues.Any(account => account.AccountId == accountId && account.Deposited == 5000m));
+        }
+
+        [Fact]
+        public async Task TestGetTransfersAvailableDates_ReturnsAvailableYearsAndMonths()
+        {
+            var (brokerAccountId, accountId) = await SetupDependencies();
+
+            var now = DateTime.UtcNow;
+
+            await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
+                await service.AddAsync(new BrokerAccountFundsTransferDto
+                {
+                    BrokerAccountId = brokerAccountId,
+                    AccountId = accountId,
+                    Amount = 1500m,
+                    Income = true,
+                    Date = now
+                });
+            });
+
+            var availableDates = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IBrokerAccountSummaryService>();
+                return await service.GetTransfersAvailableDatesAsync(brokerAccountId);
+            });
+
+            Assert.NotNull(availableDates);
+            Assert.Contains(now.Year, availableDates.AvailableYears);
+            Assert.True(availableDates.AvailableMonthsByYear.ContainsKey(now.Year));
+            Assert.Contains(now.Month, availableDates.AvailableMonthsByYear[now.Year]);
         }
 
         private async Task<(Guid brokerAccountId, Guid accountId)> SetupDependencies()
