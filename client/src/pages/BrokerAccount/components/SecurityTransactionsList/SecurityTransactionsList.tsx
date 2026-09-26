@@ -20,6 +20,7 @@ import PlaceholderWrapper from '../../../../shared/components/Placeholder/Placeh
 import AddButton from '../../../../shared/components/AddButton/AddButton';
 import { useDelayedLoading } from '../../../../shared/hooks/useDelayedLoading';
 import LoadingList from '../../../../shared/components/LoadingList/LoadingList';
+import DateGroupedList from '../../../../shared/components/DateGroupedList/DateGroupedList';
 
 interface Props {
 	brokerAccountId: Nullable<string>;
@@ -130,17 +131,20 @@ const SecurityTransactionsList: React.FC<Props> = (props) => {
 					text={t("security_transactions_empty")}
 					action={<AddButton buttonTitle={t("entity_securities_transaction_page_summary_add")} onClick={onAddClicked} />}
 				>
-					<Box>
-						{securityTransactions.map((security: SecurityTransactionEntity) => (
+					<DateGroupedList<SecurityTransactionEntity>
+						items={securityTransactions}
+						dateSelector={(transaction) => transaction.date}
+						keySelector={(transaction) => transaction.id}
+						renderItem={(transaction) => (
 							<SecurityTransaction
-								key={security.id}
+								key={transaction.id}
 								isGlobalBrokerAccount={isGlobalBrokerAccount}
-								securityTransaction={security}
+								securityTransaction={transaction}
 								onEditClicked={onEditClicked}
 								onDeleteClicked={onDeleteClicked}
 							/>
-						))}
-					</Box>
+						)}
+					/>
 				</PlaceholderWrapper>
 			</LoadingList>
 

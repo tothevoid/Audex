@@ -15,7 +15,6 @@
     "entity_security_not_found_on_moex": "Бумага с таким тикером или ISIN не найдена на бирже",
     "entity_security_fill_manually_button": "Заполнить вручную",
     "entity_security_back_to_search_button": "Поиск на бирже",
-
     "entity_securities_transaction_page_summary_add": "Добавить сделку",
     "entity_securities_transaction_delete_title": "Удалить сделку",
     "entity_security_transaction_form_title": "Сделка",
@@ -30,12 +29,10 @@
     "entity_security_transaction_operation": "Операция",
     "entity_security_transaction_operation_buy": "Покупка",
     "entity_security_transaction_operation_sell": "Продажа",
-
     "securities_transactions_with_dividends": "с дивидендами",
     "securities_transactions_without_dividends": "без дивидендов",
     "securities_transactions_volume": "Объём",
     "securities_transactions_current_price": "тек.",
-
     "security_page_tabs_history": "История котировок",
     "security_page_tabs_transactions": "Сделки",
     "security_page_tabs_dividends": "Дивиденды",
@@ -65,7 +62,6 @@
     "security_history_period_max": "Макс.",
     "security_history_period_avg": "Средняя",
     "security_history_no_data": "Нет данных по истории котировок",
-
     "security_type_precious_metal": "Драгметалл",
     "security_type_investment_fund_unit": "ПИФ",
     "security_type_stock": "Акция",
@@ -73,7 +69,6 @@
     "security_type_currency": "Валюта",
     "security_type_etf": "ETF",
     "security_type_crypto": "Криптовалюта",
-
     "security_transactions_filter_title": "Фильтры",
     "security_transactions_filter_security": "Ценная бумага",
     "security_transactions_filter_security_all": "Все ценные бумаги",
@@ -82,6 +77,8 @@
     "security_transactions_filter_date_from": "Дата с",
     "security_transactions_filter_date_to": "Дата по",
     "security_transactions_filter_reset": "Сбросить",
-    "security_transactions_empty": "Сделки не найдены"
+    "security_transactions_empty": "Сделки не найдены",
+    "security_transaction_broker_commission_short": "брокеру",
+    "security_transaction_exchange_commission_short": "бирже",
+    "security_transaction_tax_short": "налог"
 }
-

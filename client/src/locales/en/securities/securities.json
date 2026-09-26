@@ -82,6 +82,11 @@
     "security_transactions_filter_date_from": "Date from",
     "security_transactions_filter_date_to": "Date to",
     "security_transactions_filter_reset": "Reset",
-    "security_transactions_empty": "No transactions found"
+    "security_transactions_empty": "No transactions found",
+    "security_transaction_broker_commission_short": "broker",
+    "security_transaction_exchange_commission_short": "exchange",
+    "security_transaction_tax_short": "tax"
 }
+
+
 

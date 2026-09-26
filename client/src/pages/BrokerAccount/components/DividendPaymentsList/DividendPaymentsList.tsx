@@ -12,6 +12,7 @@ import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
 import { Nullable } from '../../../../shared/utilities/nullable';
 import CollectionPagination from '../../../../shared/components/CollectionPagination/CollectionPagination';
 import { getDividendPaymentsPagination } from '../../../../api/brokers/dividendPaymentApi';
+import DateGroupedList from '../../../../shared/components/DateGroupedList/DateGroupedList';
 
 interface Props {
 	brokerAccountId: Nullable<string>,
@@ -19,7 +20,7 @@ interface Props {
 }
 
 const DividendPaymentsList: React.FC<Props> = (props) => {
-	const { t } = useTranslation()
+	const { t } = useTranslation();
 
 	const { 
 		activeEntity,
@@ -79,27 +80,32 @@ const DividendPaymentsList: React.FC<Props> = (props) => {
 		setDividendPaymentsQueryParameters({recordsQuantity, pageIndex, brokerAccountId: dividendPaymentsQueryParameters.brokerAccountId});
 	}
 
-	const isGlobalBrokerAccount = !props.brokerAccountId 
+	const isGlobalBrokerAccount = !props.brokerAccountId;
 
-	return <Box>
-		<SectionHeader
-			title={t("broker_account_page_dividends_tab")}
-			size="lg"
-			onAdd={onAddClicked}
-			addButtonTitle={t("broker_account_page_add_dividend_payment_button")}
-			my={4}
-		/>
+	return (
 		<Box>
-		{
-			dividendPayments.map((dividendPayment: DividendPaymentEntity) => 
-				<DividendPayment key={dividendPayment.id}
-					isGlobalBrokerAccount={isGlobalBrokerAccount}
-					dividendPayment={dividendPayment} 
-					onEditClicked={onEditClicked} 
-					onDeleteClicked={onDeleteClicked}/>)
-		}
-		</Box>
-		<CollectionPagination getPaginationConfig={getPagination} onPageChanged={onPageChanged}/>
+			<SectionHeader
+				title={t("broker_account_page_dividends_tab")}
+				size="lg"
+				onAdd={onAddClicked}
+				addButtonTitle={t("broker_account_page_add_dividend_payment_button")}
+				my={4}
+			/>
+			<DateGroupedList<DividendPaymentEntity>
+				items={dividendPayments}
+				dateSelector={(payment) => payment.receivedAt}
+				keySelector={(payment) => payment.id}
+				renderItem={(payment) => (
+					<DividendPayment
+						key={payment.id}
+						isGlobalBrokerAccount={isGlobalBrokerAccount}
+						dividendPayment={payment}
+						onEditClicked={onEditClicked}
+						onDeleteClicked={onDeleteClicked}
+					/>
+				)}
+			/>
+			<CollectionPagination getPaginationConfig={getPagination} onPageChanged={onPageChanged}/>
 		<ConfirmModal onConfirmed={onDeleteConfirmed}
 			title={t("entity_securities_transaction_delete_title")}
 			message={t("modals_delete_message")}
@@ -107,6 +113,7 @@ const DividendPaymentsList: React.FC<Props> = (props) => {
 			ref={confirmModalRef}/>
 		{context && <DividendPaymentModal isGlobalBrokerAccount={isGlobalBrokerAccount} context={context} modalRef={modalRef} onSaved={dividendPaymentSaved}/>}
 	</Box>
-}
+	);
+};
 
 export default DividendPaymentsList;

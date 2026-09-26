@@ -12,6 +12,7 @@ import SectionHeader from '../../../../shared/components/SectionHeader';
 import { getBrokerAccountFundsTransferPagination } from '../../../../api/brokers/brokerAccountFundsTransferApi';
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
 import CollectionPagination from '../../../../shared/components/CollectionPagination/CollectionPagination';
+import DateGroupedList from '../../../../shared/components/DateGroupedList/DateGroupedList';
 
 interface Props {
     brokerAccountId: Nullable<string>,
@@ -19,6 +20,8 @@ interface Props {
 }
 
 const BrokerAccountFundTransfersList: React.FC<Props> = (props) => {
+    const { t } = useTranslation();
+
     const {
         fundTransfers,
         createFundTransferEntity,
@@ -81,30 +84,32 @@ const BrokerAccountFundTransfersList: React.FC<Props> = (props) => {
         setFundTransfersQueryParameters({recordsQuantity, pageIndex, brokerAccountId: fundTransfersQueryParameters.brokerAccountId});
     }
 
-    const {t} = useTranslation();
-
     const isGlobalBrokerAccount = !props.brokerAccountId;
 
-    return <Box>
-        <SectionHeader
-            title={t("broker_account_page_transfers_tab")}
-            size="lg"
-            onAdd={onAddClicked}
-            addButtonTitle={t("broker_account_page_transfer_button")}
-            my={4}
-        />
+    return (
         <Box>
-        {
-            fundTransfers.map((fundTransfer: BrokerAccountFundTransferEntity) => 
-                <BrokerAccountFundTransfer key={fundTransfer.id}
-                    isGlobalBrokerAccount={isGlobalBrokerAccount}
-                    onEditClicked={onEditClicked}
-                    onDeleteClicked={onDeleteClicked}
-                    fundTransfer={fundTransfer}
-                />)
-        }
-        </Box>
-        <CollectionPagination getPaginationConfig={getPagination} onPageChanged={onPageChanged}/>
+            <SectionHeader
+                title={t("broker_account_page_transfers_tab")}
+                size="lg"
+                onAdd={onAddClicked}
+                addButtonTitle={t("broker_account_page_transfer_button")}
+                my={4}
+            />
+            <DateGroupedList<BrokerAccountFundTransferEntity>
+                items={fundTransfers}
+                dateSelector={(transfer) => transfer.date}
+                keySelector={(transfer) => transfer.id}
+                renderItem={(transfer) => (
+                    <BrokerAccountFundTransfer
+                        key={transfer.id}
+                        isGlobalBrokerAccount={isGlobalBrokerAccount}
+                        onEditClicked={onEditClicked}
+                        onDeleteClicked={onDeleteClicked}
+                        fundTransfer={transfer}
+                    />
+                )}
+            />
+            <CollectionPagination getPaginationConfig={getPagination} onPageChanged={onPageChanged}/>
         <ConfirmModal onConfirmed={onDeleteConfirmed}
             title={t("entity_broker_account_fund_transfer_delete_title")}
             message={t("modals_delete_message")}
@@ -112,6 +117,7 @@ const BrokerAccountFundTransfersList: React.FC<Props> = (props) => {
             ref={confirmModalRef}/>
         {context && <BrokerAccountFundTransferModal isGlobalBrokerAccount={isGlobalBrokerAccount} modalRef={modalRef} context={context} onSaved={onTransferSaved}  />}
     </Box>
-}
+    );
+};
 
 export default BrokerAccountFundTransfersList;

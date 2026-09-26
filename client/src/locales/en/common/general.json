@@ -63,5 +63,7 @@
 
     "number_unit_thousand": "k",
     "number_unit_million": "M",
-    "number_unit_billion": "B"
+    "number_unit_billion": "B",
+    "general_total_count": "Total: {{count}}"
 }
+
