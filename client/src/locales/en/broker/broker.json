@@ -67,7 +67,8 @@
     "broker_account_stats_deposited": "Deposited",
     "broker_account_stats_withdrawn": "Withdrawn",
 
-    "broker_account_daily_stats_title": "Daily stats for {{date}}",
+    "broker_account_daily_stats_title": "Daily statistics",
+    "broker_account_daily_stats_updated_at": "Updated at {{time}}",
     "broker_account_start_portfolio_title": "Day start portfolio value",
     "broker_account_current_portfolio_title": "Current portfolio value",
 

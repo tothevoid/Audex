@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Badge, Box, Button, Flex, HStack, Icon, SimpleGrid, Spinner, Table, Text, VStack } from '@chakra-ui/react';
+import { Badge, Box, Flex, HStack, Icon, SimpleGrid, Spinner, Table, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import {
@@ -7,8 +7,7 @@ import {
     MdErrorOutline,
     MdInfoOutline,
     MdKeyboardArrowDown,
-    MdKeyboardArrowUp,
-    MdRefresh
+    MdKeyboardArrowUp
 } from 'react-icons/md';
 import { ScheduledTaskJournalEntity } from '../../../models/scheduler/ScheduledTaskJournalEntity';
 import { ScheduledTaskEntity, ScheduledTaskTriggerSource } from '../../../models/scheduler/ScheduledTaskEntity';
@@ -16,6 +15,7 @@ import { formatDuration, getStatusBadgeProps, getStatusFilterOptions } from '../
 import BaseSelect from '../../../shared/components/BaseSelect/BaseSelect';
 import { SchedulerAttachmentList } from './SchedulerAttachmentList';
 import CopyButton from '../../../shared/components/CopyButton/CopyButton';
+import RefreshButton from '../../../shared/components/RefreshButton';
 
 interface FilterOption {
     value: string;
@@ -97,10 +97,11 @@ export const SchedulerJournalTable: React.FC<SchedulerJournalTableProps> = ({
                     )}
                 </HStack>
 
-                <Button size="sm" variant="outline" borderColor="border_primary" color="text_primary" onClick={onRefresh}>
-                    <Icon mr={1}><MdRefresh /></Icon>
-                    {t('scheduler_refresh')}
-                </Button>
+                <RefreshButton
+                    isRefreshing={isLoading}
+                    title={t('scheduler_refresh')}
+                    onClick={onRefresh}
+                />
             </Flex>
 
             {isLoading ? (

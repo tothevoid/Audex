@@ -3,11 +3,10 @@ import { useTranslation } from "react-i18next";
 import { Card, Flex, HStack, Text, Icon } from "@chakra-ui/react";
 import { formatShortDateTime } from "../../../../shared/utilities/formatters/dateFormatter";
 import { BrokerAccountPortfolioEntity } from "../../../../models/brokers/BrokerAccountPortfolioEntity";
-import { BsWallet2, BsPiggyBank, BsArrowUpRight, BsArrowDownRight, BsClockHistory, BsBank, BsFileEarmarkSpreadsheet, BsPercent } from "react-icons/bs";
-import { MdRefresh } from "react-icons/md";
+import { BsWallet2, BsPiggyBank, BsArrowUpRight, BsArrowDownRight, BsBank, BsFileEarmarkSpreadsheet, BsPercent } from "react-icons/bs";
 import { TbReceiptTax } from "react-icons/tb";
 import { NumericMetricItem } from "../../../../shared/components/MetricItem";
-import "../../../../shared/components/RefreshButton/RefreshButton.scss";
+import RefreshButton from "../../../../shared/components/RefreshButton";
 
 interface Props {
     name: string;
@@ -83,39 +82,12 @@ const BrokerAccountHeader: React.FC<Props> = ({
                         )}
 
                         {/* Integrated Sync Date & Refresh Pill Button */}
-                        <HStack
-                            as="button"
-                            onClick={isReloading ? undefined : onPullQuotations}
-                            px={3}
-                            py={1.5}
-                            borderRadius="md"
-                            backgroundColor="background_secondary"
-                            borderColor="border_primary"
-                            borderWidth="1px"
-                            color="text_secondary"
-                            cursor={isReloading ? "not-allowed" : "pointer"}
-                            opacity={isReloading ? 0.6 : 1}
-                            transition="all 0.2s"
-                            _hover={isReloading ? {} : { backgroundColor: "background_primary", borderColor: "action_primary" }}
-                            alignItems="center"
-                            gap={2}
-                        >
-                            <Icon color="text_secondary">
-                                <BsClockHistory size={13} />
-                            </Icon>
-                            {lastPullDate && (
-                                <Text fontSize="xs" fontWeight={500} color="text_secondary">
-                                    {formatPullDate()}
-                                </Text>
-                            )}
-                            <Icon
-                                transition="transform 0.3s ease"
-                                animation={isReloading ? "loading-spin 1.5s linear infinite" : "none"}
-                                color="action_primary"
-                            >
-                                <MdRefresh size={16} />
-                            </Icon>
-                        </HStack>
+                        <RefreshButton
+                            isRefreshing={isReloading}
+                            showClockIcon={Boolean(lastPullDate)}
+                            title={lastPullDate ? formatPullDate() : undefined}
+                            onClick={onPullQuotations}
+                        />
                     </HStack>
                 </Flex>
 

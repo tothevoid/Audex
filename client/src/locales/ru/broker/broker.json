@@ -67,7 +67,8 @@
     "broker_account_stats_deposited": "Внесено",
     "broker_account_stats_withdrawn": "Выведено",
 
-    "broker_account_daily_stats_title": "Дневная статистика за {{date}}",
+    "broker_account_daily_stats_title": "Дневная статистика",
+    "broker_account_daily_stats_updated_at": "Обновлено в {{time}}",
     "broker_account_start_portfolio_title": "Стоимость портфеля на начало дня",
     "broker_account_current_portfolio_title": "Текущая стоимость портфеля",
 

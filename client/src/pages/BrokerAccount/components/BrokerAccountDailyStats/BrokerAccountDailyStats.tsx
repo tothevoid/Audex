@@ -11,11 +11,11 @@ import MoneyCard from "../../../../shared/components/MoneyCard/MoneyCard";
 import { calculateDiff } from "../../../../shared/utilities/numericDiffsUtilities";
 import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
 import { formatTime } from "../../../../shared/utilities/formatters/dateFormatter";
-import RefreshButton from "../../../../shared/components/RefreshButton/RefreshButton";
 import StatsCard from "../../../../shared/components/StatsCard/StatsCard";
 import { getIconUrl } from "../../../../api/securities/securityApi";
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import StoredIcon from "../../../../shared/components/StoredIcon";
+import RefreshButton from "../../../../shared/components/RefreshButton";
 
 interface Props {
 	brokerAccountId: Nullable<string>
@@ -102,9 +102,18 @@ const BrokerAccountDailyStats: React.FC<Props> = ({ brokerAccountId, currencyNam
 
 	return (
 		<Stack gapY={4}>
-			<Stack direction="row" justifyContent="start" alignItems="center">
-				<Text fontSize="3xl" fontWeight={900} color={"text_primary"}>{t("broker_account_daily_stats_title", { date: formatTime(new Date(dailyStats.fetchDate), i18n)})}</Text>
-				<RefreshButton isRefreshing={isRefreshing} transparent onClick={() => fetchDailyStats(true)}/>
+			<Stack direction="row" justifyContent="start" alignItems="center" gap={3}>
+				<Text fontSize="2xl" fontWeight={800} color="text_primary">
+					{t("broker_account_daily_stats_title")}
+				</Text>
+				<RefreshButton
+					isRefreshing={isRefreshing}
+					showClockIcon
+					title={t("broker_account_daily_stats_updated_at", {
+						time: formatTime(new Date(dailyStats.fetchDate), i18n)
+					})}
+					onClick={() => fetchDailyStats(true)}
+				/>
 			</Stack>
 			<SimpleGrid columns={2} gap={4}>
 				<MoneyCard title={t("broker_account_start_portfolio_title")} value={dailyStats.startPortfolioValue} currency={currencyName}/>
