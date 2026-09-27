@@ -64,6 +64,8 @@
     "number_unit_thousand": "тыс.",
     "number_unit_million": "млн",
     "number_unit_billion": "млрд",
-    "general_total_count": "Всего: {{count}}"
+    "general_total_count": "Всего: {{count}}",
+    "pagination_page_size_item": "{{size}} / стр.",
+    "pagination_page_size_label": "Строк на странице:"
 }
 
