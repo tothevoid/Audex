@@ -1,17 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Audex.Application.DTO.Common;
 using Audex.Application.DTO.Notifications;
 using Audex.Infrastructure.Entities.Notifications;
+using Audex.Shared.Common;
 
 namespace Audex.Application.Interfaces.Notifications
 {
     public interface INotificationService
     {
-        Task<IEnumerable<NotificationDto>> GetAllAsync(int pageIndex = 1, int recordsQuantity = 15, bool onlyUnread = false, string category = null);
-
-        Task<PaginationConfigDto> GetPaginationAsync(bool onlyUnread = false, string category = null);
+        Task<PagedResult<NotificationDto>> GetAllAsync(NotificationFilterDto filter);
 
         Task<int> GetUnreadCountAsync();
 
@@ -32,3 +30,4 @@ namespace Audex.Application.Interfaces.Notifications
         Task CleanUpOldNotificationsAsync(int olderThanDays = 90);
     }
 }
+

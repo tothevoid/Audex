@@ -1,9 +1,9 @@
 using Audex.Application.Enums.Scheduler;
 using Audex.Shared.Common;
 
-namespace Audex.WebApi.Models.Scheduler
+namespace Audex.Application.DTO.Scheduler
 {
-    public class GetJournalQuery : BasePageable
+    public class SchedulerJournalFilterDto : BasePageable
     {
         public string TaskName { get; set; }
 

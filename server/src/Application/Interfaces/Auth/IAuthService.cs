@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Auth;
 using Audex.Application.DTO.Common;
+using Audex.Shared.Common;
 
 namespace Audex.Application.Interfaces.Auth
 {
@@ -23,9 +24,7 @@ namespace Audex.Application.Interfaces.Auth
 
         Task<bool> ChangePasswordAsync(string userName, string currentPassword, string newPassword);
 
-        Task<IEnumerable<UserRefreshTokenDto>> GetRefreshTokensAsync(Guid userProfileId, bool isActive = true, int pageIndex = 1, int recordsQuantity = 10, string? currentRefreshToken = null);
-
-        Task<PaginationConfigDto> GetRefreshTokensPaginationAsync(Guid userProfileId, bool isActive = true);
+        Task<PagedResult<UserRefreshTokenDto>> GetRefreshTokensAsync(UserRefreshTokenFilterDto filter);
 
         Task<bool> RevokeTokenAsync(Guid tokenId, Guid userProfileId);
 

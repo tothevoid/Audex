@@ -12,6 +12,7 @@ using Audex.Application.DTO.Dashboard;
 using Audex.Application.DTO.Debts;
 using Audex.Application.DTO.Deposits;
 using Audex.Application.DTO.Notifications;
+using Audex.Application.DTO.Scheduler;
 using Audex.Application.DTO.Securities;
 using Audex.Application.DTO.Transactions;
 using Audex.Application.DTO.User;
@@ -65,6 +66,8 @@ namespace Audex.WebApi.Mappings
         public partial CurrencyTransactionDto Map(CurrencyTransactionModel model);
         public partial CurrencyTransactionModel Map(CurrencyTransactionDto dto);
         public partial IEnumerable<CurrencyTransactionModel> Map(IEnumerable<CurrencyTransactionDto> dtos);
+        public partial PagedResult<CurrencyTransactionModel> Map(PagedResult<CurrencyTransactionDto> dto);
+        public partial CurrencyTransactionFilterDto Map(GetAllCurrencyTransactionsQuery query);
         public partial CurrencyAccountSummaryModel Map(CurrencyAccountSummaryDto dto);
 
         public partial DepositsRangeModel Map(DepositsRangeDto dto);
@@ -89,6 +92,8 @@ namespace Audex.WebApi.Mappings
         public partial DividendDto Map(DividendModel model);
         public partial DividendModel Map(DividendDto dto);
         public partial IEnumerable<DividendModel> Map(IEnumerable<DividendDto> dtos);
+        public partial PagedResult<DividendModel> Map(PagedResult<DividendDto> dto);
+        public partial DividendFilterDto Map(GetAllDividendsQuery query);
 
         public partial SecurityTypeDto Map(SecurityTypeModel model);
         public partial SecurityTypeModel Map(SecurityTypeDto dto);
@@ -156,10 +161,14 @@ namespace Audex.WebApi.Mappings
         public partial DebtPaymentModel Map(DebtPaymentDto dto);
         public partial DebtPaymentDto Map(DebtPaymentModel model);
         public partial IEnumerable<DebtPaymentModel> Map(IEnumerable<DebtPaymentDto> dtos);
+        public partial PagedResult<DebtPaymentModel> Map(PagedResult<DebtPaymentDto> dto);
+        public partial DebtPaymentFilterDto Map(GetAllDebtPaymentsQuery query);
 
         public partial DividendPaymentModel Map(DividendPaymentDto dto);
         public partial DividendPaymentDto Map(DividendPaymentModel model);
         public partial IEnumerable<DividendPaymentModel> Map(IEnumerable<DividendPaymentDto> dtos);
+        public partial PagedResult<DividendPaymentModel> Map(PagedResult<DividendPaymentDto> dto);
+        public partial DividendPaymentFilterDto Map(GetAllDividendsPaymentsQuery query);
 
         public partial SecurityStatsModel Map(SecurityStatsDto dto);
         public partial SecurityStatsDto Map(SecurityStatsModel model);
@@ -183,6 +192,8 @@ namespace Audex.WebApi.Mappings
         public partial BrokerAccountFundsTransferModel Map(BrokerAccountFundsTransferDto dto);
         public partial BrokerAccountFundsTransferDto Map(BrokerAccountFundsTransferModel model);
         public partial IEnumerable<BrokerAccountFundsTransferModel> Map(IEnumerable<BrokerAccountFundsTransferDto> dtos);
+        public partial PagedResult<BrokerAccountFundsTransferModel> Map(PagedResult<BrokerAccountFundsTransferDto> dto);
+        public partial BrokerAccountFundsTransferFilterDto Map(GetAllBrokerAccountFundTransferQuery query);
 
         public partial BrokerAccountSummaryModel Map(BrokerAccountSummaryDto dto);
         public partial BrokerAccountSummaryDto Map(BrokerAccountSummaryModel model);
@@ -238,22 +249,26 @@ namespace Audex.WebApi.Mappings
         public partial NotificationDto Map(NotificationModel model);
         public partial NotificationModel Map(NotificationDto dto);
         public partial IEnumerable<NotificationModel> Map(IEnumerable<NotificationDto> dtos);
+        public partial PagedResult<NotificationModel> Map(PagedResult<NotificationDto> dto);
+        public partial NotificationFilterDto Map(GetAllNotificationsQuery query);
 
-        public partial ScheduledTaskDefinitionModel Map(Audex.Application.DTO.Scheduler.ScheduledTaskDefinitionDto dto);
-        public partial IEnumerable<ScheduledTaskDefinitionModel> Map(IEnumerable<Audex.Application.DTO.Scheduler.ScheduledTaskDefinitionDto> dtos);
+        public partial ScheduledTaskDefinitionModel Map(ScheduledTaskDefinitionDto dto);
+        public partial IEnumerable<ScheduledTaskDefinitionModel> Map(IEnumerable<ScheduledTaskDefinitionDto> dtos);
 
-        public partial Audex.Application.DTO.Scheduler.CreateScheduledTaskDto Map(Audex.WebApi.Models.Scheduler.CreateScheduledTaskModel model);
+        public partial CreateScheduledTaskDto Map(CreateScheduledTaskModel model);
 
-        public partial ScheduledTaskModel Map(Audex.Application.DTO.Scheduler.ScheduledTaskDto dto);
-        public partial IEnumerable<ScheduledTaskModel> Map(IEnumerable<Audex.Application.DTO.Scheduler.ScheduledTaskDto> dtos);
+        public partial ScheduledTaskModel Map(ScheduledTaskDto dto);
+        public partial IEnumerable<ScheduledTaskModel> Map(IEnumerable<ScheduledTaskDto> dtos);
 
-        public partial ScheduledTaskJournalModel Map(Audex.Application.DTO.Scheduler.ScheduledTaskJournalDto dto);
-        public partial IEnumerable<ScheduledTaskJournalModel> Map(IEnumerable<Audex.Application.DTO.Scheduler.ScheduledTaskJournalDto> dtos);
+        public partial ScheduledTaskJournalModel Map(ScheduledTaskJournalDto dto);
+        public partial IEnumerable<ScheduledTaskJournalModel> Map(IEnumerable<ScheduledTaskJournalDto> dtos);
+        public partial PagedResult<ScheduledTaskJournalModel> Map(PagedResult<ScheduledTaskJournalDto> dto);
+        public partial SchedulerJournalFilterDto Map(GetJournalQuery query);
 
-        public partial ScheduledTaskAttachmentModel Map(Audex.Application.DTO.Scheduler.ScheduledTaskAttachmentDto dto);
-        public partial IEnumerable<ScheduledTaskAttachmentModel> Map(IEnumerable<Audex.Application.DTO.Scheduler.ScheduledTaskAttachmentDto> dtos);
+        public partial ScheduledTaskAttachmentModel Map(ScheduledTaskAttachmentDto dto);
+        public partial IEnumerable<ScheduledTaskAttachmentModel> Map(IEnumerable<ScheduledTaskAttachmentDto> dtos);
 
-        public partial Audex.Application.DTO.Scheduler.UpdateScheduleDto Map(Audex.WebApi.Models.Scheduler.UpdateScheduleModel model);
+        public partial UpdateScheduleDto Map(UpdateScheduleModel model);
         public partial CryptoAccountStatsModel Map(CryptoAccountStatsDto dto);
     }
 }

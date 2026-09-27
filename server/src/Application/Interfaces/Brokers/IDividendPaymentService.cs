@@ -1,5 +1,6 @@
-﻿using Audex.Application.DTO.Brokers;
+using Audex.Application.DTO.Brokers;
 using Audex.Application.DTO.Common;
+using Audex.Shared.Common;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,13 +9,9 @@ namespace Audex.Application.Interfaces.Brokers
 {
     public interface IDividendPaymentService
     {
-        Task<IEnumerable<DividendPaymentDto>> GetAllAsync(Guid? brokerAccountId, int pageIndex, int recordsQuantity);
+        Task<PagedResult<DividendPaymentDto>> GetAllAsync(DividendPaymentFilterDto filter);
 
         Task<decimal> GetSumTillSpecificDateAsync(DateOnly date, Guid? brokerAccountId);
-
-        Task<PaginationConfigDto> GetPaginationAsync();
-
-        Task<PaginationConfigDto> GetPaginationByBrokerAccountAsync(Guid brokerAccountId);
 
         Task<decimal> GetEarningsAsync();
 
