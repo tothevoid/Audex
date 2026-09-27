@@ -28,7 +28,7 @@ import { NotificationEntity, NotificationSeverity } from "../../../models/notifi
 export const HeaderNotificationBell: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { notifications, unreadCount, markAsRead, markAllAsRead, hasMore, isLoadingMore, loadMore } = useNotifications();
+    const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
     const [open, setOpen] = useState(false);
     const [onlyUnreadFilter, setOnlyUnreadFilter] = useState(false);
 
@@ -237,19 +237,6 @@ export const HeaderNotificationBell: React.FC = () => {
                                         </Flex>
                                     </Box>
                                 ))}
-                                {!onlyUnreadFilter && hasMore && (
-                                    <Button
-                                        size="xs"
-                                        variant="ghost"
-                                        color="action_primary"
-                                        onClick={loadMore}
-                                        loading={isLoadingMore}
-                                        mt={1}
-                                        width="100%"
-                                    >
-                                        {t("notifications_load_more")}
-                                    </Button>
-                                )}
                             </VStack>
                         )}
                     </Popover.Body>
