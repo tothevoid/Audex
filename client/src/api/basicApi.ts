@@ -1,5 +1,4 @@
 import httpClient from "./httpClient";
-import { PaginationConfig } from "../shared/models/PaginationConfig";
 import { PagedResult } from "../shared/models/PagedResult";
 import { OperationResult } from "../shared/models/OperationResult";
 import { Nullable } from "../shared/utilities/nullable";
@@ -294,12 +293,6 @@ export const postAction = async (url: string, data: unknown): Promise<boolean> =
         .catch(logPromiseError);
 
     return result ?? false;
-};
-
-export const getPagination = async (url: string): Promise<PaginationConfig | void> => {
-    return await httpClient.get(url)
-        .then((response) => response.data)
-        .catch(logPromiseError);
 };
 
 export const downloadFileByUrl = async (url: string): Promise<Blob | null> => {

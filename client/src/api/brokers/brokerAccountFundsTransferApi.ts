@@ -1,24 +1,22 @@
 import { BrokerAccountFundTransferEntity, BrokerAccountFundTransferEntityRequest, BrokerAccountFundTransferEntityResponse } from '../../models/brokers/BrokerAccountFundTransfer';
-import { FundTransfersQuery } from '../../pages/BrokerAccount/hooks/useBrokerAccountFundTransfers';
-import { PaginationConfig } from '../../shared/models/PaginationConfig';
+import { BasePageable } from '../../shared/models/BasePageable';
+import { PagedResult } from '../../shared/models/PagedResult';
 import { Nullable } from '../../shared/utilities/nullable';
-import { createEntity, deleteEntity, getAllEntitiesByConfig, getPagination, updateEntity } from '../basicApi';
+import { createEntity, deleteEntity, getPagedEntities, updateEntity } from '../basicApi';
 import { prepareBrokerAccountFundsTransfer, prepareBrokerAccountFundsTransferRequest } from './brokerAccountFundsTransferMapping';
 
 const basicUrl = `BrokerAccountFundsTransfer`;
 
-export const getBrokerAccountFundsTransfers = async (query: FundTransfersQuery): Promise<BrokerAccountFundTransferEntity[]> => {
-    return await getAllEntitiesByConfig<FundTransfersQuery, BrokerAccountFundTransferEntityResponse>(`${basicUrl}/GetAll`, query)
-        .then((securityTransactions) => {
-            return securityTransactions.map(prepareBrokerAccountFundsTransfer)
-        })
-};
+export interface BrokerAccountFundsTransferQuery extends BasePageable {
+    brokerAccountId?: Nullable<string>;
+}
 
-export const getBrokerAccountFundsTransferPagination = async (brokerAccountId: Nullable<string>): Promise<PaginationConfig | void> => {
-    const url = brokerAccountId ?
-        `${basicUrl}/GetPaginationByBrokerAccount?brokerAccountId=${brokerAccountId}` :
-        `${basicUrl}/GetPagination`;
-    return getPagination(url);
+export const getPagedBrokerAccountFundsTransfers = async (query: BrokerAccountFundsTransferQuery): Promise<PagedResult<BrokerAccountFundTransferEntity>> => {
+    const pagedResult = await getPagedEntities<BrokerAccountFundsTransferQuery, BrokerAccountFundTransferEntityResponse>(`${basicUrl}/GetAll`, query);
+    return {
+        ...pagedResult,
+        items: (pagedResult?.items ?? []).map(prepareBrokerAccountFundsTransfer)
+    };
 };
 
 export const createBrokerAccountFundsTransfer = async (addedBrokerAccountFundsTransfer: BrokerAccountFundTransferEntity): Promise<BrokerAccountFundTransferEntityResponse | void> => {

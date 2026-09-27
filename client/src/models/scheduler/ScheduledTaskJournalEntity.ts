@@ -1,3 +1,4 @@
+import { BasePageable } from '../../shared/models/BasePageable';
 import { ScheduledTaskAttachmentEntity, ScheduledTaskAttachmentEntityResponse } from './ScheduledTaskAttachmentEntity';
 import { ScheduledTaskExecutionStatus, ScheduledTaskTriggerSource } from './ScheduledTaskEntity';
 
@@ -27,9 +28,7 @@ export interface ScheduledTaskJournalEntityResponse {
     attachments?: ScheduledTaskAttachmentEntityResponse[];
 }
 
-export interface GetJournalQueryRequest {
-    pageIndex: number;
-    recordsQuantity: number;
+export interface GetJournalQueryRequest extends BasePageable {
     taskName?: string;
     status?: ScheduledTaskExecutionStatus;
     triggerSource?: ScheduledTaskTriggerSource;

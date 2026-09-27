@@ -1,33 +1,22 @@
 import { NotificationEntity, NotificationEntityResponse } from "../../models/notifications/NotificationEntity";
-import { deleteEntity, getAllEntitiesByConfig, getEntity, getPagination, postAction } from "../basicApi";
-import { PaginationConfig } from "../../shared/models/PaginationConfig";
+import { deleteEntity, getEntity, getPagedEntities, postAction } from "../basicApi";
+import { BasePageable } from "../../shared/models/BasePageable";
+import { PagedResult } from "../../shared/models/PagedResult";
 import { prepareNotification } from "./notificationApiMapping";
 
 const basicUrl = "Notification";
 
-export interface NotificationsQuery {
-    pageIndex: number;
-    recordsQuantity: number;
+export interface NotificationsQuery extends BasePageable {
     onlyUnread?: boolean;
     category?: string;
 }
 
-export const getNotifications = async (query: NotificationsQuery): Promise<NotificationEntity[]> => {
-    return await getAllEntitiesByConfig<NotificationsQuery, NotificationEntityResponse>(`${basicUrl}/GetAll`, query)
-        .then((responses: NotificationEntityResponse[]) => (responses || []).map(prepareNotification));
-};
-
-export const getNotificationsPagination = async (
-    onlyUnread: boolean = false,
-    category?: string
-): Promise<PaginationConfig | void> => {
-    const params = new URLSearchParams();
-    if (onlyUnread) params.append("onlyUnread", "true");
-    if (category && category !== "All") params.append("category", category);
-
-    const queryString = params.toString();
-    const url = queryString ? `${basicUrl}/GetPagination?${queryString}` : `${basicUrl}/GetPagination`;
-    return await getPagination(url);
+export const getPagedNotifications = async (query: NotificationsQuery): Promise<PagedResult<NotificationEntity>> => {
+    const pagedResult = await getPagedEntities<NotificationsQuery, NotificationEntityResponse>(`${basicUrl}/GetAll`, query);
+    return {
+        ...pagedResult,
+        items: (pagedResult.items || []).map(prepareNotification)
+    };
 };
 
 export const getUnreadNotificationCount = async (): Promise<number> => {

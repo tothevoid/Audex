@@ -1,36 +1,33 @@
 import { DebtPaymentEntity, DebtPaymentEntityRequest, DebtPaymentEntityResponse } from "../../models/debts/DebtPaymentEntity";
-import { DebtPaymentsQuery } from "../../pages/Debts/hooks/useDebtPayments";
-import { PaginationConfig } from "../../shared/models/PaginationConfig";
-import { createEntity, deleteEntity, getAllEntitiesByConfig, getPagination, updateEntity } from "../basicApi";
+import { BasePageable } from "../../shared/models/BasePageable";
+import { PagedResult } from "../../shared/models/PagedResult";
+import { createEntity, deleteEntity, getPagedEntities, updateEntity } from "../basicApi";
 import { prepareDebtPayment, prepareDebtPaymentRequest } from "./debtPaymentApiMapping";
 
 const basicUrl = `DebtPayment`;
 
-export const getDebtPayments = async (query: DebtPaymentsQuery): Promise<DebtPaymentEntity[]> =>  {
-    return await getAllEntitiesByConfig<DebtPaymentsQuery, DebtPaymentEntityResponse>(`${basicUrl}/GetAll`, query)
-        .then((debtPayment) => {
-            return debtPayment.map(prepareDebtPayment)
-        });
+export interface DebtPaymentsQuery extends BasePageable {
+    debtId?: string;
+    tagId?: string;
 }
 
-export const getDebtPaymentsPagination = async (debtId?: string, tagId?: string): Promise<PaginationConfig | void> => {
-    const params = new URLSearchParams();
-    if (debtId) params.append("debtId", debtId);
-    if (tagId) params.append("tagId", tagId);
-    const queryString = params.toString();
-    const url = queryString ? `${basicUrl}/GetPagination?${queryString}` : `${basicUrl}/GetPagination`;
-    return await getPagination(url);
+export const getPagedDebtPayments = async (query: DebtPaymentsQuery): Promise<PagedResult<DebtPaymentEntity>> => {
+    const pagedResult = await getPagedEntities<DebtPaymentsQuery, DebtPaymentEntityResponse>(`${basicUrl}/GetAll`, query);
+    return {
+        ...pagedResult,
+        items: pagedResult.items.map(prepareDebtPayment)
+    };
 };
 
 export const createDebtPayment = async (newDebtPayment: DebtPaymentEntity): Promise<boolean | void> => {
     const addedEntity = await createEntity<DebtPaymentEntityRequest, DebtPaymentEntityResponse>(basicUrl, prepareDebtPaymentRequest(newDebtPayment));
     return !!addedEntity;
-}
+};
 
 export const updateDebtPayment = async (updatedDebtPayment: DebtPaymentEntity): Promise<boolean> => {
     return await updateEntity(basicUrl, prepareDebtPaymentRequest(updatedDebtPayment));
-}
+};
 
 export const deleteDebtPayment = async (debtPaymentId: string): Promise<boolean> => {
     return await deleteEntity(basicUrl, debtPaymentId);
-}
+};

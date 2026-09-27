@@ -1,3 +1,4 @@
+import { BasePageable } from "../../shared/models/BasePageable";
 import { Nullable } from "../../shared/utilities/nullable";
 
 export interface SecurityTransactionsFilterValues {
@@ -7,10 +8,7 @@ export interface SecurityTransactionsFilterValues {
     endDate?: Nullable<string>;
 }
 
-export interface SecurityTransactionsRequest extends SecurityTransactionsFilterValues {
-    recordsQuantity: number;
-    pageIndex: number;
-}
+export interface SecurityTransactionsRequest extends SecurityTransactionsFilterValues, BasePageable {}
 
 export const createDefaultSecurityTransactionsFilter = (
     brokerAccountId?: Nullable<string>

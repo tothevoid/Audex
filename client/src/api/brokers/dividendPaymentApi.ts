@@ -1,24 +1,22 @@
 import { DividendPaymentEntity, DividendPaymentEntityRequest, DividendPaymentEntityResponse } from '../../models/brokers/DividendPaymentEntity';
-import { DividendPaymentsQuery } from '../../pages/BrokerAccount/hooks/useDividendPayments';
-import { PaginationConfig } from '../../shared/models/PaginationConfig';
+import { BasePageable } from '../../shared/models/BasePageable';
+import { PagedResult } from '../../shared/models/PagedResult';
 import { Nullable } from '../../shared/utilities/nullable';
-import { createEntity, deleteEntity, getAllEntitiesByConfig, getEntity, getPagination, updateEntity } from '../basicApi';
+import { createEntity, deleteEntity, getEntity, getPagedEntities, updateEntity } from '../basicApi';
 import { prepareDividendPayment, prepareDividendPaymentRequest } from './dividendPaymentApiMapping';
 
 const basicUrl = `DividendPayment`;
 
-export const getDividendPaymentsByBrokerAccount = async (query: DividendPaymentsQuery): Promise<DividendPaymentEntity[]> => {
-    return await getAllEntitiesByConfig<DividendPaymentsQuery, DividendPaymentEntityResponse>(`${basicUrl}/GetAll`, query)
-        .then((dividendPayment) => {
-            return dividendPayment.map(prepareDividendPayment)
-        });
-};
+export interface DividendPaymentsQuery extends BasePageable {
+    brokerAccountId?: Nullable<string>;
+}
 
-export const getDividendPaymentsPagination = async (brokerAccountId: Nullable<string>): Promise<PaginationConfig | void> => {
-    const url = brokerAccountId ?
-        `${basicUrl}/GetPagination?brokerAccountId=${brokerAccountId}`:
-        `${basicUrl}/GetPagination`;
-    return await getPagination(url);
+export const getPagedDividendPayments = async (query: DividendPaymentsQuery): Promise<PagedResult<DividendPaymentEntity>> => {
+    const pagedResult = await getPagedEntities<DividendPaymentsQuery, DividendPaymentEntityResponse>(`${basicUrl}/GetAll`, query);
+    return {
+        ...pagedResult,
+        items: (pagedResult?.items ?? []).map(prepareDividendPayment)
+    };
 };
 
 export const getEarningsByBrokerAccount = async (brokerAccountId: string): Promise<number> => {
