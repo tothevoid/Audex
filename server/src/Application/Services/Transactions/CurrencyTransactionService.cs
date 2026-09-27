@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Audex.Shared.Common;
+
 namespace Audex.Application.Services.Transactions
 {
     public class CurrencyTransactionService: ICurrencyTransactionService
@@ -30,15 +32,19 @@ namespace Audex.Application.Services.Transactions
             _accountRepo = uow.CreateRepository<Account>();
         }
 
-        public async Task<IEnumerable<CurrencyTransactionDto>> GetAllAsync()
+        public async Task<PagedResult<CurrencyTransactionDto>> GetAllAsync(CurrencyTransactionFilterDto filter)
         {
-            var query = new ComplexQueryBuilder<CurrencyTransaction>()
-                .AddJoins(GetFullHierarchyColumns)
-                .AddOrder(CurrencyTransaction => CurrencyTransaction.Date, isDescending: true)
-                .GetQuery();
-            var currencyTransactions = await _currencyTransactionRepo.GetAllAsync(query);
-            
-            return _mapper.Map(currencyTransactions);
+            var builder = new ComplexQueryBuilder<CurrencyTransaction>()
+                .AddPagination(filter, transaction => transaction.Date, isDescending: true)
+                .AddJoins(GetFullHierarchyColumns);
+
+            if (filter.AccountId.HasValue && filter.AccountId.Value != Guid.Empty)
+            {
+                builder.AddFilter(transaction => transaction.SourceAccountId == filter.AccountId.Value || transaction.DestinationAccountId == filter.AccountId.Value);
+            }
+
+            var pagedTransactions = await _currencyTransactionRepo.GetPagedAsync(builder.GetQuery());
+            return _mapper.Map(pagedTransactions);
         }
 
         public async Task UpdateAsync(CurrencyTransactionDto currencyTransactionDto)
@@ -147,43 +153,10 @@ namespace Audex.Application.Services.Transactions
             return _mapper.Map(entity);
         }
 
-        public async Task<IEnumerable<CurrencyTransactionDto>> GetAllByAccountIdAsync(Guid accountId, int? pageIndex = null, int? recordsQuantity = null)
-        {
-            var builder = new ComplexQueryBuilder<CurrencyTransaction>()
-                .AddFilter(x => x.SourceAccountId == accountId || x.DestinationAccountId == accountId)
-                .AddJoins(GetFullHierarchyColumns);
-
-            if (pageIndex.HasValue && recordsQuantity.HasValue && recordsQuantity.Value > 0)
-            {
-                builder.AddPagination(pageIndex.Value, recordsQuantity.Value, x => x.Date, true);
-            }
-            else
-            {
-                builder.AddOrder(x => x.Date, isDescending: true);
-            }
-
-            var transactions = await _currencyTransactionRepo.GetAllAsync(builder.GetQuery());
-
-            return _mapper.Map(transactions);
-        }
-
-        public async Task<PaginationConfigDto> GetPaginationAsync(Guid accountId)
-        {
-            const int pageSize = 10;
-            var recordsQuantity = await _currencyTransactionRepo.GetCountAsync(
-                x => x.SourceAccountId == accountId || x.DestinationAccountId == accountId);
-
-            return new PaginationConfigDto
-            {
-                PageSize = pageSize,
-                RecordsQuantity = recordsQuantity
-            };
-        }
-
         public async Task<CurrencyAccountSummaryDto> GetSummaryByAccountIdAsync(Guid accountId)
         {
             var query = new ComplexQueryBuilder<CurrencyTransaction>()
-                .AddFilter(x => x.SourceAccountId == accountId || x.DestinationAccountId == accountId)
+                .AddFilter(transaction => transaction.SourceAccountId == accountId || transaction.DestinationAccountId == accountId)
                 .AddJoins(GetFullHierarchyColumns)
                 .GetQuery();
 

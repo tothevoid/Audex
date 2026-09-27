@@ -48,31 +48,8 @@ namespace Audex.Application.Services.Securities
                 .AddJoins(GetFullHierarchyColumns)
                 .AddPagination(filter, securityTransaction => securityTransaction.Date, true);
 
-            var brokerAccountSecurities = await _securityTransactionRepo
-                .GetAllAsync(query.GetQuery());
-            var items = _mapper.Map(brokerAccountSecurities).ToList();
-
-            var pageIndex = filter != null && filter.PageIndex > 0 ? filter.PageIndex : 1;
-            var pageSize = filter != null && filter.RecordsQuantity > 0 ? filter.RecordsQuantity : (items.Count > 0 ? items.Count : 10);
-
-            int totalCount;
-            if (pageIndex == 1 && items.Count < pageSize)
-            {
-                totalCount = items.Count;
-            }
-            else
-            {
-                var filterQuery = CreateFilteredQueryBuilder(filter);
-                totalCount = await _securityTransactionRepo.GetCountAsync(filterQuery.GetQuery());
-            }
-
-            return new PagedResult<SecurityTransactionDto>
-            {
-                Items = items,
-                TotalCount = totalCount,
-                PageIndex = pageIndex,
-                PageSize = pageSize
-            };
+            var pagedTransactions = await _securityTransactionRepo.GetPagedAsync(query.GetQuery());
+            return _mapper.Map(pagedTransactions);
         }
 
         public async Task<Dictionary<string, SecurityTransactionsSummaryDto>> GetSummaryTillSpecificDateAsync(DateOnly date, Guid? brokerAccountId)

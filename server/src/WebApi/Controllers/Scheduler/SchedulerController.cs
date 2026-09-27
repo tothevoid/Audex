@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Audex.Application.DTO.Scheduler;
 using Audex.Application.Enums.Scheduler;
 using Audex.Application.Interfaces.Scheduler;
+using Audex.Shared.Common;
 using Audex.WebApi.Mappings;
-using Audex.WebApi.Models.Common;
 using Audex.WebApi.Models.Scheduler;
 
 namespace Audex.WebApi.Controllers.Scheduler
@@ -146,25 +146,11 @@ namespace Audex.WebApi.Controllers.Scheduler
         }
 
         [HttpPost("journal")]
-        public async Task<IEnumerable<ScheduledTaskJournalModel>> GetJournal([FromBody] GetJournalQuery query)
+        public async Task<PagedResult<ScheduledTaskJournalModel>> GetJournal([FromBody] GetJournalQuery query)
         {
-            var records = await _journalService.GetJournalAsync(
-                query.PageIndex,
-                query.RecordsQuantity,
-                query.TaskName,
-                query.Status,
-                query.TriggerSource);
+            var filter = _mapper.Map(query);
+            var records = await _journalService.GetJournalAsync(filter);
             return _mapper.Map(records);
-        }
-
-        [HttpGet("journal/pagination")]
-        public async Task<PaginationConfigModel> GetJournalPagination(
-            [FromQuery] string taskName = null,
-            [FromQuery] ScheduledTaskExecutionStatus? status = null,
-            [FromQuery] ScheduledTaskTriggerSource? triggerSource = null)
-        {
-            var pagination = await _journalService.GetJournalPaginationAsync(taskName, status, triggerSource);
-            return _mapper.Map(pagination);
         }
 
         [HttpGet("journal/attachments/{attachmentId}/download")]

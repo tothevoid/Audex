@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.DTO.Common;
 using Audex.Application.DTO.Securities;
@@ -16,6 +16,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
+using Audex.Shared.Common;
+
 namespace Audex.Application.Services.Securities
 {
     public class DividendService : IDividendService
@@ -31,29 +33,16 @@ namespace Audex.Application.Services.Securities
             _dividendRepo = uow.CreateRepository<Dividend>();
         }
 
-        public async Task<IEnumerable<DividendDto>> GetAllAsync(Guid securityId, int pageIndex, int recordsQuantity)
+        public async Task<PagedResult<DividendDto>> GetAllAsync(DividendFilterDto filter)
         {
             var query = new ComplexQueryBuilder<Dividend>()
-                .AddPagination(pageIndex, recordsQuantity,
-                    (dividend) => dividend.SnapshotDate, true)
-                .AddFilter((dividend) => dividend.SecurityId == securityId)
+                .AddPagination(filter, dividend => dividend.SnapshotDate, true)
+                .AddFilter(dividend => dividend.SecurityId == filter.SecurityId)
                 .AddJoins(GetFullHierarchyColumns)
                 .GetQuery();
 
-            var dividends = await _dividendRepo.GetAllAsync(query);
-            return _mapper.Map(dividends);
-        }
-
-        public async Task<PaginationConfigDto> GetPaginationAsync(Guid securityId)
-        {
-            int pageSize = 10;
-            var recordsQuantity = await _dividendRepo.GetCountAsync(GetBaseFilter(securityId));
-
-            return new PaginationConfigDto()
-            {
-                PageSize = pageSize,
-                RecordsQuantity = recordsQuantity
-            };
+            var pagedDividends = await _dividendRepo.GetPagedAsync(query);
+            return _mapper.Map(pagedDividends);
         }
 
         private Expression<Func<Dividend, bool>> GetBaseFilter(Guid securityId)

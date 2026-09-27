@@ -13,6 +13,7 @@ using Audex.Infrastructure.Entities.Notifications;
 using Audex.Infrastructure.Interfaces.Database;
 using Audex.Infrastructure.Interfaces.Messages;
 using Audex.Infrastructure.Queries;
+using Audex.Shared.Common;
 
 namespace Audex.Application.Services.Notifications
 {
@@ -26,51 +27,31 @@ namespace Audex.Application.Services.Notifications
         private readonly ApplicationMapper _mapper = mapper;
         private readonly IServerNotifier _serverNotifier = serverNotifier;
 
-        private static Expression<Func<Notification, bool>> GetNotificationFilter(bool onlyUnread, string category)
+        private static Expression<Func<Notification, bool>> GetNotificationFilter(NotificationFilterDto filter)
         {
+            var onlyUnread = filter?.OnlyUnread ?? false;
+            var category = filter?.Category;
             var hasCategory = !string.IsNullOrEmpty(category) && category != "All";
-            return n => n.UserProfileId == UserProfileConstants.UserProfileId &&
-                        (!onlyUnread || !n.IsRead) &&
-                        (!hasCategory || n.Category == category);
+            return notification => notification.UserProfileId == UserProfileConstants.UserProfileId &&
+                                   (!onlyUnread || !notification.IsRead) &&
+                                   (!hasCategory || notification.Category == category);
         }
 
-        public async Task<IEnumerable<NotificationDto>> GetAllAsync(int pageIndex = 1, int recordsQuantity = 15, bool onlyUnread = false, string category = null)
+        public async Task<PagedResult<NotificationDto>> GetAllAsync(NotificationFilterDto filter)
         {
+            var filterExpression = GetNotificationFilter(filter);
             var builder = new ComplexQueryBuilder<Notification>()
-                .AddFilter(GetNotificationFilter(onlyUnread, category));
+                .AddFilter(filterExpression)
+                .AddPagination(filter, notification => notification.CreatedAt, isDescending: true);
 
-            if (pageIndex > 0 && recordsQuantity > 0)
-            {
-                builder.AddPagination(pageIndex, recordsQuantity, n => n.CreatedAt, isDescending: true);
-            }
-            else
-            {
-                builder.AddOrder(n => n.CreatedAt, isDescending: true);
-                if (recordsQuantity > 0)
-                {
-                    var query = builder.GetQuery();
-                    query.RecordsLimit = recordsQuantity;
-                }
-            }
-
-            var notifications = await _notificationRepo.GetAllAsync(builder.GetQuery());
-            return _mapper.Map(notifications);
-        }
-
-        public async Task<PaginationConfigDto> GetPaginationAsync(bool onlyUnread = false, string category = null)
-        {
-            var recordsQuantity = await _notificationRepo.GetCountAsync(GetNotificationFilter(onlyUnread, category));
-            return new PaginationConfigDto
-            {
-                PageSize = 15,
-                RecordsQuantity = recordsQuantity
-            };
+            var pagedNotifications = await _notificationRepo.GetPagedAsync(builder.GetQuery());
+            return _mapper.Map(pagedNotifications);
         }
 
         public async Task<int> GetUnreadCountAsync()
         {
             var unread = await _notificationRepo.GetAllAsync(
-                filter: n => n.UserProfileId == UserProfileConstants.UserProfileId && !n.IsRead,
+                filter: notification => notification.UserProfileId == UserProfileConstants.UserProfileId && !notification.IsRead,
                 disableTracking: true);
 
             return unread.Count();
@@ -80,7 +61,7 @@ namespace Audex.Application.Services.Notifications
         {
             var threshold = DateTime.UtcNow.AddDays(-olderThanDays);
             var oldReadNotifications = (await _notificationRepo.GetAllAsync(
-                filter: n => n.UserProfileId == UserProfileConstants.UserProfileId && n.IsRead && n.CreatedAt < threshold,
+                filter: notification => notification.UserProfileId == UserProfileConstants.UserProfileId && notification.IsRead && notification.CreatedAt < threshold,
                 disableTracking: false)).ToList();
 
             if (oldReadNotifications.Count == 0) return;
@@ -150,7 +131,7 @@ namespace Audex.Application.Services.Notifications
         public async Task MarkAllAsReadAsync()
         {
             var unreadItems = (await _notificationRepo.GetAllAsync(
-                filter: n => n.UserProfileId == UserProfileConstants.UserProfileId && !n.IsRead,
+                filter: notification => notification.UserProfileId == UserProfileConstants.UserProfileId && !notification.IsRead,
                 disableTracking: false)).ToList();
 
             if (unreadItems.Count == 0) return;

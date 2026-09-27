@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Audex.Shared.Common;
 using Audex.Shared.Entities;
 using Audex.Infrastructure.Interfaces.Database;
 using Audex.Infrastructure.Migrations;
@@ -127,6 +128,28 @@ namespace Audex.Infrastructure.Database
             }
 
             return await query.ToListAsync();
+        }
+
+        public async Task<PagedResult<TEntity>> GetPagedAsync(ComplexQuery<TEntity> complexQuery)
+        {
+            var items = (await GetAllAsync(complexQuery)).ToList();
+
+            var pageIndex = complexQuery.RecordsLimit > 0 && complexQuery.RecordsOffset >= 0
+                ? (complexQuery.RecordsOffset / complexQuery.RecordsLimit) + 1
+                : 1;
+            var pageSize = complexQuery.RecordsLimit > 0 ? complexQuery.RecordsLimit : (items.Count > 0 ? items.Count : 10);
+
+            int totalCount = (pageIndex == 1 && items.Count < pageSize)
+                ? items.Count
+                : await GetCountAsync(complexQuery);
+
+            return new PagedResult<TEntity>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
         }
 
         public async Task<int> GetCountAsync(Expression<Func<TEntity, bool>> filter = null)

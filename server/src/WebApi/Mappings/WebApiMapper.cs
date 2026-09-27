@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Riok.Mapperly.Abstractions;
 using Audex.Application.DTO;
 using Audex.Application.DTO.Accounts;
+using Audex.Application.DTO.Auth;
 using Audex.Application.DTO.Banks;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.DTO.Common;
@@ -235,7 +237,9 @@ namespace Audex.WebApi.Mappings
         public partial BankDto Map(BankModel model);
         public partial IEnumerable<BankModel> Map(IEnumerable<BankDto> dtos);
 
-        public partial PaginationConfigModel Map(PaginationConfigDto dto);
+        public partial UserRefreshTokenFilterDto Map(GetRefreshTokensQuery query, Guid userProfileId, string currentRefreshToken);
+        public partial UserRefreshTokenModel Map(UserRefreshTokenDto dto);
+        public partial PagedResult<UserRefreshTokenModel> Map(PagedResult<UserRefreshTokenDto> dto);
 
         public partial LoginModel Map(LoginDto dto);
         public partial LoginDto Map(LoginModel model);

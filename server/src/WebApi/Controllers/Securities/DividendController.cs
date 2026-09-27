@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Securities;
+using Audex.Shared.Common;
 using Audex.WebApi.Mappings;
-using Audex.WebApi.Models.Common;
 using Audex.WebApi.Models.Securities;
 using System;
 using System.Collections.Generic;
@@ -26,10 +26,11 @@ namespace Audex.WebApi.Controllers.Securities
         }
 
         [HttpPost(nameof(GetAll))]
-        public async Task<IEnumerable<DividendModel>> GetAll(GetAllDividendsQuery query)
+        public async Task<PagedResult<DividendModel>> GetAll(GetAllDividendsQuery query)
         {
-            var securities = await _dividendService.GetAllAsync(query.SecurityId, query.PageIndex, query.RecordsQuantity);
-            return _mapper.Map(securities);
+            var filter = _mapper.Map(query);
+            var dividends = await _dividendService.GetAllAsync(filter);
+            return _mapper.Map(dividends);
         }
 
         [HttpGet(nameof(GetAvailable))]
@@ -37,13 +38,6 @@ namespace Audex.WebApi.Controllers.Securities
         {
             var securities = await _dividendService.GetAvailableAsync(brokerAccountId);
             return _mapper.Map(securities);
-        }
-
-        [HttpGet(nameof(GetPagination))]
-        public async Task<PaginationConfigModel> GetPagination([FromQuery] Guid securityId)
-        {
-            var pagination = await _dividendService.GetPaginationAsync(securityId);
-            return _mapper.Map(pagination);
         }
 
         [HttpPut]

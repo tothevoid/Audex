@@ -9,6 +9,7 @@ using Audex.Infrastructure.Entities.Accounts;
 using Audex.Infrastructure.Entities.Brokers;
 using Audex.Infrastructure.Interfaces.Database;
 using Audex.Infrastructure.Queries;
+using Audex.Shared.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,36 +39,29 @@ namespace Audex.Application.Services.Brokers
             _accountService = accountService;
         }
 
-        public async Task<IEnumerable<BrokerAccountFundsTransferDto>> GetAllAsync()
+        public async Task<PagedResult<BrokerAccountFundsTransferDto>> GetAllAsync(BrokerAccountFundsTransferFilterDto filter = null)
         {
-            var complexQuery = GetBaseBuilder().GetQuery();
+            filter ??= new BrokerAccountFundsTransferFilterDto();
 
-            var transfers = await _transfersRepo.GetAllAsync(complexQuery);
-            return _mapper.Map(transfers).ToList();
+            var builder = new ComplexQueryBuilder<BrokerAccountFundsTransfer>()
+                .AddJoins(GetFullHierarchyColumns)
+                .AddPagination(filter, transfer => transfer.Date, isDescending: true);
+
+            ApplyFilters(builder, filter);
+
+            var pagedTransfers = await _transfersRepo.GetPagedAsync(builder.GetQuery());
+            return _mapper.Map(pagedTransfers);
         }
 
-        public async Task<IEnumerable<BrokerAccountFundsTransferDto>> GetAllAsync(Guid brokerAccountId)
+        private static ComplexQueryBuilder<BrokerAccountFundsTransfer> ApplyFilters(
+            ComplexQueryBuilder<BrokerAccountFundsTransfer> builder,
+            BrokerAccountFundsTransferFilterDto filter)
         {
-            var complexQuery = GetBaseBuilderWithFilter(brokerAccountId).GetQuery();
-
-            var transfers = await _transfersRepo.GetAllAsync(complexQuery);
-            return _mapper.Map(transfers).ToList();
-        }
-
-        public async Task<IEnumerable<BrokerAccountFundsTransferDto>> GetAllAsync(Guid? brokerAccountId, int pageIndex, int recordsQuantity)
-        {
-            var builder = brokerAccountId != null ?
-                GetBaseBuilderWithFilter((Guid) brokerAccountId):
-                GetBaseBuilder();
-
-            var complexQuery = builder
-                .AddPagination(pageIndex, recordsQuantity,
-                    transfer => transfer.Date,
-                    true)
-                .GetQuery();
-
-            var transfers = await _transfersRepo.GetAllAsync(complexQuery);
-            return _mapper.Map(transfers).ToList();
+            if (filter.BrokerAccountId.HasValue && filter.BrokerAccountId.Value != Guid.Empty)
+            {
+                builder.AddFilter(transfer => transfer.BrokerAccountId == filter.BrokerAccountId.Value);
+            }
+            return builder;
         }
 
         public async Task<(decimal deposited, decimal withdrawn)> GetSumTillSpecificDateAsync(DateOnly date, Guid? brokerAccountId)
@@ -88,18 +82,6 @@ namespace Audex.Application.Services.Brokers
                deposited,
                withdrawn
             );
-        }
-
-        private ComplexQueryBuilder<BrokerAccountFundsTransfer> GetBaseBuilder()
-        {
-            return new ComplexQueryBuilder<BrokerAccountFundsTransfer>()
-                .AddJoins(GetFullHierarchyColumns);
-        }
-
-        private ComplexQueryBuilder<BrokerAccountFundsTransfer> GetBaseBuilderWithFilter(Guid brokerAccountId)
-        {
-            return GetBaseBuilder()
-                .AddFilter(GetBaseFilter(brokerAccountId));
         }
 
         public async Task<BrokerAccountFundsTransferDto> AddAsync(BrokerAccountFundsTransferDto transferDto)
@@ -165,44 +147,16 @@ namespace Audex.Application.Services.Brokers
             await _accountService.UpdateAsync(_mapper.Map(account));
         }
 
-        public async Task<PaginationConfigDto> GetPaginationByBrokerAccountAsync(Guid brokerAccountId)
-        {
-            var filter = GetBaseFilter(brokerAccountId);
-            return await GetPaginationByFilter(filter);
-        }
-
-        public async Task<PaginationConfigDto> GetPaginationAsync()
-        {
-            return await GetPaginationByFilter();
-        }
-
-        private async Task<PaginationConfigDto> GetPaginationByFilter(Expression<Func<BrokerAccountFundsTransfer, bool>> filter = null)
-        {
-            int pageSize = 10;
-            var recordsQuantity = await _transfersRepo.GetCountAsync(filter);
-
-            return new PaginationConfigDto()
-            {
-                PageSize = pageSize,
-                RecordsQuantity = recordsQuantity
-            };
-        }
-
-        private Expression<Func<BrokerAccountFundsTransfer, bool>> GetBaseFilter(Guid brokerAccountId)
-        {
-            return brokerAccountSecurity => brokerAccountSecurity.BrokerAccountId == brokerAccountId;
-        }
-
         private IQueryable<BrokerAccountFundsTransfer> GetFullHierarchyColumns(IQueryable<BrokerAccountFundsTransfer> query)
         {
             return query
-                .Include(x => x.Account.Currency)
-                .Include(x => x.Account.AccountType)
-                .Include(x => x.Account.Bank)
-                .Include(x => x.BrokerAccount.Type)
-                .Include(x => x.BrokerAccount.Currency)
-                .Include(x => x.BrokerAccount.Broker)
-                .Include(x => x.BrokerAccount.Bank);
+                .Include(transfer => transfer.Account.Currency)
+                .Include(transfer => transfer.Account.AccountType)
+                .Include(transfer => transfer.Account.Bank)
+                .Include(transfer => transfer.BrokerAccount.Type)
+                .Include(transfer => transfer.BrokerAccount.Currency)
+                .Include(transfer => transfer.BrokerAccount.Broker)
+                .Include(transfer => transfer.BrokerAccount.Bank);
         }
     }
 }

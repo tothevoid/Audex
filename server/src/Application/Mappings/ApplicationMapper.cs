@@ -23,6 +23,7 @@ using Audex.Infrastructure.Entities.Notifications;
 using Audex.Infrastructure.Entities.Securities;
 using Audex.Infrastructure.Entities.Transactions;
 using Audex.Infrastructure.Entities.User;
+using Audex.Shared.Common;
 
 namespace Audex.Application.Mappings
 {
@@ -148,5 +149,13 @@ namespace Audex.Application.Mappings
         public partial Notification Map(NotificationDto dto);
         public partial NotificationDto Map(Notification entity);
         public partial IEnumerable<NotificationDto> Map(IEnumerable<Notification> entities);
+
+        public partial PagedResult<BrokerAccountFundsTransferDto> Map(PagedResult<BrokerAccountFundsTransfer> pagedResult);
+        public partial PagedResult<DividendPaymentDto> Map(PagedResult<DividendPayment> pagedResult);
+        public partial PagedResult<DividendDto> Map(PagedResult<Dividend> pagedResult);
+        public partial PagedResult<DebtPaymentDto> Map(PagedResult<DebtPayment> pagedResult);
+        public partial PagedResult<CurrencyTransactionDto> Map(PagedResult<CurrencyTransaction> pagedResult);
+        public partial PagedResult<NotificationDto> Map(PagedResult<Notification> pagedResult);
+        public partial PagedResult<SecurityTransactionDto> Map(PagedResult<SecurityTransaction> pagedResult);
     }
 }

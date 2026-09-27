@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.DTO.Common;
 using Audex.Application.Interfaces.Brokers;
@@ -8,6 +8,7 @@ using Audex.Infrastructure.Entities.Brokers;
 using Audex.Infrastructure.Entities.Securities;
 using Audex.Infrastructure.Interfaces.Database;
 using Audex.Infrastructure.Queries;
+using Audex.Shared.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,23 +35,19 @@ namespace Audex.Application.Services.Brokers
             _dividendRepo = uow.CreateRepository<Dividend>();
         }
 
-        public async Task<IEnumerable<DividendPaymentDto>> GetAllAsync(Guid? brokerAccountId, int pageIndex, int recordsQuantity)
+        public async Task<PagedResult<DividendPaymentDto>> GetAllAsync(DividendPaymentFilterDto filter)
         {
-            var query = new ComplexQueryBuilder<DividendPayment>()
-                .AddPagination(pageIndex, recordsQuantity,
-                    dividendPayment => dividendPayment.ReceivedAt,
-                    true)
+            var queryBuilder = new ComplexQueryBuilder<DividendPayment>()
+                .AddPagination(filter, dividendPayment => dividendPayment.ReceivedAt, true)
                 .AddJoins(DividendPaymentQuery.GetFullHierarchyColumns);
 
-            if (brokerAccountId != null)
+            if (filter.BrokerAccountId.HasValue)
             {
-                query.AddFilter(GetBaseFilter((Guid) brokerAccountId));
+                queryBuilder.AddFilter(GetBaseFilter(filter.BrokerAccountId.Value));
             }
 
-            var dividends = await _dividendPaymentRepo
-                .GetAllAsync(query.GetQuery());
-            
-            return _mapper.Map(dividends);
+            var pagedDividends = await _dividendPaymentRepo.GetPagedAsync(queryBuilder.GetQuery());
+            return _mapper.Map(pagedDividends);
         }
 
         public async Task<decimal> GetSumTillSpecificDateAsync(DateOnly date, Guid? brokerAccountId)
@@ -60,28 +57,6 @@ namespace Audex.Application.Services.Brokers
                 (dividendPayment) => dividendPayment.ReceivedAt <= date;
 
             return await _dividendPaymentRepo.GetSumAsync((payment) => payment.SecuritiesQuantity * payment.Dividend.Amount - payment.Tax, filter);
-        }
-
-        public async Task<PaginationConfigDto> GetPaginationAsync()
-        {
-            return await GetPaginationByFilter();
-        }
-
-        public async Task<PaginationConfigDto> GetPaginationByBrokerAccountAsync(Guid brokerAccountId)
-        {
-            return await GetPaginationByFilter(GetBaseFilter(brokerAccountId));
-        }
-
-        private async Task<PaginationConfigDto> GetPaginationByFilter(Expression<Func<DividendPayment, bool>> filter = null)
-        {
-            int pageSize = 10;
-            var recordsQuantity = await _dividendPaymentRepo.GetCountAsync(filter);
-
-            return new PaginationConfigDto()
-            {
-                PageSize = pageSize,
-                RecordsQuantity = recordsQuantity
-            };
         }
 
         private Expression<Func<DividendPayment, bool>> GetBaseFilter(Guid brokerAccountId)

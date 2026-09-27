@@ -23,6 +23,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Audex.Application.Constants;
 using Audex.Application.Interfaces.Localization;
+using Audex.Shared.Common;
 
 namespace Audex.Application.Services.Auth
 {
@@ -231,31 +232,18 @@ namespace Audex.Application.Services.Auth
             return true;
         }
 
-        public async Task<IEnumerable<UserRefreshTokenDto>> GetRefreshTokensAsync(
-            Guid userProfileId,
-            bool isActive = true,
-            int pageIndex = 1,
-            int recordsQuantity = 10,
-            string? currentRefreshToken = null)
+        public async Task<PagedResult<UserRefreshTokenDto>> GetRefreshTokensAsync(UserRefreshTokenFilterDto filter)
         {
-            var filter = GetTokenFilter(userProfileId, isActive);
+            var expression = GetTokenFilter(filter.UserProfileId, filter.IsActive);
 
             var builder = new ComplexQueryBuilder<UserRefreshToken>()
-                .AddFilter(filter);
+                .AddFilter(expression)
+                .AddPagination(filter, token => token.CreatedAt, isDescending: true);
 
-            if (pageIndex > 0 && recordsQuantity > 0)
-            {
-                builder.AddPagination(pageIndex, recordsQuantity, t => t.CreatedAt, isDescending: true);
-            }
-            else
-            {
-                builder.AddOrder(t => t.CreatedAt, isDescending: true);
-            }
+            var pagedTokens = await _refreshTokenRepo.GetPagedAsync(builder.GetQuery());
+            var currentHash = string.IsNullOrEmpty(filter.CurrentRefreshToken) ? null : HashToken(filter.CurrentRefreshToken);
 
-            var tokens = await _refreshTokenRepo.GetAllAsync(builder.GetQuery());
-            var currentHash = string.IsNullOrEmpty(currentRefreshToken) ? null : HashToken(currentRefreshToken);
-
-            return tokens.Select(token => new UserRefreshTokenDto
+            var items = pagedTokens.Items.Select(token => new UserRefreshTokenDto
             {
                 Id = token.Id,
                 CreatedByIp = token.CreatedByIp,
@@ -265,18 +253,14 @@ namespace Audex.Application.Services.Auth
                 IsCurrent = currentHash != null && token.TokenHash == currentHash,
                 IsRevoked = token.IsRevoked,
                 IsUsed = token.IsUsed
-            });
-        }
+            }).ToList();
 
-        public async Task<PaginationConfigDto> GetRefreshTokensPaginationAsync(Guid userProfileId, bool isActive = true)
-        {
-            var filter = GetTokenFilter(userProfileId, isActive);
-            var recordsQuantity = await _refreshTokenRepo.GetCountAsync(filter);
-
-            return new PaginationConfigDto
+            return new PagedResult<UserRefreshTokenDto>
             {
-                PageSize = 10,
-                RecordsQuantity = recordsQuantity
+                Items = items,
+                TotalCount = pagedTokens.TotalCount,
+                PageIndex = pagedTokens.PageIndex,
+                PageSize = pagedTokens.PageSize
             };
         }
 

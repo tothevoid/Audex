@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Audex.Application.DTO.Auth;
 using Audex.Application.Interfaces.Auth;
+using Audex.Shared.Common;
+using Audex.WebApi.Mappings;
 using Audex.WebApi.Models.Auth;
 using System;
 using System.Security.Claims;
@@ -17,10 +19,12 @@ namespace Audex.WebApi.Controllers.Auth
     {
         private const string RefreshTokenCookieKey = "refreshToken";
         private readonly IAuthService _authService;
+        private readonly WebApiMapper _mapper;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, WebApiMapper mapper)
         {
             _authService = authService;
+            _mapper = mapper;
         }
 
         [HttpGet("Status")]
@@ -202,8 +206,8 @@ namespace Audex.WebApi.Controllers.Auth
         }
 
         [Authorize]
-        [HttpGet("RefreshTokens")]
-        public async Task<IActionResult> GetRefreshTokens([FromQuery] bool isActive = true, [FromQuery] int pageIndex = 1, [FromQuery] int recordsQuantity = 10)
+        [HttpPost("RefreshTokens")]
+        public async Task<ActionResult<PagedResult<UserRefreshTokenModel>>> GetRefreshTokens([FromBody] GetRefreshTokensQuery query)
         {
             if (!TryGetCurrentUserId(out var userId))
             {
@@ -211,21 +215,9 @@ namespace Audex.WebApi.Controllers.Auth
             }
 
             Request.Cookies.TryGetValue(RefreshTokenCookieKey, out var currentCookieToken);
-            var tokens = await _authService.GetRefreshTokensAsync(userId, isActive, pageIndex, recordsQuantity, currentCookieToken);
-            return Ok(tokens);
-        }
-
-        [Authorize]
-        [HttpGet("RefreshTokens/Pagination")]
-        public async Task<IActionResult> GetRefreshTokensPagination([FromQuery] bool isActive = true)
-        {
-            if (!TryGetCurrentUserId(out var userId))
-            {
-                return Unauthorized();
-            }
-
-            var pagination = await _authService.GetRefreshTokensPaginationAsync(userId, isActive);
-            return Ok(pagination);
+            var filter = _mapper.Map(query, userId, currentCookieToken);
+            var pagedResult = await _authService.GetRefreshTokensAsync(filter);
+            return _mapper.Map(pagedResult);
         }
 
         [Authorize]

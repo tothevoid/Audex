@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Audex.Infrastructure.Queries;
+using Audex.Shared.Common;
 using Audex.Shared.Entities;
 
 namespace Audex.Infrastructure.Interfaces.Database
@@ -21,6 +22,7 @@ namespace Audex.Infrastructure.Interfaces.Database
             Func<IQueryable<TEntity>, IQueryable<TEntity>> include = null,
             bool disableTracking = true);
         Task<IEnumerable<TEntity>> GetAllAsync(ComplexQuery<TEntity> complexQuery);
+        Task<PagedResult<TEntity>> GetPagedAsync(ComplexQuery<TEntity> complexQuery);
 
         Task<IEnumerable<Output>> GroupAsync<KeySelector, Output>(Expression<Func<TEntity, KeySelector>> groupSelector,
             Expression<Func<IGrouping<KeySelector, TEntity>, Output>> projection,

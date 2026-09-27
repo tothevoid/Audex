@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Audex.Application.DTO.Common;
 using Audex.Application.DTO.Scheduler;
 using Audex.Application.Enums.Scheduler;
 using Audex.Application.Interfaces.Localization;
@@ -14,6 +13,7 @@ using Audex.Application.Utilities.Scheduler;
 using Audex.Infrastructure.Entities.Scheduler;
 using Audex.Infrastructure.Interfaces.Database;
 using Audex.Infrastructure.Queries;
+using Audex.Shared.Common;
 using TickerQ.Utilities.Entities;
 using TickerQ.Utilities.Enums;
 
@@ -40,22 +40,17 @@ namespace Audex.Application.Services.Scheduler
             _logger = logger;
         }
 
-        public async Task<IEnumerable<ScheduledTaskJournalDto>> GetJournalAsync(
-            int pageIndex = 1,
-            int recordsQuantity = 20,
-            string taskName = null,
-            ScheduledTaskExecutionStatus? status = null,
-            ScheduledTaskTriggerSource? triggerSource = null)
+        public async Task<PagedResult<ScheduledTaskJournalDto>> GetJournalAsync(SchedulerJournalFilterDto filter)
         {
-            var lang = await _localizer.GetUserLanguageAsync();
+            var language = await _localizer.GetUserLanguageAsync();
 
             var builder = new ComplexQueryBuilder<CronTickerOccurrenceEntity<ScheduledCronTicker>>()
                 .AddJoins(query => query.Include(occurrence => occurrence.CronTicker))
-                .AddFilter(GetFilter(taskName, status))
-                .AddPagination(pageIndex, recordsQuantity, occurrence => occurrence.ExecutionTime, isDescending: true);
+                .AddFilter(GetFilter(filter.TaskName, filter.Status))
+                .AddPagination(filter, occurrence => occurrence.ExecutionTime, isDescending: true);
 
-            var occurrences = await _occurrenceRepo.GetAllAsync(builder.GetQuery());
-            var occurrenceList = occurrences.ToList();
+            var pagedOccurrences = await _occurrenceRepo.GetPagedAsync(builder.GetQuery());
+            var occurrenceList = pagedOccurrences.Items.ToList();
             var occurrenceIds = occurrenceList.Select(occurrence => occurrence.Id).ToHashSet();
 
             var attachments = await _attachmentRepo.GetAllAsync(
@@ -66,11 +61,11 @@ namespace Audex.Application.Services.Scheduler
                 .GroupBy(attachment => attachment.OccurrenceId)
                 .ToDictionary(group => group.Key, group => group.Select(MapAttachmentDto).ToList());
 
-            return occurrenceList.Select(occurrence =>
+            var items = occurrenceList.Select(occurrence =>
             {
                 var functionName = occurrence.CronTicker?.Function ?? "ScheduledTask";
                 var displayName = _jobRegistry.TryGetDescriptor(functionName, out var jobDescriptor) && !string.IsNullOrWhiteSpace(jobDescriptor.DisplayNameKey)
-                    ? _localizer.Get(jobDescriptor.DisplayNameKey, lang)
+                    ? _localizer.Get(jobDescriptor.DisplayNameKey, language)
                     : functionName;
 
                 return new ScheduledTaskJournalDto
@@ -81,26 +76,19 @@ namespace Audex.Application.Services.Scheduler
                     ExecutedAtUtc = occurrence.ExecutedAt ?? occurrence.ExecutionTime,
                     DurationMs = occurrence.ElapsedTime,
                     Status = SchedulerStatusMapper.ToExecutionStatus(occurrence.Status),
-                    TriggerSource = triggerSource ?? ScheduledTaskTriggerSource.Scheduled,
+                    TriggerSource = filter.TriggerSource ?? ScheduledTaskTriggerSource.Scheduled,
                     LogMessage = null,
                     ErrorMessage = occurrence.ExceptionMessage,
                     Attachments = attachmentMap.TryGetValue(occurrence.Id, out var taskAttachments) ? taskAttachments : new List<ScheduledTaskAttachmentDto>()
                 };
             }).ToList();
-        }
 
-        public async Task<PaginationConfigDto> GetJournalPaginationAsync(
-            string taskName = null,
-            ScheduledTaskExecutionStatus? status = null,
-            ScheduledTaskTriggerSource? triggerSource = null)
-        {
-            var filter = GetFilter(taskName, status);
-            var recordsQuantity = await _occurrenceRepo.GetCountAsync(filter);
-
-            return new PaginationConfigDto
+            return new PagedResult<ScheduledTaskJournalDto>
             {
-                PageSize = 15,
-                RecordsQuantity = recordsQuantity
+                Items = items,
+                TotalCount = pagedOccurrences.TotalCount,
+                PageIndex = pagedOccurrences.PageIndex,
+                PageSize = pagedOccurrences.PageSize
             };
         }
 

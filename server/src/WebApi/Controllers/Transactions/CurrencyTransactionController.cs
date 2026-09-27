@@ -4,11 +4,10 @@ using System.Threading.Tasks;
 using System;
 using Audex.Application.DTO.Transactions;
 using Audex.Application.Interfaces.Transactions;
+using Audex.Shared.Common;
 using Audex.WebApi.Mappings;
 using Audex.WebApi.Models.Transactions;
 using Microsoft.AspNetCore.Authorization;
-
-using Audex.WebApi.Models.Common;
 
 namespace Audex.WebApi.Controllers.Transactions
 {
@@ -26,10 +25,11 @@ namespace Audex.WebApi.Controllers.Transactions
             _currencyTransactionService = currencyTransactionService;
         }
 
-        [HttpGet]
-        public async Task<IEnumerable<CurrencyTransactionModel>> GetAll()
+        [HttpPost(nameof(GetAll))]
+        public async Task<PagedResult<CurrencyTransactionModel>> GetAll(GetAllCurrencyTransactionsQuery query)
         {
-            var currencyTransactions = await _currencyTransactionService.GetAllAsync();
+            var filter = _mapper.Map(query);
+            var currencyTransactions = await _currencyTransactionService.GetAllAsync(filter);
             return _mapper.Map(currencyTransactions);
         }
 
@@ -39,23 +39,6 @@ namespace Audex.WebApi.Controllers.Transactions
             var dto = await _currencyTransactionService.GetByIdAsync(id);
             if (dto == null) return NotFound();
             return _mapper.Map(dto);
-        }
-
-        [HttpGet(nameof(GetAllByAccountId))]
-        public async Task<IEnumerable<CurrencyTransactionModel>> GetAllByAccountId(
-            [FromQuery] Guid accountId,
-            [FromQuery] int? pageIndex = null,
-            [FromQuery] int? recordsQuantity = null)
-        {
-            var dtos = await _currencyTransactionService.GetAllByAccountIdAsync(accountId, pageIndex, recordsQuantity);
-            return _mapper.Map(dtos);
-        }
-
-        [HttpGet(nameof(GetPaginationByAccountId))]
-        public async Task<PaginationConfigModel> GetPaginationByAccountId([FromQuery] Guid accountId)
-        {
-            var pagination = await _currencyTransactionService.GetPaginationAsync(accountId);
-            return _mapper.Map(pagination);
         }
 
         [HttpGet(nameof(GetSummaryByAccountId))]

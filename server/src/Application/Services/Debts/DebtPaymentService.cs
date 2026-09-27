@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Audex.Application.DTO.Common;
+using Microsoft.EntityFrameworkCore;
 using Audex.Application.DTO.Debts;
 using Audex.Application.Interfaces.Debts;
 using Audex.Application.Interfaces.Transactions;
@@ -9,6 +8,7 @@ using Audex.Infrastructure.Entities.Brokers;
 using Audex.Infrastructure.Entities.Debts;
 using Audex.Infrastructure.Interfaces.Database;
 using Audex.Infrastructure.Queries;
+using Audex.Shared.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,60 +40,24 @@ namespace Audex.Application.Services.Debts
             return _mapper.Map(debtPayment);
         }
 
-        public async Task<IEnumerable<DebtPaymentDto>> GetAllAsync(int pageIndex, int recordsQuantity, Guid? debtId = null, Guid? tagId = null)
+        public async Task<PagedResult<DebtPaymentDto>> GetAllAsync(DebtPaymentFilterDto filter)
         {
-            var builder = new ComplexQueryBuilder<DebtPayment>();
+            var builder = new ComplexQueryBuilder<DebtPayment>()
+                .AddPagination(filter, payment => payment.Date, true)
+                .AddJoins(GetFullHierarchyColumns);
 
-            if (debtId.HasValue && debtId.Value != Guid.Empty)
+            if (filter.DebtId.HasValue && filter.DebtId.Value != Guid.Empty)
             {
-                builder.AddFilter(payment => payment.DebtId == debtId.Value);
+                builder.AddFilter(payment => payment.DebtId == filter.DebtId.Value);
             }
 
-            if (tagId.HasValue && tagId.Value != Guid.Empty)
+            if (filter.TagId.HasValue && filter.TagId.Value != Guid.Empty)
             {
-                builder.AddFilter(payment => payment.Debt.DebtTags.Any(dt => dt.DebtTagId == tagId.Value));
+                builder.AddFilter(payment => payment.Debt.DebtTags.Any(debtTag => debtTag.DebtTagId == filter.TagId.Value));
             }
 
-            var query = builder
-                .AddPagination(pageIndex, recordsQuantity,
-                    (payment) => payment.Date, true)
-                .AddJoins(GetFullHierarchyColumns)
-                .GetQuery();
-
-            var debtPayments = await _debtPaymentRepo.GetAllAsync(query);
-            return _mapper.Map(debtPayments);
-        }
-
-        public async Task<PaginationConfigDto> GetPaginationAsync(Guid? debtId = null, Guid? tagId = null)
-        {
-            int pageSize = 10;
-            int recordsQuantity;
-
-            var hasDebtId = debtId.HasValue && debtId.Value != Guid.Empty;
-            var hasTagId = tagId.HasValue && tagId.Value != Guid.Empty;
-
-            if (hasDebtId && hasTagId)
-            {
-                recordsQuantity = await _debtPaymentRepo.GetCountAsync(p => p.DebtId == debtId.Value && p.Debt.DebtTags.Any(dt => dt.DebtTagId == tagId.Value));
-            }
-            else if (hasDebtId)
-            {
-                recordsQuantity = await _debtPaymentRepo.GetCountAsync(p => p.DebtId == debtId.Value);
-            }
-            else if (hasTagId)
-            {
-                recordsQuantity = await _debtPaymentRepo.GetCountAsync(p => p.Debt.DebtTags.Any(dt => dt.DebtTagId == tagId.Value));
-            }
-            else
-            {
-                recordsQuantity = await _debtPaymentRepo.GetCountAsync();
-            }
-
-            return new PaginationConfigDto()
-            {
-                PageSize = pageSize,
-                RecordsQuantity = recordsQuantity
-            };
+            var pagedPayments = await _debtPaymentRepo.GetPagedAsync(builder.GetQuery());
+            return _mapper.Map(pagedPayments);
         }
 
         public async Task<Guid> AddAsync(DebtPaymentDto debtPaymentDto)

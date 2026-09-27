@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Audex.Application.Interfaces.Notifications;
+using Audex.Shared.Common;
 using Audex.WebApi.Mappings;
 using Audex.WebApi.Models.Common;
 using Audex.WebApi.Models.Notifications;
@@ -26,19 +27,11 @@ namespace Audex.WebApi.Controllers.Notifications
         }
 
         [HttpPost(nameof(GetAll))]
-        public async Task<IEnumerable<NotificationModel>> GetAll(GetAllNotificationsQuery query)
+        public async Task<PagedResult<NotificationModel>> GetAll(GetAllNotificationsQuery query)
         {
-            var notifications = await _notificationService.GetAllAsync(query.PageIndex, query.RecordsQuantity, query.OnlyUnread, query.Category);
-            return _mapper.Map(notifications);
-        }
-
-        [HttpGet(nameof(GetPagination))]
-        public async Task<PaginationConfigModel> GetPagination(
-            [FromQuery] bool onlyUnread = false,
-            [FromQuery] string category = null)
-        {
-            var pagination = await _notificationService.GetPaginationAsync(onlyUnread, category);
-            return _mapper.Map(pagination);
+            var filter = _mapper.Map(query);
+            var pagedResult = await _notificationService.GetAllAsync(filter);
+            return _mapper.Map(pagedResult);
         }
 
         [HttpGet("unread-count")]

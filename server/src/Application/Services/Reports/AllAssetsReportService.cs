@@ -1,9 +1,10 @@
-﻿using ClosedXML.Excel;
+using ClosedXML.Excel;
 using Audex.Application.Constants;
 using Audex.Application.DTO.Accounts;
 using Audex.Application.DTO.Banks;
 using Audex.Application.DTO.Dashboard;
 using Audex.Application.DTO.Reports;
+using Audex.Application.DTO.Transactions;
 using Audex.Application.Interfaces.Accounts;
 using Audex.Application.Interfaces.Banks;
 using Audex.Application.Interfaces.Brokers;
@@ -336,7 +337,11 @@ namespace Audex.Application.Services.Reports
             decimal totalPnL = 0;
             decimal total = 0;
 
-            var transactions = (await _currencyTransactionService.GetAllByAccountIdAsync(cashAccount.Id))
+            var transactionsResult = await _currencyTransactionService.GetAllAsync(new CurrencyTransactionFilterDto
+            {
+                AccountId = cashAccount.Id
+            });
+            var transactions = transactionsResult.Items
                 .Where(transaction => transaction.DestinationAccountId == cashAccount.Id).ToList();
 
             foreach (var transaction in transactions.OrderBy(transaction => transaction.Date))

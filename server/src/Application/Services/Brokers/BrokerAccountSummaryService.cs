@@ -44,7 +44,7 @@ namespace Audex.Application.Services.Brokers
 
         public async Task<BrokerAccountSummaryDto> GetSummaryAsync()
         {
-            var transfers = (await _fundsTransferService.GetAllAsync()).ToList();
+            var transfers = await GetFundsTransfersAsync();
 
             return new BrokerAccountSummaryDto()
             {
@@ -55,7 +55,7 @@ namespace Audex.Application.Services.Brokers
 
         public async Task<BrokerAccountSummaryDto> GetSummaryByBrokerAccountAsync(Guid brokerAccountId)
         {
-            var transfers = (await _fundsTransferService.GetAllAsync(brokerAccountId)).ToList();
+            var transfers = await GetFundsTransfersAsync(brokerAccountId);
 
             return new BrokerAccountSummaryDto()
             {
@@ -123,7 +123,7 @@ namespace Audex.Application.Services.Brokers
             var taxDeductions = await _taxDeductionService.GetAmountByBrokerAccountAsync(brokerAccount.Id);
 
             // TODO: Run in parallel
-            var transfers = await _fundsTransferService.GetAllAsync(brokerAccount.Id);
+            var transfers = await GetFundsTransfersAsync(brokerAccount.Id);
             var depositedAmount = transfers.Sum(transfer => transfer.Income ? transfer.Amount : transfer.Amount * -1);
 
             var dividends = await _dividendPaymentService.GetEarningsByBrokerAccountAsync(brokerAccount.Id);
@@ -241,13 +241,13 @@ namespace Audex.Application.Services.Brokers
 
         public async Task<BrokerAccountMonthTransfersHistoryDto> GetMonthTransfersHistoryAsync(int month, int year)
         {
-            var transfers = (await _fundsTransferService.GetAllAsync()).ToList();
+            var transfers = await GetFundsTransfersAsync();
             return GetMonthTransfersHistoryByBrokerAccount(transfers, month, year, allBrokerAccounts: true);
         }
 
         public async Task<BrokerAccountMonthTransfersHistoryDto> GetMonthTransfersHistoryByBrokerAccountAsync(Guid brokerAccountId, int month, int year)
         {
-            var transfers = (await _fundsTransferService.GetAllAsync(brokerAccountId)).ToList();
+            var transfers = await GetFundsTransfersAsync(brokerAccountId);
             return GetMonthTransfersHistoryByBrokerAccount(transfers, month, year, allBrokerAccounts: false);
         }
 
@@ -286,13 +286,13 @@ namespace Audex.Application.Services.Brokers
 
         public async Task<BrokerAccountYearTransfersHistoryDto> GetYearTransfersHistoryAsync(int year)
         {
-            var transfers = (await _fundsTransferService.GetAllAsync()).ToList();
+            var transfers = await GetFundsTransfersAsync();
             return GetYearTransfersHistoryByBrokerAccount(transfers, year, allBrokerAccounts: true);
         }
 
         public async Task<BrokerAccountYearTransfersHistoryDto> GetYearTransfersHistoryByBrokerAccountAsync(Guid brokerAccountId, int year)
         {
-            var transfers = (await _fundsTransferService.GetAllAsync(brokerAccountId)).ToList();
+            var transfers = await GetFundsTransfersAsync(brokerAccountId);
             return GetYearTransfersHistoryByBrokerAccount(transfers, year, allBrokerAccounts: false);
         }
 
@@ -400,9 +400,7 @@ namespace Audex.Application.Services.Brokers
 
         public async Task<BrokerAccountTransfersAvailableDatesDto> GetTransfersAvailableDatesAsync(Guid? brokerAccountId)
         {
-            var transfers = brokerAccountId.HasValue
-                ? (await _fundsTransferService.GetAllAsync(brokerAccountId.Value)).ToList()
-                : (await _fundsTransferService.GetAllAsync()).ToList();
+            var transfers = await GetFundsTransfersAsync(brokerAccountId);
 
             if (transfers.Count == 0)
             {
@@ -499,6 +497,14 @@ namespace Audex.Application.Services.Brokers
             public Dictionary<Guid, BrokerAccountTransferAccountValueDto> AccountValues { get; set; } = new();
         }
 
+        private async Task<List<BrokerAccountFundsTransferDto>> GetFundsTransfersAsync(Guid? brokerAccountId = null)
+        {
+            var filter = brokerAccountId.HasValue
+                ? new BrokerAccountFundsTransferFilterDto { BrokerAccountId = brokerAccountId }
+                : null;
 
+            var pagedResult = await _fundsTransferService.GetAllAsync(filter);
+            return pagedResult.Items.ToList();
+        }
     }
 }

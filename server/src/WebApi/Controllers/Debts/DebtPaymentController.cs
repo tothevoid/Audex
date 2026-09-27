@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Audex.Application.DTO.Debts;
 using Audex.Application.Interfaces.Debts;
+using Audex.Shared.Common;
 using Audex.WebApi.Mappings;
-using Audex.WebApi.Models.Common;
 using Audex.WebApi.Models.Debts;
 using System;
 using System.Collections.Generic;
@@ -26,17 +26,11 @@ namespace Audex.WebApi.Controllers.Debts
         }
 
         [HttpPost(nameof(GetAll))]
-        public async Task<IEnumerable<DebtPaymentModel>> GetAll(GetAllDebtPaymentsQuery query)
+        public async Task<PagedResult<DebtPaymentModel>> GetAll(GetAllDebtPaymentsQuery query)
         {
-            var debtPayments = await _debtPaymentService.GetAllAsync(query.PageIndex, query.RecordsQuantity, query.DebtId, query.TagId);
+            var filter = _mapper.Map(query);
+            var debtPayments = await _debtPaymentService.GetAllAsync(filter);
             return _mapper.Map(debtPayments);
-        }
-
-        [HttpGet(nameof(GetPagination))]
-        public async Task<PaginationConfigModel> GetPagination([FromQuery] Guid? debtId, [FromQuery] Guid? tagId)
-        {
-            var pagination = await _debtPaymentService.GetPaginationAsync(debtId, tagId);
-            return _mapper.Map(pagination);
         }
 
         [HttpPut]

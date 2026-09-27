@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.Interfaces.Brokers;
+using Audex.Shared.Common;
 using Audex.WebApi.Mappings;
 using Audex.WebApi.Models.Brokers;
 using Audex.WebApi.Models.Common;
@@ -27,10 +28,10 @@ namespace Audex.WebApi.Controllers.Brokers
         }
 
         [HttpPost(nameof(GetAll))]
-        public async Task<IEnumerable<BrokerAccountFundsTransferModel>> GetAll(GetAllBrokerAccountFundTransferQuery query)
+        public async Task<PagedResult<BrokerAccountFundsTransferModel>> GetAll(GetAllBrokerAccountFundTransferQuery query)
         {
-            var transfers = await _brokerAccountFundsTransferService.GetAllAsync(query.BrokerAccountId, 
-                query.PageIndex, query.RecordsQuantity);
+            var filter = _mapper.Map(query);
+            var transfers = await _brokerAccountFundsTransferService.GetAllAsync(filter);
             return _mapper.Map(transfers);
         }
 
@@ -47,22 +48,6 @@ namespace Audex.WebApi.Controllers.Brokers
         {
             var transferDto = _mapper.Map(transferModel);
             await _brokerAccountFundsTransferService.UpdateAsync(transferDto);
-        }
-
-        [HttpGet(nameof(GetPagination))]
-        public async Task<PaginationConfigModel> GetPagination()
-        {
-            var pagination = await _brokerAccountFundsTransferService
-                .GetPaginationAsync();
-            return _mapper.Map(pagination);
-        }
-
-        [HttpGet(nameof(GetPaginationByBrokerAccount))]
-        public async Task<PaginationConfigModel> GetPaginationByBrokerAccount([FromQuery] Guid brokerAccountId)
-        {
-            var pagination = await _brokerAccountFundsTransferService
-                .GetPaginationByBrokerAccountAsync(brokerAccountId);
-            return _mapper.Map(pagination);
         }
 
         [HttpDelete]

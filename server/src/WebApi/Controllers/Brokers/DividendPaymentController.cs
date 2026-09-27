@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.Interfaces.Brokers;
 using Audex.Application.Services.Brokers;
+using Audex.Shared.Common;
 using Audex.WebApi.Mappings;
 using Audex.WebApi.Models.Brokers;
 using Audex.WebApi.Models.Common;
@@ -28,9 +29,10 @@ namespace Audex.WebApi.Controllers.Brokers
         }
 
         [HttpPost(nameof(GetAll))]
-        public async Task<IEnumerable<DividendPaymentModel>> GetAll(GetAllDividendsPaymentsQuery query)
+        public async Task<PagedResult<DividendPaymentModel>> GetAll(GetAllDividendsPaymentsQuery query)
         {
-            var dividendPayments = await _dividendPaymentService.GetAllAsync(query.BrokerAccountId, query.PageIndex, query.RecordsQuantity);
+            var filter = _mapper.Map(query);
+            var dividendPayments = await _dividendPaymentService.GetAllAsync(filter);
             return _mapper.Map(dividendPayments);
         }
 
@@ -52,22 +54,6 @@ namespace Audex.WebApi.Controllers.Brokers
         {
             var dividendDto = _mapper.Map(dividendPayment);
             await _dividendPaymentService.UpdateAsync(dividendDto);
-        }
-
-        [HttpGet(nameof(GetPagination))]
-        public async Task<PaginationConfigModel> GetPagination()
-        {
-            var pagination = await _dividendPaymentService
-                .GetPaginationAsync();
-            return _mapper.Map(pagination);
-        }
-
-        [HttpGet(nameof(GetPaginationByBrokerAccount))]
-        public async Task<PaginationConfigModel> GetPaginationByBrokerAccount([FromQuery] Guid brokerAccountId)
-        {
-            var pagination = await _dividendPaymentService
-                .GetPaginationByBrokerAccountAsync(brokerAccountId);
-            return _mapper.Map(pagination);
         }
 
         [HttpDelete]
