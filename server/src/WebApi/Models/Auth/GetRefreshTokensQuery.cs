@@ -4,6 +4,6 @@ namespace Audex.WebApi.Models.Auth
 {
     public class GetRefreshTokensQuery : BasePageable
     {
-        public bool IsActive { get; set; } = true;
+        public bool IsOnlyActive { get; set; } = true;
     }
 }

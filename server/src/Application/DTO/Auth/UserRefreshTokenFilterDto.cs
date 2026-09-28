@@ -7,7 +7,7 @@ namespace Audex.Application.DTO.Auth
     public class UserRefreshTokenFilterDto : BasePageable
     {
         public Guid UserProfileId { get; set; }
-        public bool IsActive { get; set; } = true;
+        public bool IsOnlyActive { get; set; } = true;
         public string? CurrentRefreshToken { get; set; }
     }
 }

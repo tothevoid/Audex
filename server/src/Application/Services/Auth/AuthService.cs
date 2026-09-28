@@ -234,7 +234,7 @@ namespace Audex.Application.Services.Auth
 
         public async Task<PagedResult<UserRefreshTokenDto>> GetRefreshTokensAsync(UserRefreshTokenFilterDto filter)
         {
-            var expression = GetTokenFilter(filter.UserProfileId, filter.IsActive);
+            var expression = GetTokenFilter(filter.UserProfileId, filter.IsOnlyActive);
 
             var builder = new ComplexQueryBuilder<UserRefreshToken>()
                 .AddFilter(expression)
@@ -338,9 +338,9 @@ namespace Audex.Application.Services.Auth
             return true;
         }
 
-        private static Expression<Func<UserRefreshToken, bool>> GetTokenFilter(Guid userProfileId, bool isActive)
+        private static Expression<Func<UserRefreshToken, bool>> GetTokenFilter(Guid userProfileId, bool isOnlyActive)
         {
-            if (isActive)
+            if (isOnlyActive)
             {
                 return token => token.UserProfileId == userProfileId &&
                                 !token.IsRevoked &&
