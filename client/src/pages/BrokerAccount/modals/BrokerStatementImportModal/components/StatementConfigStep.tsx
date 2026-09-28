@@ -9,6 +9,7 @@ import { getTimeZones } from "@/api/common/timeZoneApi";
 import { TimeZoneEntity } from "@/models/common/TimeZoneEntity";
 import { BrokerStatementImporterEntity } from "@/models/brokers/BrokerStatementImportModels";
 import { Nullable } from "@/shared/utilities/nullable";
+import { resolveDefaultEntityId } from "@/shared/utilities/arrayUtilities";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
 import { StatementConfig } from "@/pages/BrokerAccount/modals/BrokerStatementImportModal/types";
@@ -38,24 +39,12 @@ export const StatementConfigStep: React.FC<Props> = ({
     const [selectedImporterId, setSelectedImporterId] = useState<string>("");
     const [selectedAccountId, setSelectedAccountId] = useState<string>(defaultBrokerAccountId ?? "");
     const [selectedTimeZoneId, setSelectedTimeZoneId] = useState<string>(
-        user?.timeZoneId || Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Moscow"
+        user?.timeZoneId || Intl.DateTimeFormat().resolvedOptions().timeZone || ""
     );
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [validationError, setValidationError] = useState<string | null>(null);
 
     const fileInputRef = React.useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        if (defaultBrokerAccountId) {
-            setSelectedAccountId(defaultBrokerAccountId);
-        }
-    }, [defaultBrokerAccountId]);
-
-    useEffect(() => {
-        if (user?.timeZoneId) {
-            setSelectedTimeZoneId(user.timeZoneId);
-        }
-    }, [user?.timeZoneId]);
 
     useEffect(() => {
         const loadReferenceData = async () => {
@@ -69,35 +58,13 @@ export const StatementConfigStep: React.FC<Props> = ({
             setTimeZones(loadedTimeZones);
             setBrokerAccounts(loadedAccounts);
 
-            if (loadedImporters.length > 0) {
-                setSelectedImporterId((previous) =>
-                    previous && loadedImporters.some((importer) => importer.id === previous)
-                        ? previous
-                        : loadedImporters[0].id
-                );
-            }
-
-            if (loadedTimeZones.length > 0) {
-                if (user?.timeZoneId && loadedTimeZones.some((timeZone) => timeZone.id === user.timeZoneId)) {
-                    setSelectedTimeZoneId(user.timeZoneId);
-                } else {
-                    setSelectedTimeZoneId((previous) => {
-                        if (previous && loadedTimeZones.some((timeZone) => timeZone.id === previous)) return previous;
-                        const moscowTimeZone = loadedTimeZones.find((timeZone) => timeZone.id === "Europe/Moscow");
-                        return moscowTimeZone ? moscowTimeZone.id : loadedTimeZones[0].id;
-                    });
-                }
-            }
-
-            if (defaultBrokerAccountId) {
-                setSelectedAccountId(defaultBrokerAccountId);
-            } else if (!selectedAccountId && loadedAccounts.length > 0) {
-                setSelectedAccountId(loadedAccounts[0].id);
-            }
+            setSelectedImporterId((previous) => resolveDefaultEntityId(loadedImporters, null, previous));
+            setSelectedTimeZoneId((previous) => resolveDefaultEntityId(loadedTimeZones, user?.timeZoneId, previous));
+            setSelectedAccountId((previous) => resolveDefaultEntityId(loadedAccounts, defaultBrokerAccountId, previous));
         };
 
         loadReferenceData();
-    }, [defaultBrokerAccountId]);
+    }, [defaultBrokerAccountId, user?.timeZoneId]);
 
     const handleAnalyzeClicked = () => {
         if (!selectedFile) {

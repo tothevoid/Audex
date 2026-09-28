@@ -34,3 +34,18 @@ export const sumEntities = <T>(records: T[], entitySumSelector: (entity: T) => n
         return accumulator;
     }, 0);
 };
+
+export const resolveDefaultEntityId = <T extends { id: string }>(
+    items: readonly T[] | T[],
+    preferredId?: string | null,
+    previousId?: string | null,
+    fallback = ""
+): string => {
+    if (preferredId && items.some((item) => item.id === preferredId)) {
+        return preferredId;
+    }
+    if (previousId && items.some((item) => item.id === previousId)) {
+        return previousId;
+    }
+    return items.length > 0 ? items[0].id : fallback;
+};
