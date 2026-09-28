@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Flex, FlexProps, Text } from '@chakra-ui/react';
-import AddButton from '../AddButton/AddButton';
+import AddButton from '@/shared/components/AddButton/AddButton';
 
 export interface SectionHeaderProps extends Omit<FlexProps, 'title'> {
     title: React.ReactNode;

@@ -1,12 +1,12 @@
 import React, { RefObject, useState } from 'react'
 import { useTranslation } from 'react-i18next';
-import BaseFormModal from '../../../../shared/modals/BaseFormModal/BaseFormModal';
-import { BaseModalRef } from '../../../../shared/utilities/modalUtilities';
-import CurrencyTransactionForm from '../../components/CurrencyTransactionForm/CurrencyTransactionForm';
-import { CurrencyTransactionEntity } from '../../../../models/transactions/CurrencyTransactionEntity';
-import { AccountEntity } from '../../../../models/accounts/AccountEntity';
+import BaseFormModal from '@/shared/modals/BaseFormModal/BaseFormModal';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import CurrencyTransactionForm from '@/pages/Transactions/components/CurrencyTransactionForm/CurrencyTransactionForm';
+import { CurrencyTransactionEntity } from '@/models/transactions/CurrencyTransactionEntity';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
 import { FieldValues, UseFormHandleSubmit } from 'react-hook-form';
-import { SetSubmitHandler } from '../NewTransactionModal/NewTransactionModal';
+import { SetSubmitHandler } from '@/pages/Transactions/modals/NewTransactionModal/NewTransactionModal';
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>,

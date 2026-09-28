@@ -1,12 +1,12 @@
 import { Button, Card, Flex, Stack, Text } from '@chakra-ui/react';
 import { MdSettings } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import { DebtEntity } from '../../../../models/debts/DebtEntity';
-import { formatDate } from '../../../../shared/utilities/formatters/dateFormatter';
-import DebtTagBadge from '../DebtTagBadge/DebtTagBadge';
-import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
-import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import { DebtEntity } from '@/models/debts/DebtEntity';
+import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
+import DebtTagBadge from '@/pages/Debts/components/DebtTagBadge/DebtTagBadge';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '@/shared/components/EntityCard/EntityCard';
 
 type Props = {
 	debt: DebtEntity,

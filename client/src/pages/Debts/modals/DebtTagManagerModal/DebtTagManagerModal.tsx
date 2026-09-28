@@ -1,14 +1,14 @@
 import React, { forwardRef, useState } from "react";
 import { Stack, Flex, Text, IconButton, Box } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { DebtTagEntity } from "../../../../models/debts/DebtTagEntity";
-import { updateDebtTag, deleteDebtTag, createDebtTag } from "../../../../api/debts/debtTagApi";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
+import { DebtTagEntity } from "@/models/debts/DebtTagEntity";
+import { updateDebtTag, deleteDebtTag, createDebtTag } from "@/api/debts/debtTagApi";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import { MdAdd } from "react-icons/md";
-import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
-import BaseModal from "../../../../shared/modals/BaseModal/BaseModal";
-import DebtTagEditor from "../../components/DebtTagEditor/DebtTagEditor";
-import DebtTagItem from "../../components/DebtTagItem/DebtTagItem";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import BaseModal from "@/shared/modals/BaseModal/BaseModal";
+import DebtTagEditor from "@/pages/Debts/components/DebtTagEditor/DebtTagEditor";
+import DebtTagItem from "@/pages/Debts/components/DebtTagItem/DebtTagItem";
 
 interface Props {
     tags: DebtTagEntity[];

@@ -1,18 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { SimpleGrid, Box } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { DebtEntity } from "../../../../models/debts/DebtEntity";
-import { DebtTagEntity } from "../../../../models/debts/DebtTagEntity";
-import { useDebts } from "../../hooks/useDebts";
-import DebtModal from "../../modals/DebtModal.tsx/DebtModal";
-import Debt from "../Debt/Debt";
-import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
-import { useEntityModal } from "../../../../shared/hooks/useEntityModal";
-import { ActiveEntityMode } from "../../../../shared/enums/activeEntityMode";
-import { DebtTagAssignModal } from "../../modals/DebtTagAssignModal/DebtTagAssignModal";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import { assignTagsToDebt } from "../../../../api/debts/debtTagApi";
-import DebtsHeader from "../DebtsHeader/DebtsHeader";
+import { DebtEntity } from "@/models/debts/DebtEntity";
+import { DebtTagEntity } from "@/models/debts/DebtTagEntity";
+import { useDebts } from "@/pages/Debts/hooks/useDebts";
+import DebtModal from "@/pages/Debts/modals/DebtModal.tsx/DebtModal";
+import Debt from "@/pages/Debts/components/Debt/Debt";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useEntityModal } from "@/shared/hooks/useEntityModal";
+import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
+import { DebtTagAssignModal } from "@/pages/Debts/modals/DebtTagAssignModal/DebtTagAssignModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { assignTagsToDebt } from "@/api/debts/debtTagApi";
+import DebtsHeader from "@/pages/Debts/components/DebtsHeader/DebtsHeader";
 
 interface Props {
     debtsPaymentsVersion: number;

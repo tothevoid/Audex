@@ -2,19 +2,19 @@ import { Field } from "@chakra-ui/react";
 import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { getAccounts } from "../../../../api/accounts/accountApi";
-import { AccountEntity } from "../../../../models/accounts/AccountEntity";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { getAccounts } from "@/api/accounts/accountApi";
+import { AccountEntity } from "@/models/accounts/AccountEntity";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import { useTranslation } from "react-i18next";
-import { BrokerAccountFundTransferEntity } from "../../../../models/brokers/BrokerAccountFundTransfer";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
-import DateSelect from "../../../../shared/components/DateSelect/DateSelect";
-import MoneyInput from "../../../../shared/components/MoneyInput/MoneyInput";
+import { BrokerAccountFundTransferEntity } from "@/models/brokers/BrokerAccountFundTransfer";
+import { generateGuid } from "@/shared/utilities/idUtilities";
+import DateSelect from "@/shared/components/DateSelect/DateSelect";
+import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 import { BrokerAccountFundTransferFormInput, getBrokerAccountFundTransferValidationSchema } from "./BrokerAccountFundTransferValidationSchema";
-import { getBrokerAccounts } from "../../../../api/brokers/brokerAccountApi";
-import { BrokerAccountEntity } from "../../../../models/brokers/BrokerAccountEntity";
+import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 
 export interface CreateBrokerAccountFundTransferContext {
     brokerAccountId: string

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Box, Card, Flex, NativeSelect } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { AccountCurrencySummary } from "../../../../models/accounts/accountsSummary";
-import { NumericMetricItem } from "../../../../shared/components/MetricItem";
-import { getCurrencyColor, getCurrencyIcon } from "../../../../shared/utilities/currencyUtils";
-import { useColorMode } from "../../../../shared/context/ColorModeContext";
-import SectionHeader from "../../../../shared/components/SectionHeader";
-import FilterBlock, { FilterBlockDivider } from "../../../../shared/components/FilterBlock";
-import { CurrencyEntity } from "../../../../models/currencies/CurrencyEntity";
-import { AccountTypeEntity } from "../../../../models/accounts/AccountTypeEntity";
-import { getCurrencies } from "../../../../api/currencies/currencyApi";
-import { getAccountTypes } from "../../../../api/accounts/accountTypeApi";
+import { AccountCurrencySummary } from "@/models/accounts/accountsSummary";
+import { NumericMetricItem } from "@/shared/components/MetricItem";
+import { getCurrencyColor, getCurrencyIcon } from "@/shared/utilities/currencyUtils";
+import { useColorMode } from "@/shared/context/ColorModeContext";
+import SectionHeader from "@/shared/components/SectionHeader";
+import FilterBlock, { FilterBlockDivider } from "@/shared/components/FilterBlock";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
+import { AccountTypeEntity } from "@/models/accounts/AccountTypeEntity";
+import { getCurrencies } from "@/api/currencies/currencyApi";
+import { getAccountTypes } from "@/api/accounts/accountTypeApi";
 
 interface Props {
     accountCurrencySummaries: AccountCurrencySummary[];

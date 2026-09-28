@@ -1,5 +1,5 @@
-import { GlobalDashboard } from "../../models/dashboard/DashboardEntity";
-import { getEntity } from "../basicApi";
+import { GlobalDashboard } from "@/models/dashboard/DashboardEntity";
+import { getEntity } from "@/api/basicApi";
 
 const basicUrl = `Dashboard`;
 

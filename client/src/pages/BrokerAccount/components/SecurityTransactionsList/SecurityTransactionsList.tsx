@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { SecurityTransactionEntity, SecurityTransactionEntityRequest } from '../../../../models/securities/SecurityTransactionEntity';
-import SecurityTransaction from '../SecurityTransaction/SecurityTransaction';
-import SecurityTransactionModal, { CreateSecurityTransactionContext, EditSecurityTransactionContext } from '../../modals/SecurityTransactionModal/SecurityTransactionModal';
-import { useSecurityTransactions } from '../../hooks/useSecurityTransactions';
-import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
-import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
-import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
-import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
-import { Nullable } from '../../../../shared/utilities/nullable';
-import CollectionPagination from '../../../../shared/components/CollectionPagination/CollectionPagination';
-import SecurityTransactionsFilter from '../SecurityTransactionsFilter/SecurityTransactionsFilter';
+import { SecurityTransactionEntity, SecurityTransactionEntityRequest } from '@/models/securities/SecurityTransactionEntity';
+import SecurityTransaction from '@/pages/BrokerAccount/components/SecurityTransaction/SecurityTransaction';
+import SecurityTransactionModal, { CreateSecurityTransactionContext, EditSecurityTransactionContext } from '@/pages/BrokerAccount/modals/SecurityTransactionModal/SecurityTransactionModal';
+import { useSecurityTransactions } from '@/pages/BrokerAccount/hooks/useSecurityTransactions';
+import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
+import SectionHeader from '@/shared/components/SectionHeader/SectionHeader';
+import { Nullable } from '@/shared/utilities/nullable';
+import CollectionPagination from '@/shared/components/CollectionPagination/CollectionPagination';
+import SecurityTransactionsFilter from '@/pages/BrokerAccount/components/SecurityTransactionsFilter/SecurityTransactionsFilter';
 import {
 	SecurityTransactionsFilterValues,
 	createDefaultSecurityTransactionsFilter
-} from '../../../../models/securities/SecurityTransactionsRequest';
-import PlaceholderWrapper from '../../../../shared/components/Placeholder/PlaceholderWrapper';
-import AddButton from '../../../../shared/components/AddButton/AddButton';
-import { useDelayedLoading } from '../../../../shared/hooks/useDelayedLoading';
-import LoadingList from '../../../../shared/components/LoadingList/LoadingList';
-import DateGroupedList from '../../../../shared/components/DateGroupedList/DateGroupedList';
+} from '@/models/securities/SecurityTransactionsRequest';
+import PlaceholderWrapper from '@/shared/components/Placeholder/PlaceholderWrapper';
+import AddButton from '@/shared/components/AddButton/AddButton';
+import { useDelayedLoading } from '@/shared/hooks/useDelayedLoading';
+import LoadingList from '@/shared/components/LoadingList/LoadingList';
+import DateGroupedList from '@/shared/components/DateGroupedList/DateGroupedList';
 
 interface Props {
 	brokerAccountId: Nullable<string>;

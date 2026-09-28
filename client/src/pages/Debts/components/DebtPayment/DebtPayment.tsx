@@ -2,12 +2,12 @@ import React from 'react';
 import { Flex, HStack, Icon, Text } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { MdArrowForward, MdCalendarToday } from "react-icons/md";
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import { formatDate } from '../../../../shared/utilities/formatters/dateFormatter';
-import { DebtPaymentEntity } from '../../../../models/debts/DebtPaymentEntity';
-import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
-import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
-import AccountIcon from '../../../../shared/components/AccountIcon';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
+import { DebtPaymentEntity } from '@/models/debts/DebtPaymentEntity';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
+import AccentBadge from '@/shared/components/AccentBadge/AccentBadge';
+import AccountIcon from '@/shared/components/AccountIcon';
 
 interface Props {
     debtPayment: DebtPaymentEntity;

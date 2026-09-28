@@ -1,12 +1,12 @@
 import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, Flex, SimpleGrid, Text } from "@chakra-ui/react";
-import { Nullable } from "../../../../shared/utilities/nullable";
-import { CryptoAccountStatsEntity } from "../../../../models/crypto/CryptoAccountStatsEntity";
-import { getCryptoAccountStats } from "../../../../api/crypto/cryptoAccountStatsApi";
-import DistributionChart from "../../../Dashboard/components/DistributionChart";
-import Placeholder from "../../../../shared/components/Placeholder/Placeholder";
-import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { Nullable } from "@/shared/utilities/nullable";
+import { CryptoAccountStatsEntity } from "@/models/crypto/CryptoAccountStatsEntity";
+import { getCryptoAccountStats } from "@/api/crypto/cryptoAccountStatsApi";
+import DistributionChart from "@/pages/Dashboard/components/DistributionChart";
+import Placeholder from "@/shared/components/Placeholder/Placeholder";
+import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 
 interface Props {
     cryptoAccountId?: Nullable<string>;

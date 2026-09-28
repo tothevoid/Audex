@@ -1,9 +1,9 @@
-import httpClient from '../httpClient';
-import { ScheduledTaskEntity, ScheduledTaskEntityResponse, UpdateScheduleEntityRequest } from '../../models/scheduler/ScheduledTaskEntity';
-import { CreateScheduledTaskEntityRequest, ScheduledTaskDefinitionEntity, ScheduledTaskDefinitionEntityResponse } from '../../models/scheduler/ScheduledTaskDefinitionEntity';
-import { logPromiseError } from '../../shared/utilities/webApiUtilities';
+import httpClient from '@/api/httpClient';
+import { ScheduledTaskEntity, ScheduledTaskEntityResponse, UpdateScheduleEntityRequest } from '@/models/scheduler/ScheduledTaskEntity';
+import { CreateScheduledTaskEntityRequest, ScheduledTaskDefinitionEntity, ScheduledTaskDefinitionEntityResponse } from '@/models/scheduler/ScheduledTaskDefinitionEntity';
+import { logPromiseError } from '@/shared/utilities/webApiUtilities';
 import { prepareScheduledTask } from './schedulerTaskApiMapping';
-import { getAllEntities, getEntity } from '../basicApi';
+import { getAllEntities, getEntity } from '@/api/basicApi';
 
 const basicUrl = 'api/Scheduler';
 

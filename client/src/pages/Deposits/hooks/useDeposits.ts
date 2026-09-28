@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { DepositEntity } from "../../../models/deposits/DepositEntity";
-import { createDeposit, deleteDeposit, getDeposits, updateDeposit } from "../../../api/deposits/depositApi";
+import { DepositEntity } from "@/models/deposits/DepositEntity";
+import { createDeposit, deleteDeposit, getDeposits, updateDeposit } from "@/api/deposits/depositApi";
 
 export interface DepositsQuery {
 	selectedMinMonths: number,

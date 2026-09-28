@@ -4,21 +4,21 @@ import { RefObject, useCallback, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
-import DateSelect from "../../../../shared/components/DateSelect/DateSelect";
-import MoneyInput from "../../../../shared/components/MoneyInput/MoneyInput";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import DateSelect from "@/shared/components/DateSelect/DateSelect";
+import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { DividendPaymentFormInput, getDividendPaymentValidationSchema } from "./DividendPaymentValidationSchema";
-import { DividendPaymentEntity } from "../../../../models/brokers/DividendPaymentEntity";
-import { getAvailableDividends } from "../../../../api/securities/dividendApi";
-import { DividendEntity } from "../../../../models/securities/DividendEntity";
-import { formatDate } from "../../../../shared/utilities/formatters/dateFormatter";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { SecurityEntity } from "../../../../models/securities/SecurityEntity";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
-import { getBrokerAccounts } from "../../../../api/brokers/brokerAccountApi";
-import { BrokerAccountEntity } from "../../../../models/brokers/BrokerAccountEntity";
+import { DividendPaymentEntity } from "@/models/brokers/DividendPaymentEntity";
+import { getAvailableDividends } from "@/api/securities/dividendApi";
+import { DividendEntity } from "@/models/securities/DividendEntity";
+import { formatDate } from "@/shared/utilities/formatters/dateFormatter";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { SecurityEntity } from "@/models/securities/SecurityEntity";
+import { generateGuid } from "@/shared/utilities/idUtilities";
+import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 
 export interface CreateDividendPaymentContext {
 	brokerAccountId: string

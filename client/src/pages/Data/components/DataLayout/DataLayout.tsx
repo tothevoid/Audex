@@ -1,5 +1,5 @@
 import { Box, Flex } from "@chakra-ui/react";
-import DataSidebar from "../DataSidebar/DataSidebar";
+import DataSidebar from "@/pages/Data/components/DataSidebar/DataSidebar";
 
 export default function DataLayout({ children }: { children: React.ReactNode }) {
 	return (

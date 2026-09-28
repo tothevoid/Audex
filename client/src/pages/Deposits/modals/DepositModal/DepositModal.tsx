@@ -4,17 +4,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form";
 import { getDepositValidationSchema, DepositFormInput } from "./DepositValidationSchema";
 import { useTranslation } from "react-i18next";
-import { getCurrencies } from '../../../../api/currencies/currencyApi';
-import { CurrencyEntity } from '../../../../models/currencies/CurrencyEntity';
-import { DepositEntity } from '../../../../models/deposits/DepositEntity';
-import CollectionSelect from '../../../../shared/components/CollectionSelect/CollectionSelect';
-import DateSelect from '../../../../shared/components/DateSelect/DateSelect';
-import BaseFormModal from '../../../../shared/modals/BaseFormModal/BaseFormModal';
-import { BaseModalRef } from '../../../../shared/utilities/modalUtilities';
-import { generateGuid } from '../../../../shared/utilities/idUtilities';
-import { BankEntity } from '../../../../models/banks/BankEntity';
-import { getBanks } from '../../../../api/banks/bankApi';
-import MoneyInput from '../../../../shared/components/MoneyInput/MoneyInput';
+import { getCurrencies } from '@/api/currencies/currencyApi';
+import { CurrencyEntity } from '@/models/currencies/CurrencyEntity';
+import { DepositEntity } from '@/models/deposits/DepositEntity';
+import CollectionSelect from '@/shared/components/CollectionSelect/CollectionSelect';
+import DateSelect from '@/shared/components/DateSelect/DateSelect';
+import BaseFormModal from '@/shared/modals/BaseFormModal/BaseFormModal';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import { generateGuid } from '@/shared/utilities/idUtilities';
+import { BankEntity } from '@/models/banks/BankEntity';
+import { getBanks } from '@/api/banks/bankApi';
+import MoneyInput from '@/shared/components/MoneyInput/MoneyInput';
 
 interface ModalProps {
 	modalRef: RefObject<BaseModalRef | null>,

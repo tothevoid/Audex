@@ -1,16 +1,16 @@
 import React, { Fragment } from 'react';
 import { SimpleGrid } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import Security from '../Security/Security';
-import { SecurityEntity } from '../../../../models/securities/SecurityEntity';
-import SecurityModal from '../../modals/SecurityModal/SecurityModal';
-import { useSecurities } from '../../hooks/useSecurities';
-import Placeholder from '../../../../shared/components/Placeholder/Placeholder';
-import AddButton from '../../../../shared/components/AddButton/AddButton';
-import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
-import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
-import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
-import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
+import Security from '@/pages/SecuritiesPage/components/Security/Security';
+import { SecurityEntity } from '@/models/securities/SecurityEntity';
+import SecurityModal from '@/pages/SecuritiesPage/modals/SecurityModal/SecurityModal';
+import { useSecurities } from '@/pages/SecuritiesPage/hooks/useSecurities';
+import Placeholder from '@/shared/components/Placeholder/Placeholder';
+import AddButton from '@/shared/components/AddButton/AddButton';
+import SectionHeader from '@/shared/components/SectionHeader/SectionHeader';
+import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
+import { useEntityModal } from '@/shared/hooks/useEntityModal';
 
 const SecuritiesList: React.FC = () => {
     const { t } = useTranslation();

@@ -1,5 +1,5 @@
- import { CryptoAccountEntity, CryptoAccountEntityRequest, CryptoAccountEntityResponse } from '../../models/crypto/CryptoAccountEntity';
-import { createEntity, deleteEntity, getAllEntities, getEntityById, updateEntity } from '../basicApi';
+ import { CryptoAccountEntity, CryptoAccountEntityRequest, CryptoAccountEntityResponse } from '@/models/crypto/CryptoAccountEntity';
+import { createEntity, deleteEntity, getAllEntities, getEntityById, updateEntity } from '@/api/basicApi';
 import { prepareCryptoAccount, prepareCryptoAccountEntityRequest } from './cryptoAccountApiMapping';
 
 const basicUrl = `CryptoAccount`;

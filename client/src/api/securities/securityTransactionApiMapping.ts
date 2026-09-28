@@ -1,5 +1,5 @@
-import { SecurityTransactionEntity, SecurityTransactionEntityRequest, SecurityTransactionEntityResponse } from "../../models/securities/SecurityTransactionEntity"
-import { prepareBrokerAccount } from "../brokers/brokerAccountApiMapping"
+import { SecurityTransactionEntity, SecurityTransactionEntityRequest, SecurityTransactionEntityResponse } from "@/models/securities/SecurityTransactionEntity"
+import { prepareBrokerAccount } from "@/api/brokers/brokerAccountApiMapping"
 import { prepareSecurity } from "./securityApiMapping"
 
 export const prepareSecurityTransactionRequest = (securityTransaction: SecurityTransactionEntity): SecurityTransactionEntityRequest => {

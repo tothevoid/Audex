@@ -1,19 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Grid, Heading, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { ScheduledTaskEntity, ScheduledTaskExecutionStatus } from '../../models/scheduler/ScheduledTaskEntity';
-import { ScheduledTaskJournalEntity, GetJournalQueryRequest } from '../../models/scheduler/ScheduledTaskJournalEntity';
-import { getScheduledTasks } from '../../api/scheduler/schedulerTaskApi';
-import { getPagedScheduledTaskJournal } from '../../api/scheduler/schedulerJournalApi';
+import { ScheduledTaskEntity, ScheduledTaskExecutionStatus } from '@/models/scheduler/ScheduledTaskEntity';
+import { ScheduledTaskJournalEntity, GetJournalQueryRequest } from '@/models/scheduler/ScheduledTaskJournalEntity';
+import { getScheduledTasks } from '@/api/scheduler/schedulerTaskApi';
+import { getPagedScheduledTaskJournal } from '@/api/scheduler/schedulerJournalApi';
 import { SchedulerTaskMasterList } from './components/SchedulerTaskMasterList';
 import { SchedulerTaskDetailPane } from './components/SchedulerTaskDetailPane';
 import { SchedulerJournalTable } from './components/SchedulerJournalTable';
 import { ScheduleConfigModal, ScheduleConfigModalRef } from './components/ScheduleConfigModal';
 import { CreateTaskModal, CreateTaskModalRef } from './components/CreateTaskModal';
-import CollectionPagination from '../../shared/components/CollectionPagination/CollectionPagination';
-import PageContainer from '../../shared/components/PageContainer/PageContainer';
-import { useSchedulerEvents } from '../../shared/hooks/useSchedulerEvents';
-import usePagedQuery from '../../shared/hooks/usePagedQuery';
+import CollectionPagination from '@/shared/components/CollectionPagination/CollectionPagination';
+import PageContainer from '@/shared/components/PageContainer/PageContainer';
+import { useSchedulerEvents } from '@/shared/hooks/useSchedulerEvents';
+import usePagedQuery from '@/shared/hooks/usePagedQuery';
 
 const SchedulerPage: React.FC = () => {
     const { t } = useTranslation();

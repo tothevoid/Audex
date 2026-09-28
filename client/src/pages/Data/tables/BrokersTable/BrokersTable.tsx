@@ -2,13 +2,13 @@ import { Box, Button, Icon, Text } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
-import { BrokerEntity } from "../../../../models/brokers/BrokerEntity";
-import { createBroker, deleteBroker, getBrokers, updateBroker } from "../../../../api/brokers/brokerApi";
-import BrokerModal from "../../modals/BrokerModal/BrokerModal";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import DataTable, { ColumnDef } from "../../../../shared/components/DataTable/DataTable";
-import SectionHeader from "../../../../shared/components/SectionHeader/SectionHeader";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { BrokerEntity } from "@/models/brokers/BrokerEntity";
+import { createBroker, deleteBroker, getBrokers, updateBroker } from "@/api/brokers/brokerApi";
+import BrokerModal from "@/pages/Data/modals/BrokerModal/BrokerModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
+import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 
 interface State {
     brokers: BrokerEntity[],

@@ -1,5 +1,5 @@
 import i18n, { TFunction } from 'i18next';
-import { AccountTypeEntity } from '../../../models/accounts/AccountTypeEntity';
+import { AccountTypeEntity } from '@/models/accounts/AccountTypeEntity';
 
 export const ACCOUNT_TYPE_IDS = {
     Cash: 'a08f5553-379e-4294-a2e5-75e88219433c',

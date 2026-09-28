@@ -1,8 +1,8 @@
-import { CurrencyAccountSummaryEntity } from '../../models/transactions/CurrencyAccountSummaryEntity';
-import { CurrencyTransactionEntity, CurrencyTransactionEntityRequest, CurrencyTransactionEntityResponse } from '../../models/transactions/CurrencyTransactionEntity';
-import { BasePageable } from '../../shared/models/BasePageable';
-import { PagedResult } from '../../shared/models/PagedResult';
-import { createEntity, deleteEntity, getEntityById, getEntity, getPagedEntities, updateEntity } from '../basicApi';
+import { CurrencyAccountSummaryEntity } from '@/models/transactions/CurrencyAccountSummaryEntity';
+import { CurrencyTransactionEntity, CurrencyTransactionEntityRequest, CurrencyTransactionEntityResponse } from '@/models/transactions/CurrencyTransactionEntity';
+import { BasePageable } from '@/shared/models/BasePageable';
+import { PagedResult } from '@/shared/models/PagedResult';
+import { createEntity, deleteEntity, getEntityById, getEntity, getPagedEntities, updateEntity } from '@/api/basicApi';
 import { prepareCurrencyTransaction, prepareCurrencyTransactionRequest } from './currencyTransactionApiMapping';
 
 const basicUrl = `CurrencyTransaction`;

@@ -1,5 +1,5 @@
-import config from "../config";
-import { Nullable } from "../shared/utilities/nullable";
+import config from "@/config";
+import { Nullable } from "@/shared/utilities/nullable";
 
 export const getStoredIconUrl = (controllerName: string, iconKey: Nullable<string>): string => {
     if (!iconKey) {

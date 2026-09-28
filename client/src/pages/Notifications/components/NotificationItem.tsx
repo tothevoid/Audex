@@ -21,8 +21,8 @@ import {
 } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { NotificationEntity, NotificationSeverity } from "../../../models/notifications/NotificationEntity";
-import { formatDateTime } from "../../../shared/utilities/formatters/dateFormatter";
+import { NotificationEntity, NotificationSeverity } from "@/models/notifications/NotificationEntity";
+import { formatDateTime } from "@/shared/utilities/formatters/dateFormatter";
 
 interface NotificationItemProps {
     item: NotificationEntity;

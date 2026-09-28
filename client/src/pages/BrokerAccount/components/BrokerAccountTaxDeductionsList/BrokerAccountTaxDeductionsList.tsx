@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@chakra-ui/react';
-import { useBrokerAccountTaxDeductions } from '../../hooks/useBrokerAccountTaxDeductions';
-import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
-import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
+import { useBrokerAccountTaxDeductions } from '@/pages/BrokerAccount/hooks/useBrokerAccountTaxDeductions';
+import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { useEntityModal } from '@/shared/hooks/useEntityModal';
 import { useTranslation } from 'react-i18next';
-import { Nullable } from '../../../../shared/utilities/nullable';
-import SectionHeader from '../../../../shared/components/SectionHeader';
-import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
-import BrokerAccountTaxDeduction from '../BrokerAccountTaxDeduction/BrokerAccountTaxDeduction';
-import { BrokerAccountTaxDeductionEntity } from '../../../../models/brokers/BrokerAccountTaxDeductionEntity';
-import BrokerAccountTaxDeductionModal, { CreateBrokerAccountTaxDeductionContext, EditBrokerAccountTaxDeductionContext } from '../../../BrokerAccounts/modals/BrokerAccountTaxDeductionModal/BrokerAccountTaxDeductionModal';
+import { Nullable } from '@/shared/utilities/nullable';
+import SectionHeader from '@/shared/components/SectionHeader';
+import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
+import BrokerAccountTaxDeduction from '@/pages/BrokerAccount/components/BrokerAccountTaxDeduction/BrokerAccountTaxDeduction';
+import { BrokerAccountTaxDeductionEntity } from '@/models/brokers/BrokerAccountTaxDeductionEntity';
+import BrokerAccountTaxDeductionModal, { CreateBrokerAccountTaxDeductionContext, EditBrokerAccountTaxDeductionContext } from '@/pages/BrokerAccounts/modals/BrokerAccountTaxDeductionModal/BrokerAccountTaxDeductionModal';
 
 interface Props {
     brokerAccountId: Nullable<string>,

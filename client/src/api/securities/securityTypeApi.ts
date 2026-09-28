@@ -1,5 +1,5 @@
-import { SecurityTypeEntity } from '../../models/securities/SecurityTypeEntity';
-import { createEntity, deleteEntity, getAllEntities, updateEntity } from '../basicApi';
+import { SecurityTypeEntity } from '@/models/securities/SecurityTypeEntity';
+import { createEntity, deleteEntity, getAllEntities, updateEntity } from '@/api/basicApi';
 import { prepareSecurityType } from './securityTypeApiMapping';
 
 const basicUrl = `SecurityType`;

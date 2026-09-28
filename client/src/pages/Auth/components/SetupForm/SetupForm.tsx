@@ -4,8 +4,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { MdVisibility, MdVisibilityOff, MdErrorOutline } from "react-icons/md";
-import { initialSetup } from "../../../../api/auth/authApi";
-import { AuthErrorCode } from "../../../../models/auth/AuthResult";
+import { initialSetup } from "@/api/auth/authApi";
+import { AuthErrorCode } from "@/models/auth/AuthResult";
 import { SetupFormInput, getSetupValidationSchema } from "./SetupValidationSchema";
 
 interface Props {

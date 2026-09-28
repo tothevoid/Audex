@@ -4,12 +4,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { CryptocurrencyFormInput, getCryptocurrencyValidationSchema } from "./CryptocurrencyValidationSchema";
-import BaseFormModal from "../../../shared/modals/BaseFormModal/BaseFormModal";
-import { BaseModalRef } from "../../../shared/utilities/modalUtilities";
-import { CryptocurrencyEntity } from "../../../models/crypto/CryptocurrencyEntity";
-import { getIconUrl } from "../../../api/crypto/cryptocurrencyApi";
-import { generateGuid } from "../../../shared/utilities/idUtilities";
-import ImageInput from "../../../shared/components/Form/ImageInput/ImageInput";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { CryptocurrencyEntity } from "@/models/crypto/CryptocurrencyEntity";
+import { getIconUrl } from "@/api/crypto/cryptocurrencyApi";
+import { generateGuid } from "@/shared/utilities/idUtilities";
+import ImageInput from "@/shared/components/Form/ImageInput/ImageInput";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>

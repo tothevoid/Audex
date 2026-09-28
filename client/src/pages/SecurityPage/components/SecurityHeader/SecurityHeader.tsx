@@ -1,12 +1,12 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Box, Card, Flex, HStack, Icon, SimpleGrid, Stack, Text } from "@chakra-ui/react";
-import { SecurityEntity } from "../../../../models/securities/SecurityEntity";
-import { SecurityStats } from "../../../../models/securities/SecurityStats";
-import { getIconUrl } from "../../../../api/securities/securityApi";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { formatShortDateTime } from "../../../../shared/utilities/formatters/dateFormatter";
-import StoredIcon from "../../../../shared/components/StoredIcon";
+import { SecurityEntity } from "@/models/securities/SecurityEntity";
+import { SecurityStats } from "@/models/securities/SecurityStats";
+import { getIconUrl } from "@/api/securities/securityApi";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { formatShortDateTime } from "@/shared/utilities/formatters/dateFormatter";
+import StoredIcon from "@/shared/components/StoredIcon";
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
 import {
     BsBriefcase,

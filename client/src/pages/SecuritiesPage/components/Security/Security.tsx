@@ -2,13 +2,13 @@ import React from 'react';
 import { Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
 import { NavLink } from 'react-router-dom';
 import { HiOutlineBuildingOffice2 } from 'react-icons/hi2';
-import { getIconUrl } from '../../../../api/securities/securityApi';
-import { SecurityEntity } from '../../../../models/securities/SecurityEntity';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import StoredIcon from '../../../../shared/components/StoredIcon';
-import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
-import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
-import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
+import { getIconUrl } from '@/api/securities/securityApi';
+import { SecurityEntity } from '@/models/securities/SecurityEntity';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import StoredIcon from '@/shared/components/StoredIcon';
+import AccentBadge from '@/shared/components/AccentBadge/AccentBadge';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '@/shared/components/EntityCard/EntityCard';
 
 type Props = {
     security: SecurityEntity;

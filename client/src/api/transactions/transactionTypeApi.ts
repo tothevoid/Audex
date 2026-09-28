@@ -1,7 +1,7 @@
-import { TransactionTypeEntity } from "../../models/transactions/TransactionTypeEntity";
-import { Nullable } from "../../shared/utilities/nullable";
-import { createEntityWithIcon, deleteEntity, getAllEntities, updateEntityWithIcon } from "../basicApi";
-import { getStoredIconUrl } from "../iconApi";
+import { TransactionTypeEntity } from "@/models/transactions/TransactionTypeEntity";
+import { Nullable } from "@/shared/utilities/nullable";
+import { createEntityWithIcon, deleteEntity, getAllEntities, updateEntityWithIcon } from "@/api/basicApi";
+import { getStoredIconUrl } from "@/api/iconApi";
 
 const basicUrl = `TransactionType`;
 const ENTITY_NAME = "transactionTypeJson"

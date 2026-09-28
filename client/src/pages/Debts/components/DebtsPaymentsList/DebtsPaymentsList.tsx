@@ -1,17 +1,17 @@
 import React, { Fragment } from "react";
 import { Box, Flex, Badge, Button } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { DebtPaymentEntity } from "../../../../models/debts/DebtPaymentEntity";
-import { useDebtPayments } from "../../hooks/useDebtPayments";
-import DebtPaymentModal from "../../modals/DebtPaymentModal/DebtPaymentModal";
-import DebtPayment from "../DebtPayment/DebtPayment";
-import { useEntityModal } from "../../../../shared/hooks/useEntityModal";
-import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
-import { ActiveEntityMode } from "../../../../shared/enums/activeEntityMode";
-import AddButton from "../../../../shared/components/AddButton/AddButton";
-import SectionHeader from "../../../../shared/components/SectionHeader";
-import CollectionPagination from "../../../../shared/components/CollectionPagination/CollectionPagination";
-import PlaceholderWrapper from "../../../../shared/components/Placeholder/PlaceholderWrapper";
+import { DebtPaymentEntity } from "@/models/debts/DebtPaymentEntity";
+import { useDebtPayments } from "@/pages/Debts/hooks/useDebtPayments";
+import DebtPaymentModal from "@/pages/Debts/modals/DebtPaymentModal/DebtPaymentModal";
+import DebtPayment from "@/pages/Debts/components/DebtPayment/DebtPayment";
+import { useEntityModal } from "@/shared/hooks/useEntityModal";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
+import AddButton from "@/shared/components/AddButton/AddButton";
+import SectionHeader from "@/shared/components/SectionHeader";
+import CollectionPagination from "@/shared/components/CollectionPagination/CollectionPagination";
+import PlaceholderWrapper from "@/shared/components/Placeholder/PlaceholderWrapper";
 import { MdClose } from "react-icons/md";
 
 interface Props {

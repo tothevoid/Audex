@@ -1,16 +1,16 @@
 import { Fragment } from "react/jsx-runtime";
-import BrokerAccountHeader from "../BrokerAccount/components/BrokerAccountHeader/BrokerAccountHeader";
-import BrokerAccountSecuritiesList, { BrokerAccountSecuritiesListRef } from "../BrokerAccount/components/BrokerAccountSecuritiesList/BrokerAccountSecuritiesList";
-import BrokerAccountTabs, { ChangeAction } from "../BrokerAccount/components/BrokerAccountTabs/BrokerAccountTabs";
-import { useUserProfile } from "../../features/UserProfileSettingsModal/hooks/UserProfileContext";
-import { getLastPullDate, pullBrokerAccountQuotations } from "../../api/brokers/brokerAccountSecurityApi";
-import { useSignalR } from "../../shared/hooks/useSignalR";
+import BrokerAccountHeader from "@/pages/BrokerAccount/components/BrokerAccountHeader/BrokerAccountHeader";
+import BrokerAccountSecuritiesList, { BrokerAccountSecuritiesListRef } from "@/pages/BrokerAccount/components/BrokerAccountSecuritiesList/BrokerAccountSecuritiesList";
+import BrokerAccountTabs, { ChangeAction } from "@/pages/BrokerAccount/components/BrokerAccountTabs/BrokerAccountTabs";
+import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { getLastPullDate, pullBrokerAccountQuotations } from "@/api/brokers/brokerAccountSecurityApi";
+import { useSignalR } from "@/shared/hooks/useSignalR";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getPortfolioValues } from "../../api/brokers/brokerAccountSummaryApi";
-import { BrokerAccountPortfolioEntity } from "../../models/brokers/BrokerAccountPortfolioEntity";
-import { BrokerStatementImportModal } from "../BrokerAccount/modals/BrokerStatementImportModal/BrokerStatementImportModal";
-import { BaseModalRef } from "../../shared/utilities/modalUtilities";
+import { getPortfolioValues } from "@/api/brokers/brokerAccountSummaryApi";
+import { BrokerAccountPortfolioEntity } from "@/models/brokers/BrokerAccountPortfolioEntity";
+import { BrokerStatementImportModal } from "@/pages/BrokerAccount/modals/BrokerStatementImportModal/BrokerStatementImportModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
 interface State {
     isReloading: boolean

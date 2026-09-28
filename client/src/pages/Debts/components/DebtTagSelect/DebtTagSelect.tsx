@@ -1,9 +1,9 @@
 import React from "react";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { DebtTagEntity } from "../../../../models/debts/DebtTagEntity";
+import { DebtTagEntity } from "@/models/debts/DebtTagEntity";
 import { MdCheck } from "react-icons/md";
-import DebtTagBadge from "../DebtTagBadge/DebtTagBadge";
+import DebtTagBadge from "@/pages/Debts/components/DebtTagBadge/DebtTagBadge";
 
 interface Props {
     availableTags: DebtTagEntity[];

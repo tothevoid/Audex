@@ -1,12 +1,12 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, Flex, HStack, Text, Icon } from "@chakra-ui/react";
-import { formatShortDateTime } from "../../../../shared/utilities/formatters/dateFormatter";
-import { BrokerAccountPortfolioEntity } from "../../../../models/brokers/BrokerAccountPortfolioEntity";
+import { formatShortDateTime } from "@/shared/utilities/formatters/dateFormatter";
+import { BrokerAccountPortfolioEntity } from "@/models/brokers/BrokerAccountPortfolioEntity";
 import { BsWallet2, BsPiggyBank, BsArrowUpRight, BsArrowDownRight, BsBank, BsFileEarmarkSpreadsheet, BsPercent } from "react-icons/bs";
 import { TbReceiptTax } from "react-icons/tb";
-import { NumericMetricItem } from "../../../../shared/components/MetricItem";
-import RefreshButton from "../../../../shared/components/RefreshButton";
+import { NumericMetricItem } from "@/shared/components/MetricItem";
+import RefreshButton from "@/shared/components/RefreshButton";
 
 interface Props {
     name: string;

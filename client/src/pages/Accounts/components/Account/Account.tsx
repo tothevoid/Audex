@@ -1,12 +1,12 @@
 import { Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
 import { NavLink } from 'react-router-dom';
-import { AccountEntity } from '../../../../models/accounts/AccountEntity';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import { ACCOUNT_TYPE } from '../../../../shared/constants/accountType';
-import AccountIcon from '../../../../shared/components/AccountIcon';
-import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
-import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
-import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import { ACCOUNT_TYPE } from '@/shared/constants/accountType';
+import AccountIcon from '@/shared/components/AccountIcon';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '@/shared/components/EntityCard/EntityCard';
+import AccentBadge from '@/shared/components/AccentBadge/AccentBadge';
 
 interface Props {
     account: AccountEntity;

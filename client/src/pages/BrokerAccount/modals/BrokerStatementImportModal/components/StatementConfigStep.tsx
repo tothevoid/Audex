@@ -2,16 +2,16 @@ import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { Box, Button, Dialog, HStack, Spinner, Text, VStack } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BsFileEarmarkSpreadsheet, BsUpload } from "react-icons/bs";
-import { getBrokerAccounts } from "../../../../../api/brokers/brokerAccountApi";
-import { BrokerAccountEntity } from "../../../../../models/brokers/BrokerAccountEntity";
-import { getStatementImporters } from "../../../../../api/brokers/brokerStatementImportApi";
-import { getTimeZones } from "../../../../../api/common/timeZoneApi";
-import { TimeZoneEntity } from "../../../../../models/common/TimeZoneEntity";
-import { BrokerStatementImporterEntity } from "../../../../../models/brokers/BrokerStatementImportModels";
-import { Nullable } from "../../../../../shared/utilities/nullable";
-import { useUserProfile } from "../../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
-import BaseSelect from "../../../../../shared/components/BaseSelect/BaseSelect";
-import { StatementConfig } from "../types";
+import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
+import { getStatementImporters } from "@/api/brokers/brokerStatementImportApi";
+import { getTimeZones } from "@/api/common/timeZoneApi";
+import { TimeZoneEntity } from "@/models/common/TimeZoneEntity";
+import { BrokerStatementImporterEntity } from "@/models/brokers/BrokerStatementImportModels";
+import { Nullable } from "@/shared/utilities/nullable";
+import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
+import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
+import { StatementConfig } from "@/pages/BrokerAccount/modals/BrokerStatementImportModal/types";
 
 interface Props {
     defaultBrokerAccountId?: Nullable<string>;

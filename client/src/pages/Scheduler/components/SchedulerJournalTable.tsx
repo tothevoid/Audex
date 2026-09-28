@@ -9,13 +9,13 @@ import {
     MdKeyboardArrowDown,
     MdKeyboardArrowUp
 } from 'react-icons/md';
-import { ScheduledTaskJournalEntity } from '../../../models/scheduler/ScheduledTaskJournalEntity';
-import { ScheduledTaskEntity, ScheduledTaskTriggerSource } from '../../../models/scheduler/ScheduledTaskEntity';
-import { formatDuration, getStatusBadgeProps, getStatusFilterOptions } from '../schedulerUtils';
-import BaseSelect from '../../../shared/components/BaseSelect/BaseSelect';
+import { ScheduledTaskJournalEntity } from '@/models/scheduler/ScheduledTaskJournalEntity';
+import { ScheduledTaskEntity, ScheduledTaskTriggerSource } from '@/models/scheduler/ScheduledTaskEntity';
+import { formatDuration, getStatusBadgeProps, getStatusFilterOptions } from '@/pages/Scheduler/schedulerUtils';
+import BaseSelect from '@/shared/components/BaseSelect/BaseSelect';
 import { SchedulerAttachmentList } from './SchedulerAttachmentList';
-import CopyButton from '../../../shared/components/CopyButton/CopyButton';
-import RefreshButton from '../../../shared/components/RefreshButton';
+import CopyButton from '@/shared/components/CopyButton/CopyButton';
+import RefreshButton from '@/shared/components/RefreshButton';
 
 interface FilterOption {
     value: string;

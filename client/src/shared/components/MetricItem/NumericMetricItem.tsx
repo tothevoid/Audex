@@ -1,5 +1,5 @@
 import React from "react";
-import { formatMoneyByCurrencyCulture } from "../../utilities/formatters/moneyFormatter";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import { BaseMetricItem, BaseMetricItemProps } from "./BaseMetricItem";
 
 export interface NumericMetricItemProps extends Omit<BaseMetricItemProps, "value"> {

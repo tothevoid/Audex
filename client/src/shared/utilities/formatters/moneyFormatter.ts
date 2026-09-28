@@ -1,4 +1,4 @@
-import { Nullable } from "../nullable";
+import { Nullable } from "@/shared/utilities/nullable";
 
 export enum Currency {
 	RUB = 0,

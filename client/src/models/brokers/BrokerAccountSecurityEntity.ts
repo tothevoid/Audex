@@ -1,5 +1,5 @@
 import { BrokerAccountEntity, BrokerAccountEntityResponse } from "./BrokerAccountEntity";
-import { SecurityEntity, SecurityEntityResponse } from "../securities/SecurityEntity";
+import { SecurityEntity, SecurityEntityResponse } from "@/models/securities/SecurityEntity";
 
 export interface CommonBrokerAccountSecurityEntity {
     id: string,

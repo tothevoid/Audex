@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Flex, Input, Button, IconButton } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { DebtTagEntity } from "../../../../models/debts/DebtTagEntity";
+import { DebtTagEntity } from "@/models/debts/DebtTagEntity";
 import { MdCheck, MdClose } from "react-icons/md";
 
 interface Props {

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Card, Flex, HStack, Stack, Text } from '@chakra-ui/react';
 import { FaBitcoin } from "react-icons/fa";
-import { getIconUrl } from '../../../../api/crypto/cryptocurrencyApi';
-import { CryptocurrencyEntity } from '../../../../models/crypto/CryptocurrencyEntity';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import StoredIcon from '../../../../shared/components/StoredIcon';
-import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
-import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
-import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
+import { getIconUrl } from '@/api/crypto/cryptocurrencyApi';
+import { CryptocurrencyEntity } from '@/models/crypto/CryptocurrencyEntity';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import StoredIcon from '@/shared/components/StoredIcon';
+import AccentBadge from '@/shared/components/AccentBadge/AccentBadge';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '@/shared/components/EntityCard/EntityCard';
 
 interface Props {
     cryptocurrency: CryptocurrencyEntity,

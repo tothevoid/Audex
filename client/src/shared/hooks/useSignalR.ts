@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
-import config from "../../config";
+import config from "@/config";
 
 const HANDLER_NAME = "ReceiveServerMessage"
 

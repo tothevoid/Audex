@@ -1,4 +1,4 @@
-import { BasePageable } from '../../shared/models/BasePageable';
+import { BasePageable } from '@/shared/models/BasePageable';
 import { ScheduledTaskAttachmentEntity, ScheduledTaskAttachmentEntityResponse } from './ScheduledTaskAttachmentEntity';
 import { ScheduledTaskExecutionStatus, ScheduledTaskTriggerSource } from './ScheduledTaskEntity';
 

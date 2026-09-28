@@ -4,9 +4,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AuthForm from "./components/AuthForm/AuthForm";
 import ChangePasswordForm from "./components/ChangePasswordForm/ChangePasswordForm";
 import SetupForm from "./components/SetupForm/SetupForm";
-import { Nullable } from "../../shared/utilities/nullable";
-import AppIcon from "../../shared/components/AppIcon/AppIcon";
-import { getAuthStatus } from "../../api/auth/authApi";
+import { Nullable } from "@/shared/utilities/nullable";
+import AppIcon from "@/shared/components/AppIcon/AppIcon";
+import { getAuthStatus } from "@/api/auth/authApi";
 
 enum FormType {
     Loading,

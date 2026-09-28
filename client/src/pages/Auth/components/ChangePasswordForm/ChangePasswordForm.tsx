@@ -5,10 +5,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { MdVisibility, MdVisibilityOff, MdErrorOutline, MdArrowBack } from "react-icons/md";
-import { changePassword } from "../../../../api/auth/authApi";
-import { AuthErrorCode } from "../../../../models/auth/AuthResult";
+import { changePassword } from "@/api/auth/authApi";
+import { AuthErrorCode } from "@/models/auth/AuthResult";
 import { ChangePasswordFormInput, getChangePasswordValidationSchema } from "./ChangePasswordFormValidationSchema";
-import { Nullable } from "../../../../shared/utilities/nullable";
+import { Nullable } from "@/shared/utilities/nullable";
 
 interface Props {
     defaultPasswordResetValues: { userName: string; currentPassword: Nullable<string> };

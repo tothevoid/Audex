@@ -1,4 +1,4 @@
-import { BrokerAccountTaxDeductionEntity, BrokerAccountTaxDeductionEntityRequest, BrokerAccountTaxDeductionEntityResponse, } from "../../models/brokers/BrokerAccountTaxDeductionEntity";
+import { BrokerAccountTaxDeductionEntity, BrokerAccountTaxDeductionEntityRequest, BrokerAccountTaxDeductionEntityResponse, } from "@/models/brokers/BrokerAccountTaxDeductionEntity";
 import { prepareBrokerAccount } from "./brokerAccountApiMapping";
 
 export const prepareBrokerAccountTaxDeductionRequest = (entity: BrokerAccountTaxDeductionEntity): BrokerAccountTaxDeductionEntityRequest => {

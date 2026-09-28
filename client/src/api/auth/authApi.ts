@@ -1,14 +1,14 @@
 import axios from 'axios';
-import config from '../../config';
-import { Nullable } from '../../shared/utilities/nullable';
-import { setAccessToken, clearAccessToken, getAccessToken } from '../tokenStorage';
+import config from '@/config';
+import { Nullable } from '@/shared/utilities/nullable';
+import { setAccessToken, clearAccessToken, getAccessToken } from '@/api/tokenStorage';
 
 import {
     AuthErrorCode,
     AuthResult,
     ChangePasswordResult
-} from '../../models/auth/AuthResult';
-import { AuthStatus } from '../../models/auth/AuthStatus';
+} from '@/models/auth/AuthResult';
+import { AuthStatus } from '@/models/auth/AuthStatus';
 const basicUrl = `${config.api.URL}/Auth`;
 
 const parseAuthError = (err: unknown): AuthErrorCode => {

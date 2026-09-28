@@ -1,9 +1,9 @@
 import { Stack } from '@chakra-ui/react'
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, TooltipValueType, TooltipPayloadEntry } from 'recharts';
-import { DistributionModel } from '../../../models/dashboard/DashboardEntity';
-import { getChartLabelConfig } from '../../../shared/utilities/chartUtilities';
-import { formatMoneyByCurrencyCulture } from '../../../shared/utilities/formatters/moneyFormatter';
-import { CHARTS_COLORS } from '../../../shared/constants/chartColors';
+import { DistributionModel } from '@/models/dashboard/DashboardEntity';
+import { getChartLabelConfig } from '@/shared/utilities/chartUtilities';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import { CHARTS_COLORS } from '@/shared/constants/chartColors';
 
 type Props = {
     data: DistributionModel[]

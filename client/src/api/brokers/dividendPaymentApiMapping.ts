@@ -1,6 +1,6 @@
-import { DividendPaymentEntityResponse, DividendPaymentEntity, DividendPaymentEntityRequest } from "../../models/brokers/DividendPaymentEntity";
-import { convertToDateOnly } from "../../shared/utilities/dateUtils";
-import { prepareDividend } from "../securities/dividendApiMapping";
+import { DividendPaymentEntityResponse, DividendPaymentEntity, DividendPaymentEntityRequest } from "@/models/brokers/DividendPaymentEntity";
+import { convertToDateOnly } from "@/shared/utilities/dateUtils";
+import { prepareDividend } from "@/api/securities/dividendApiMapping";
 import { prepareBrokerAccount } from "./brokerAccountApiMapping";
 
 export const prepareDividendPaymentRequest = (dividendPayment: DividendPaymentEntity): DividendPaymentEntityRequest => {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { CryptocurrencyEntity } from "../../../models/crypto/CryptocurrencyEntity";
-import { createCryptocurrency, deleteCryptocurrency, getCryptocurrencies, updateCryptocurrency } from "../../../api/crypto/cryptocurrencyApi";
+import { CryptocurrencyEntity } from "@/models/crypto/CryptocurrencyEntity";
+import { createCryptocurrency, deleteCryptocurrency, getCryptocurrencies, updateCryptocurrency } from "@/api/crypto/cryptocurrencyApi";
 
 export const useCryptocurrencies = () => {
     const [cryptocurrencies, setCryptocurrencies] = useState<CryptocurrencyEntity[]>([]);

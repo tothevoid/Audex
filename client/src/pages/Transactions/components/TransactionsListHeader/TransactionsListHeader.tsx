@@ -2,8 +2,8 @@ import React from 'react';
 import { Button, Flex, HStack, Icon } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineRefresh } from 'react-icons/md';
-import { ViewDisplayMode } from '../TransactionFilterBar/TransactionFilterBar';
-import TransactionViewModeSwitcher from '../TransactionViewModeSwitcher/TransactionViewModeSwitcher';
+import { ViewDisplayMode } from '@/pages/Transactions/components/TransactionFilterBar/TransactionFilterBar';
+import TransactionViewModeSwitcher from '@/pages/Transactions/components/TransactionViewModeSwitcher/TransactionViewModeSwitcher';
 
 export interface TransactionsListHeaderProps {
     viewDisplayMode: ViewDisplayMode;

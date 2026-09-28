@@ -2,9 +2,9 @@ import React from 'react';
 import { SimpleGrid } from '@chakra-ui/react';
 import { MdTrendingUp, MdTrendingDown, MdAccountBalanceWallet, MdCalendarToday } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import { TransactionEntity } from '../../../../models/transactions/TransactionEntity';
-import { useUserProfile } from '../../../../features/UserProfileSettingsModal/hooks/UserProfileContext';
-import MoneyCard from '../../../../shared/components/MoneyCard/MoneyCard';
+import { TransactionEntity } from '@/models/transactions/TransactionEntity';
+import { useUserProfile } from '@/features/UserProfileSettingsModal/hooks/UserProfileContext';
+import MoneyCard from '@/shared/components/MoneyCard/MoneyCard';
 
 interface Props {
     transactions: TransactionEntity[];

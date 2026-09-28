@@ -1,6 +1,6 @@
-import { CurrencyTransactionEntityResponse, CurrencyTransactionEntity, CurrencyTransactionEntityRequest } from "../../models/transactions/CurrencyTransactionEntity"
-import { convertToDateOnly } from "../../shared/utilities/dateUtils"
-import { prepareAccount } from "../accounts/accountApiMapping"
+import { CurrencyTransactionEntityResponse, CurrencyTransactionEntity, CurrencyTransactionEntityRequest } from "@/models/transactions/CurrencyTransactionEntity"
+import { convertToDateOnly } from "@/shared/utilities/dateUtils"
+import { prepareAccount } from "@/api/accounts/accountApiMapping"
 
 export const prepareCurrencyTransactionRequest = (currencyTransaction: CurrencyTransactionEntity): CurrencyTransactionEntityRequest => {
 	return {

@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Input, Image} from "@chakra-ui/react"
 import { ChangeEvent, Fragment, useRef } from "react";
-import { Nullable } from "../../../utilities/nullable";
+import { Nullable } from "@/shared/utilities/nullable";
 import { MdFileUpload } from "react-icons/md";
 
 interface ModalProps {

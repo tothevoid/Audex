@@ -1,7 +1,7 @@
-import { BankEntity } from '../../models/banks/BankEntity';
-import { Nullable } from '../../shared/utilities/nullable';
-import { createEntityWithIcon, deleteEntity, getAllEntities, updateEntityWithIcon } from '../basicApi';
-import { getStoredIconUrl } from '../iconApi';
+import { BankEntity } from '@/models/banks/BankEntity';
+import { Nullable } from '@/shared/utilities/nullable';
+import { createEntityWithIcon, deleteEntity, getAllEntities, updateEntityWithIcon } from '@/api/basicApi';
+import { getStoredIconUrl } from '@/api/iconApi';
 
 const basicUrl = `Bank`;
 

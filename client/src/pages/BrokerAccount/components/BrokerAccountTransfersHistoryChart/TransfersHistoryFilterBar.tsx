@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import i18n from "../../../../i18n";
-import BaseSelect from "../../../../shared/components/BaseSelect/BaseSelect";
-import ButtonGroup from "../../../../shared/components/ButtonGroup/ButtonGroup";
-import { Nullable } from "../../../../shared/utilities/nullable";
-import { BrokerAccountEntity } from "../../../../models/brokers/BrokerAccountEntity";
-import { BrokerAccountTransfersAvailableDatesEntity } from "../../../../models/brokers/BrokerAccountTransfersAvailableDatesEntity";
+import i18n from "@/i18n";
+import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
+import ButtonGroup from "@/shared/components/ButtonGroup/ButtonGroup";
+import { Nullable } from "@/shared/utilities/nullable";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
+import { BrokerAccountTransfersAvailableDatesEntity } from "@/models/brokers/BrokerAccountTransfersAvailableDatesEntity";
 import {
     AccountSelectOption,
     MONTH_RANGE,

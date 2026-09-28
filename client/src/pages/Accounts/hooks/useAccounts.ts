@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { AccountEntity } from "../../../models/accounts/AccountEntity";
-import { createAccount, getAccounts, updateAccount, deleteAccount } from "../../../api/accounts/accountApi";
+import { AccountEntity } from "@/models/accounts/AccountEntity";
+import { createAccount, getAccounts, updateAccount, deleteAccount } from "@/api/accounts/accountApi";
 
 export interface AccountsQuery {
 	onlyActive: boolean;

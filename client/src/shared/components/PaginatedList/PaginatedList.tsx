@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
 import { Box, Stack } from "@chakra-ui/react";
-import LoadingList from "../LoadingList/LoadingList";
-import PlaceholderWrapper from "../Placeholder/PlaceholderWrapper";
-import CollectionPagination from "../CollectionPagination/CollectionPagination";
+import LoadingList from "@/shared/components/LoadingList/LoadingList";
+import PlaceholderWrapper from "@/shared/components/Placeholder/PlaceholderWrapper";
+import CollectionPagination from "@/shared/components/CollectionPagination/CollectionPagination";
 
 export interface PagedQueryState<T> {
 	items: T[];

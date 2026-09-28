@@ -1,5 +1,5 @@
-import { DebtEntityResponse, DebtEntity, DebtEntityRequest } from "../../models/debts/DebtEntity";
-import { convertToDateOnly } from "../../shared/utilities/dateUtils";
+import { DebtEntityResponse, DebtEntity, DebtEntityRequest } from "@/models/debts/DebtEntity";
+import { convertToDateOnly } from "@/shared/utilities/dateUtils";
 
 export const prepareDebtRequest = (debt: DebtEntity): DebtEntityRequest => {
     return {

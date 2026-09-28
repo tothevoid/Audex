@@ -3,14 +3,14 @@ import React, { RefObject, useCallback, useEffect, useMemo, useState } from "rea
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { CryptoProviderEntity } from "../../../../models/crypto/CryptoProviderEntity";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { CryptoProviderEntity } from "@/models/crypto/CryptoProviderEntity";
 import { CryptoProviderFormInput, getCryptoProviderValidationSchema } from "./CryptoProviderValidationSchema";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
-import { Nullable } from "../../../../shared/utilities/nullable";
-import { getCryptoProviderIconUrl } from "../../../../api/crypto/cryptoProviderApi";
-import ImageInput from "../../../../shared/components/Form/ImageInput/ImageInput";
+import { generateGuid } from "@/shared/utilities/idUtilities";
+import { Nullable } from "@/shared/utilities/nullable";
+import { getCryptoProviderIconUrl } from "@/api/crypto/cryptoProviderApi";
+import ImageInput from "@/shared/components/Form/ImageInput/ImageInput";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>;

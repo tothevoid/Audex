@@ -1,15 +1,15 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import Dividend from '../Dividend/Dividend';
+import Dividend from '@/pages/SecurityPage/components/Dividend/Dividend';
 import { useTranslation } from 'react-i18next';
-import { DividendEntity } from '../../../../models/securities/DividendEntity';
-import DividendModal, { CreateDividendContext, EditDividendContext } from '../../modals/DividendModal/DividendModal';
-import { useDividends } from '../../hooks/useDividends';
-import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
-import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
-import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
-import SectionHeader from '../../../../shared/components/SectionHeader';
-import { Nullable } from '../../../../shared/utilities/nullable';
-import PaginatedList from '../../../../shared/components/PaginatedList/PaginatedList';
+import { DividendEntity } from '@/models/securities/DividendEntity';
+import DividendModal, { CreateDividendContext, EditDividendContext } from '@/pages/SecurityPage/modals/DividendModal/DividendModal';
+import { useDividends } from '@/pages/SecurityPage/hooks/useDividends';
+import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
+import SectionHeader from '@/shared/components/SectionHeader';
+import { Nullable } from '@/shared/utilities/nullable';
+import PaginatedList from '@/shared/components/PaginatedList/PaginatedList';
 
 interface Props {
 	securityId: string;

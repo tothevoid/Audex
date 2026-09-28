@@ -3,21 +3,21 @@ import { RefObject, useCallback, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { getBrokers } from "../../../../api/brokers/brokerApi";
-import { BrokerAccountEntity } from "../../../../models/brokers/BrokerAccountEntity";
-import { CurrencyEntity } from "../../../../models/currencies/CurrencyEntity";
-import { BrokerAccountTypeEntity } from "../../../../models/brokers/BrokerAccountTypeEntity";
-import { BrokerEntity } from "../../../../models/brokers/BrokerEntity";
-import { getCurrencies } from "../../../../api/currencies/currencyApi";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
-import MoneyInput from "../../../../shared/components/MoneyInput/MoneyInput";
+import { getBrokers } from "@/api/brokers/brokerApi";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
+import { BrokerAccountTypeEntity } from "@/models/brokers/BrokerAccountTypeEntity";
+import { BrokerEntity } from "@/models/brokers/BrokerEntity";
+import { getCurrencies } from "@/api/currencies/currencyApi";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 import { BrokerAccountFormInput, getBrokerAccountValidationSchema } from "./BrokerAccountValidationSchema";
-import { getBrokerAccountTypes } from "../../../../api/brokers/brokerAccountTypeApi";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
-import { getBanks } from "../../../../api/banks/bankApi";
-import { BankEntity } from "../../../../models/banks/BankEntity";
+import { getBrokerAccountTypes } from "@/api/brokers/brokerAccountTypeApi";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { generateGuid } from "@/shared/utilities/idUtilities";
+import { getBanks } from "@/api/banks/bankApi";
+import { BankEntity } from "@/models/banks/BankEntity";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>

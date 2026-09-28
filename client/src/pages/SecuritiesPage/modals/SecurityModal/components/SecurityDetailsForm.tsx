@@ -3,15 +3,15 @@ import React, { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { getSecurityValidationSchema, SecurityFormInput } from "../SecurityValidationSchema";
-import { SecurityEntity } from "../../../../../models/securities/SecurityEntity";
-import { SecurityTypeEntity } from "../../../../../models/securities/SecurityTypeEntity";
-import { CurrencyEntity } from "../../../../../models/currencies/CurrencyEntity";
-import CollectionSelect from "../../../../../shared/components/CollectionSelect/CollectionSelect";
-import ImageInput from "../../../../../shared/components/Form/ImageInput/ImageInput";
-import { generateGuid } from "../../../../../shared/utilities/idUtilities";
-import { getIconUrl } from "../../../../../api/securities/securityApi";
-import { OperationResult } from "../../../../../shared/models/OperationResult";
+import { getSecurityValidationSchema, SecurityFormInput } from "@/pages/SecuritiesPage/modals/SecurityModal/SecurityValidationSchema";
+import { SecurityEntity } from "@/models/securities/SecurityEntity";
+import { SecurityTypeEntity } from "@/models/securities/SecurityTypeEntity";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import ImageInput from "@/shared/components/Form/ImageInput/ImageInput";
+import { generateGuid } from "@/shared/utilities/idUtilities";
+import { getIconUrl } from "@/api/securities/securityApi";
+import { OperationResult } from "@/shared/models/OperationResult";
 
 interface SecurityDetailsFormProps {
     initialValues?: Partial<SecurityFormInput>;

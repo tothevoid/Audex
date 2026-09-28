@@ -1,8 +1,8 @@
 import httpClient from "./httpClient";
-import { PagedResult } from "../shared/models/PagedResult";
-import { OperationResult } from "../shared/models/OperationResult";
-import { Nullable } from "../shared/utilities/nullable";
-import { logPromiseError } from "../shared/utilities/webApiUtilities";
+import { PagedResult } from "@/shared/models/PagedResult";
+import { OperationResult } from "@/shared/models/OperationResult";
+import { Nullable } from "@/shared/utilities/nullable";
+import { logPromiseError } from "@/shared/utilities/webApiUtilities";
 
 export const getAllEntities = async <T>(basicUrl: string): Promise<T[]> => {
     const entities = await httpClient.get(basicUrl)

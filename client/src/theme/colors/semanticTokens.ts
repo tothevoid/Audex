@@ -1,6 +1,6 @@
 import { darkColors } from './dark';
 import { solarizedLightColors } from './solarizedLight';
-import { ThemeColors } from '../types';
+import { ThemeColors } from '@/theme/types';
 
 type ColorTokenMap = {
     [K in keyof ThemeColors]: {

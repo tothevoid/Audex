@@ -2,13 +2,13 @@ import React from 'react';
 import { Badge, Box, Flex, HStack, Span, Text } from '@chakra-ui/react';
 import { PiCoinsLight } from 'react-icons/pi';
 import { useTranslation } from 'react-i18next';
-import { DividendPaymentEntity } from '../../../../models/brokers/DividendPaymentEntity';
-import { formatTime } from '../../../../shared/utilities/formatters/dateFormatter';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import { getIconUrl } from '../../../../api/securities/securityApi';
-import StoredIcon from '../../../../shared/components/StoredIcon';
-import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
-import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
+import { DividendPaymentEntity } from '@/models/brokers/DividendPaymentEntity';
+import { formatTime } from '@/shared/utilities/formatters/dateFormatter';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import { getIconUrl } from '@/api/securities/securityApi';
+import StoredIcon from '@/shared/components/StoredIcon';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '@/shared/components/EntityCard/EntityCard';
 
 interface Props {
     isGlobalBrokerAccount: boolean;

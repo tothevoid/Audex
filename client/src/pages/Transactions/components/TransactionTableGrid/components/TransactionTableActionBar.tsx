@@ -2,8 +2,8 @@ import React from 'react';
 import { Button, HStack, Icon, Text } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { MdAdd, MdCheckCircle, MdUndo } from 'react-icons/md';
-import { ViewDisplayMode } from '../../TransactionFilterBar/TransactionFilterBar';
-import TransactionsListHeader from '../../TransactionsListHeader/TransactionsListHeader';
+import { ViewDisplayMode } from '@/pages/Transactions/components/TransactionFilterBar/TransactionFilterBar';
+import TransactionsListHeader from '@/pages/Transactions/components/TransactionsListHeader/TransactionsListHeader';
 
 interface TransactionTableActionBarProps {
     hasChanges: boolean;

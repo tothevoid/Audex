@@ -1,16 +1,16 @@
 import React, { Fragment } from 'react';
 import { SimpleGrid } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import CryptoAccount from '../CryptoAccount/CryptoAccount';
-import { CryptoAccountEntity } from '../../../../models/crypto/CryptoAccountEntity';
-import CryptoAccountModal from '../../modals/CryptoAccountModal/CryptoAccountModal';
-import { useCryptoAccounts } from '../../hooks/useCryptoAccounts';
-import Placeholder from '../../../../shared/components/Placeholder/Placeholder';
-import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
-import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
-import AddButton from '../../../../shared/components/AddButton/AddButton';
-import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
-import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
+import CryptoAccount from '@/pages/CryptoAccountsPage/components/CryptoAccount/CryptoAccount';
+import { CryptoAccountEntity } from '@/models/crypto/CryptoAccountEntity';
+import CryptoAccountModal from '@/pages/CryptoAccountsPage/modals/CryptoAccountModal/CryptoAccountModal';
+import { useCryptoAccounts } from '@/pages/CryptoAccountsPage/hooks/useCryptoAccounts';
+import Placeholder from '@/shared/components/Placeholder/Placeholder';
+import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import AddButton from '@/shared/components/AddButton/AddButton';
+import SectionHeader from '@/shared/components/SectionHeader/SectionHeader';
+import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 
 interface Props {
     onDataChanged: () => void;

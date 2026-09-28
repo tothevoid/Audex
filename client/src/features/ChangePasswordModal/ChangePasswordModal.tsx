@@ -3,12 +3,12 @@ import { Field, Stack, Text } from '@chakra-ui/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
-import { BaseModalRef } from '../../shared/utilities/modalUtilities';
-import BaseFormModal from '../../shared/modals/BaseFormModal/BaseFormModal';
-import { useUserProfile } from '../UserProfileSettingsModal/hooks/UserProfileContext';
-import { changePassword } from '../../api/auth/authApi';
-import { AuthErrorCode } from '../../models/auth/AuthResult';
-import { PasswordInput } from '../../shared/components/PasswordInput/PasswordInput';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import BaseFormModal from '@/shared/modals/BaseFormModal/BaseFormModal';
+import { useUserProfile } from '@/features/UserProfileSettingsModal/hooks/UserProfileContext';
+import { changePassword } from '@/api/auth/authApi';
+import { AuthErrorCode } from '@/models/auth/AuthResult';
+import { PasswordInput } from '@/shared/components/PasswordInput/PasswordInput';
 import {
     ChangePasswordModalInput,
     getChangePasswordModalValidationSchema

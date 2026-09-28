@@ -2,7 +2,7 @@ import React from "react";
 import { Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BsArrowDownLeft, BsArrowUpRight, BsPiggyBank } from "react-icons/bs";
-import { NumericMetricItem } from "../../../../shared/components/MetricItem";
+import { NumericMetricItem } from "@/shared/components/MetricItem";
 
 interface Props {
     depositedByPeriod: number;

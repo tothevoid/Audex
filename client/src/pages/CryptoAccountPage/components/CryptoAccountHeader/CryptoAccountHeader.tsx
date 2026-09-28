@@ -1,15 +1,15 @@
 import React from "react";
 import { Card, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { CryptoAccountEntity } from "../../../../models/crypto/CryptoAccountEntity";
+import { CryptoAccountEntity } from "@/models/crypto/CryptoAccountEntity";
 import { BsWallet2 } from "react-icons/bs";
 import { SiBinance } from "react-icons/si";
-import { NumericMetricItem } from "../../../../shared/components/MetricItem";
-import { getCryptoProviderIconUrl } from "../../../../api/crypto/cryptoProviderApi";
-import StoredIcon from "../../../../shared/components/StoredIcon/StoredIcon";
-import SectionHeader from "../../../../shared/components/SectionHeader";
-import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
-import { getCurrencies } from "../../../../api/currencies/currencyApi";
+import { NumericMetricItem } from "@/shared/components/MetricItem";
+import { getCryptoProviderIconUrl } from "@/api/crypto/cryptoProviderApi";
+import StoredIcon from "@/shared/components/StoredIcon/StoredIcon";
+import SectionHeader from "@/shared/components/SectionHeader";
+import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { getCurrencies } from "@/api/currencies/currencyApi";
 
 interface CryptoAccountHeaderProps {
     cryptoAccount?: CryptoAccountEntity | null;

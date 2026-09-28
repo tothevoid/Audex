@@ -1,19 +1,19 @@
 import React, { useEffect, useRef } from 'react';
-import Account from '../Account/Account';
+import Account from '@/pages/Accounts/components/Account/Account';
 import { Box, SimpleGrid } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { AccountEntity } from '../../../../models/accounts/AccountEntity';
-import { BaseModalRef } from '../../../../shared/utilities/modalUtilities';
-import AccountModal from '../../modals/AccountModal/AccountModal';
-import { useAccounts } from '../../hooks/useAccounts';
-import Placeholder from '../../../../shared/components/Placeholder/Placeholder';
-import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
-import AddButton from '../../../../shared/components/AddButton/AddButton';
-import AccountsHeader from '../AccountsHeader/AccountsHeader';
-import { AccountCurrencySummary } from '../../../../models/accounts/accountsSummary';
-import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
-import AccountBalanceTransferModal from '../../modals/AccountBalanceTransferModal/AccountBalanceTransferModal';
-import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import AccountModal from '@/pages/Accounts/modals/AccountModal/AccountModal';
+import { useAccounts } from '@/pages/Accounts/hooks/useAccounts';
+import Placeholder from '@/shared/components/Placeholder/Placeholder';
+import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import AddButton from '@/shared/components/AddButton/AddButton';
+import AccountsHeader from '@/pages/Accounts/components/AccountsHeader/AccountsHeader';
+import { AccountCurrencySummary } from '@/models/accounts/accountsSummary';
+import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import AccountBalanceTransferModal from '@/pages/Accounts/modals/AccountBalanceTransferModal/AccountBalanceTransferModal';
+import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 
 interface Props {
 	onAccountsChanged: () => void;

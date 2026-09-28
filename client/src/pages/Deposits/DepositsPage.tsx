@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DepositEntity } from "../../models/deposits/DepositEntity";
+import { DepositEntity } from "@/models/deposits/DepositEntity";
 import { SimpleGrid, Box } from "@chakra-ui/react";
 import DepositStats from "./components/DepositStats/DepositStats";
 import Deposit from "./components/Deposit/Deposit";
@@ -7,14 +7,14 @@ import DepositsRangeSlider from "./components/DepositsRangeSlider/DepositsRangeS
 import { useTranslation } from "react-i18next";
 import DepositModal from "./modals/DepositModal/DepositModal";
 import { useDeposits } from "./hooks/useDeposits";
-import Placeholder from "../../shared/components/Placeholder/Placeholder";
-import { useEntityModal } from "../../shared/hooks/useEntityModal";
-import { ConfirmModal } from "../../shared/modals/ConfirmModal/ConfirmModal";
-import AddButton from "../../shared/components/AddButton/AddButton";
-import SectionHeader from "../../shared/components/SectionHeader/SectionHeader";
-import FilterBlock from "../../shared/components/FilterBlock";
-import PageContainer from "../../shared/components/PageContainer/PageContainer";
-import { ActiveEntityMode } from "../../shared/enums/activeEntityMode";
+import Placeholder from "@/shared/components/Placeholder/Placeholder";
+import { useEntityModal } from "@/shared/hooks/useEntityModal";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import AddButton from "@/shared/components/AddButton/AddButton";
+import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
+import FilterBlock from "@/shared/components/FilterBlock";
+import PageContainer from "@/shared/components/PageContainer/PageContainer";
+import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
 
 const DepositsPage: React.FC = () => {
 	const { t } = useTranslation();

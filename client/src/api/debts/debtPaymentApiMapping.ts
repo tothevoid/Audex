@@ -1,6 +1,6 @@
-import { DebtPaymentEntityResponse, DebtPaymentEntity, DebtPaymentEntityRequest } from "../../models/debts/DebtPaymentEntity";
-import { convertToDateOnly } from "../../shared/utilities/dateUtils";
-import { prepareAccount } from "../accounts/accountApiMapping";
+import { DebtPaymentEntityResponse, DebtPaymentEntity, DebtPaymentEntityRequest } from "@/models/debts/DebtPaymentEntity";
+import { convertToDateOnly } from "@/shared/utilities/dateUtils";
+import { prepareAccount } from "@/api/accounts/accountApiMapping";
 import { prepareDebt } from "./debtApiMapping";
 
 export const prepareDebtPaymentRequest = (debtPayment: DebtPaymentEntity): DebtPaymentEntityRequest => {

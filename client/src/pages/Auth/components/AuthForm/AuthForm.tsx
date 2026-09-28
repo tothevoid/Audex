@@ -4,10 +4,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { MdVisibility, MdVisibilityOff, MdErrorOutline } from "react-icons/md";
-import { auth } from "../../../../api/auth/authApi";
-import { AuthErrorCode } from "../../../../models/auth/AuthResult";
+import { auth } from "@/api/auth/authApi";
+import { AuthErrorCode } from "@/models/auth/AuthResult";
 import { AuthFormInput, getAuthValidationSchema } from "./AuthValidationSchema";
-import { Nullable } from "../../../../shared/utilities/nullable";
+import { Nullable } from "@/shared/utilities/nullable";
 
 interface Props {
     onPasswordChangeRequired: (userName: string, currentPassword: Nullable<string>) => void;

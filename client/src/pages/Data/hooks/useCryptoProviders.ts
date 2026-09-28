@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { CryptoProviderEntity } from "../../../models/crypto/CryptoProviderEntity";
-import { createCryptoProvider, deleteCryptoProvider, getCryptoProviders, updateCryptoProvider } from "../../../api/crypto/cryptoProviderApi";
-import { Nullable } from "../../../shared/utilities/nullable";
+import { CryptoProviderEntity } from "@/models/crypto/CryptoProviderEntity";
+import { createCryptoProvider, deleteCryptoProvider, getCryptoProviders, updateCryptoProvider } from "@/api/crypto/cryptoProviderApi";
+import { Nullable } from "@/shared/utilities/nullable";
 
 export const useCryptoProviders = () => {
     const [cryptoProviders, setCryptoProviders] = useState<CryptoProviderEntity[]>([]);

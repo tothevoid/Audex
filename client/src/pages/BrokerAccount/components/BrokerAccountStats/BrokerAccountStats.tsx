@@ -1,16 +1,16 @@
 import { Fragment, useEffect, useState } from "react";
-import { getBrokerAccountStats } from "../../../../api/brokers/brokerAccountSummaryApi";
-import { getBrokerAccounts } from "../../../../api/brokers/brokerAccountApi";
-import { BrokerAccountSummaryEntity } from "../../../../models/brokers/BrokerAccountSummaryEntity";
-import { BrokerAccountEntity } from "../../../../models/brokers/BrokerAccountEntity";
+import { getBrokerAccountStats } from "@/api/brokers/brokerAccountSummaryApi";
+import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
+import { BrokerAccountSummaryEntity } from "@/models/brokers/BrokerAccountSummaryEntity";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 import { Card, SimpleGrid } from "@chakra-ui/react";
-import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
-import { NumericMetricItem } from "../../../../shared/components/MetricItem";
-import BrokerAccountTransfersHistoryChart from "../BrokerAccountTransfersHistoryChart/BrokerAccountTransfersHistoryChart";
+import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { NumericMetricItem } from "@/shared/components/MetricItem";
+import BrokerAccountTransfersHistoryChart from "@/pages/BrokerAccount/components/BrokerAccountTransfersHistoryChart/BrokerAccountTransfersHistoryChart";
 import { useTranslation } from "react-i18next";
-import { Nullable } from "../../../../shared/utilities/nullable";
+import { Nullable } from "@/shared/utilities/nullable";
 import { BsBank, BsWallet2, BsArrowDownLeft, BsArrowUpRight } from "react-icons/bs";
-import LoadingCard from "../../../../shared/components/LoadingCard/LoadingCard";
+import LoadingCard from "@/shared/components/LoadingCard/LoadingCard";
 
 interface Props {
     brokerAccountId: Nullable<string>;

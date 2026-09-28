@@ -1,9 +1,9 @@
 import { forwardRef, Fragment, useImperativeHandle } from 'react';
 import { SimpleGrid } from '@chakra-ui/react';
-import BrokerAccountSecurity from '../BrokerAccountSecurity/BrokerAccountSecurity';
-import { BrokerAccountSecurityEntity } from '../../../../models/brokers/BrokerAccountSecurityEntity';
-import { useBrokerAccountsSecurities } from '../../hooks/useBrokerAccountsSecurities';
-import { Nullable } from '../../../../shared/utilities/nullable';
+import BrokerAccountSecurity from '@/pages/BrokerAccount/components/BrokerAccountSecurity/BrokerAccountSecurity';
+import { BrokerAccountSecurityEntity } from '@/models/brokers/BrokerAccountSecurityEntity';
+import { useBrokerAccountsSecurities } from '@/pages/BrokerAccount/hooks/useBrokerAccountsSecurities';
+import { Nullable } from '@/shared/utilities/nullable';
 
 interface Props {
 	mainCurrencyAmount?: number,

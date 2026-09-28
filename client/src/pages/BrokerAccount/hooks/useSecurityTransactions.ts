@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { createSecurityTransaction, deleteSecurityTransaction, getSecurityTransactions, updateSecurityTransaction } from "../../../api/securities/securityTransactionApi";
-import { SecurityTransactionEntity, SecurityTransactionEntityRequest } from "../../../models/securities/SecurityTransactionEntity";
-import { Nullable } from "../../../shared/utilities/nullable";
+import { createSecurityTransaction, deleteSecurityTransaction, getSecurityTransactions, updateSecurityTransaction } from "@/api/securities/securityTransactionApi";
+import { SecurityTransactionEntity, SecurityTransactionEntityRequest } from "@/models/securities/SecurityTransactionEntity";
+import { Nullable } from "@/shared/utilities/nullable";
 import {
 	createDefaultSecurityTransactionsRequest,
 	SecurityTransactionsRequest
-} from "../../../models/securities/SecurityTransactionsRequest";
+} from "@/models/securities/SecurityTransactionsRequest";
 
 export const useSecurityTransactions = (brokerAccountId: Nullable<string>) => {
 	const [securityTransactions, setSecurityTransactions] = useState<SecurityTransactionEntity[]>([]);

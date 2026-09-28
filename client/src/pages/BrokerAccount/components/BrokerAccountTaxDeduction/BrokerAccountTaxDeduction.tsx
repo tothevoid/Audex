@@ -1,9 +1,9 @@
 import { Card, Flex, Stack, Text, CardBody, Button, Icon } from '@chakra-ui/react';
-import { formatDateTime } from '../../../../shared/utilities/formatters/dateFormatter';
+import { formatDateTime } from '@/shared/utilities/formatters/dateFormatter';
 import { useTranslation } from 'react-i18next';
 import { MdDelete, MdEdit } from 'react-icons/md';
-import { BrokerAccountTaxDeductionEntity } from '../../../../models/brokers/BrokerAccountTaxDeductionEntity';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
+import { BrokerAccountTaxDeductionEntity } from '@/models/brokers/BrokerAccountTaxDeductionEntity';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
 
 interface Props {
     isGlobalBrokerAccount: boolean

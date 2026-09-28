@@ -1,7 +1,7 @@
-import { DebtPaymentEntity, DebtPaymentEntityRequest, DebtPaymentEntityResponse } from "../../models/debts/DebtPaymentEntity";
-import { BasePageable } from "../../shared/models/BasePageable";
-import { PagedResult } from "../../shared/models/PagedResult";
-import { createEntity, deleteEntity, getPagedEntities, updateEntity } from "../basicApi";
+import { DebtPaymentEntity, DebtPaymentEntityRequest, DebtPaymentEntityResponse } from "@/models/debts/DebtPaymentEntity";
+import { BasePageable } from "@/shared/models/BasePageable";
+import { PagedResult } from "@/shared/models/PagedResult";
+import { createEntity, deleteEntity, getPagedEntities, updateEntity } from "@/api/basicApi";
 import { prepareDebtPayment, prepareDebtPaymentRequest } from "./debtPaymentApiMapping";
 
 const basicUrl = `DebtPayment`;

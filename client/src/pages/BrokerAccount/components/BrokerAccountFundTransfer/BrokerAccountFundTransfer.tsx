@@ -2,13 +2,13 @@ import React from 'react';
 import { Badge, Box, Flex, Text } from '@chakra-ui/react';
 import { MdTrendingDown, MdTrendingUp } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import { BrokerAccountFundTransferEntity } from '../../../../models/brokers/BrokerAccountFundTransfer';
-import { formatTime } from '../../../../shared/utilities/formatters/dateFormatter';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import { getBankIconUrl } from '../../../../api/banks/bankApi';
-import StoredIcon from '../../../../shared/components/StoredIcon';
-import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
-import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
+import { BrokerAccountFundTransferEntity } from '@/models/brokers/BrokerAccountFundTransfer';
+import { formatTime } from '@/shared/utilities/formatters/dateFormatter';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import { getBankIconUrl } from '@/api/banks/bankApi';
+import StoredIcon from '@/shared/components/StoredIcon';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '@/shared/components/EntityCard/EntityCard';
 
 interface Props {
     isGlobalBrokerAccount: boolean;

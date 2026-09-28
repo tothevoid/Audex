@@ -1,4 +1,4 @@
-import { CryptoAccountEntityResponse, CryptoAccountEntity, CryptoAccountEntityRequest } from "../../models/crypto/CryptoAccountEntity";
+import { CryptoAccountEntityResponse, CryptoAccountEntity, CryptoAccountEntityRequest } from "@/models/crypto/CryptoAccountEntity";
 
 export const prepareCryptoAccountEntityRequest = (cryptoAccount: CryptoAccountEntity): CryptoAccountEntityRequest => {
     return {

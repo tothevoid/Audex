@@ -1,7 +1,7 @@
-import { CryptoAccountCryptocurrencyEntity, CryptoAccountCryptocurrencyEntityRequest, CryptoAccountCryptocurrencyEntityResponse } from '../../models/crypto/CryptoAccountCryptocurrencyEntity';
-import { createEntity, deleteEntity, getAllEntities, getEntity, updateEntity } from '../basicApi';
+import { CryptoAccountCryptocurrencyEntity, CryptoAccountCryptocurrencyEntityRequest, CryptoAccountCryptocurrencyEntityResponse } from '@/models/crypto/CryptoAccountCryptocurrencyEntity';
+import { createEntity, deleteEntity, getAllEntities, getEntity, updateEntity } from '@/api/basicApi';
 import { prepareCryptoAccountCryptocurrency, prepareCryptoAccountCryptocurrencyRequest } from './cryptoAccountCryptocurrencyApiMapping';
-import { Nullable } from '../../shared/utilities/nullable';
+import { Nullable } from '@/shared/utilities/nullable';
 
 const basicUrl = `CryptoAccountCryptocurrency`;
 

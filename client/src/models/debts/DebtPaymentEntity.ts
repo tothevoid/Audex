@@ -1,4 +1,4 @@
-import { AccountEntity, AccountEntityResponse } from "../accounts/AccountEntity";
+import { AccountEntity, AccountEntityResponse } from "@/models/accounts/AccountEntity";
 import { DebtEntity, DebtEntityResponse } from "./DebtEntity";
 
 export interface CommonDebtPaymentEntity {

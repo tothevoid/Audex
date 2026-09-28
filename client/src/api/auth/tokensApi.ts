@@ -1,9 +1,9 @@
-import { UserRefreshTokenEntity } from '../../models/auth/UserRefreshTokenEntity';
-import { BasePageable } from '../../shared/models/BasePageable';
-import { PagedResult } from '../../shared/models/PagedResult';
-import { getPagedEntities } from '../basicApi';
-import httpClient from '../httpClient';
-import { logPromiseError } from '../../shared/utilities/webApiUtilities';
+import { UserRefreshTokenEntity } from '@/models/auth/UserRefreshTokenEntity';
+import { BasePageable } from '@/shared/models/BasePageable';
+import { PagedResult } from '@/shared/models/PagedResult';
+import { getPagedEntities } from '@/api/basicApi';
+import httpClient from '@/api/httpClient';
+import { logPromiseError } from '@/shared/utilities/webApiUtilities';
 
 const basicUrl = 'Auth';
 

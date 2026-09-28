@@ -1,5 +1,5 @@
-import { AccountEntity, AccountEntityRequest, AccountEntityResponse } from "../../models/accounts/AccountEntity";
-import { convertToDateOnly } from "../../shared/utilities/dateUtils";
+import { AccountEntity, AccountEntityRequest, AccountEntityResponse } from "@/models/accounts/AccountEntity";
+import { convertToDateOnly } from "@/shared/utilities/dateUtils";
 import { prepareAccountType } from "./accountTypeApiMapping";
 
 export const prepareAccountRequest = (account: AccountEntity): AccountEntityRequest => {

@@ -2,16 +2,16 @@ import { Box, Button, Icon, Text } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import { Nullable } from "../../../../shared/utilities/nullable";
-import { createBank, deleteBank, getBankIconUrl, getBanks, updateBank } from "../../../../api/banks/bankApi";
-import { BankEntity } from "../../../../models/banks/BankEntity";
-import BankModal from "../../modals/BankModal/BankModal";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { Nullable } from "@/shared/utilities/nullable";
+import { createBank, deleteBank, getBankIconUrl, getBanks, updateBank } from "@/api/banks/bankApi";
+import { BankEntity } from "@/models/banks/BankEntity";
+import BankModal from "@/pages/Data/modals/BankModal/BankModal";
 import { BsBank } from "react-icons/bs";
-import SectionHeader from "../../../../shared/components/SectionHeader/SectionHeader";
-import DataTable, { ColumnDef } from "../../../../shared/components/DataTable/DataTable";
-import StoredIcon from "../../../../shared/components/StoredIcon";
+import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
+import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
+import StoredIcon from "@/shared/components/StoredIcon";
 
 interface State {
     banks: BankEntity[]

@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import PageContainer from "../../shared/components/PageContainer/PageContainer";
+import PageContainer from "@/shared/components/PageContainer/PageContainer";
 import DebtsList from "./components/DebtsList/DebtsList";
 import DebtsPaymentsList from "./components/DebtsPaymentsList/DebtsPaymentsList";
 import { DebtTagManagerModal } from "./modals/DebtTagManagerModal/DebtTagManagerModal";
 import { DebtTagStatsModal } from "./modals/DebtTagStatsModal/DebtTagStatsModal";
-import { DebtTagEntity, DebtTagStatsEntity } from "../../models/debts/DebtTagEntity";
-import { getDebtTags, getDebtTagStats } from "../../api/debts/debtTagApi";
-import { getDebts } from "../../api/debts/debtApi";
-import { BaseModalRef } from "../../shared/utilities/modalUtilities";
+import { DebtTagEntity, DebtTagStatsEntity } from "@/models/debts/DebtTagEntity";
+import { getDebtTags, getDebtTagStats } from "@/api/debts/debtTagApi";
+import { getDebts } from "@/api/debts/debtApi";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
 const DebtsPage: React.FC = () => {
 	const [hasDebts, setHasDebts] = useState(false);

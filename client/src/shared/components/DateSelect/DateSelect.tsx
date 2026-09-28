@@ -1,7 +1,7 @@
 import "./DateSelect.scss";
 import DatePicker from "react-datepicker";
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
-import DateInput from "../DateInput/DateInput";
+import DateInput from "@/shared/components/DateInput/DateInput";
 
 interface Props<TFieldValues extends FieldValues> {
     name: Path<TFieldValues>;

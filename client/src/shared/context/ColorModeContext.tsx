@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useTransition } from 'react';
-import { ColorMode, ResolvedColorMode } from '../../theme/types';
+import { ColorMode, ResolvedColorMode } from '@/theme/types';
 
 interface ColorModeContextType {
     colorMode: ColorMode;

@@ -1,7 +1,7 @@
 import { Box, Table } from "@chakra-ui/react";
 import React from "react";
-import TableSkeleton from "../TableSkeleton/TableSkeleton";
-import useDelayedLoading from "../../hooks/useDelayedLoading";
+import TableSkeleton from "@/shared/components/TableSkeleton/TableSkeleton";
+import useDelayedLoading from "@/shared/hooks/useDelayedLoading";
 
 export interface ColumnDef<T> {
     header?: React.ReactNode;

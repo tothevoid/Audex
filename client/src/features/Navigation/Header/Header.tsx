@@ -1,18 +1,18 @@
-import HeaderItem from '../HeaderItem/HeaderItem';
+import HeaderItem from '@/features/Navigation/HeaderItem/HeaderItem';
 import { Badge, Box, Button, Flex, Icon, Link } from '@chakra-ui/react';
 import { IoIosFlash } from 'react-icons/io';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import UserProfileSettingsModal from '../../UserProfileSettingsModal/UserProfileSettingsModal';
-import ChangePasswordModal from '../../ChangePasswordModal/ChangePasswordModal';
-import TokensModal from '../../TokensModal/TokensModal';
-import ActionsModal from '../../ActionsModal/ActionsModal';
+import UserProfileSettingsModal from '@/features/UserProfileSettingsModal/UserProfileSettingsModal';
+import ChangePasswordModal from '@/features/ChangePasswordModal/ChangePasswordModal';
+import TokensModal from '@/features/TokensModal/TokensModal';
+import ActionsModal from '@/features/ActionsModal/ActionsModal';
 import { NavLink, useLocation } from 'react-router-dom';
-import { BaseModalRef } from '../../../shared/utilities/modalUtilities';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
 import { HeaderNotificationBell } from './HeaderNotificationBell';
 import { HeaderProfileMenu } from './HeaderProfileMenu';
 import { HeaderNavDropdown, HeaderNavDropdownItem } from './HeaderNavDropdown';
-import AppIcon from '../../../shared/components/AppIcon/AppIcon';
+import AppIcon from '@/shared/components/AppIcon/AppIcon';
 
 import { MdAccountBalance, MdAccountBalanceWallet, MdCurrencyBitcoin, MdSchedule, MdShowChart, MdStorage } from 'react-icons/md';
 

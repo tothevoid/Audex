@@ -3,13 +3,13 @@ import { Field } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import DateSelect from "../../../../shared/components/DateSelect/DateSelect";
-import { DividendEntity } from '../../../../models/securities/DividendEntity';
+import DateSelect from "@/shared/components/DateSelect/DateSelect";
+import { DividendEntity } from '@/models/securities/DividendEntity';
 import { DividendFormInput, getDividendValidationSchema } from './DividendValidationSchema';
-import { BaseModalRef } from '../../../../shared/utilities/modalUtilities';
-import BaseFormModal from '../../../../shared/modals/BaseFormModal/BaseFormModal';
-import MoneyInput from '../../../../shared/components/MoneyInput/MoneyInput';
-import { generateGuid } from '../../../../shared/utilities/idUtilities';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import BaseFormModal from '@/shared/modals/BaseFormModal/BaseFormModal';
+import MoneyInput from '@/shared/components/MoneyInput/MoneyInput';
+import { generateGuid } from '@/shared/utilities/idUtilities';
 
 export interface CreateDividendContext {
 	securityId: string

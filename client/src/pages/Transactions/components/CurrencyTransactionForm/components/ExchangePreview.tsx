@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, HStack, Icon, Text } from '@chakra-ui/react';
 import { MdArrowForward } from 'react-icons/md';
-import { formatMoneyByCurrencyCulture } from '../../../../../shared/utilities/formatters/moneyFormatter';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
 
 interface ExchangePreviewProps {
     spentAmount: number;

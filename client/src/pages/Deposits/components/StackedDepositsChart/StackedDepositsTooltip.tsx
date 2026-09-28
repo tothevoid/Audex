@@ -1,14 +1,14 @@
 import React from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { formatPeriodLabel } from "../DepositStats/depositChartUtils";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { CHART_THEME_COLORS } from "../../../../shared/constants/chartColors";
+import { formatPeriodLabel } from "@/pages/Deposits/components/DepositStats/depositChartUtils";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { CHART_THEME_COLORS } from "@/shared/constants/chartColors";
 import {
     ChartTooltipContainer,
     ChartTooltipHeader,
     ChartTooltipItem,
-} from "../../../../shared/components/ChartTooltip/ChartTooltip";
+} from "@/shared/components/ChartTooltip/ChartTooltip";
 
 interface Props {
     active?: boolean;

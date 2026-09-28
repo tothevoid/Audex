@@ -1,5 +1,5 @@
-import { BrokerAccountEntity, BrokerAccountEntityRequest, BrokerAccountEntityResponse } from '../../models/brokers/BrokerAccountEntity';
-import { createEntity, deleteEntity, getAllEntities, getEntity, getEntityById, updateEntity } from '../basicApi';
+import { BrokerAccountEntity, BrokerAccountEntityRequest, BrokerAccountEntityResponse } from '@/models/brokers/BrokerAccountEntity';
+import { createEntity, deleteEntity, getAllEntities, getEntity, getEntityById, updateEntity } from '@/api/basicApi';
 import { prepareBrokerAccount, prepareBrokerAccountRequest } from './brokerAccountApiMapping';
 
 const basicUrl = `BrokerAccount`;

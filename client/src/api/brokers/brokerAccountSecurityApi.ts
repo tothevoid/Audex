@@ -1,6 +1,6 @@
-import { BrokerAccountSecurityEntity, BrokerAccountSecurityEntityResponse } from '../../models/brokers/BrokerAccountSecurityEntity';
-import { Nullable } from '../../shared/utilities/nullable';
-import { getAction, getAllEntities, getEntity } from '../basicApi';
+import { BrokerAccountSecurityEntity, BrokerAccountSecurityEntityResponse } from '@/models/brokers/BrokerAccountSecurityEntity';
+import { Nullable } from '@/shared/utilities/nullable';
+import { getAction, getAllEntities, getEntity } from '@/api/basicApi';
 import { prepareBrokerAccountSecurity } from './brokerAccountSecurityApiMapping';
 
 const basicUrl = `BrokerAccountSecurity`;

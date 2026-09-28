@@ -1,15 +1,15 @@
 import { Card, Flex, Link, Span, Stack, Text } from '@chakra-ui/react';
 import { NavLink } from 'react-router-dom';
 import { Fragment, useEffect, useState } from 'react';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import { BrokerAccountEntity } from '../../../../models/brokers/BrokerAccountEntity';
-import { getBankIconUrl } from '../../../../api/banks/bankApi';
-import { getPortfolioValues } from '../../../../api/brokers/brokerAccountSummaryApi';
-import { BrokerAccountPortfolioEntity } from '../../../../models/brokers/BrokerAccountPortfolioEntity';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import { BrokerAccountEntity } from '@/models/brokers/BrokerAccountEntity';
+import { getBankIconUrl } from '@/api/banks/bankApi';
+import { getPortfolioValues } from '@/api/brokers/brokerAccountSummaryApi';
+import { BrokerAccountPortfolioEntity } from '@/models/brokers/BrokerAccountPortfolioEntity';
 import { BsBank } from 'react-icons/bs';
-import StoredIcon from '../../../../shared/components/StoredIcon';
-import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
-import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
+import StoredIcon from '@/shared/components/StoredIcon';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '@/shared/components/EntityCard/EntityCard';
 
 interface Props {
 	brokerAccount: BrokerAccountEntity

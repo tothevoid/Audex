@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { DebtEntity } from "../../../models/debts/DebtEntity";
-import { createDebt, deleteDebt, getDebts, updateDebt } from "../../../api/debts/debtApi";
+import { DebtEntity } from "@/models/debts/DebtEntity";
+import { createDebt, deleteDebt, getDebts, updateDebt } from "@/api/debts/debtApi";
 
 export const useDebts = () => {
 	const [debts, setDebts] = useState<DebtEntity[]>([]);

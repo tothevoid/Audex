@@ -1,8 +1,8 @@
-import { SecurityTransactionEntity, SecurityTransactionEntityRequest, SecurityTransactionEntityResponse } from '../../models/securities/SecurityTransactionEntity';
-import { SecurityTransactionsHistory } from '../../models/securities/SecurityTransactionsHistory';
-import { SecurityTransactionsRequest } from '../../models/securities/SecurityTransactionsRequest';
-import { PagedResult } from '../../shared/models/PagedResult';
-import { createEntity, deleteEntity, getAllEntities, getPagedEntities, updateEntity } from '../basicApi';
+import { SecurityTransactionEntity, SecurityTransactionEntityRequest, SecurityTransactionEntityResponse } from '@/models/securities/SecurityTransactionEntity';
+import { SecurityTransactionsHistory } from '@/models/securities/SecurityTransactionsHistory';
+import { SecurityTransactionsRequest } from '@/models/securities/SecurityTransactionsRequest';
+import { PagedResult } from '@/shared/models/PagedResult';
+import { createEntity, deleteEntity, getAllEntities, getPagedEntities, updateEntity } from '@/api/basicApi';
 import { prepareSecurityTransaction } from './securityTransactionApiMapping';
 
 const basicUrl = `SecurityTransaction`;

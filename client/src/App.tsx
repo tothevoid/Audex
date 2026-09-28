@@ -1,28 +1,28 @@
-import './App.scss';
-import Header from './features/Navigation/Header/Header';
-import TransactionsPage from './pages/Transactions/TransactionsPage'
-import DepositsPage from './pages/Deposits/DepositsPage';
+import '@/App.scss';
+import Header from '@/features/Navigation/Header/Header';
+import TransactionsPage from '@/pages/Transactions/TransactionsPage'
+import DepositsPage from '@/pages/Deposits/DepositsPage';
 
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Outlet, Navigate, useLocation } from 'react-router-dom';
-import AccountsPage from './pages/Accounts/AccountsPage';
-import DataPage from './pages/Data/DataPage';
-import BrokerAccountsPage from './pages/BrokerAccounts/BrokerAccountsPage';
-import SecuritiesPage from './pages/SecuritiesPage/SecuritiesPage';
-import BrokerAccountPage from './pages/BrokerAccount/BrokerAccountPage';
-import SecurityPage from './pages/SecurityPage/SecurityPage';
-import DashboardPage from './pages/Dashboard/DashboardPage';
-import DebtsPage from './pages/Debts/DebtsPage';
-import CryptocurrenciesPage from './pages/CryptocurrenciesPage/CryptocurrenciesPage';
-import CryptoAccountsPage from './pages/CryptoAccountsPage/CryptoAccountsPage';
-import CryptoAccountPage from './pages/CryptoAccountPage/CryptoAccountPage';
-import AuthPage from './pages/Auth/AuthPage';
-import { UserProvider } from './features/UserProfileSettingsModal/hooks/UserProfileContext';
-import NotificationsPage from './pages/Notifications/NotificationsPage';
-import CashAccountPage from './pages/CashAccountPage/CashAccountPage.tsx';
-import SchedulerPage from './pages/Scheduler/SchedulerPage.tsx';
-import { getAccessToken } from './api/tokenStorage';
-import { refreshToken } from './api/auth/authApi';
+import AccountsPage from '@/pages/Accounts/AccountsPage';
+import DataPage from '@/pages/Data/DataPage';
+import BrokerAccountsPage from '@/pages/BrokerAccounts/BrokerAccountsPage';
+import SecuritiesPage from '@/pages/SecuritiesPage/SecuritiesPage';
+import BrokerAccountPage from '@/pages/BrokerAccount/BrokerAccountPage';
+import SecurityPage from '@/pages/SecurityPage/SecurityPage';
+import DashboardPage from '@/pages/Dashboard/DashboardPage';
+import DebtsPage from '@/pages/Debts/DebtsPage';
+import CryptocurrenciesPage from '@/pages/CryptocurrenciesPage/CryptocurrenciesPage';
+import CryptoAccountsPage from '@/pages/CryptoAccountsPage/CryptoAccountsPage';
+import CryptoAccountPage from '@/pages/CryptoAccountPage/CryptoAccountPage';
+import AuthPage from '@/pages/Auth/AuthPage';
+import { UserProvider } from '@/features/UserProfileSettingsModal/hooks/UserProfileContext';
+import NotificationsPage from '@/pages/Notifications/NotificationsPage';
+import CashAccountPage from '@/pages/CashAccountPage/CashAccountPage.tsx';
+import SchedulerPage from '@/pages/Scheduler/SchedulerPage.tsx';
+import { getAccessToken } from '@/api/tokenStorage';
+import { refreshToken } from '@/api/auth/authApi';
 
 const RequireAuth = () => {
 	const token = getAccessToken();

@@ -1,4 +1,4 @@
-import { Nullable } from "../../shared/utilities/nullable";
+import { Nullable } from "@/shared/utilities/nullable";
 
 export enum StatementDiffType {
     New = 1,
@@ -27,7 +27,7 @@ export interface BrokerStatementImporterEntity {
     supportedExtensions: string[];
 }
 
-import { TimeZoneEntity } from "../common/TimeZoneEntity";
+import { TimeZoneEntity } from "@/models/common/TimeZoneEntity";
 
 export type BrokerStatementTimeZoneEntity = TimeZoneEntity;
 
@@ -39,7 +39,7 @@ export interface StatementSecurityEntity {
     resolvedSecurityId?: Nullable<string>;
 }
 
-import { SecurityTransactionEntityResponse } from "../securities/SecurityTransactionEntity";
+import { SecurityTransactionEntityResponse } from "@/models/securities/SecurityTransactionEntity";
 
 export interface BrokerStatementDiffItemEntity {
     id: string;

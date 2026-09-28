@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { NotificationEntity, NotificationEntityResponse } from "../../models/notifications/NotificationEntity";
-import { prepareNotification } from "../../api/notifications/notificationApiMapping";
+import { NotificationEntity, NotificationEntityResponse } from "@/models/notifications/NotificationEntity";
+import { prepareNotification } from "@/api/notifications/notificationApiMapping";
 import { useSignalR } from "./useSignalR";
 
 export interface NotificationEventsHandlers {

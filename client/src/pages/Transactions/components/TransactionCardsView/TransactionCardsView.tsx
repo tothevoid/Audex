@@ -1,15 +1,15 @@
 import React, { useMemo } from 'react';
 import { Box, Flex, Grid, GridItem, Skeleton, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { TransactionEntity } from '../../../../models/transactions/TransactionEntity';
-import { AccountEntity } from '../../../../models/accounts/AccountEntity';
-import { TypeFilterMode } from '../TransactionFilterBar/TransactionFilterBar';
-import Transaction from '../Transaction/Transaction';
-import TransactionStats from '../TransactionStats/TransactionStats';
-import { formatDate } from '../../../../shared/utilities/formatters/dateFormatter';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import { groupByKey, sumEntities } from '../../../../shared/utilities/arrayUtilities';
-import { useUserProfile } from '../../../../features/UserProfileSettingsModal/hooks/UserProfileContext';
+import { TransactionEntity } from '@/models/transactions/TransactionEntity';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
+import { TypeFilterMode } from '@/pages/Transactions/components/TransactionFilterBar/TransactionFilterBar';
+import Transaction from '@/pages/Transactions/components/Transaction/Transaction';
+import TransactionStats from '@/pages/Transactions/components/TransactionStats/TransactionStats';
+import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import { groupByKey, sumEntities } from '@/shared/utilities/arrayUtilities';
+import { useUserProfile } from '@/features/UserProfileSettingsModal/hooks/UserProfileContext';
 
 export interface TransactionCardsViewProps {
     transactions: TransactionEntity[];

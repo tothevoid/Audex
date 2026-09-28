@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box, Flex, Icon, Popover, Text, VStack } from '@chakra-ui/react';
 import { LuChevronRight } from 'react-icons/lu';
 import { NavLink } from 'react-router-dom';
-import HeaderItem from '../HeaderItem/HeaderItem';
+import HeaderItem from '@/features/Navigation/HeaderItem/HeaderItem';
 
 export interface HeaderNavDropdownItem {
     path: string;

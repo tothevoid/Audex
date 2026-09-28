@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { HiOutlineBuildingOffice2 } from 'react-icons/hi2';
 import { FiTrendingUp, FiTrendingDown, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { TbArrowDownLeft, TbArrowUpRight } from 'react-icons/tb';
-import { getIconUrl } from '../../../../api/securities/securityApi';
-import { BrokerAccountSecurityEntity } from '../../../../models/brokers/BrokerAccountSecurityEntity';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import StoredIcon from '../../../../shared/components/StoredIcon';
-import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
+import { getIconUrl } from '@/api/securities/securityApi';
+import { BrokerAccountSecurityEntity } from '@/models/brokers/BrokerAccountSecurityEntity';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import StoredIcon from '@/shared/components/StoredIcon';
+import EntityCard from '@/shared/components/EntityCard/EntityCard';
 
 type Props = {
     brokerAccountSecurity: BrokerAccountSecurityEntity;

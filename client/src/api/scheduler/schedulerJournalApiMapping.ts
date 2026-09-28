@@ -1,5 +1,5 @@
-import { ScheduledTaskAttachmentEntity, ScheduledTaskAttachmentEntityResponse } from '../../models/scheduler/ScheduledTaskAttachmentEntity';
-import { ScheduledTaskJournalEntity, ScheduledTaskJournalEntityResponse } from '../../models/scheduler/ScheduledTaskJournalEntity';
+import { ScheduledTaskAttachmentEntity, ScheduledTaskAttachmentEntityResponse } from '@/models/scheduler/ScheduledTaskAttachmentEntity';
+import { ScheduledTaskJournalEntity, ScheduledTaskJournalEntityResponse } from '@/models/scheduler/ScheduledTaskJournalEntity';
 
 export const prepareScheduledTaskAttachment = (
     response: ScheduledTaskAttachmentEntityResponse

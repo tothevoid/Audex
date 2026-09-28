@@ -2,9 +2,9 @@ import React from "react";
 import { Box, Flex, HStack, Icon, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { ChartPeriod } from "../../../../shared/utilities/formatters/dateFormatter";
-import { SecurityHistoryPeriod } from "../../../../models/securities/SecurityHistoryPeriod";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { ChartPeriod } from "@/shared/utilities/formatters/dateFormatter";
+import { SecurityHistoryPeriod } from "@/models/securities/SecurityHistoryPeriod";
 
 export interface PeriodOption {
     id: ChartPeriod;

@@ -1,21 +1,21 @@
 
 import React, { Fragment, useCallback, useEffect, useState } from "react";
 
-import { getDailyStats } from "../../../../api/brokers/brokerAccountSummaryApi";
+import { getDailyStats } from "@/api/brokers/brokerAccountSummaryApi";
 import { Card, SimpleGrid, Stack, Table, Text, Link, Flex } from "@chakra-ui/react";
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
-import { BrokerAccountDailySecurityStatsEntity, BrokerAccountDailyStatsEntity } from "../../../../models/brokers/BrokerAccountDailyStatsEntity";
-import { Nullable } from "../../../../shared/utilities/nullable";
-import MoneyCard from "../../../../shared/components/MoneyCard/MoneyCard";
-import { calculateDiff } from "../../../../shared/utilities/numericDiffsUtilities";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { formatTime } from "../../../../shared/utilities/formatters/dateFormatter";
-import StatsCard from "../../../../shared/components/StatsCard/StatsCard";
-import { getIconUrl } from "../../../../api/securities/securityApi";
+import { BrokerAccountDailySecurityStatsEntity, BrokerAccountDailyStatsEntity } from "@/models/brokers/BrokerAccountDailyStatsEntity";
+import { Nullable } from "@/shared/utilities/nullable";
+import MoneyCard from "@/shared/components/MoneyCard/MoneyCard";
+import { calculateDiff } from "@/shared/utilities/numericDiffsUtilities";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { formatTime } from "@/shared/utilities/formatters/dateFormatter";
+import StatsCard from "@/shared/components/StatsCard/StatsCard";
+import { getIconUrl } from "@/api/securities/securityApi";
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2";
-import StoredIcon from "../../../../shared/components/StoredIcon";
-import RefreshButton from "../../../../shared/components/RefreshButton";
+import StoredIcon from "@/shared/components/StoredIcon";
+import RefreshButton from "@/shared/components/RefreshButton";
 
 interface Props {
 	brokerAccountId: Nullable<string>

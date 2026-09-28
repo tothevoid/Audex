@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Tabs } from "@chakra-ui/react";
 import { IoMdStats } from "react-icons/io";
 import { MdQueryStats } from "react-icons/md";
-import CryptoAccountsList from "../../../CryptoAccountsPage/components/CryptoAccountsList/CryptoAccountsList";
-import CryptoAccountStats from "../CryptoAccountStats/CryptoAccountStats";
+import CryptoAccountsList from "@/pages/CryptoAccountsPage/components/CryptoAccountsList/CryptoAccountsList";
+import CryptoAccountStats from "@/pages/CryptoAccountPage/components/CryptoAccountStats/CryptoAccountStats";
 
 interface Props {
     cryptoAccountId?: string;

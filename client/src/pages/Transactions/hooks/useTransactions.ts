@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { TransactionEntity } from "../../../models/transactions/TransactionEntity";
-import { createTransaction, getTransactions, updateTransaction, deleteTransaction } from "../../../api/transactions/transactionApi";
-import { insertByPredicate, reorderByPredicate } from "../../../shared/utilities/arrayUtilities";
+import { TransactionEntity } from "@/models/transactions/TransactionEntity";
+import { createTransaction, getTransactions, updateTransaction, deleteTransaction } from "@/api/transactions/transactionApi";
+import { insertByPredicate, reorderByPredicate } from "@/shared/utilities/arrayUtilities";
 
 export interface TransactionsQuery {
 	month: number,

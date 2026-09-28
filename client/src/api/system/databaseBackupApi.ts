@@ -1,6 +1,6 @@
-import httpClient from '../httpClient';
-import { BackupValidationResult, RestoreBackupResult } from '../../models/system/backupModels';
-import { logPromiseError } from '../../shared/utilities/webApiUtilities';
+import httpClient from '@/api/httpClient';
+import { BackupValidationResult, RestoreBackupResult } from '@/models/system/backupModels';
+import { logPromiseError } from '@/shared/utilities/webApiUtilities';
 
 export interface ExportBackupResponse {
     blob: Blob;

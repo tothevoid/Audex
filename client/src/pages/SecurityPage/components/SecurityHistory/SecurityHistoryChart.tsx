@@ -11,8 +11,8 @@ import {
     ReferenceLine,
 } from "recharts";
 import { useTranslation } from "react-i18next";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { formatChartAxisDate, ChartPeriod } from "../../../../shared/utilities/formatters/dateFormatter";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { formatChartAxisDate, ChartPeriod } from "@/shared/utilities/formatters/dateFormatter";
 import SecurityHistoryChartTooltip from "./SecurityHistoryChartTooltip";
 
 export interface ProcessedHistoryItem {

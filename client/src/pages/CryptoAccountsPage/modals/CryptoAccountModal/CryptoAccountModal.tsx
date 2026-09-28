@@ -3,14 +3,14 @@ import React, { RefObject, useCallback, useEffect, useMemo, useState } from "rea
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { getCryptoProviders } from "../../../../api/crypto/cryptoProviderApi";
-import { CryptoProviderEntity } from "../../../../models/crypto/CryptoProviderEntity";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { getCryptoProviders } from "@/api/crypto/cryptoProviderApi";
+import { CryptoProviderEntity } from "@/models/crypto/CryptoProviderEntity";
 import { CryptoAccountFormInput, getCryptoAccountValidationSchema } from "./CryptoAccountValidationSchema";
-import { CryptoAccountEntity } from "../../../../models/crypto/CryptoAccountEntity";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
+import { CryptoAccountEntity } from "@/models/crypto/CryptoAccountEntity";
+import { generateGuid } from "@/shared/utilities/idUtilities";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>,

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { TFunction } from 'i18next';
-import { CronFrequency, isValidCronExpression } from '../../pages/Scheduler/schedulerUtils';
+import { CronFrequency, isValidCronExpression } from '@/pages/Scheduler/schedulerUtils';
 
 export const getScheduleValidationSchema = (t: TFunction) => z.object({
     cronExpression: z.string()

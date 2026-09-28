@@ -6,10 +6,10 @@ import {
     deleteBrokerAccountFundsTransfer,
     getPagedBrokerAccountFundsTransfers,
     updateBrokerAccountFundsTransfer
-} from "../../../api/brokers/brokerAccountFundsTransferApi";
-import { BrokerAccountFundTransferEntity } from "../../../models/brokers/BrokerAccountFundTransfer";
-import { Nullable } from "../../../shared/utilities/nullable";
-import usePagedQuery from "../../../shared/hooks/usePagedQuery";
+} from "@/api/brokers/brokerAccountFundsTransferApi";
+import { BrokerAccountFundTransferEntity } from "@/models/brokers/BrokerAccountFundTransfer";
+import { Nullable } from "@/shared/utilities/nullable";
+import usePagedQuery from "@/shared/hooks/usePagedQuery";
 
 export interface UseBrokerAccountFundTransfersOptions {
     brokerAccountId?: Nullable<string>;

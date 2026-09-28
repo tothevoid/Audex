@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Popover } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { useUserProfile } from '../../UserProfileSettingsModal/hooks/UserProfileContext';
-import { logout } from '../../../api/auth/authApi';
+import { useUserProfile } from '@/features/UserProfileSettingsModal/hooks/UserProfileContext';
+import { logout } from '@/api/auth/authApi';
 import { HeaderProfileButton } from './HeaderProfileButton';
 import { HeaderProfileCard } from './HeaderProfileCard';
 

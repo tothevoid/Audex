@@ -1,5 +1,5 @@
-import { BrokerAccountFundTransferEntity, BrokerAccountFundTransferEntityRequest, BrokerAccountFundTransferEntityResponse } from "../../models/brokers/BrokerAccountFundTransfer";
-import { prepareAccount } from "../accounts/accountApiMapping";
+import { BrokerAccountFundTransferEntity, BrokerAccountFundTransferEntityRequest, BrokerAccountFundTransferEntityResponse } from "@/models/brokers/BrokerAccountFundTransfer";
+import { prepareAccount } from "@/api/accounts/accountApiMapping";
 import { prepareBrokerAccount } from "./brokerAccountApiMapping";
 
 export const prepareBrokerAccountFundsTransferRequest = (brokerAccountFundsTransfer: BrokerAccountFundTransferEntity): BrokerAccountFundTransferEntityRequest => {

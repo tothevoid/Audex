@@ -1,6 +1,6 @@
 import { useState } from "react"
 import "./Calendar.scss"
-import { getMonthsNames } from "../../utilities/dateUtils";
+import { getMonthsNames } from "@/shared/utilities/dateUtils";
 import { useTranslation } from "react-i18next";
 import { Box } from "@chakra-ui/react";
 

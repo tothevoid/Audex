@@ -4,21 +4,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountFormInput, getAccountValidationSchema } from "./AccountValidationSchema";
 import { useTranslation } from "react-i18next";
-import { getAccountTypes } from "../../../../api/accounts/accountTypeApi";
-import { getCurrencies } from "../../../../api/currencies/currencyApi";
-import { AccountEntity } from "../../../../models/accounts/AccountEntity";
-import { AccountTypeEntity } from "../../../../models/accounts/AccountTypeEntity";
-import { CurrencyEntity } from "../../../../models/currencies/CurrencyEntity";
-import CheckboxInput from "../../../../shared/components/CheckboxInput/CheckboxInput";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
-import DateSelect from "../../../../shared/components/DateSelect/DateSelect";
-import MoneyInput from "../../../../shared/components/MoneyInput/MoneyInput";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
-import { getBanks } from "../../../../api/banks/bankApi";
-import { BankEntity } from "../../../../models/banks/BankEntity";
-import { ACCOUNT_TYPE } from "../../../../shared/constants/accountType";
+import { getAccountTypes } from "@/api/accounts/accountTypeApi";
+import { getCurrencies } from "@/api/currencies/currencyApi";
+import { AccountEntity } from "@/models/accounts/AccountEntity";
+import { AccountTypeEntity } from "@/models/accounts/AccountTypeEntity";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
+import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import DateSelect from "@/shared/components/DateSelect/DateSelect";
+import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { generateGuid } from "@/shared/utilities/idUtilities";
+import { getBanks } from "@/api/banks/bankApi";
+import { BankEntity } from "@/models/banks/BankEntity";
+import { ACCOUNT_TYPE } from "@/shared/constants/accountType";
 
 
 interface ModalProps {

@@ -1,5 +1,5 @@
-import { DividendEntity, DividendEntityRequest, DividendEntityResponse } from "../../models/securities/DividendEntity";
-import { convertToDateOnly } from "../../shared/utilities/dateUtils";
+import { DividendEntity, DividendEntityRequest, DividendEntityResponse } from "@/models/securities/DividendEntity";
+import { convertToDateOnly } from "@/shared/utilities/dateUtils";
 import { prepareSecurity } from "./securityApiMapping";
 
 export const prepareDividendRequest = (dividend: DividendEntity): DividendEntityRequest => {

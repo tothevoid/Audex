@@ -1,7 +1,7 @@
-import { CryptocurrencyEntity } from '../../models/crypto/CryptocurrencyEntity';
-import { Nullable } from '../../shared/utilities/nullable';
-import { createEntityWithIcon, deleteEntity, getAllEntities, updateEntityWithIcon } from '../basicApi';
-import { getStoredIconUrl } from '../iconApi';
+import { CryptocurrencyEntity } from '@/models/crypto/CryptocurrencyEntity';
+import { Nullable } from '@/shared/utilities/nullable';
+import { createEntityWithIcon, deleteEntity, getAllEntities, updateEntityWithIcon } from '@/api/basicApi';
+import { getStoredIconUrl } from '@/api/iconApi';
 
 const basicUrl = `Cryptocurrency`;
 const ENTITY_NAME = "cryptocurrencyJson"

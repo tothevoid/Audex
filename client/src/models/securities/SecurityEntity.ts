@@ -1,5 +1,5 @@
-import { Nullable } from "../../shared/utilities/nullable";
-import { CurrencyEntity } from "../currencies/CurrencyEntity";
+import { Nullable } from "@/shared/utilities/nullable";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
 import { SecurityTypeEntity } from "./SecurityTypeEntity";
 
 export interface CommonSecurityEntity {

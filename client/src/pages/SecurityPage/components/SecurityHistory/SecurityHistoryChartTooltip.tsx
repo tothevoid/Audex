@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, HStack, Icon, Text } from "@chakra-ui/react";
 import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { formatChartTooltipDate, ChartPeriod } from "../../../../shared/utilities/formatters/dateFormatter";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { formatChartTooltipDate, ChartPeriod } from "@/shared/utilities/formatters/dateFormatter";
 
 interface Props {
     active?: boolean;

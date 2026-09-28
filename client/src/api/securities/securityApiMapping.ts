@@ -1,4 +1,4 @@
-import { SecurityEntityResponse, SecurityEntity, SecurityEntityRequest } from "../../models/securities/SecurityEntity";
+import { SecurityEntityResponse, SecurityEntity, SecurityEntityRequest } from "@/models/securities/SecurityEntity";
 import { prepareSecurityType } from "./securityTypeApiMapping";
 
 export const prepareSecurity = (security: SecurityEntityResponse): SecurityEntity => {

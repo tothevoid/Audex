@@ -3,17 +3,17 @@ import React, { RefObject, useCallback, useEffect, useMemo, useState } from "rea
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
-import { getCurrencies } from "../../../../api/currencies/currencyApi";
-import { getUserProfile } from "../../../../api/user/userProfileApi";
-import { CurrencyEntity } from "../../../../models/currencies/CurrencyEntity";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import { getCurrencies } from "@/api/currencies/currencyApi";
+import { getUserProfile } from "@/api/user/userProfileApi";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
 import { DebtFormInput, getDebtValidationSchema } from "./DebtValidationSchema";
-import { DebtEntity } from "../../../../models/debts/DebtEntity";
-import DateSelect from "../../../../shared/components/DateSelect/DateSelect";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
-import MoneyInput from "../../../../shared/components/MoneyInput/MoneyInput";
+import { DebtEntity } from "@/models/debts/DebtEntity";
+import DateSelect from "@/shared/components/DateSelect/DateSelect";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { generateGuid } from "@/shared/utilities/idUtilities";
+import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 
 interface Props {
 	debt?: DebtEntity | null,

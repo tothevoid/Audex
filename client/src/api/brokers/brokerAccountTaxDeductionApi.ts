@@ -1,5 +1,5 @@
-import { BrokerAccountTaxDeductionEntity, BrokerAccountTaxDeductionEntityResponse, TaxDeductionsQuery } from "../../models/brokers/BrokerAccountTaxDeductionEntity";
-import { createEntity, deleteEntity, getAllEntitiesByConfig, getEntity, updateEntity } from "../basicApi";
+import { BrokerAccountTaxDeductionEntity, BrokerAccountTaxDeductionEntityResponse, TaxDeductionsQuery } from "@/models/brokers/BrokerAccountTaxDeductionEntity";
+import { createEntity, deleteEntity, getAllEntitiesByConfig, getEntity, updateEntity } from "@/api/basicApi";
 import { prepareBrokerAccountTaxDeductionRequest, prepareBrokerAccountTaxDeductionResponse } from "./brokerAccountTaxDeductionApiMapping";
 
 const basicUrl = `BrokerAccountTaxDeduction`;

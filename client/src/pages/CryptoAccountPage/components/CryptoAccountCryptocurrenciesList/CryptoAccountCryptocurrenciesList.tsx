@@ -1,18 +1,18 @@
 import React, { Fragment, useMemo } from 'react';
 import { SimpleGrid } from '@chakra-ui/react';
-import { useCryptoAccountCryptocurrencies } from '../../hooks/useCryptoAccountCryptocurrencies';
-import { CryptoAccountEntity } from '../../../../models/crypto/CryptoAccountEntity';
-import { CryptoAccountCryptocurrencyEntity } from '../../../../models/crypto/CryptoAccountCryptocurrencyEntity';
-import CryptoAccountCryptocurrency from '../CryptoAccountCryptocurrency/CryptoAccountCryptocurrency';
-import CryptoAccountCryptocurrencyModal from '../../modals/CryptoAccountCryptocurrencyModal';
-import CryptoAccountHeader from '../CryptoAccountHeader/CryptoAccountHeader';
-import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
-import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
-import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
-import AddButton from '../../../../shared/components/AddButton/AddButton';
+import { useCryptoAccountCryptocurrencies } from '@/pages/CryptoAccountPage/hooks/useCryptoAccountCryptocurrencies';
+import { CryptoAccountEntity } from '@/models/crypto/CryptoAccountEntity';
+import { CryptoAccountCryptocurrencyEntity } from '@/models/crypto/CryptoAccountCryptocurrencyEntity';
+import CryptoAccountCryptocurrency from '@/pages/CryptoAccountPage/components/CryptoAccountCryptocurrency/CryptoAccountCryptocurrency';
+import CryptoAccountCryptocurrencyModal from '@/pages/CryptoAccountPage/modals/CryptoAccountCryptocurrencyModal';
+import CryptoAccountHeader from '@/pages/CryptoAccountPage/components/CryptoAccountHeader/CryptoAccountHeader';
+import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
+import AddButton from '@/shared/components/AddButton/AddButton';
 import { useTranslation } from 'react-i18next';
 
-import Placeholder from '../../../../shared/components/Placeholder/Placeholder';
+import Placeholder from '@/shared/components/Placeholder/Placeholder';
 
 interface Props {
 	cryptoAccount: CryptoAccountEntity;

@@ -2,15 +2,15 @@ import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { SimpleGrid } from "@chakra-ui/react";
 import { useCryptocurrencies } from "./hooks/useCryptocurrencies";
-import { CryptocurrencyEntity } from "../../models/crypto/CryptocurrencyEntity";
+import { CryptocurrencyEntity } from "@/models/crypto/CryptocurrencyEntity";
 import Cryptocurrency from "./components/Cryptocurrency/Cryptocurrency";
 import CryptocurrencyModal from "./modals/CryptocurrencyModal";
-import Placeholder from "../../shared/components/Placeholder/Placeholder";
-import { ConfirmModal } from "../../shared/modals/ConfirmModal/ConfirmModal";
-import AddButton from "../../shared/components/AddButton/AddButton";
-import SectionHeader from "../../shared/components/SectionHeader/SectionHeader";
-import { ActiveEntityMode } from "../../shared/enums/activeEntityMode";
-import { useEntityModal } from "../../shared/hooks/useEntityModal";
+import Placeholder from "@/shared/components/Placeholder/Placeholder";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import AddButton from "@/shared/components/AddButton/AddButton";
+import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
+import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
+import { useEntityModal } from "@/shared/hooks/useEntityModal";
 
 const CryptocurrenciesPage: React.FC = () => {
     const { t } = useTranslation();

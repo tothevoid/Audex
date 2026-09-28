@@ -3,16 +3,16 @@ import React, { RefObject, useCallback, useEffect, useMemo, useState } from "rea
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import CollectionSelect from "../../../shared/components/CollectionSelect/CollectionSelect";
-import MoneyInput from "../../../shared/components/MoneyInput/MoneyInput";
-import { BaseModalRef } from "../../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../../shared/modals/BaseFormModal/BaseFormModal";
-import { CryptoAccountCryptocurrencyEntity } from "../../../models/crypto/CryptoAccountCryptocurrencyEntity";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { CryptoAccountCryptocurrencyEntity } from "@/models/crypto/CryptoAccountCryptocurrencyEntity";
 import { CryptoAccountCryptocurrencyFormInput, getCryptoAccountCryptocurrencyValidationSchema } from "./CryptoAccountCryptocurrencyValidationSchema";
-import { getCryptocurrencies } from "../../../api/crypto/cryptocurrencyApi";
-import { CryptocurrencyEntity } from "../../../models/crypto/CryptocurrencyEntity";
-import { CryptoAccountEntity } from "../../../models/crypto/CryptoAccountEntity";
-import { generateGuid } from "../../../shared/utilities/idUtilities";
+import { getCryptocurrencies } from "@/api/crypto/cryptocurrencyApi";
+import { CryptocurrencyEntity } from "@/models/crypto/CryptocurrencyEntity";
+import { CryptoAccountEntity } from "@/models/crypto/CryptoAccountEntity";
+import { generateGuid } from "@/shared/utilities/idUtilities";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>;

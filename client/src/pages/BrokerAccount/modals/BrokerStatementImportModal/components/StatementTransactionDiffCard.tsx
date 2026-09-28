@@ -6,9 +6,9 @@ import { BsExclamationTriangle } from "react-icons/bs";
 import {
     BrokerStatementDiffItemEntity,
     StatementDiscrepancyField
-} from "../../../../../models/brokers/BrokerStatementImportModels";
-import { Nullable } from "../../../../../shared/utilities/nullable";
-import { formatShortDateTime, formatTimeWithSeconds } from "../../../../../shared/utilities/formatters/dateFormatter";
+} from "@/models/brokers/BrokerStatementImportModels";
+import { Nullable } from "@/shared/utilities/nullable";
+import { formatShortDateTime, formatTimeWithSeconds } from "@/shared/utilities/formatters/dateFormatter";
 
 const formatTradeDate = (dateString: string, i18n: I18nInstance): string => {
     if (!dateString) return "";

@@ -1,5 +1,5 @@
-import { TimeZoneEntity } from "../../models/common/TimeZoneEntity";
-import { getAllEntities } from "../basicApi";
+import { TimeZoneEntity } from "@/models/common/TimeZoneEntity";
+import { getAllEntities } from "@/api/basicApi";
 
 const basicUrl = "TimeZone";
 

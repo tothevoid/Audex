@@ -1,4 +1,4 @@
-import { ThemeColors } from '../types';
+import { ThemeColors } from '@/theme/types';
 
 export const solarizedLightColors: ThemeColors = {
     background_main: '#fbf8f2',

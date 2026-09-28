@@ -1,6 +1,6 @@
-import { CryptoAccountStatsEntity } from '../../models/crypto/CryptoAccountStatsEntity';
-import { Nullable } from '../../shared/utilities/nullable';
-import { getEntity } from '../basicApi';
+import { CryptoAccountStatsEntity } from '@/models/crypto/CryptoAccountStatsEntity';
+import { Nullable } from '@/shared/utilities/nullable';
+import { getEntity } from '@/api/basicApi';
 
 const basicUrl = `CryptoAccountStats`;
 

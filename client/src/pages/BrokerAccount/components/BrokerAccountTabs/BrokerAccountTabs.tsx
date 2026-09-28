@@ -6,15 +6,15 @@ import { PiCoinsLight } from "react-icons/pi";
 import { MdAttachMoney, MdQueryStats, MdHistory } from "react-icons/md";
 import { IoMdStats } from "react-icons/io";
 import { TbTax } from "react-icons/tb";
-import BrokerAccountDailyStats from "../BrokerAccountDailyStats/BrokerAccountDailyStats";
-import BrokerAccountFundTransfersList from "../BrokerAccountFundTransfersList/BrokerAccountFundTransfersList";
-import BrokerAccountStats from "../BrokerAccountStats/BrokerAccountStats";
-import BrokerAccountPortfolioHistory from "../BrokerAccountPortfolioHistory/BrokerAccountPortfolioHistory";
-import BrokerAccountTaxDeductionsList from "../BrokerAccountTaxDeductionsList/BrokerAccountTaxDeductionsList";
-import DividendPaymentsList from "../DividendPaymentsList/DividendPaymentsList";
-import SecurityTransactionsList from "../SecurityTransactionsList/SecurityTransactionsList";
-import { Nullable } from "../../../../shared/utilities/nullable";
-import BrokerAccountsList from "../../../BrokerAccounts/components/BrokerAccountsList/BrokerAccountsList";
+import BrokerAccountDailyStats from "@/pages/BrokerAccount/components/BrokerAccountDailyStats/BrokerAccountDailyStats";
+import BrokerAccountFundTransfersList from "@/pages/BrokerAccount/components/BrokerAccountFundTransfersList/BrokerAccountFundTransfersList";
+import BrokerAccountStats from "@/pages/BrokerAccount/components/BrokerAccountStats/BrokerAccountStats";
+import BrokerAccountPortfolioHistory from "@/pages/BrokerAccount/components/BrokerAccountPortfolioHistory/BrokerAccountPortfolioHistory";
+import BrokerAccountTaxDeductionsList from "@/pages/BrokerAccount/components/BrokerAccountTaxDeductionsList/BrokerAccountTaxDeductionsList";
+import DividendPaymentsList from "@/pages/BrokerAccount/components/DividendPaymentsList/DividendPaymentsList";
+import SecurityTransactionsList from "@/pages/BrokerAccount/components/SecurityTransactionsList/SecurityTransactionsList";
+import { Nullable } from "@/shared/utilities/nullable";
+import BrokerAccountsList from "@/pages/BrokerAccounts/components/BrokerAccountsList/BrokerAccountsList";
 
 interface Props {
     brokerAccountId?: Nullable<string>

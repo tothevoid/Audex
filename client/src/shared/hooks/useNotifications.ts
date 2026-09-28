@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { NotificationEntity } from "../../models/notifications/NotificationEntity";
+import { NotificationEntity } from "@/models/notifications/NotificationEntity";
 import {
     deleteNotification as apiDeleteNotification,
     getPagedNotifications,
@@ -7,7 +7,7 @@ import {
     markAllNotificationsAsRead as apiMarkAllAsRead,
     markNotificationAsRead as apiMarkAsRead,
     NotificationsQuery
-} from "../../api/notifications/notificationApi";
+} from "@/api/notifications/notificationApi";
 import { useNotificationEvents } from "./useNotificationEvents";
 import { usePagedQuery } from "./usePagedQuery";
 

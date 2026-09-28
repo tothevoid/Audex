@@ -21,15 +21,15 @@ import {
     MdSchedule,
     MdSettings
 } from 'react-icons/md';
-import { ScheduledTaskEntity, ScheduledTaskExecutionStatus } from '../../../models/scheduler/ScheduledTaskEntity';
-import { GetJournalQueryRequest, ScheduledTaskJournalEntity } from '../../../models/scheduler/ScheduledTaskJournalEntity';
-import { deleteScheduledTask, runTaskNow } from '../../../api/scheduler/schedulerTaskApi';
-import { getPagedScheduledTaskJournal } from '../../../api/scheduler/schedulerJournalApi';
-import { formatCronExpression, formatDuration, getStatusBadgeProps } from '../schedulerUtils';
+import { ScheduledTaskEntity, ScheduledTaskExecutionStatus } from '@/models/scheduler/ScheduledTaskEntity';
+import { GetJournalQueryRequest, ScheduledTaskJournalEntity } from '@/models/scheduler/ScheduledTaskJournalEntity';
+import { deleteScheduledTask, runTaskNow } from '@/api/scheduler/schedulerTaskApi';
+import { getPagedScheduledTaskJournal } from '@/api/scheduler/schedulerJournalApi';
+import { formatCronExpression, formatDuration, getStatusBadgeProps } from '@/pages/Scheduler/schedulerUtils';
 import { SchedulerJournalTable } from './SchedulerJournalTable';
-import { useSchedulerEvents } from '../../../shared/hooks/useSchedulerEvents';
-import usePagedQuery from '../../../shared/hooks/usePagedQuery';
-import CollectionPagination from '../../../shared/components/CollectionPagination/CollectionPagination';
+import { useSchedulerEvents } from '@/shared/hooks/useSchedulerEvents';
+import usePagedQuery from '@/shared/hooks/usePagedQuery';
+import CollectionPagination from '@/shared/components/CollectionPagination/CollectionPagination';
 
 interface SchedulerTaskDetailPaneProps {
     task: ScheduledTaskEntity | null;

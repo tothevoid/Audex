@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
 import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip } from "recharts";
-import { DepositMonthSummary } from "../DepositStats/depositMonthSummary";
+import { DepositMonthSummary } from "@/pages/Deposits/components/DepositStats/depositMonthSummary";
 import { Box } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { formatPeriodLabel } from "../DepositStats/depositChartUtils";
-import { CHART_THEME_COLORS } from "../../../../shared/constants/chartColors";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { formatPeriodLabel } from "@/pages/Deposits/components/DepositStats/depositChartUtils";
+import { CHART_THEME_COLORS } from "@/shared/constants/chartColors";
 import DepositsEarningsTooltip from "./DepositsEarningsTooltip";
 
 interface Props {

@@ -1,4 +1,4 @@
-import { ScheduledTaskEntity, ScheduledTaskEntityResponse } from '../../models/scheduler/ScheduledTaskEntity';
+import { ScheduledTaskEntity, ScheduledTaskEntityResponse } from '@/models/scheduler/ScheduledTaskEntity';
 
 export const prepareScheduledTask = (
     response: ScheduledTaskEntityResponse

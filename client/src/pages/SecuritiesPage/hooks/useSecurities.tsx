@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { SecurityEntity } from "../../../models/securities/SecurityEntity";
-import { createSecurity, deleteSecurity, getSecurities, updateSecurity } from "../../../api/securities/securityApi";
-import { OperationResult } from "../../../shared/models/OperationResult";
+import { SecurityEntity } from "@/models/securities/SecurityEntity";
+import { createSecurity, deleteSecurity, getSecurities, updateSecurity } from "@/api/securities/securityApi";
+import { OperationResult } from "@/shared/models/OperationResult";
 
 export const useSecurities = () => {
 	const [securities, setSecurities] = useState<SecurityEntity[]>([]);

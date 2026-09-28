@@ -1,13 +1,13 @@
 import React from "react";
 import { Badge, Card, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { AccountEntity } from "../../../models/accounts/AccountEntity";
+import { AccountEntity } from "@/models/accounts/AccountEntity";
 import { BsWallet2, BsArrowUpRight, BsArrowDownRight, BsBank } from "react-icons/bs";
 import { MdSwapHoriz } from "react-icons/md";
-import SectionHeader from "../../../shared/components/SectionHeader";
-import StoredIcon from "../../../shared/components/StoredIcon";
-import { getBankIconUrl } from "../../../api/banks/bankApi";
-import { NumericMetricItem } from "../../../shared/components/MetricItem";
+import SectionHeader from "@/shared/components/SectionHeader";
+import StoredIcon from "@/shared/components/StoredIcon";
+import { getBankIconUrl } from "@/api/banks/bankApi";
+import { NumericMetricItem } from "@/shared/components/MetricItem";
 
 interface CashAccountHeaderProps {
     account: AccountEntity | null;

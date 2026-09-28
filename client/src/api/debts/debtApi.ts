@@ -1,5 +1,5 @@
-import { DebtEntity, DebtEntityRequest, DebtEntityResponse } from "../../models/debts/DebtEntity";
-import { createEntity, deleteEntity, getAllEntities, updateEntity } from "../basicApi";
+import { DebtEntity, DebtEntityRequest, DebtEntityResponse } from "@/models/debts/DebtEntity";
+import { createEntity, deleteEntity, getAllEntities, updateEntity } from "@/api/basicApi";
 import { prepareDebt, prepareDebtRequest } from "./debtApiMapping";
 
 const basicUrl = `Debt`;

@@ -14,11 +14,11 @@ import {
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { MdAdd, MdHistory, MdSchedule } from 'react-icons/md';
-import { ScheduledTaskEntity } from '../../../models/scheduler/ScheduledTaskEntity';
-import { toggleTaskStatus } from '../../../api/scheduler/schedulerTaskApi';
-import AddButton from '../../../shared/components/AddButton/AddButton';
-import SwitchInput from '../../../shared/components/SwitchInput/SwitchInput';
-import { formatCronExpression, getTaskStatusDotColor } from '../schedulerUtils';
+import { ScheduledTaskEntity } from '@/models/scheduler/ScheduledTaskEntity';
+import { toggleTaskStatus } from '@/api/scheduler/schedulerTaskApi';
+import AddButton from '@/shared/components/AddButton/AddButton';
+import SwitchInput from '@/shared/components/SwitchInput/SwitchInput';
+import { formatCronExpression, getTaskStatusDotColor } from '@/pages/Scheduler/schedulerUtils';
 
 interface SchedulerTaskMasterListProps {
     tasks: ScheduledTaskEntity[];

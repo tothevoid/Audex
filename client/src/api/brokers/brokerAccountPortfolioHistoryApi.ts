@@ -1,6 +1,6 @@
-import { BrokerAccountPortfolioHistoryEntity } from '../../models/brokers/BrokerAccountPortfolioHistoryEntity';
-import { Nullable } from '../../shared/utilities/nullable';
-import { getEntity } from '../basicApi';
+import { BrokerAccountPortfolioHistoryEntity } from '@/models/brokers/BrokerAccountPortfolioHistoryEntity';
+import { Nullable } from '@/shared/utilities/nullable';
+import { getEntity } from '@/api/basicApi';
 
 const basicUrl = `BrokerAccountPortfolioHistory`;
 

@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, ReactNode } from "react";
 import { Box, BoxProps, Flex, Text } from "@chakra-ui/react";
-import { CHART_THEME_COLORS } from "../../constants/chartColors";
+import { CHART_THEME_COLORS } from "@/shared/constants/chartColors";
 
 interface ContainerProps extends BoxProps {
     minW?: string | number;

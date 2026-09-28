@@ -1,7 +1,7 @@
-import { GetJournalQueryRequest, ScheduledTaskJournalEntity, ScheduledTaskJournalEntityResponse } from '../../models/scheduler/ScheduledTaskJournalEntity';
-import { PagedResult } from '../../shared/models/PagedResult';
+import { GetJournalQueryRequest, ScheduledTaskJournalEntity, ScheduledTaskJournalEntityResponse } from '@/models/scheduler/ScheduledTaskJournalEntity';
+import { PagedResult } from '@/shared/models/PagedResult';
 import { prepareScheduledTaskJournal } from './schedulerJournalApiMapping';
-import { getPagedEntities } from '../basicApi';
+import { getPagedEntities } from '@/api/basicApi';
 
 const basicUrl = 'api/Scheduler';
 

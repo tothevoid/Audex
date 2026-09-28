@@ -2,17 +2,17 @@ import { Field, Input } from "@chakra-ui/react";
 import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { useTranslation } from "react-i18next";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
-import DateSelect from "../../../../shared/components/DateSelect/DateSelect";
+import { generateGuid } from "@/shared/utilities/idUtilities";
+import DateSelect from "@/shared/components/DateSelect/DateSelect";
 import { BrokerAccountTaxDeductionFormInput, getBrokerAccountTaxDeductionValidationSchema } from "./BrokerAccountTaxDeductionValidationSchema";
-import { BrokerAccountTaxDeductionEntity } from "../../../../models/brokers/BrokerAccountTaxDeductionEntity";
-import { getBrokerAccounts } from "../../../../api/brokers/brokerAccountApi";
-import { BrokerAccountEntity } from "../../../../models/brokers/BrokerAccountEntity";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
-import MoneyInput from "../../../../shared/components/MoneyInput/MoneyInput";
+import { BrokerAccountTaxDeductionEntity } from "@/models/brokers/BrokerAccountTaxDeductionEntity";
+import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 
 export interface CreateBrokerAccountTaxDeductionContext {
     brokerAccountId: string

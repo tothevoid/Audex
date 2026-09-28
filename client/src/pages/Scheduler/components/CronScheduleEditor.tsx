@@ -11,9 +11,9 @@ import {
     getCronWeekDays,
     getMaxIntervalValue,
     toggleCronWeekDay
-} from '../schedulerUtils';
-import ButtonGroup from '../../../shared/components/ButtonGroup/ButtonGroup';
-import TimeInput from '../../../shared/components/TimeInput/TimeInput';
+} from '@/pages/Scheduler/schedulerUtils';
+import ButtonGroup from '@/shared/components/ButtonGroup/ButtonGroup';
+import TimeInput from '@/shared/components/TimeInput/TimeInput';
 
 interface CronScheduleEditorProps {
     config: CronScheduleConfig;

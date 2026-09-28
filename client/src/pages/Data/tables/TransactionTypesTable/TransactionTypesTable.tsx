@@ -2,14 +2,14 @@ import { Box, Button, Checkbox, Icon, Text } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete, MdEdit, MdOutlinePayment } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
-import { TransactionTypeEntity } from "../../../../models/transactions/TransactionTypeEntity";
-import { createTransactionType, deleteTransactionType, getTransactionTypeIconUrl, getTransactionTypes, updateTransactionType } from "../../../../api/transactions/transactionTypeApi";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import TransactionTypeModal from "../../modals/TransactionTypeModal/TransactionTypeModal";
-import SectionHeader from "../../../../shared/components/SectionHeader/SectionHeader";
-import DataTable, { ColumnDef } from "../../../../shared/components/DataTable/DataTable";
-import StoredIcon from "../../../../shared/components/StoredIcon";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { TransactionTypeEntity } from "@/models/transactions/TransactionTypeEntity";
+import { createTransactionType, deleteTransactionType, getTransactionTypeIconUrl, getTransactionTypes, updateTransactionType } from "@/api/transactions/transactionTypeApi";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import TransactionTypeModal from "@/pages/Data/modals/TransactionTypeModal/TransactionTypeModal";
+import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
+import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
+import StoredIcon from "@/shared/components/StoredIcon";
 
 interface State {
     transactionTypes: TransactionTypeEntity[]

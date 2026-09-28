@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { useDividendPayments } from '../../hooks/useDividendPayments';
-import { DividendPaymentEntity } from '../../../../models/brokers/DividendPaymentEntity';
-import DividendPayment from '../DividendPayment/DividendPayment';
-import DividendPaymentModal, { CreateDividendPaymentContext, EditDividendPaymentContext } from '../../modals/DividendPaymentModal/DividendPaymentModal';
-import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
-import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
-import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
-import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
-import { Nullable } from '../../../../shared/utilities/nullable';
-import CollectionPagination from '../../../../shared/components/CollectionPagination/CollectionPagination';
-import DateGroupedList from '../../../../shared/components/DateGroupedList/DateGroupedList';
+import { useDividendPayments } from '@/pages/BrokerAccount/hooks/useDividendPayments';
+import { DividendPaymentEntity } from '@/models/brokers/DividendPaymentEntity';
+import DividendPayment from '@/pages/BrokerAccount/components/DividendPayment/DividendPayment';
+import DividendPaymentModal, { CreateDividendPaymentContext, EditDividendPaymentContext } from '@/pages/BrokerAccount/modals/DividendPaymentModal/DividendPaymentModal';
+import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import SectionHeader from '@/shared/components/SectionHeader/SectionHeader';
+import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
+import { Nullable } from '@/shared/utilities/nullable';
+import CollectionPagination from '@/shared/components/CollectionPagination/CollectionPagination';
+import DateGroupedList from '@/shared/components/DateGroupedList/DateGroupedList';
 
 interface Props {
 	brokerAccountId: Nullable<string>,

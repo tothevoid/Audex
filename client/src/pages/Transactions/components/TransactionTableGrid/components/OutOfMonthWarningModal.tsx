@@ -1,10 +1,10 @@
 import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { Button, HStack, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import BaseModal from '../../../../../shared/modals/BaseModal/BaseModal';
-import { BaseModalRef } from '../../../../../shared/utilities/modalUtilities';
-import { formatDate } from '../../../../../shared/utilities/formatters/dateFormatter';
-import { CommitDiffPayload, OutOfMonthItem } from '../types';
+import BaseModal from '@/shared/modals/BaseModal/BaseModal';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
+import { CommitDiffPayload, OutOfMonthItem } from '@/pages/Transactions/components/TransactionTableGrid/types';
 
 export const hasOutOfPeriodTransactions = (
     diff: CommitDiffPayload,

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { BrokerAccountEntity } from "../../../models/brokers/BrokerAccountEntity";
-import { createBrokerAccount, deleteBrokerAccount, getBrokerAccounts, updateBrokerAccount } from "../../../api/brokers/brokerAccountApi";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
+import { createBrokerAccount, deleteBrokerAccount, getBrokerAccounts, updateBrokerAccount } from "@/api/brokers/brokerAccountApi";
 
 export const useBrokerAccounts = () => {
 	const [brokerAccounts, setBrokerAccounts] = useState<BrokerAccountEntity[]>([]);

@@ -1,9 +1,9 @@
 import React from "react";
 import { Box, Card, Flex, SimpleGrid, Text, Progress } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { DebtTagStatsEntity } from "../../../../models/debts/DebtTagEntity";
-import { formatMoney, formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import DebtTagBadge from "../DebtTagBadge/DebtTagBadge";
+import { DebtTagStatsEntity } from "@/models/debts/DebtTagEntity";
+import { formatMoney, formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import DebtTagBadge from "@/pages/Debts/components/DebtTagBadge/DebtTagBadge";
 
 interface Props {
     stats: DebtTagStatsEntity[];

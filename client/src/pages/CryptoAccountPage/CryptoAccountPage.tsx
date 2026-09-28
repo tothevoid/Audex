@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { CryptoAccountEntity } from "../../models/crypto/CryptoAccountEntity";
-import { getCryptoAccountById } from "../../api/crypto/cryptoAccountApi";
+import { CryptoAccountEntity } from "@/models/crypto/CryptoAccountEntity";
+import { getCryptoAccountById } from "@/api/crypto/cryptoAccountApi";
 import CryptoAccountCryptocurrenciesList from "./components/CryptoAccountCryptocurrenciesList/CryptoAccountCryptocurrenciesList";
 import CryptoAccountTabs from "./components/CryptoAccountTabs/CryptoAccountTabs";
 

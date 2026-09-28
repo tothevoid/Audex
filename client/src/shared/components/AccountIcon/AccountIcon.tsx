@@ -1,9 +1,9 @@
 import React from 'react';
 import { BsBank, BsCurrencyExchange } from 'react-icons/bs';
-import { StoredIcon, StoredIconProps, StoredIconSize, StoredIconShape } from '../StoredIcon';
-import { ACCOUNT_TYPE } from '../../constants/accountType';
-import { getBankIconUrl } from '../../../api/banks/bankApi';
-import { Nullable } from '../../utilities/nullable';
+import { StoredIcon, StoredIconProps, StoredIconSize, StoredIconShape } from '@/shared/components/StoredIcon';
+import { ACCOUNT_TYPE } from '@/shared/constants/accountType';
+import { getBankIconUrl } from '@/api/banks/bankApi';
+import { Nullable } from '@/shared/utilities/nullable';
 
 export interface AccountIconTarget {
     accountType?: Nullable<{ id: string }>;

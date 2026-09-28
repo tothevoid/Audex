@@ -1,4 +1,4 @@
-import { SecurityEntity } from "../securities/SecurityEntity";
+import { SecurityEntity } from "@/models/securities/SecurityEntity";
 
 export interface BrokerAccountDailyStatsEntity {    
     fetchDate: Date

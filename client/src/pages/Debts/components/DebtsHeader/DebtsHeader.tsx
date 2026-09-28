@@ -3,16 +3,16 @@ import { Box, Card, Flex, Button } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { MdSettings, MdBarChart } from "react-icons/md";
 import { BsWallet2, BsPeople, BsListCheck } from "react-icons/bs";
-import AddButton from "../../../../shared/components/AddButton/AddButton";
-import SectionHeader from "../../../../shared/components/SectionHeader";
-import FilterBlock, { FilterBlockDivider } from "../../../../shared/components/FilterBlock";
-import SwitchButton from "../../../../shared/components/SwitchButton/SwitchButton";
-import Placeholder from "../../../../shared/components/Placeholder/Placeholder";
-import DebtTagBadge from "../DebtTagBadge/DebtTagBadge";
-import { DebtEntity } from "../../../../models/debts/DebtEntity";
-import { DebtTagEntity } from "../../../../models/debts/DebtTagEntity";
-import { NumericMetricItem } from "../../../../shared/components/MetricItem";
-import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import AddButton from "@/shared/components/AddButton/AddButton";
+import SectionHeader from "@/shared/components/SectionHeader";
+import FilterBlock, { FilterBlockDivider } from "@/shared/components/FilterBlock";
+import SwitchButton from "@/shared/components/SwitchButton/SwitchButton";
+import Placeholder from "@/shared/components/Placeholder/Placeholder";
+import DebtTagBadge from "@/pages/Debts/components/DebtTagBadge/DebtTagBadge";
+import { DebtEntity } from "@/models/debts/DebtEntity";
+import { DebtTagEntity } from "@/models/debts/DebtTagEntity";
+import { NumericMetricItem } from "@/shared/components/MetricItem";
+import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 
 interface Props {
     hasDebts: boolean;

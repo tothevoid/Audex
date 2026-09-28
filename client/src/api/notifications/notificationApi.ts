@@ -1,7 +1,7 @@
-import { NotificationEntity, NotificationEntityResponse } from "../../models/notifications/NotificationEntity";
-import { deleteEntity, getEntity, getPagedEntities, postAction } from "../basicApi";
-import { BasePageable } from "../../shared/models/BasePageable";
-import { PagedResult } from "../../shared/models/PagedResult";
+import { NotificationEntity, NotificationEntityResponse } from "@/models/notifications/NotificationEntity";
+import { deleteEntity, getEntity, getPagedEntities, postAction } from "@/api/basicApi";
+import { BasePageable } from "@/shared/models/BasePageable";
+import { PagedResult } from "@/shared/models/PagedResult";
 import { prepareNotification } from "./notificationApiMapping";
 
 const basicUrl = "Notification";

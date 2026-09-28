@@ -1,15 +1,15 @@
 import { Box, Flex, SimpleGrid, Text } from "@chakra-ui/react";
 import React, { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getDepositsSummary } from "../../../../api/deposits/depositApi";
-import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
-import ButtonGroup, { ButtonGroupOption } from "../../../../shared/components/ButtonGroup/ButtonGroup";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
+import { getDepositsSummary } from "@/api/deposits/depositApi";
+import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
+import ButtonGroup, { ButtonGroupOption } from "@/shared/components/ButtonGroup/ButtonGroup";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import { formatPeriodLabel } from "./depositChartUtils";
 import { DepositMonthSummary } from "./depositMonthSummary";
-import DepositsEarningsChart from "../DepositsEarningsChart/DepositsEarningsChart";
-import StackedDepositsChart from "../StackedDepositsChart/StackedDepositsChart";
-import LoadingCard from "../../../../shared/components/LoadingCard/LoadingCard";
+import DepositsEarningsChart from "@/pages/Deposits/components/DepositsEarningsChart/DepositsEarningsChart";
+import StackedDepositsChart from "@/pages/Deposits/components/StackedDepositsChart/StackedDepositsChart";
+import LoadingCard from "@/shared/components/LoadingCard/LoadingCard";
 import { BsGraphUp } from "react-icons/bs";
 
 enum ChartType {

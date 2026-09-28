@@ -1,5 +1,5 @@
-import { BrokerAccountSecurityEntity, BrokerAccountSecurityEntityRequest, BrokerAccountSecurityEntityResponse } from "../../models/brokers/BrokerAccountSecurityEntity";
-import { prepareSecurity } from "../securities/securityApiMapping";
+import { BrokerAccountSecurityEntity, BrokerAccountSecurityEntityRequest, BrokerAccountSecurityEntityResponse } from "@/models/brokers/BrokerAccountSecurityEntity";
+import { prepareSecurity } from "@/api/securities/securityApiMapping";
 import { prepareBrokerAccount } from "./brokerAccountApiMapping";
 
 export const prepareBrokerAccountSecurityRequest = (brokerAccountSecurity: BrokerAccountSecurityEntity): BrokerAccountSecurityEntityRequest => {

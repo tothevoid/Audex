@@ -2,7 +2,7 @@ import { Button, CloseButton, Dialog, Portal, useDisclosure } from "@chakra-ui/r
 import React, { useImperativeHandle } from "react";
 import { forwardRef } from "react"
 import { useTranslation } from "react-i18next";
-import { BaseModalRef } from "../../utilities/modalUtilities";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
 interface Props {
     onConfirmed: () => Promise<void>

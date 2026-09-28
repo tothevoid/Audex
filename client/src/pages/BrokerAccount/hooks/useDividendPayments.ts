@@ -5,10 +5,10 @@ import {
     DividendPaymentsQuery,
     getPagedDividendPayments,
     updateDividendPayment
-} from "../../../api/brokers/dividendPaymentApi";
-import { DividendPaymentEntity } from "../../../models/brokers/DividendPaymentEntity";
-import { Nullable } from "../../../shared/utilities/nullable";
-import usePagedQuery from "../../../shared/hooks/usePagedQuery";
+} from "@/api/brokers/dividendPaymentApi";
+import { DividendPaymentEntity } from "@/models/brokers/DividendPaymentEntity";
+import { Nullable } from "@/shared/utilities/nullable";
+import usePagedQuery from "@/shared/hooks/usePagedQuery";
 
 export interface UseDividendPaymentsOptions {
     brokerAccountId?: Nullable<string>;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Box, Flex, Image } from '@chakra-ui/react';
 import { LuImage } from 'react-icons/lu';
-import { Nullable } from '../../utilities/nullable';
+import { Nullable } from '@/shared/utilities/nullable';
 
 export type StoredIconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | number;
 export type StoredIconShape = 'rounded' | 'circle' | 'square';

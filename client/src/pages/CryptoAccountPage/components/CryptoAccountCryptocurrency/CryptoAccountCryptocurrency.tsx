@@ -2,12 +2,12 @@ import { Card, Flex, HStack, Stack, Text } from '@chakra-ui/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaBitcoin } from 'react-icons/fa';
-import { getIconUrl } from '../../../../api/crypto/cryptocurrencyApi';
-import { CryptoAccountCryptocurrencyEntity } from '../../../../models/crypto/CryptoAccountCryptocurrencyEntity';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import StoredIcon from '../../../../shared/components/StoredIcon';
-import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
-import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
+import { getIconUrl } from '@/api/crypto/cryptocurrencyApi';
+import { CryptoAccountCryptocurrencyEntity } from '@/models/crypto/CryptoAccountCryptocurrencyEntity';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import StoredIcon from '@/shared/components/StoredIcon';
+import EntityCard from '@/shared/components/EntityCard/EntityCard';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
 
 type Props = {
     cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity;

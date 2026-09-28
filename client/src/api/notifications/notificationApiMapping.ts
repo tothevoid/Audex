@@ -1,4 +1,4 @@
-import { NotificationEntity, NotificationEntityResponse } from "../../models/notifications/NotificationEntity";
+import { NotificationEntity, NotificationEntityResponse } from "@/models/notifications/NotificationEntity";
 
 export const prepareNotification = (response: NotificationEntityResponse): NotificationEntity => ({
     id: response.id,

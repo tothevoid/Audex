@@ -1,15 +1,15 @@
 import { useTranslation } from "react-i18next";
 import { Box, Card, Grid, Stack} from "@chakra-ui/react";
 import { Text} from "@chakra-ui/react";
-import { useUserProfile } from "../../features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { Fragment, useEffect, useState } from "react";
-import { getDashboard } from "../../api/dashboard/dashboardApi";
-import { GlobalDashboard, DistributionModel } from "../../models/dashboard/DashboardEntity";
-import { formatMoneyByCurrencyCulture } from "../../shared/utilities/formatters/moneyFormatter";
+import { getDashboard } from "@/api/dashboard/dashboardApi";
+import { GlobalDashboard, DistributionModel } from "@/models/dashboard/DashboardEntity";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import DistributionChart from "./components/DistributionChart";
-import Placeholder from "../../shared/components/Placeholder/Placeholder";
-import PageContainer from "../../shared/components/PageContainer/PageContainer";
-import { Nullable } from "../../shared/utilities/nullable";
+import Placeholder from "@/shared/components/Placeholder/Placeholder";
+import PageContainer from "@/shared/components/PageContainer/PageContainer";
+import { Nullable } from "@/shared/utilities/nullable";
 
 interface State {
 	dashboard: GlobalDashboard | null

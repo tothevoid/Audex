@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useSignalR } from "./useSignalR";
-import { ScheduledTaskExecutionStatus } from "../../models/scheduler/ScheduledTaskEntity";
+import { ScheduledTaskExecutionStatus } from "@/models/scheduler/ScheduledTaskEntity";
 
 export interface TaskExecutionRecordedPayload {
     taskName: string;

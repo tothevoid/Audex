@@ -3,19 +3,19 @@ import React, { RefObject, useCallback, useEffect, useMemo, useState } from "rea
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
-import { DebtEntity } from "../../../../models/debts/DebtEntity";
-import DateSelect from "../../../../shared/components/DateSelect/DateSelect";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import { DebtEntity } from "@/models/debts/DebtEntity";
+import DateSelect from "@/shared/components/DateSelect/DateSelect";
 import { DebtPaymentFormInput, getDebtPaymentValidationSchema } from "./DebtPaymentValidationSchema";
-import { DebtPaymentEntity } from "../../../../models/debts/DebtPaymentEntity";
-import { AccountEntity } from "../../../../models/accounts/AccountEntity";
-import { getDebts } from "../../../../api/debts/debtApi";
-import { getAccounts } from "../../../../api/accounts/accountApi";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
-import CheckboxInput from "../../../../shared/components/CheckboxInput/CheckboxInput";
-import MoneyInput from "../../../../shared/components/MoneyInput/MoneyInput";
+import { DebtPaymentEntity } from "@/models/debts/DebtPaymentEntity";
+import { AccountEntity } from "@/models/accounts/AccountEntity";
+import { getDebts } from "@/api/debts/debtApi";
+import { getAccounts } from "@/api/accounts/accountApi";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { generateGuid } from "@/shared/utilities/idUtilities";
+import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
+import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 
 interface Props {
 	debtPayment?: DebtPaymentEntity | null,

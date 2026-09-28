@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Stack } from "@chakra-ui/react";
-import { getAccountById } from "../../api/accounts/accountApi";
+import { getAccountById } from "@/api/accounts/accountApi";
 import {
     createCurrencyTransaction,
     CurrencyTransactionsQuery,
@@ -9,21 +9,21 @@ import {
     getCurrencyAccountSummary,
     getPagedCurrencyTransactions,
     updateCurrencyTransaction
-} from "../../api/transactions/currencyTransactionApi";
-import { CurrencyTransactionEntity } from "../../models/transactions/CurrencyTransactionEntity";
+} from "@/api/transactions/currencyTransactionApi";
+import { CurrencyTransactionEntity } from "@/models/transactions/CurrencyTransactionEntity";
 import { useTranslation } from "react-i18next";
-import { getCurrenciesMap } from "../../api/currencies/currencyApi";
-import { AccountEntity } from "../../models/accounts/AccountEntity";
-import { useUserProfile } from "../../features/UserProfileSettingsModal/hooks/UserProfileContext";
-import CurrencyTransactionModal from "../Transactions/modals/CurrencyTransactionModal/CurrencyTransactionModal";
-import { ConfirmModal } from "../../shared/modals/ConfirmModal/ConfirmModal";
-import { useEntityModal } from "../../shared/hooks/useEntityModal";
-import { ActiveEntityMode } from "../../shared/enums/activeEntityMode";
-import Placeholder from "../../shared/components/Placeholder/Placeholder";
+import { getCurrenciesMap } from "@/api/currencies/currencyApi";
+import { AccountEntity } from "@/models/accounts/AccountEntity";
+import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
+import CurrencyTransactionModal from "@/pages/Transactions/modals/CurrencyTransactionModal/CurrencyTransactionModal";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useEntityModal } from "@/shared/hooks/useEntityModal";
+import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
+import Placeholder from "@/shared/components/Placeholder/Placeholder";
 import CashAccountHeader from "./components/CashAccountHeader";
 import { CurrencyTransactionsTable } from "./components/CurrencyTransactionsTable/CurrencyTransactionsTable";
-import CollectionPagination from "../../shared/components/CollectionPagination/CollectionPagination";
-import usePagedQuery from "../../shared/hooks/usePagedQuery";
+import CollectionPagination from "@/shared/components/CollectionPagination/CollectionPagination";
+import usePagedQuery from "@/shared/hooks/usePagedQuery";
 
 const CashAccountPage: React.FC = () => {
     const { cashAccountId } = useParams();

@@ -3,12 +3,12 @@ import { Box, Button, Flex, HStack, Input, NativeSelect, Table, Tooltip } from '
 import { NumericFormat } from 'react-number-format';
 import DatePicker from 'react-datepicker';
 import { useTranslation } from 'react-i18next';
-import { TransactionEntity } from '../../../../../models/transactions/TransactionEntity';
-import { AccountEntity } from '../../../../../models/accounts/AccountEntity';
-import { TransactionTypeEntity } from '../../../../../models/transactions/TransactionTypeEntity';
-import CardActionButtons from '../../../../../shared/components/CardActionButtons/CardActionButtons';
-import DateInput from '../../../../../shared/components/DateInput/DateInput';
-import { computeRowDiff, EMPTY_ROW_DIFF, RowDiff } from '../types';
+import { TransactionEntity } from '@/models/transactions/TransactionEntity';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
+import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEntity';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
+import DateInput from '@/shared/components/DateInput/DateInput';
+import { computeRowDiff, EMPTY_ROW_DIFF, RowDiff } from '@/pages/Transactions/components/TransactionTableGrid/types';
 
 export interface TransactionTableRowProps {
     row: TransactionEntity;

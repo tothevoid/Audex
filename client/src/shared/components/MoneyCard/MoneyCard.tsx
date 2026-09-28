@@ -1,7 +1,7 @@
 import React from "react";
-import StatsCard from "../StatsCard/StatsCard";
-import { formatMoneyByCurrencyCulture } from "../../utilities/formatters/moneyFormatter";
-import { Nullable } from "../../utilities/nullable";
+import StatsCard from "@/shared/components/StatsCard/StatsCard";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { Nullable } from "@/shared/utilities/nullable";
 
 export interface MoneyCardProps {
     title: string;

@@ -3,17 +3,17 @@ import React, { RefObject, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { BrokerAccountSecurityEntity } from "../../../../models/brokers/BrokerAccountSecurityEntity";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
-import MoneyInput from "../../../../shared/components/MoneyInput/MoneyInput";
-import { getSecurities } from "../../../../api/securities/securityApi";
-import { getBrokerAccounts } from "../../../../api/brokers/brokerAccountApi";
-import { BrokerAccountEntity } from "../../../../models/brokers/BrokerAccountEntity";
-import { SecurityEntity } from "../../../../models/securities/SecurityEntity";
+import { BrokerAccountSecurityEntity } from "@/models/brokers/BrokerAccountSecurityEntity";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
+import { getSecurities } from "@/api/securities/securityApi";
+import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
+import { SecurityEntity } from "@/models/securities/SecurityEntity";
 import { BrokerAccountSecurityFormInput, getBrokerAccountSecurityValidationSchema } from "./BrokerAccountSecurityValidationSchema";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { generateGuid } from "@/shared/utilities/idUtilities";
 
 
 interface ModalProps {

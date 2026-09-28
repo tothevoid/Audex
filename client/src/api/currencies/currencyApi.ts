@@ -1,5 +1,5 @@
-import { CurrencyEntity } from "../../models/currencies/CurrencyEntity";
-import { createEntity, deleteEntity, getAction, getAllEntities, updateEntity } from "../basicApi";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
+import { createEntity, deleteEntity, getAction, getAllEntities, updateEntity } from "@/api/basicApi";
 
 const basicUrl = `Currency`;
 

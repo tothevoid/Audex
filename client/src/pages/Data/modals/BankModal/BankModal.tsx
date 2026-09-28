@@ -2,15 +2,15 @@ import { Field, Input} from "@chakra-ui/react"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import { RefObject, useCallback, useEffect, useMemo, useState } from "react";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { generateGuid } from "@/shared/utilities/idUtilities";
 import { BankFormInput, getBankValidationSchema } from "./BankValidationSchema";
-import { BankEntity } from "../../../../models/banks/BankEntity";
-import { Nullable } from "../../../../shared/utilities/nullable";
-import { getBankIconUrl } from "../../../../api/banks/bankApi";
-import ImageInput from "../../../../shared/components/Form/ImageInput/ImageInput";
+import { BankEntity } from "@/models/banks/BankEntity";
+import { Nullable } from "@/shared/utilities/nullable";
+import { getBankIconUrl } from "@/api/banks/bankApi";
+import ImageInput from "@/shared/components/Form/ImageInput/ImageInput";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>,

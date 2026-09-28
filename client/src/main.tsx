@@ -1,12 +1,12 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import './index.css';
-import './i18n';
-import App from './App.tsx';
+import '@/index.css';
+import '@/i18n';
+import App from '@/App.tsx';
 import { Box, ChakraProvider, Theme } from '@chakra-ui/react';
 import 'react-datepicker/dist/react-datepicker.css';
-import { appTheme } from './theme';
-import { ColorModeProvider, useColorMode } from './shared/context/ColorModeContext';
+import { appTheme } from '@/theme';
+import { ColorModeProvider, useColorMode } from '@/shared/context/ColorModeContext';
 
 const AppRoot = () => {
     const { resolvedColorMode } = useColorMode();

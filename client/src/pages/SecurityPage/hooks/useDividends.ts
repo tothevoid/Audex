@@ -1,13 +1,13 @@
 import { useMemo } from "react";
-import { DividendEntity } from "../../../models/securities/DividendEntity";
+import { DividendEntity } from "@/models/securities/DividendEntity";
 import {
     createDividend,
     deleteDividend,
     DividendsQuery,
     getPagedDividends,
     updateDividend
-} from "../../../api/securities/dividendApi";
-import usePagedQuery from "../../../shared/hooks/usePagedQuery";
+} from "@/api/securities/dividendApi";
+import usePagedQuery from "@/shared/hooks/usePagedQuery";
 
 export interface UseDividendsOptions {
     securityId: string;

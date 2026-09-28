@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@chakra-ui/react';
-import { useBrokerAccountFundTransfers } from '../../hooks/useBrokerAccountFundTransfers';
-import BrokerAccountFundTransfer from '../BrokerAccountFundTransfer/BrokerAccountFundTransfer';
-import { BrokerAccountFundTransferEntity } from '../../../../models/brokers/BrokerAccountFundTransfer';
-import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
-import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
+import { useBrokerAccountFundTransfers } from '@/pages/BrokerAccount/hooks/useBrokerAccountFundTransfers';
+import BrokerAccountFundTransfer from '@/pages/BrokerAccount/components/BrokerAccountFundTransfer/BrokerAccountFundTransfer';
+import { BrokerAccountFundTransferEntity } from '@/models/brokers/BrokerAccountFundTransfer';
+import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { useEntityModal } from '@/shared/hooks/useEntityModal';
 import { useTranslation } from 'react-i18next';
-import BrokerAccountFundTransferModal, { CreateBrokerAccountFundTransferContext, EditBrokerAccountFundTransferContext } from '../../../BrokerAccounts/modals/BrokerAccountFundTransferModal/BrokerAccountFundTransferModal';
-import { Nullable } from '../../../../shared/utilities/nullable';
-import SectionHeader from '../../../../shared/components/SectionHeader';
-import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
-import CollectionPagination from '../../../../shared/components/CollectionPagination/CollectionPagination';
-import DateGroupedList from '../../../../shared/components/DateGroupedList/DateGroupedList';
+import BrokerAccountFundTransferModal, { CreateBrokerAccountFundTransferContext, EditBrokerAccountFundTransferContext } from '@/pages/BrokerAccounts/modals/BrokerAccountFundTransferModal/BrokerAccountFundTransferModal';
+import { Nullable } from '@/shared/utilities/nullable';
+import SectionHeader from '@/shared/components/SectionHeader';
+import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
+import CollectionPagination from '@/shared/components/CollectionPagination/CollectionPagination';
+import DateGroupedList from '@/shared/components/DateGroupedList/DateGroupedList';
 
 interface Props {
     brokerAccountId: Nullable<string>,

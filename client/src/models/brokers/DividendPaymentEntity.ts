@@ -1,4 +1,4 @@
-import { DividendEntity, DividendEntityResponse } from "../securities/DividendEntity";
+import { DividendEntity, DividendEntityResponse } from "@/models/securities/DividendEntity";
 import { BrokerAccountEntity, BrokerAccountEntityResponse } from "./BrokerAccountEntity";
 
 interface CommonDividendPaymentEntity {

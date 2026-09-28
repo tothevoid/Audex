@@ -15,12 +15,12 @@ import { useTranslation } from "react-i18next";
 import { BsArrowLeft, BsCheckCircle, BsExclamationTriangle } from "react-icons/bs";
 import { GrTransaction } from "react-icons/gr";
 import { HiOutlineDocumentReport } from "react-icons/hi";
-import { applyStatementDiffs } from "../../../../../api/brokers/brokerStatementImportApi";
+import { applyStatementDiffs } from "@/api/brokers/brokerStatementImportApi";
 import {
     BrokerStatementAnalysisResultEntity,
     StatementDiffType
-} from "../../../../../models/brokers/BrokerStatementImportModels";
-import { StatementFilterType } from "../types";
+} from "@/models/brokers/BrokerStatementImportModels";
+import { StatementFilterType } from "@/pages/BrokerAccount/modals/BrokerStatementImportModal/types";
 import { StatementTransactionDiffCard } from "./StatementTransactionDiffCard";
 import { StatementSecurityItem } from "./StatementSecurityItem";
 

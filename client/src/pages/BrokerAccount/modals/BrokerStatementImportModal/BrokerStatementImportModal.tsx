@@ -6,10 +6,10 @@ import {
     useDisclosure
 } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import { Nullable } from "../../../../shared/utilities/nullable";
-import { analyzeBrokerStatement } from "../../../../api/brokers/brokerStatementImportApi";
-import { BrokerStatementAnalysisResultEntity } from "../../../../models/brokers/BrokerStatementImportModels";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { Nullable } from "@/shared/utilities/nullable";
+import { analyzeBrokerStatement } from "@/api/brokers/brokerStatementImportApi";
+import { BrokerStatementAnalysisResultEntity } from "@/models/brokers/BrokerStatementImportModels";
 import { StatementConfig } from "./types";
 import { StatementConfigStep } from "./components/StatementConfigStep";
 import { StatementAnalysisResultStep } from "./components/StatementAnalysisResultStep";

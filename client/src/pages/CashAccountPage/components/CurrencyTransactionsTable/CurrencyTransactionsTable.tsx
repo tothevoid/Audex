@@ -2,11 +2,11 @@ import React from "react";
 import { Box, Button, HStack, Icon, Table, Text, Badge } from "@chakra-ui/react";
 import { MdEdit, MdDelete, MdArrowForward } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { formatNumericDate } from "../../../../shared/utilities/formatters/dateFormatter";
-import { calculateDiff } from "../../../../shared/utilities/numericDiffsUtilities";
-import { CurrencyTransactionEntity } from "../../../../models/transactions/CurrencyTransactionEntity";
-import { UserProfileEntity } from "../../../../models/user/UserProfileEntity";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { formatNumericDate } from "@/shared/utilities/formatters/dateFormatter";
+import { calculateDiff } from "@/shared/utilities/numericDiffsUtilities";
+import { CurrencyTransactionEntity } from "@/models/transactions/CurrencyTransactionEntity";
+import { UserProfileEntity } from "@/models/user/UserProfileEntity";
 
 interface CurrencyTransactionsTableProps {
     transactions: CurrencyTransactionEntity[];

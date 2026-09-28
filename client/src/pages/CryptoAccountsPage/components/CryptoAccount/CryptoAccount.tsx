@@ -2,14 +2,14 @@ import { Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
 import { NavLink } from 'react-router-dom';
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { SiBinance } from 'react-icons/si';
-import { CryptoAccountEntity } from '../../../../models/crypto/CryptoAccountEntity';
-import { getTotalBalance } from '../../../../api/crypto/cryptoAccountCryptocurrencyApi';
-import { getCryptoProviderIconUrl } from '../../../../api/crypto/cryptoProviderApi';
-import StoredIcon from '../../../../shared/components/StoredIcon/StoredIcon';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
-import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
-import AccentBadge from '../../../../shared/components/AccentBadge/AccentBadge';
+import { CryptoAccountEntity } from '@/models/crypto/CryptoAccountEntity';
+import { getTotalBalance } from '@/api/crypto/cryptoAccountCryptocurrencyApi';
+import { getCryptoProviderIconUrl } from '@/api/crypto/cryptoProviderApi';
+import StoredIcon from '@/shared/components/StoredIcon/StoredIcon';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '@/shared/components/EntityCard/EntityCard';
+import AccentBadge from '@/shared/components/AccentBadge/AccentBadge';
 
 interface Props {
     cryptoAccount: CryptoAccountEntity;

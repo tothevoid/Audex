@@ -1,17 +1,17 @@
 import { Box, Button, Checkbox, Icon, Text } from "@chakra-ui/react";
-import { CurrencyEntity } from "../../../../models/currencies/CurrencyEntity";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
-import { getCurrencies, updateCurrency, createCurrency, deleteCurrency, syncRates } from "../../../../api/currencies/currencyApi";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import CurrencyModal from "../../modals/CurrencyModal/CurrencyModal";
-import { useUserProfile } from "../../../../features/UserProfileSettingsModal/hooks/UserProfileContext";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import RefreshButton from "../../../../shared/components/RefreshButton/RefreshButton";
-import DataTable, { ColumnDef } from "../../../../shared/components/DataTable/DataTable";
-import SectionHeader from "../../../../shared/components/SectionHeader/SectionHeader";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { getCurrencies, updateCurrency, createCurrency, deleteCurrency, syncRates } from "@/api/currencies/currencyApi";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import CurrencyModal from "@/pages/Data/modals/CurrencyModal/CurrencyModal";
+import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import RefreshButton from "@/shared/components/RefreshButton/RefreshButton";
+import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
+import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 
 interface State {
     currencies: CurrencyEntity[],

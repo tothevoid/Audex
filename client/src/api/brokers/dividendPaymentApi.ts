@@ -1,8 +1,8 @@
-import { DividendPaymentEntity, DividendPaymentEntityRequest, DividendPaymentEntityResponse } from '../../models/brokers/DividendPaymentEntity';
-import { BasePageable } from '../../shared/models/BasePageable';
-import { PagedResult } from '../../shared/models/PagedResult';
-import { Nullable } from '../../shared/utilities/nullable';
-import { createEntity, deleteEntity, getEntity, getPagedEntities, updateEntity } from '../basicApi';
+import { DividendPaymentEntity, DividendPaymentEntityRequest, DividendPaymentEntityResponse } from '@/models/brokers/DividendPaymentEntity';
+import { BasePageable } from '@/shared/models/BasePageable';
+import { PagedResult } from '@/shared/models/PagedResult';
+import { Nullable } from '@/shared/utilities/nullable';
+import { createEntity, deleteEntity, getEntity, getPagedEntities, updateEntity } from '@/api/basicApi';
 import { prepareDividendPayment, prepareDividendPaymentRequest } from './dividendPaymentApiMapping';
 
 const basicUrl = `DividendPayment`;

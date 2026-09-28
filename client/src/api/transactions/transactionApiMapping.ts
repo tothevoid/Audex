@@ -1,6 +1,6 @@
-import { TransactionEntityResponse, TransactionEntity, TransactionEntityRequest } from "../../models/transactions/TransactionEntity"
-import { convertToDateOnly } from "../../shared/utilities/dateUtils"
-import { prepareAccount } from "../accounts/accountApiMapping"
+import { TransactionEntityResponse, TransactionEntity, TransactionEntityRequest } from "@/models/transactions/TransactionEntity"
+import { convertToDateOnly } from "@/shared/utilities/dateUtils"
+import { prepareAccount } from "@/api/accounts/accountApiMapping"
 
 export const prepareTransactionRequest = (transaction: TransactionEntity): TransactionEntityRequest => {
     return {

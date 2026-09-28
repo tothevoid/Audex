@@ -1,5 +1,5 @@
-import { UserProfileEntity } from "../../models/user/UserProfileEntity";
-import { getEntity, updateEntity } from "../basicApi";
+import { UserProfileEntity } from "@/models/user/UserProfileEntity";
+import { getEntity, updateEntity } from "@/api/basicApi";
 import { prepareUserProfileRequest } from "./userProfileApiMapping";
 
 const basicUrl = `UserProfile`;

@@ -1,14 +1,14 @@
 import React from 'react';
 import { Card, Container, Flex, Progress, Stack, Text } from "@chakra-ui/react";
-import { formatNumericDate } from "../../../../shared/utilities/formatters/dateFormatter";
-import { formatMoney } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { DepositEntity } from "../../../../models/deposits/DepositEntity";
+import { formatNumericDate } from "@/shared/utilities/formatters/dateFormatter";
+import { formatMoney } from "@/shared/utilities/formatters/moneyFormatter";
+import { DepositEntity } from "@/models/deposits/DepositEntity";
 import { useTranslation } from "react-i18next";
-import { getBankIconUrl } from "../../../../api/banks/bankApi";
+import { getBankIconUrl } from "@/api/banks/bankApi";
 import { BsBank } from "react-icons/bs";
-import StoredIcon from "../../../../shared/components/StoredIcon";
-import CardActionButtons from "../../../../shared/components/CardActionButtons/CardActionButtons";
-import EntityCard from "../../../../shared/components/EntityCard/EntityCard";
+import StoredIcon from "@/shared/components/StoredIcon";
+import CardActionButtons from "@/shared/components/CardActionButtons/CardActionButtons";
+import EntityCard from "@/shared/components/EntityCard/EntityCard";
 
 interface Props {
     deposit: DepositEntity;

@@ -1,20 +1,20 @@
 import { Box } from '@chakra-ui/react';
 import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { BaseModalRef } from '../../shared/utilities/modalUtilities';
-import BaseModal from '../../shared/modals/BaseModal/BaseModal';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import BaseModal from '@/shared/modals/BaseModal/BaseModal';
 import {
     getPagedRefreshTokens,
     RefreshTokensQuery,
     revokeOtherTokens,
     revokeToken
-} from '../../api/auth/tokensApi';
-import CollectionPagination from '../../shared/components/CollectionPagination/CollectionPagination';
+} from '@/api/auth/tokensApi';
+import CollectionPagination from '@/shared/components/CollectionPagination/CollectionPagination';
 import { TokensHeader } from './components/TokensHeader';
 import { TokensTabs } from './components/TokensTabs';
 import { TokensList } from './components/TokensList';
 import { TokensFooter } from './components/TokensFooter';
-import { usePagedQuery } from '../../shared/hooks/usePagedQuery';
-import { UserRefreshTokenEntity } from '../../models/auth/UserRefreshTokenEntity';
+import { usePagedQuery } from '@/shared/hooks/usePagedQuery';
+import { UserRefreshTokenEntity } from '@/models/auth/UserRefreshTokenEntity';
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
 

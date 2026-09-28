@@ -1,8 +1,8 @@
 import { Fragment, useEffect, useState } from "react";
-import { getDepositsRange } from "../../../../api/deposits/depositApi";
+import { getDepositsRange } from "@/api/deposits/depositApi";
 import { Box, Slider } from "@chakra-ui/react";
-import { DepositsRange } from "../../../../models/deposits/depositsRange";
-import { formatMonthYear } from "../../../../shared/utilities/formatters/dateFormatter";
+import { DepositsRange } from "@/models/deposits/depositsRange";
+import { formatMonthYear } from "@/shared/utilities/formatters/dateFormatter";
 
 interface State {
     minMonths: number | null,

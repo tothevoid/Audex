@@ -1,8 +1,8 @@
-import { BrokerAccountFundTransferEntity, BrokerAccountFundTransferEntityRequest, BrokerAccountFundTransferEntityResponse } from '../../models/brokers/BrokerAccountFundTransfer';
-import { BasePageable } from '../../shared/models/BasePageable';
-import { PagedResult } from '../../shared/models/PagedResult';
-import { Nullable } from '../../shared/utilities/nullable';
-import { createEntity, deleteEntity, getPagedEntities, updateEntity } from '../basicApi';
+import { BrokerAccountFundTransferEntity, BrokerAccountFundTransferEntityRequest, BrokerAccountFundTransferEntityResponse } from '@/models/brokers/BrokerAccountFundTransfer';
+import { BasePageable } from '@/shared/models/BasePageable';
+import { PagedResult } from '@/shared/models/PagedResult';
+import { Nullable } from '@/shared/utilities/nullable';
+import { createEntity, deleteEntity, getPagedEntities, updateEntity } from '@/api/basicApi';
 import { prepareBrokerAccountFundsTransfer, prepareBrokerAccountFundsTransferRequest } from './brokerAccountFundsTransferMapping';
 
 const basicUrl = `BrokerAccountFundsTransfer`;

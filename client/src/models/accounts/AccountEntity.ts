@@ -1,5 +1,5 @@
-import { BankEntity } from "../banks/BankEntity"
-import { CurrencyEntity } from "../currencies/CurrencyEntity"
+import { BankEntity } from "@/models/banks/BankEntity"
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity"
 import { AccountTypeEntity } from "./AccountTypeEntity"
 
 interface CommonAccount {

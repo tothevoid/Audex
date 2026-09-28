@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import {
     StatementSecurityEntity,
     StatementSecurityStatus
-} from "../../../../../models/brokers/BrokerStatementImportModels";
+} from "@/models/brokers/BrokerStatementImportModels";
 
 interface Props {
     security: StatementSecurityEntity;

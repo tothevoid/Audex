@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, HStack, Icon } from '@chakra-ui/react';
 import { MdViewAgenda, MdTableChart } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import { ViewDisplayMode } from '../TransactionFilterBar/TransactionFilterBar';
+import { ViewDisplayMode } from '@/pages/Transactions/components/TransactionFilterBar/TransactionFilterBar';
 
 interface Props {
     viewDisplayMode: ViewDisplayMode;

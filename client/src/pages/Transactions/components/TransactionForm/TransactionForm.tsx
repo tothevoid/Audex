@@ -4,17 +4,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { getTransactionValidationSchema, TransactionFormInput } from './TransactionValidationSchema';
 import { useForm, } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { getTransactionTypes } from '../../../../api/transactions/transactionTypeApi';
-import { AccountEntity } from '../../../../models/accounts/AccountEntity';
-import { TransactionEntity } from '../../../../models/transactions/TransactionEntity';
-import { TransactionTypeEntity } from '../../../../models/transactions/TransactionTypeEntity';
-import CollectionSelect from '../../../../shared/components/CollectionSelect/CollectionSelect';
-import DateSelect from '../../../../shared/components/DateSelect/DateSelect';
-import MoneyInput from '../../../../shared/components/MoneyInput/MoneyInput';
-import { getAccounts } from '../../../../api/accounts/accountApi';
-import { generateGuid } from '../../../../shared/utilities/idUtilities';
-import { Nullable } from '../../../../shared/utilities/nullable';
-import { SetSubmitHandler } from '../../modals/NewTransactionModal/NewTransactionModal';
+import { getTransactionTypes } from '@/api/transactions/transactionTypeApi';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
+import { TransactionEntity } from '@/models/transactions/TransactionEntity';
+import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEntity';
+import CollectionSelect from '@/shared/components/CollectionSelect/CollectionSelect';
+import DateSelect from '@/shared/components/DateSelect/DateSelect';
+import MoneyInput from '@/shared/components/MoneyInput/MoneyInput';
+import { getAccounts } from '@/api/accounts/accountApi';
+import { generateGuid } from '@/shared/utilities/idUtilities';
+import { Nullable } from '@/shared/utilities/nullable';
+import { SetSubmitHandler } from '@/pages/Transactions/modals/NewTransactionModal/NewTransactionModal';
 
 interface ModalProps {
 	setSubmitHandler: SetSubmitHandler,

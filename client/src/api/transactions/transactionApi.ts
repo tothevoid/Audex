@@ -1,5 +1,5 @@
-import { createAndGetFullEntity, deleteEntity, getAllEntities, updateEntity } from '../basicApi';
-import { TransactionEntity, TransactionEntityRequest, TransactionEntityResponse } from '../../models/transactions/TransactionEntity';
+import { createAndGetFullEntity, deleteEntity, getAllEntities, updateEntity } from '@/api/basicApi';
+import { TransactionEntity, TransactionEntityRequest, TransactionEntityResponse } from '@/models/transactions/TransactionEntity';
 import { prepareTransaction, prepareTransactionRequest } from './transactionApiMapping';
 
 const basicUrl = `Transaction`;

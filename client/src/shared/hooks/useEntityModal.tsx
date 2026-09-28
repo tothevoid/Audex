@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
-import { ActiveEntityMode } from "../enums/activeEntityMode";
-import { BaseModalRef } from "../utilities/modalUtilities";
+import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
 export function useEntityModal<T>() {
     const [activeEntity, setActiveEntity] = useState<T | null>(null);

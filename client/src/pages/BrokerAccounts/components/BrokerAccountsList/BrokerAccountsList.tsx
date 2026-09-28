@@ -1,16 +1,16 @@
 import React, { Fragment } from 'react';
 import { SimpleGrid } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import BrokerAccount from '../BrokerAccount/BrokerAccount';
-import { BrokerAccountEntity } from '../../../../models/brokers/BrokerAccountEntity';
-import BrokerAccountModal from '../../modals/BrokerAccountModal/BrokerAccountModal';
-import { useBrokerAccounts } from '../../hooks/useBrokerAccounts';
-import Placeholder from '../../../../shared/components/Placeholder/Placeholder';
-import { ConfirmModal } from '../../../../shared/modals/ConfirmModal/ConfirmModal';
-import { useEntityModal } from '../../../../shared/hooks/useEntityModal';
-import AddButton from '../../../../shared/components/AddButton/AddButton';
-import SectionHeader from '../../../../shared/components/SectionHeader/SectionHeader';
-import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
+import BrokerAccount from '@/pages/BrokerAccounts/components/BrokerAccount/BrokerAccount';
+import { BrokerAccountEntity } from '@/models/brokers/BrokerAccountEntity';
+import BrokerAccountModal from '@/pages/BrokerAccounts/modals/BrokerAccountModal/BrokerAccountModal';
+import { useBrokerAccounts } from '@/pages/BrokerAccounts/hooks/useBrokerAccounts';
+import Placeholder from '@/shared/components/Placeholder/Placeholder';
+import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import AddButton from '@/shared/components/AddButton/AddButton';
+import SectionHeader from '@/shared/components/SectionHeader/SectionHeader';
+import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 
 const BrokerAccountsList: React.FC = () => {
 	const { t } = useTranslation()

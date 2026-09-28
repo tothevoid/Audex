@@ -1,20 +1,20 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { Badge, Box, Field, HStack, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { BaseModalRef } from '../../../shared/utilities/modalUtilities';
-import BaseFormModal from '../../../shared/modals/BaseFormModal/BaseFormModal';
-import BaseSelect from '../../../shared/components/BaseSelect/BaseSelect';
-import { ScheduledTaskEntity } from '../../../models/scheduler/ScheduledTaskEntity';
-import { ScheduledTaskDefinitionEntity } from '../../../models/scheduler/ScheduledTaskDefinitionEntity';
-import { createScheduledTask, getNotScheduledTasks } from '../../../api/scheduler/schedulerTaskApi';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import BaseFormModal from '@/shared/modals/BaseFormModal/BaseFormModal';
+import BaseSelect from '@/shared/components/BaseSelect/BaseSelect';
+import { ScheduledTaskEntity } from '@/models/scheduler/ScheduledTaskEntity';
+import { ScheduledTaskDefinitionEntity } from '@/models/scheduler/ScheduledTaskDefinitionEntity';
+import { createScheduledTask, getNotScheduledTasks } from '@/api/scheduler/schedulerTaskApi';
 import {
     buildCronSchedule,
     CronScheduleConfig,
     DEFAULT_CRON_SCHEDULE,
     parseCronSchedule
-} from '../schedulerUtils';
+} from '@/pages/Scheduler/schedulerUtils';
 import { CronScheduleEditor } from './CronScheduleEditor';
-import ButtonGroup from '../../../shared/components/ButtonGroup/ButtonGroup';
+import ButtonGroup from '@/shared/components/ButtonGroup/ButtonGroup';
 
 export interface CreateTaskModalRef {
     openModal: () => void;

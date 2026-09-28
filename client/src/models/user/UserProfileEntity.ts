@@ -1,4 +1,4 @@
-import { CurrencyEntity } from "../currencies/CurrencyEntity"
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity"
 
 export interface CommonUserProfileEntity {
     id: string,

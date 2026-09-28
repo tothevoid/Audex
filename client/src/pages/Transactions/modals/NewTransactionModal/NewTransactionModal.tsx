@@ -1,14 +1,14 @@
 import React, { RefObject, useEffect, useState } from 'react'
 import { Tabs } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { AccountEntity } from '../../../../models/accounts/AccountEntity';
-import BaseFormModal from '../../../../shared/modals/BaseFormModal/BaseFormModal';
-import { BaseModalRef } from '../../../../shared/utilities/modalUtilities';
-import { getAccounts } from '../../../../api/accounts/accountApi';
-import CurrencyTransactionForm from '../../components/CurrencyTransactionForm/CurrencyTransactionForm';
-import TransactionForm from '../../components/TransactionForm/TransactionForm';
-import { TransactionEntity } from '../../../../models/transactions/TransactionEntity';
-import { CurrencyTransactionEntity } from '../../../../models/transactions/CurrencyTransactionEntity';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
+import BaseFormModal from '@/shared/modals/BaseFormModal/BaseFormModal';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import { getAccounts } from '@/api/accounts/accountApi';
+import CurrencyTransactionForm from '@/pages/Transactions/components/CurrencyTransactionForm/CurrencyTransactionForm';
+import TransactionForm from '@/pages/Transactions/components/TransactionForm/TransactionForm';
+import { TransactionEntity } from '@/models/transactions/TransactionEntity';
+import { CurrencyTransactionEntity } from '@/models/transactions/CurrencyTransactionEntity';
 import { MdCurrencyExchange } from 'react-icons/md';
 import { GrTransaction } from 'react-icons/gr';
 import { FieldValues, UseFormHandleSubmit } from 'react-hook-form';

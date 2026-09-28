@@ -1,11 +1,11 @@
-import { BrokerAccountDailyStatsEntity } from '../../models/brokers/BrokerAccountDailyStatsEntity';
-import { BrokerAccountMonthTransfersHistoryEntity } from '../../models/brokers/BrokerAccountMonthTransfersHistoryEntity';
-import { BrokerAccountYearTransfersHistoryEntity } from '../../models/brokers/BrokerAccountYearTransfersHistoryEntity';
-import { BrokerAccountPortfolioEntity } from '../../models/brokers/BrokerAccountPortfolioEntity';
-import { BrokerAccountSummaryEntity } from '../../models/brokers/BrokerAccountSummaryEntity';
-import { BrokerAccountTransfersAvailableDatesEntity } from '../../models/brokers/BrokerAccountTransfersAvailableDatesEntity';
-import { Nullable } from '../../shared/utilities/nullable';
-import { getEntity } from '../basicApi';
+import { BrokerAccountDailyStatsEntity } from '@/models/brokers/BrokerAccountDailyStatsEntity';
+import { BrokerAccountMonthTransfersHistoryEntity } from '@/models/brokers/BrokerAccountMonthTransfersHistoryEntity';
+import { BrokerAccountYearTransfersHistoryEntity } from '@/models/brokers/BrokerAccountYearTransfersHistoryEntity';
+import { BrokerAccountPortfolioEntity } from '@/models/brokers/BrokerAccountPortfolioEntity';
+import { BrokerAccountSummaryEntity } from '@/models/brokers/BrokerAccountSummaryEntity';
+import { BrokerAccountTransfersAvailableDatesEntity } from '@/models/brokers/BrokerAccountTransfersAvailableDatesEntity';
+import { Nullable } from '@/shared/utilities/nullable';
+import { getEntity } from '@/api/basicApi';
 import { prepareBrokerAccountsSecurityStats, prepareDailyStats } from './brokerAccountSummaryApiMapping';
 
 const basicUrl = `BrokerAccountSummary`;

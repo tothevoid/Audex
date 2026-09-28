@@ -1,4 +1,4 @@
-import { BrokerAccountEntity, BrokerAccountEntityRequest, BrokerAccountEntityResponse } from "../../models/brokers/BrokerAccountEntity";
+import { BrokerAccountEntity, BrokerAccountEntityRequest, BrokerAccountEntityResponse } from "@/models/brokers/BrokerAccountEntity";
 
 export const prepareBrokerAccountRequest = (brokerAccount: BrokerAccountEntity): BrokerAccountEntityRequest => {
     return {

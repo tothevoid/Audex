@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { createBrokerAccountTaxDeduction, deleteBrokerAccountTaxDeduction, getBrokerAccountTaxDeductions, updateBrokerAccountTaxDeduction } from "../../../api/brokers/brokerAccountTaxDeductionApi";
-import { BrokerAccountTaxDeductionEntity, TaxDeductionsQuery } from "../../../models/brokers/BrokerAccountTaxDeductionEntity";
+import { createBrokerAccountTaxDeduction, deleteBrokerAccountTaxDeduction, getBrokerAccountTaxDeductions, updateBrokerAccountTaxDeduction } from "@/api/brokers/brokerAccountTaxDeductionApi";
+import { BrokerAccountTaxDeductionEntity, TaxDeductionsQuery } from "@/models/brokers/BrokerAccountTaxDeductionEntity";
 
 export type { TaxDeductionsQuery };
 

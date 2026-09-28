@@ -4,18 +4,18 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { UserProfileFormInput, getUserProfileValidationSchema } from "./UserProfileValidationSchema";
-import { getCurrencies } from "../../api/currencies/currencyApi";
-import { getTimeZones } from "../../api/common/timeZoneApi";
-import { updateUserProfile } from "../../api/user/userProfileApi";
-import { CurrencyEntity } from "../../models/currencies/CurrencyEntity";
-import { UserProfileEntity } from "../../models/user/UserProfileEntity";
-import { TimeZoneEntity } from "../../models/common/TimeZoneEntity";
-import CollectionSelect from "../../shared/components/CollectionSelect/CollectionSelect";
-import BaseSelect from "../../shared/components/BaseSelect/BaseSelect";
-import { BaseModalRef } from "../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../shared/modals/BaseFormModal/BaseFormModal";
+import { getCurrencies } from "@/api/currencies/currencyApi";
+import { getTimeZones } from "@/api/common/timeZoneApi";
+import { updateUserProfile } from "@/api/user/userProfileApi";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
+import { UserProfileEntity } from "@/models/user/UserProfileEntity";
+import { TimeZoneEntity } from "@/models/common/TimeZoneEntity";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { useUserProfile } from "./hooks/UserProfileContext";
-import { useColorMode } from "../../shared/context/ColorModeContext";
+import { useColorMode } from "@/shared/context/ColorModeContext";
 
 interface State {
 	currencies: CurrencyEntity[]

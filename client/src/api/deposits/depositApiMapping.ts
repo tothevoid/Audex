@@ -1,5 +1,5 @@
-import { DepositEntityResponse, DepositEntity, DepositEntityRequest } from "../../models/deposits/DepositEntity"
-import { convertToDateOnly } from "../../shared/utilities/dateUtils"
+import { DepositEntityResponse, DepositEntity, DepositEntityRequest } from "@/models/deposits/DepositEntity"
+import { convertToDateOnly } from "@/shared/utilities/dateUtils"
 
 export const prepareDepositEntity = (deposit: DepositEntityResponse): DepositEntity => {
     return {

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Box, Button, Flex, HStack, Icon, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { MdAttachFile, MdDownload, MdInsertDriveFile } from 'react-icons/md';
-import { ScheduledTaskAttachmentEntity } from '../../../models/scheduler/ScheduledTaskAttachmentEntity';
-import { downloadAttachmentFile } from '../../../api/scheduler/schedulerAttachmentApi';
-import { formatFileSize } from '../../../shared/utilities/formatters/fileFormatter';
+import { ScheduledTaskAttachmentEntity } from '@/models/scheduler/ScheduledTaskAttachmentEntity';
+import { downloadAttachmentFile } from '@/api/scheduler/schedulerAttachmentApi';
+import { formatFileSize } from '@/shared/utilities/formatters/fileFormatter';
 
 interface SchedulerAttachmentListProps {
     attachments?: ScheduledTaskAttachmentEntity[];

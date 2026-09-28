@@ -1,10 +1,10 @@
 import React from 'react';
 import { Box, Button, Flex, HStack, NativeSelect } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { AccountEntity } from '../../../../models/accounts/AccountEntity';
-import { FilterBarSearch } from '../../../../shared/components/FilterBar';
-import MonthPicker from '../MonthPicker/MonthPicker';
-import SwitchButton from '../../../../shared/components/SwitchButton/SwitchButton';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
+import { FilterBarSearch } from '@/shared/components/FilterBar';
+import MonthPicker from '@/pages/Transactions/components/MonthPicker/MonthPicker';
+import SwitchButton from '@/shared/components/SwitchButton/SwitchButton';
 
 export type TypeFilterMode = 'all' | 'income' | 'expense';
 export type ViewDisplayMode = 'cards' | 'table';

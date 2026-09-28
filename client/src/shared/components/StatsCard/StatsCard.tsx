@@ -1,6 +1,6 @@
 import { Box, Card, Flex, Text } from "@chakra-ui/react";
 import React from "react";
-import { Nullable } from "../../utilities/nullable";
+import { Nullable } from "@/shared/utilities/nullable";
 
 export interface StatsCardProps {
     title: string;

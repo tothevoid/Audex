@@ -1,4 +1,4 @@
-import { UserProfileEntity, UserProfileEntityRequest } from "../../models/user/UserProfileEntity";
+import { UserProfileEntity, UserProfileEntityRequest } from "@/models/user/UserProfileEntity";
 
 export const prepareUserProfileRequest = (userProfile: UserProfileEntity): UserProfileEntityRequest => {
     return {

@@ -1,5 +1,5 @@
 import i18n, { TFunction } from 'i18next';
-import { SecurityTypeEntity } from '../../../models/securities/SecurityTypeEntity';
+import { SecurityTypeEntity } from '@/models/securities/SecurityTypeEntity';
 
 export const SECURITY_TYPE_IDS = {
     Stock: '23b0a73a-9ac1-4fb5-a763-3c10424ed798',

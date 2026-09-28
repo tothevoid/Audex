@@ -3,16 +3,16 @@ import { useMemo } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { SiBinance } from "react-icons/si";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "../../../../shared/modals/ConfirmModal/ConfirmModal";
-import { Nullable } from "../../../../shared/utilities/nullable";
-import { CryptoProviderEntity } from "../../../../models/crypto/CryptoProviderEntity";
-import CryptoProviderModal from "../../modals/CryptoProviderModal/CryptoProviderModal";
-import { useCryptoProviders } from "../../hooks/useCryptoProviders";
-import { getCryptoProviderIconUrl } from "../../../../api/crypto/cryptoProviderApi";
-import DataTable, { ColumnDef } from "../../../../shared/components/DataTable/DataTable";
-import StoredIcon from "../../../../shared/components/StoredIcon";
-import { useEntityModal } from "../../../../shared/hooks/useEntityModal";
-import SectionHeader from "../../../../shared/components/SectionHeader/SectionHeader";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { Nullable } from "@/shared/utilities/nullable";
+import { CryptoProviderEntity } from "@/models/crypto/CryptoProviderEntity";
+import CryptoProviderModal from "@/pages/Data/modals/CryptoProviderModal/CryptoProviderModal";
+import { useCryptoProviders } from "@/pages/Data/hooks/useCryptoProviders";
+import { getCryptoProviderIconUrl } from "@/api/crypto/cryptoProviderApi";
+import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
+import StoredIcon from "@/shared/components/StoredIcon";
+import { useEntityModal } from "@/shared/hooks/useEntityModal";
+import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 
 const CryptoProvidersTable: React.FC = () => {
 	const { t } = useTranslation();

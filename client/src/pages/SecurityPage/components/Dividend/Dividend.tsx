@@ -1,9 +1,9 @@
 import { Button, Card, CardBody, Flex, Icon, Stack, Text } from '@chakra-ui/react';
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from 'react-i18next';
-import { DividendEntity } from '../../../../models/securities/DividendEntity';
-import { formatDate } from '../../../../shared/utilities/formatters/dateFormatter';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
+import { DividendEntity } from '@/models/securities/DividendEntity';
+import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
 
 interface Props {
     dividend: DividendEntity

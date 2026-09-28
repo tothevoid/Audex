@@ -1,4 +1,4 @@
-import { Nullable } from '../../shared/utilities/nullable';
+import { Nullable } from '@/shared/utilities/nullable';
 
 export interface UserRefreshTokenEntity {
     id: string;

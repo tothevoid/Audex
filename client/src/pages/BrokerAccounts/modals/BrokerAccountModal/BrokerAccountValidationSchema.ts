@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { TFunction } from 'i18next';
-import { getCurrencyValidationSchema } from '../../../../validation/CurrencyValidationSchema';
+import { getCurrencyValidationSchema } from '@/validation/CurrencyValidationSchema';
 
 export const getBrokerAccountValidationSchema = (t: TFunction) => z.object({
     id: z.string().optional(),

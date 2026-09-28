@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Card, Flex, Icon, Skeleton, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BsClockHistory } from "react-icons/bs";
-import { getTickerHistory } from "../../../../api/securities/securityApi";
-import { SecurityHistory as SecurityHistoryModel } from "../../../../models/securities/SecurityHistory";
-import { formatDate, ChartPeriod } from "../../../../shared/utilities/formatters/dateFormatter";
+import { getTickerHistory } from "@/api/securities/securityApi";
+import { SecurityHistory as SecurityHistoryModel } from "@/models/securities/SecurityHistory";
+import { formatDate, ChartPeriod } from "@/shared/utilities/formatters/dateFormatter";
 import SecurityHistoryHeader, { PERIOD_OPTIONS, HistoryStats } from "./SecurityHistoryHeader";
 import SecurityHistoryChart, { ProcessedHistoryItem } from "./SecurityHistoryChart";
 

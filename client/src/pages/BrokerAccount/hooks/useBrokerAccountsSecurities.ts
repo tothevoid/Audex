@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { BrokerAccountSecurityEntity } from "../../../models/brokers/BrokerAccountSecurityEntity";
-import { getSecuritiesByBrokerAccount } from "../../../api/brokers/brokerAccountSecurityApi";
-import { Nullable } from "../../../shared/utilities/nullable";
+import { BrokerAccountSecurityEntity } from "@/models/brokers/BrokerAccountSecurityEntity";
+import { getSecuritiesByBrokerAccount } from "@/api/brokers/brokerAccountSecurityApi";
+import { Nullable } from "@/shared/utilities/nullable";
 
 export interface BrokerAccountSecuritiesQuery {
 	brokerAccountId: Nullable<string>

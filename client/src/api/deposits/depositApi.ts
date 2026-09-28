@@ -1,7 +1,7 @@
-import { DepositMonthSummary } from '../../pages/Deposits/components/DepositStats/depositMonthSummary';
-import { DepositsRange } from '../../models/deposits/depositsRange';
-import { createEntity, deleteEntity, getAllEntitiesByConfig, getEntity, getEntityByConfig, updateEntity } from '../basicApi';
-import { DepositEntity, DepositEntityRequest, DepositEntityResponse } from '../../models/deposits/DepositEntity';
+import { DepositMonthSummary } from '@/pages/Deposits/components/DepositStats/depositMonthSummary';
+import { DepositsRange } from '@/models/deposits/depositsRange';
+import { createEntity, deleteEntity, getAllEntitiesByConfig, getEntity, getEntityByConfig, updateEntity } from '@/api/basicApi';
+import { DepositEntity, DepositEntityRequest, DepositEntityResponse } from '@/models/deposits/DepositEntity';
 import { prepareDepositEntity, prepareDepositEntityRequest } from './depositApiMapping';
 
 const basicUrl = `Deposit`;

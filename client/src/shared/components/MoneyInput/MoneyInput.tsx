@@ -2,7 +2,7 @@ import { Box, Input, InputProps, Text } from '@chakra-ui/react';
 import { NumericFormat } from 'react-number-format';
 import { Controller, Control, FieldValues, Path } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { formatNumberToWords } from '../../utilities/formatters/numberWordsFormatter';
+import { formatNumberToWords } from '@/shared/utilities/formatters/numberWordsFormatter';
 
 export interface MoneyInputProps<T extends FieldValues>
     extends Omit<InputProps, 'name' | 'defaultValue' | 'value' | 'onChange' | 'onBlur' | 'type'> {

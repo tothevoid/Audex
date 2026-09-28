@@ -2,8 +2,8 @@ import { Box, Button, HStack, Input, Stack, Text } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BsSearch } from "react-icons/bs";
-import { searchMarketSecurity } from "../../../../../api/securities/securityApi";
-import { MarketSecurityInfoEntity } from "../../../../../models/securities/SecurityEntity";
+import { searchMarketSecurity } from "@/api/securities/securityApi";
+import { MarketSecurityInfoEntity } from "@/models/securities/SecurityEntity";
 
 interface SecuritySearchFormProps {
     onFound: (marketInfo: MarketSecurityInfoEntity) => void;

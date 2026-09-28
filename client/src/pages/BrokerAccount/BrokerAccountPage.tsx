@@ -1,16 +1,16 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { BrokerAccountEntity } from "../../models/brokers/BrokerAccountEntity";
-import { getBrokerAccountById } from "../../api/brokers/brokerAccountApi";
-import { getLastPullDate, pullBrokerAccountQuotations } from "../../api/brokers/brokerAccountSecurityApi";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
+import { getBrokerAccountById } from "@/api/brokers/brokerAccountApi";
+import { getLastPullDate, pullBrokerAccountQuotations } from "@/api/brokers/brokerAccountSecurityApi";
 import BrokerAccountSecuritiesList, { BrokerAccountSecuritiesListRef } from "./components/BrokerAccountSecuritiesList/BrokerAccountSecuritiesList";
-import { useSignalR } from "../../shared/hooks/useSignalR";
+import { useSignalR } from "@/shared/hooks/useSignalR";
 import BrokerAccountTabs, { ChangeAction } from "./components/BrokerAccountTabs/BrokerAccountTabs";
 import BrokerAccountHeader from "./components/BrokerAccountHeader/BrokerAccountHeader";
-import { getPortfolioValues } from "../../api/brokers/brokerAccountSummaryApi";
-import { BrokerAccountPortfolioEntity } from "../../models/brokers/BrokerAccountPortfolioEntity";
+import { getPortfolioValues } from "@/api/brokers/brokerAccountSummaryApi";
+import { BrokerAccountPortfolioEntity } from "@/models/brokers/BrokerAccountPortfolioEntity";
 import { BrokerStatementImportModal } from "./modals/BrokerStatementImportModal/BrokerStatementImportModal";
-import { BaseModalRef } from "../../shared/utilities/modalUtilities";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
 interface State {
     brokerAccount: BrokerAccountEntity | null,

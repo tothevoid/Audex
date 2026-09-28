@@ -3,8 +3,8 @@ import { Container, VStack } from "@chakra-ui/react";
 import { NotificationsHeader } from "./components/NotificationsHeader";
 import { NotificationsFilterBar } from "./components/NotificationsFilterBar";
 import { NotificationsList } from "./components/NotificationsList";
-import CollectionPagination from "../../shared/components/CollectionPagination/CollectionPagination";
-import { useNotifications } from "../../shared/hooks/useNotifications";
+import CollectionPagination from "@/shared/components/CollectionPagination/CollectionPagination";
+import { useNotifications } from "@/shared/hooks/useNotifications";
 
 const NotificationsPage: React.FC = () => {
     const {

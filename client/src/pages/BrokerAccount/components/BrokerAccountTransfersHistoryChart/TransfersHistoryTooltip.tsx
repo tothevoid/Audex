@@ -1,10 +1,10 @@
 import React from "react";
 import { Box, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import i18n from "../../../../i18n";
-import { ChartTooltipContainer, ChartTooltipHeader, ChartTooltipItem } from "../../../../shared/components/ChartTooltip/ChartTooltip";
-import { CHART_THEME_COLORS } from "../../../../shared/constants/chartColors";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
+import i18n from "@/i18n";
+import { ChartTooltipContainer, ChartTooltipHeader, ChartTooltipItem } from "@/shared/components/ChartTooltip/ChartTooltip";
+import { CHART_THEME_COLORS } from "@/shared/constants/chartColors";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import { AccountItem, MONTH_RANGE, TransfersChartRow } from "./types";
 
 interface Props {

@@ -1,5 +1,5 @@
-import { BasePageable } from "../../shared/models/BasePageable";
-import { Nullable } from "../../shared/utilities/nullable";
+import { BasePageable } from "@/shared/models/BasePageable";
+import { Nullable } from "@/shared/utilities/nullable";
 
 export interface SecurityTransactionsFilterValues {
     brokerAccountId?: Nullable<string>;

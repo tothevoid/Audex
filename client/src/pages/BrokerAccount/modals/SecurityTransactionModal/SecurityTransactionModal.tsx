@@ -3,18 +3,18 @@ import { RefObject, useCallback, useEffect, useMemo, useState } from "react"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
-import MoneyInput from "../../../../shared/components/MoneyInput/MoneyInput";
-import { getSecurities } from "../../../../api/securities/securityApi";
-import { getBrokerAccounts } from "../../../../api/brokers/brokerAccountApi";
-import { BrokerAccountEntity } from "../../../../models/brokers/BrokerAccountEntity";
-import { SecurityEntity } from "../../../../models/securities/SecurityEntity";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
+import { getSecurities } from "@/api/securities/securityApi";
+import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
+import { SecurityEntity } from "@/models/securities/SecurityEntity";
 import { SecurityTransactionFormInput, getSecurityTransactionValidationSchema } from "./SecurityTransactionValidationSchema";
-import DateSelect from "../../../../shared/components/DateSelect/DateSelect";
-import { SecurityTransactionEntity, SecurityTransactionEntityRequest } from "../../../../models/securities/SecurityTransactionEntity";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
+import DateSelect from "@/shared/components/DateSelect/DateSelect";
+import { SecurityTransactionEntity, SecurityTransactionEntityRequest } from "@/models/securities/SecurityTransactionEntity";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { generateGuid } from "@/shared/utilities/idUtilities";
 
 enum SecurityTransactionOperation {
 	Buy = "buy",

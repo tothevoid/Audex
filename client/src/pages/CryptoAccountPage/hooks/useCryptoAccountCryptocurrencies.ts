@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { CryptoAccountCryptocurrencyEntity } from "../../../models/crypto/CryptoAccountCryptocurrencyEntity";
-import { createCryptoAccountCryptocurrency, deleteCryptoAccountCryptocurrency, updateCryptoAccountCryptocurrency, getCryptocurrenciesByCryptoAccount, getTotalBalance } from "../../../api/crypto/cryptoAccountCryptocurrencyApi";
+import { CryptoAccountCryptocurrencyEntity } from "@/models/crypto/CryptoAccountCryptocurrencyEntity";
+import { createCryptoAccountCryptocurrency, deleteCryptoAccountCryptocurrency, updateCryptoAccountCryptocurrency, getCryptocurrenciesByCryptoAccount, getTotalBalance } from "@/api/crypto/cryptoAccountCryptocurrencyApi";
 
 export interface CryptoAccountCryptocurrenciesQuery {
     cryptoAccountId: string

@@ -1,4 +1,4 @@
-import { downloadFileByUrl } from '../basicApi';
+import { downloadFileByUrl } from '@/api/basicApi';
 
 const basicUrl = 'api/Scheduler';
 

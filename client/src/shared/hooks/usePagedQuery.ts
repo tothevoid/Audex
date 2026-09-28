@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { BasePageable } from "../models/BasePageable";
-import { PagedResult } from "../models/PagedResult";
+import { BasePageable } from "@/shared/models/BasePageable";
+import { PagedResult } from "@/shared/models/PagedResult";
 
 export interface UsePagedQueryOptions<TItem, TFilter extends BasePageable> {
 	fetchData: (query: TFilter) => Promise<PagedResult<TItem>>;

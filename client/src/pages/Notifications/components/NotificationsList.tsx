@@ -2,10 +2,10 @@ import React, { useRef, useState } from "react";
 import { Box, Icon, Text, VStack } from "@chakra-ui/react";
 import { MdNotifications } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import { NotificationEntity } from "../../../models/notifications/NotificationEntity";
+import { NotificationEntity } from "@/models/notifications/NotificationEntity";
 import { NotificationItem } from "./NotificationItem";
-import { ConfirmModal } from "../../../shared/modals/ConfirmModal/ConfirmModal";
-import { BaseModalRef } from "../../../shared/utilities/modalUtilities";
+import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
 interface NotificationsListProps {
     items: NotificationEntity[];

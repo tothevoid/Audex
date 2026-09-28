@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, BoxProps, Flex } from '@chakra-ui/react';
-import SwitchButton, { SwitchButtonProps } from '../SwitchButton/SwitchButton';
+import SwitchButton, { SwitchButtonProps } from '@/shared/components/SwitchButton/SwitchButton';
 
 export interface FilterBlockProps extends BoxProps {
     children?: React.ReactNode;

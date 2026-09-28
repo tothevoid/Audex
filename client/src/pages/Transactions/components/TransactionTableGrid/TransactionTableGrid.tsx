@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Table } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { TransactionEntity } from '../../../../models/transactions/TransactionEntity';
-import { AccountEntity } from '../../../../models/accounts/AccountEntity';
-import { TransactionTypeEntity } from '../../../../models/transactions/TransactionTypeEntity';
-import { generateGuid } from '../../../../shared/utilities/idUtilities';
-import { BaseModalRef } from '../../../../shared/utilities/modalUtilities';
+import { TransactionEntity } from '@/models/transactions/TransactionEntity';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
+import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEntity';
+import { generateGuid } from '@/shared/utilities/idUtilities';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
 import {
     CommitDiffPayload,
     RowDiff,

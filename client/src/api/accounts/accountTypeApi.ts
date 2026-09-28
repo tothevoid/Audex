@@ -1,5 +1,5 @@
-import { AccountTypeEntity } from '../../models/accounts/AccountTypeEntity';
-import { createEntity, deleteEntity, getAllEntities, updateEntity } from '../basicApi';
+import { AccountTypeEntity } from '@/models/accounts/AccountTypeEntity';
+import { createEntity, deleteEntity, getAllEntities, updateEntity } from '@/api/basicApi';
 import { prepareAccountType } from './accountTypeApiMapping';
 
 const basicUrl = `AccountType`;

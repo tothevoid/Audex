@@ -4,12 +4,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountBalanceTransferFormInput, getAccountBalanceTransferValidationSchema } from "./AccountBalanceTransferModalValidationSchema";
 import { useTranslation } from "react-i18next";
-import { getAccounts, transferBalance } from "../../../../api/accounts/accountApi";
-import { AccountEntity } from "../../../../models/accounts/AccountEntity";
-import CollectionSelect from "../../../../shared/components/CollectionSelect/CollectionSelect";
-import MoneyInput from "../../../../shared/components/MoneyInput/MoneyInput";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
+import { getAccounts, transferBalance } from "@/api/accounts/accountApi";
+import { AccountEntity } from "@/models/accounts/AccountEntity";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
+import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
 interface ModalProps {
 	modalRef: RefObject<BaseModalRef | null>,

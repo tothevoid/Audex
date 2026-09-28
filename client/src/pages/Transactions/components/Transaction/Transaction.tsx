@@ -1,14 +1,14 @@
 import React from 'react';
-import { AccountEntity } from '../../../../models/accounts/AccountEntity';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
 import { MdOutlinePayment } from 'react-icons/md';
 import { Flex, Text, Badge, Box } from '@chakra-ui/react';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import { TransactionEntity } from '../../../../models/transactions/TransactionEntity';
-import { getTransactionTypeIconUrl } from '../../../../api/transactions/transactionTypeApi';
-import StoredIcon from '../../../../shared/components/StoredIcon';
-import CardActionButtons from '../../../../shared/components/CardActionButtons/CardActionButtons';
-import EntityCard from '../../../../shared/components/EntityCard/EntityCard';
-import { useUserProfile } from '../../../../features/UserProfileSettingsModal/hooks/UserProfileContext';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import { TransactionEntity } from '@/models/transactions/TransactionEntity';
+import { getTransactionTypeIconUrl } from '@/api/transactions/transactionTypeApi';
+import StoredIcon from '@/shared/components/StoredIcon';
+import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
+import EntityCard from '@/shared/components/EntityCard/EntityCard';
+import { useUserProfile } from '@/features/UserProfileSettingsModal/hooks/UserProfileContext';
 
 interface Props {
     transaction: TransactionEntity;

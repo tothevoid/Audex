@@ -1,10 +1,10 @@
-import { TransactionEntity } from '../../../../models/transactions/TransactionEntity';
-import { AccountEntity } from '../../../../models/accounts/AccountEntity';
-import { TransactionTypeEntity } from '../../../../models/transactions/TransactionTypeEntity';
-import { formatDate } from '../../../../shared/utilities/formatters/dateFormatter';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
+import { TransactionEntity } from '@/models/transactions/TransactionEntity';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
+import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEntity';
+import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
 import { i18n as I18nType } from 'i18next';
-import { ViewDisplayMode } from '../TransactionFilterBar/TransactionFilterBar';
+import { ViewDisplayMode } from '@/pages/Transactions/components/TransactionFilterBar/TransactionFilterBar';
 
 export interface FieldDiff {
     isModified: boolean;

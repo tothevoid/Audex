@@ -1,13 +1,13 @@
-import httpClient from "../httpClient";
-import { Nullable } from "../../shared/utilities/nullable";
-import { logPromiseError } from "../../shared/utilities/webApiUtilities";
-import { OperationResult } from "../../shared/models/OperationResult";
+import httpClient from "@/api/httpClient";
+import { Nullable } from "@/shared/utilities/nullable";
+import { logPromiseError } from "@/shared/utilities/webApiUtilities";
+import { OperationResult } from "@/shared/models/OperationResult";
 import {
     ApplyStatementDiffsRequestEntity,
     ApplyStatementDiffsSummaryEntity,
     BrokerStatementAnalysisResultEntity,
     BrokerStatementImporterEntity
-} from "../../models/brokers/BrokerStatementImportModels";
+} from "@/models/brokers/BrokerStatementImportModels";
 
 const basicUrl = "/BrokerStatementImport";
 

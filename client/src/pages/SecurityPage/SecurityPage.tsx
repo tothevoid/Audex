@@ -1,14 +1,14 @@
 import { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
-import { getSecurityById, getSecurityStats } from "../../api/securities/securityApi";
-import { SecurityEntity } from "../../models/securities/SecurityEntity";
+import { getSecurityById, getSecurityStats } from "@/api/securities/securityApi";
+import { SecurityEntity } from "@/models/securities/SecurityEntity";
 import { Stack, Tabs } from "@chakra-ui/react";
 import DividendList from "./components/DividendsList/DividendList";
 import SecurityHistory from "./components/SecurityHistory/SecurityHistory";
 import SecurityTransactionsChart from "./components/SecurityTransactionsChart/SecurityTransactionsChart";
 import SecurityHeader from "./components/SecurityHeader/SecurityHeader";
-import { SecurityStats } from "../../models/securities/SecurityStats";
+import { SecurityStats } from "@/models/securities/SecurityStats";
 import { GrTransaction } from "react-icons/gr";
 import { MdHistory } from "react-icons/md";
 import { PiCoinsLight } from "react-icons/pi";

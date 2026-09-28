@@ -4,11 +4,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getCurrencyModalValidationSchema, CurrencyFormInput } from "./CurrencyValidationSchema";
 import { useTranslation } from "react-i18next";
-import { CurrencyEntity } from "../../../../models/currencies/CurrencyEntity";
-import CheckboxInput from "../../../../shared/components/CheckboxInput/CheckboxInput";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
+import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { generateGuid } from "@/shared/utilities/idUtilities";
 
 interface ModalProps {
 	modalRef: RefObject<BaseModalRef | null>,

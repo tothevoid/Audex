@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { AccountEntity } from '../../../../models/accounts/AccountEntity';
+import { AccountEntity } from '@/models/accounts/AccountEntity';
 import { Box, Flex, Stack, Text, Progress } from '@chakra-ui/react';
-import ButtonGroup from '../../../../shared/components/ButtonGroup/ButtonGroup';
+import ButtonGroup from '@/shared/components/ButtonGroup/ButtonGroup';
 import { useTranslation } from 'react-i18next';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, TooltipValueType } from 'recharts';
-import { TransactionEntity } from '../../../../models/transactions/TransactionEntity';
-import { getChartLabelConfig } from '../../../../shared/utilities/chartUtilities';
-import { useUserProfile } from '../../../../features/UserProfileSettingsModal/hooks/UserProfileContext';
-import { formatMoneyByCurrencyCulture } from '../../../../shared/utilities/formatters/moneyFormatter';
-import { CHARTS_COLORS } from '../../../../shared/constants/chartColors';
-import { TypeFilterMode } from '../TransactionFilterBar/TransactionFilterBar';
+import { TransactionEntity } from '@/models/transactions/TransactionEntity';
+import { getChartLabelConfig } from '@/shared/utilities/chartUtilities';
+import { useUserProfile } from '@/features/UserProfileSettingsModal/hooks/UserProfileContext';
+import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
+import { CHARTS_COLORS } from '@/shared/constants/chartColors';
+import { TypeFilterMode } from '@/pages/Transactions/components/TransactionFilterBar/TransactionFilterBar';
 
 export type TransactionStatsProps = {
     accounts: AccountEntity[];

@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { getChartColor, CHART_THEME_COLORS } from "../../../../shared/constants/chartColors";
-import { DepositMonthSummary } from "../DepositStats/depositMonthSummary";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { formatPeriodLabel } from "../DepositStats/depositChartUtils";
+import { getChartColor, CHART_THEME_COLORS } from "@/shared/constants/chartColors";
+import { DepositMonthSummary } from "@/pages/Deposits/components/DepositStats/depositMonthSummary";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { formatPeriodLabel } from "@/pages/Deposits/components/DepositStats/depositChartUtils";
 import { useTranslation } from "react-i18next";
 import StackedDepositsTooltip from "./StackedDepositsTooltip";
 

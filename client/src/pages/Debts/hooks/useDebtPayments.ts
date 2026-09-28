@@ -1,14 +1,14 @@
 import { useMemo } from "react";
-import { DebtPaymentEntity } from "../../../models/debts/DebtPaymentEntity";
+import { DebtPaymentEntity } from "@/models/debts/DebtPaymentEntity";
 import {
     createDebtPayment,
     DebtPaymentsQuery,
     deleteDebtPayment,
     getPagedDebtPayments,
     updateDebtPayment
-} from "../../../api/debts/debtPaymentApi";
-import { Nullable } from "../../../shared/utilities/nullable";
-import usePagedQuery from "../../../shared/hooks/usePagedQuery";
+} from "@/api/debts/debtPaymentApi";
+import { Nullable } from "@/shared/utilities/nullable";
+import usePagedQuery from "@/shared/hooks/usePagedQuery";
 
 export interface UseDebtPaymentsOptions {
     debtId?: Nullable<string>;

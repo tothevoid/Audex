@@ -1,4 +1,4 @@
-import { CurrencyEntity } from "../currencies/CurrencyEntity";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
 import { DebtTagEntity } from "./DebtTagEntity";
 
 interface CommonDebtEntity {

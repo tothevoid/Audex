@@ -1,4 +1,4 @@
-import { BrokerAccountEntity, BrokerAccountEntityResponse } from "../brokers/BrokerAccountEntity";
+import { BrokerAccountEntity, BrokerAccountEntityResponse } from "@/models/brokers/BrokerAccountEntity";
 import { SecurityEntity, SecurityEntityResponse } from "./SecurityEntity";
 
 interface CommonSecurityTransactionEntity {

@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Flex, Text } from "@chakra-ui/react";
-import { CHART_THEME_COLORS } from "../../../../shared/constants/chartColors";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { Nullable } from "../../../../shared/utilities/nullable";
+import { CHART_THEME_COLORS } from "@/shared/constants/chartColors";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { Nullable } from "@/shared/utilities/nullable";
 import { AccountItem } from "./types";
 
 interface Props {

@@ -1,5 +1,5 @@
-import { BrokerAccountDailyStatsEntity } from "../../models/brokers/BrokerAccountDailyStatsEntity";
-import { BrokerAccountSummaryEntity } from "../../models/brokers/BrokerAccountSummaryEntity";
+import { BrokerAccountDailyStatsEntity } from "@/models/brokers/BrokerAccountDailyStatsEntity";
+import { BrokerAccountSummaryEntity } from "@/models/brokers/BrokerAccountSummaryEntity";
 
 export const prepareBrokerAccountsSecurityStats = (brokerAccountSecurity: BrokerAccountSummaryEntity): BrokerAccountSummaryEntity => {
     return {

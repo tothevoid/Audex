@@ -1,5 +1,5 @@
-import { SecurityHistory } from '../../models/securities/SecurityHistory';
-import { SecurityHistoryPeriod } from '../../models/securities/SecurityHistoryPeriod';
+import { SecurityHistory } from '@/models/securities/SecurityHistory';
+import { SecurityHistoryPeriod } from '@/models/securities/SecurityHistoryPeriod';
 import { 
     createEntityWithIconResult, 
     deleteEntity, 
@@ -7,13 +7,13 @@ import {
     getEntity, 
     getEntityById, 
     updateEntityWithIconResult 
-} from '../basicApi';
-import { SecurityStats } from '../../models/securities/SecurityStats';
-import { SecurityEntity, SecurityEntityResponse, MarketSecurityInfoEntity } from '../../models/securities/SecurityEntity';
+} from '@/api/basicApi';
+import { SecurityStats } from '@/models/securities/SecurityStats';
+import { SecurityEntity, SecurityEntityResponse, MarketSecurityInfoEntity } from '@/models/securities/SecurityEntity';
 import { prepareSecurity, prepareSecurityEntityRequest } from './securityApiMapping';
-import { Nullable } from '../../shared/utilities/nullable';
-import { getStoredIconUrl } from '../iconApi';
-import { OperationResult } from '../../shared/models/OperationResult';
+import { Nullable } from '@/shared/utilities/nullable';
+import { getStoredIconUrl } from '@/api/iconApi';
+import { OperationResult } from '@/shared/models/OperationResult';
 
 const basicUrl = `Security`;
 const ENTITY_NAME = "securityJson"

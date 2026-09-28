@@ -2,11 +2,11 @@ import { ResponsiveContainer, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Line
 import { Box } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getTransactionsBySecurity } from "../../../../api/securities/securityTransactionApi";
-import { formatShortDateTime } from "../../../../shared/utilities/formatters/dateFormatter";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
-import { getChartLabelConfig } from "../../../../shared/utilities/chartUtilities";
-import { SecurityTransactionsHistory } from "../../../../models/securities/SecurityTransactionsHistory";
+import { getTransactionsBySecurity } from "@/api/securities/securityTransactionApi";
+import { formatShortDateTime } from "@/shared/utilities/formatters/dateFormatter";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { getChartLabelConfig } from "@/shared/utilities/chartUtilities";
+import { SecurityTransactionsHistory } from "@/models/securities/SecurityTransactionsHistory";
 
 interface Props {
     securityId: string

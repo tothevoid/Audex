@@ -4,10 +4,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { BrokerAccountTypeFormInput, getBrokerAccountTypeValidationSchema } from "./BrokerAccountTypeValidationSchema";
-import { BrokerAccountTypeEntity } from "../../../../models/brokers/BrokerAccountTypeEntity";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
+import { BrokerAccountTypeEntity } from "@/models/brokers/BrokerAccountTypeEntity";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { generateGuid } from "@/shared/utilities/idUtilities";
 
 interface ModalProps {
 	modalRef: RefObject<BaseModalRef | null>;

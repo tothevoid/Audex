@@ -1,4 +1,4 @@
-import { ThemeColors } from '../types';
+import { ThemeColors } from '@/theme/types';
 
 export const darkColors: ThemeColors = {
     background_main: '#121212',

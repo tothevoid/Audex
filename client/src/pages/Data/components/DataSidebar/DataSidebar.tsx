@@ -1,7 +1,7 @@
 import { Box, Stack, Text } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { getDataTablesConfig } from "../../dataTablesUtilities";
+import { getDataTablesConfig } from "@/pages/Data/dataTablesUtilities";
 
 export default function DataSidebar() {
 	const { t } = useTranslation();

@@ -1,22 +1,22 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { BrokerAccountDayTransferEntity } from "../../../../models/brokers/BrokerAccountDayTransferEntity";
-import { BrokerAccountMonthTransferEntity } from "../../../../models/brokers/BrokerAccountMonthTransferEntity";
-import { BrokerAccountMonthTransfersHistoryEntity } from "../../../../models/brokers/BrokerAccountMonthTransfersHistoryEntity";
-import { BrokerAccountYearTransfersHistoryEntity } from "../../../../models/brokers/BrokerAccountYearTransfersHistoryEntity";
-import { BrokerAccountTransfersAvailableDatesEntity } from "../../../../models/brokers/BrokerAccountTransfersAvailableDatesEntity";
-import { BrokerAccountEntity } from "../../../../models/brokers/BrokerAccountEntity";
+import { BrokerAccountDayTransferEntity } from "@/models/brokers/BrokerAccountDayTransferEntity";
+import { BrokerAccountMonthTransferEntity } from "@/models/brokers/BrokerAccountMonthTransferEntity";
+import { BrokerAccountMonthTransfersHistoryEntity } from "@/models/brokers/BrokerAccountMonthTransfersHistoryEntity";
+import { BrokerAccountYearTransfersHistoryEntity } from "@/models/brokers/BrokerAccountYearTransfersHistoryEntity";
+import { BrokerAccountTransfersAvailableDatesEntity } from "@/models/brokers/BrokerAccountTransfersAvailableDatesEntity";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 import {
     getMonthTransfersHistory,
     getYearTransfersHistory,
     getTransfersAvailableDates
-} from "../../../../api/brokers/brokerAccountSummaryApi";
+} from "@/api/brokers/brokerAccountSummaryApi";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { Box, Card, Flex, HStack, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import i18n from "../../../../i18n";
-import { CHART_THEME_COLORS, getChartColor } from "../../../../shared/constants/chartColors";
-import { Nullable } from "../../../../shared/utilities/nullable";
-import { formatMoneyByCurrencyCulture } from "../../../../shared/utilities/formatters/moneyFormatter";
+import i18n from "@/i18n";
+import { CHART_THEME_COLORS, getChartColor } from "@/shared/constants/chartColors";
+import { Nullable } from "@/shared/utilities/nullable";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import { MdHistory } from "react-icons/md";
 import { AccountItem, MONTH_RANGE, TransfersChartRow, TransfersHistoryFilterState, YEAR_RANGE } from "./types";
 import TransfersHistoryFilterBar from "./TransfersHistoryFilterBar";

@@ -1,6 +1,6 @@
 import React, { forwardRef, useImperativeHandle } from "react";
 import { Dialog, Portal, CloseButton, useDisclosure } from "@chakra-ui/react";
-import { BaseModalRef } from "../../utilities/modalUtilities";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
 export interface BaseModalProps {
     title: React.ReactNode;

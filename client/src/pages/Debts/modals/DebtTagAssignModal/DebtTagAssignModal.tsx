@@ -1,14 +1,14 @@
 import { forwardRef, useEffect, useState } from "react";
 import { Button, Stack, Text, Box } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { DebtEntity } from "../../../../models/debts/DebtEntity";
-import { DebtTagEntity } from "../../../../models/debts/DebtTagEntity";
-import DebtTagSelect from "../../components/DebtTagSelect/DebtTagSelect";
-import DebtTagEditor from "../../components/DebtTagEditor/DebtTagEditor";
-import { createDebtTag } from "../../../../api/debts/debtTagApi";
+import { DebtEntity } from "@/models/debts/DebtEntity";
+import { DebtTagEntity } from "@/models/debts/DebtTagEntity";
+import DebtTagSelect from "@/pages/Debts/components/DebtTagSelect/DebtTagSelect";
+import DebtTagEditor from "@/pages/Debts/components/DebtTagEditor/DebtTagEditor";
+import { createDebtTag } from "@/api/debts/debtTagApi";
 import { MdAdd } from "react-icons/md";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import BaseModal from "../../../../shared/modals/BaseModal/BaseModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseModal from "@/shared/modals/BaseModal/BaseModal";
 
 interface Props {
     debt: DebtEntity | null;

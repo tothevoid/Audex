@@ -1,5 +1,5 @@
-import { Nullable } from "../../../../shared/utilities/nullable";
-import { BrokerAccountTransferAccountValueEntity } from "../../../../models/brokers/BrokerAccountTransferAccountValueEntity";
+import { Nullable } from "@/shared/utilities/nullable";
+import { BrokerAccountTransferAccountValueEntity } from "@/models/brokers/BrokerAccountTransferAccountValueEntity";
 
 export const YEAR_RANGE = "YEAR_RANGE";
 export const MONTH_RANGE = "MONTH_RANGE";

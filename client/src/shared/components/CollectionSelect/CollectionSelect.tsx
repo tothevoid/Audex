@@ -1,5 +1,5 @@
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
-import BaseSelect from "../BaseSelect/BaseSelect";
+import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
 
 interface Props<T, TFieldValues extends FieldValues = FieldValues, IsClearable extends boolean = true> {
     name: Path<TFieldValues>;

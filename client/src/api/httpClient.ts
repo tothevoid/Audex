@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "axios";
-import config from "../config";
+import config from "@/config";
 import { getAccessToken, setAccessToken, clearAccessToken } from "./tokenStorage";
 import { refreshToken } from "./auth/authApi";
 

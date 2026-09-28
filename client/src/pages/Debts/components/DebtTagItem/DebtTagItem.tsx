@@ -1,8 +1,8 @@
 import React from "react";
 import { Flex, Text, IconButton } from "@chakra-ui/react";
 import { MdDelete, MdEdit } from "react-icons/md";
-import { DebtTagEntity } from "../../../../models/debts/DebtTagEntity";
-import DebtTagBadge from "../DebtTagBadge/DebtTagBadge";
+import { DebtTagEntity } from "@/models/debts/DebtTagEntity";
+import DebtTagBadge from "@/pages/Debts/components/DebtTagBadge/DebtTagBadge";
 
 export interface DebtTagItemProps {
     tag: DebtTagEntity;

@@ -1,5 +1,5 @@
-import { DebtTagEntity, DebtTagStatsEntity } from "../../models/debts/DebtTagEntity";
-import { createEntity, deleteEntity, getAllEntities, updateEntity } from "../basicApi";
+import { DebtTagEntity, DebtTagStatsEntity } from "@/models/debts/DebtTagEntity";
+import { createEntity, deleteEntity, getAllEntities, updateEntity } from "@/api/basicApi";
 
 const basicUrl = `DebtTag`;
 

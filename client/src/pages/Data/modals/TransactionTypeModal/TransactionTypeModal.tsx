@@ -4,13 +4,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { getTransactionTypeValidationSchema, TransactionTypeFormInput } from "./TransactionTypeValidationSchema";
-import { getTransactionTypeIconUrl } from "../../../../api/transactions/transactionTypeApi";
-import { TransactionTypeEntity } from "../../../../models/transactions/TransactionTypeEntity";
-import CheckboxInput from "../../../../shared/components/CheckboxInput/CheckboxInput";
-import BaseFormModal from "../../../../shared/modals/BaseFormModal/BaseFormModal";
-import { BaseModalRef } from "../../../../shared/utilities/modalUtilities";
-import { generateGuid } from "../../../../shared/utilities/idUtilities";
-import ImageInput from "../../../../shared/components/Form/ImageInput/ImageInput";
+import { getTransactionTypeIconUrl } from "@/api/transactions/transactionTypeApi";
+import { TransactionTypeEntity } from "@/models/transactions/TransactionTypeEntity";
+import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
+import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { generateGuid } from "@/shared/utilities/idUtilities";
+import ImageInput from "@/shared/components/Form/ImageInput/ImageInput";
 
 interface ModalProps {
 	modalRef: RefObject<BaseModalRef | null>,

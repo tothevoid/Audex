@@ -3,14 +3,14 @@ import { Box, Flex, Grid, Text, Badge, Button, HStack, Icon } from "@chakra-ui/r
 import { useTranslation } from "react-i18next";
 import { MdFilterList, MdClose } from "react-icons/md";
 import DatePicker from "react-datepicker";
-import BaseSelect from "../../../../shared/components/BaseSelect/BaseSelect";
-import DateInput from "../../../../shared/components/DateInput/DateInput";
-import { convertToDateOnly, parseIsoDateOnly } from "../../../../shared/utilities/dateUtils";
-import { getSecurities } from "../../../../api/securities/securityApi";
-import { getBrokerAccounts } from "../../../../api/brokers/brokerAccountApi";
-import { SecurityEntity } from "../../../../models/securities/SecurityEntity";
-import { BrokerAccountEntity } from "../../../../models/brokers/BrokerAccountEntity";
-import { SecurityTransactionsFilterValues } from "../../../../models/securities/SecurityTransactionsRequest";
+import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
+import DateInput from "@/shared/components/DateInput/DateInput";
+import { convertToDateOnly, parseIsoDateOnly } from "@/shared/utilities/dateUtils";
+import { getSecurities } from "@/api/securities/securityApi";
+import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
+import { SecurityEntity } from "@/models/securities/SecurityEntity";
+import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
+import { SecurityTransactionsFilterValues } from "@/models/securities/SecurityTransactionsRequest";
 
 export type { SecurityTransactionsFilterValues };
 

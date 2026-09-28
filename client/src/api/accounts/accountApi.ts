@@ -1,7 +1,7 @@
-import { AccountEntity, AccountEntityRequest, AccountEntityResponse } from "../../models/accounts/AccountEntity";
-import { AccountCurrencySummary } from "../../models/accounts/accountsSummary";
-import { createEntity, deleteEntity, getAllEntities, getAllEntitiesByConfig, postAction, updateEntity, getEntityById } from "../basicApi";
-import { Transfer } from "../../pages/Accounts/modals/AccountBalanceTransferModal/AccountBalanceTransferModal";
+import { AccountEntity, AccountEntityRequest, AccountEntityResponse } from "@/models/accounts/AccountEntity";
+import { AccountCurrencySummary } from "@/models/accounts/accountsSummary";
+import { createEntity, deleteEntity, getAllEntities, getAllEntitiesByConfig, postAction, updateEntity, getEntityById } from "@/api/basicApi";
+import { Transfer } from "@/pages/Accounts/modals/AccountBalanceTransferModal/AccountBalanceTransferModal";
 import { prepareAccount, prepareAccountRequest } from "./accountApiMapping";
 
 const basicUrl = `Account`;

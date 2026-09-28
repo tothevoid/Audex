@@ -1,7 +1,7 @@
 import { Button, CloseButton, Dialog, Portal, useDisclosure} from "@chakra-ui/react"
 import { FormEventHandler, forwardRef, useEffect, useImperativeHandle } from "react"
 import { useTranslation } from "react-i18next";
-import { BaseModalRef } from "../../utilities/modalUtilities";
+import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
 interface BaseFormModalProps {
     title: string,

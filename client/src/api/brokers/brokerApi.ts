@@ -1,5 +1,5 @@
-import { BrokerEntity } from '../../models/brokers/BrokerEntity';
-import { createEntity, deleteEntity, getAllEntities, updateEntity } from '../basicApi';
+import { BrokerEntity } from '@/models/brokers/BrokerEntity';
+import { createEntity, deleteEntity, getAllEntities, updateEntity } from '@/api/basicApi';
 
 const basicUrl = `Broker`;
 
