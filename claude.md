@@ -24,6 +24,10 @@ This document contains guidelines, coding standards, and architectural patterns 
 - **Explore Before Creating**: Always inspect the existing codebase before writing new functionality. Check whether helper functions, utilities, or models already exist (e.g. in `shared/utilities`, `dateUtils`, formatters, base repositories, or common services).
 - **No Redundant Boilerplate**: Reuse established patterns, shared components, and utilities rather than duplicating logic across modules.
 
+### 5. Strict Typing & No Type Crutches
+- **No `any` or Cast-Through-`unknown` Crutches**: NEVER use `any` or cast types through `unknown` as a workaround when concrete domain interfaces, component props, chart tooltips, or form models exist or can be defined.
+- **Valid TypeScript `catch` Syntax**: TypeScript catch blocks must use `catch (error: unknown)` or `catch (error)`. Do not use `catch (error: Error)` (which is invalid TypeScript TS1196). Error properties must be extracted using `parseErrorMessage` and `parseErrorCode`.
+
 ---
 
 ## 🛠️ Server (Backend) Rules & Architecture
@@ -212,14 +216,20 @@ This document contains guidelines, coding standards, and architectural patterns 
 - **Themes & Scrollbars**: The application supports Dark Theme and Solarized Sand Light Theme via Chakra UI v3 semantic tokens. Root elements (`html`, `body` in `index.css`) support `[data-theme="dark"]` and `[data-theme="light"]`, matching scrollbars and WebKit autofill styles. Always preserve `scrollbar-gutter: stable` on `html` to prevent layout jumping/shifting between scrollable and non-scrollable pages.
 - **Layout & Styling**: Use Chakra UI v3 theme tokens (`background_main`, `background_primary`, `background_secondary`, `text_primary`, `text_secondary`, `border_primary`, `action_primary`) and `<SimpleGrid columns={2} gap={4}>` with `<MoneyCard>` for metric grids. Do NOT use hardcoded hex/rgb/rgba colors in components.
 
-### API Client Functions
+### API Client Functions & Centralized `basicApi` Architecture
+- **Mandatory Use of `basicApi` Wrappers**: Direct `httpClient` or `axios` calls in domain API modules (`client/src/api/<domain>/`) are prohibited. All API calls must route through universal helpers in `client/src/api/basicApi.ts`:
+  - **Queries**: `getAllEntities<T>(url)`, `getAllEntitiesByConfig<TInput, TOutput>(url, data)`, `getPagedEntities<TInput, TOutput>(url, data)`, `getEntity<T>(url)`, `getEntityByConfig<T>(url, body)`, `getEntityById<T>(url, id)`.
+  - **Mutations (`OperationResult<T>`)**: `createEntityResult`, `createEntityWithIconResult`, `updateEntityResult`, `updateEntityWithIconResult`, `postEntityResult`, `deleteEntityResult`. All result helpers automatically parse localized error messages and error codes from responses.
+  - **File Downloads**: `downloadFileByUrl(url)` (GET blob), `downloadFileByConfig<TInput>(url, data)` (POST blob returning `Nullable<FileDownloadResult>` containing `{ blob, fileName? }`).
+  - **Simple Actions**: `getAction(url)`, `postAction(url, data?)`, `putAction(url, data?)`, `deleteAction(url)`.
+- **Axios FormData Multipart Boundary**: NEVER manually specify `headers: { "Content-Type": "multipart/form-data" }` when passing `FormData` to Axios or `basicApi`. Axios automatically generates the correct `Content-Type` header with the unique boundary parameter.
 - **Dual Endpoint Handling**: API functions accept `brokerAccountId: Nullable<string>` and switch URLs conditionally:
   ```ts
   const url = brokerAccountId
       ? `${basicUrl}/GetByBrokerAccount?date=${date}&brokerAccountId=${brokerAccountId}`
       : `${basicUrl}/GetAll?date=${date}`;
   ```
-- **Operation Result API Functions**: For mutating endpoints returning `OperationResultDto<T>`, use universal wrappers in `client/src/api/basicApi.ts` (`createEntityWithIconResult`, `updateEntityWithIconResult`, `createEntityResult`, `updateEntityResult`, `deleteEntityResult`) with optional response mapping callbacks (`mapResponse`). Keep low-level multipart form construction (`generateForm`) encapsulated inside `basicApi.ts`.
+- **Centralized Error Parsing (`webApiUtilities.ts`)**: In React components and custom hooks, never swallow errors silently. Catch blocks must use `parseErrorMessage(err, t("error_data_load"))` and `parseErrorCode(err)` from `shared/utilities/webApiUtilities.ts`.
 
 ### Client Commands
 - **Build**: `cd client && npm run build`
