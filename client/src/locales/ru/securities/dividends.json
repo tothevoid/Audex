@@ -14,5 +14,7 @@
     "entity_dividend_received_at": "Дата получения",
 
     "dividend_payment_form_security": "Бумага",
-    "dividend_payment_form_payment": "Выплата"
+    "dividend_payment_form_payment": "Выплата",
+
+    "dividends_empty": "Дивиденды не найдены"
 }

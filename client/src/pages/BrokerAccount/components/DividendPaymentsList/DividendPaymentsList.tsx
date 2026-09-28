@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { useDividendPayments } from '../../hooks/useDividendPayments';
@@ -11,7 +11,6 @@ import SectionHeader from '../../../../shared/components/SectionHeader/SectionHe
 import { ActiveEntityMode } from '../../../../shared/enums/activeEntityMode';
 import { Nullable } from '../../../../shared/utilities/nullable';
 import CollectionPagination from '../../../../shared/components/CollectionPagination/CollectionPagination';
-import { getDividendPaymentsPagination } from '../../../../api/brokers/dividendPaymentApi';
 import DateGroupedList from '../../../../shared/components/DateGroupedList/DateGroupedList';
 
 interface Props {
@@ -35,12 +34,17 @@ const DividendPaymentsList: React.FC<Props> = (props) => {
 
 	const {
 		dividendPayments,
+		totalCount,
+		pageIndex,
+		pageSize,
+		loadPage,
 		createDividendPaymentEntity,
 		updateDividendPaymentEntity,
-		deleteDividendPaymentEntity,
-		dividendPaymentsQueryParameters,
-		setDividendPaymentsQueryParameters
-	} = useDividendPayments({ pageIndex: 1, recordsQuantity: -1, brokerAccountId: props.brokerAccountId }, props.onDividendsChanged);
+		deleteDividendPaymentEntity
+	} = useDividendPayments({
+		brokerAccountId: props.brokerAccountId,
+		onDataChanged: props.onDividendsChanged
+	});
 
 	const [context, setContext] = useState<Nullable<CreateDividendPaymentContext | EditDividendPaymentContext>>(null);
 
@@ -72,14 +76,6 @@ const DividendPaymentsList: React.FC<Props> = (props) => {
 		onActionEnded();
 	}
 
-	const getPagination = useCallback(() => {
-		return getDividendPaymentsPagination(props.brokerAccountId);
-	}, [props.brokerAccountId]);
-
-	const onPageChanged = async (recordsQuantity: number, pageIndex: number) => {
-		setDividendPaymentsQueryParameters({recordsQuantity, pageIndex, brokerAccountId: dividendPaymentsQueryParameters.brokerAccountId});
-	}
-
 	const isGlobalBrokerAccount = !props.brokerAccountId;
 
 	return (
@@ -105,7 +101,12 @@ const DividendPaymentsList: React.FC<Props> = (props) => {
 					/>
 				)}
 			/>
-			<CollectionPagination getPaginationConfig={getPagination} onPageChanged={onPageChanged}/>
+			<CollectionPagination
+				count={totalCount}
+				page={pageIndex}
+				pageSize={pageSize}
+				onPageChange={loadPage}
+			/>
 		<ConfirmModal onConfirmed={onDeleteConfirmed}
 			title={t("entity_securities_transaction_delete_title")}
 			message={t("modals_delete_message")}

@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Grid, Heading, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { ScheduledTaskEntity, ScheduledTaskExecutionStatus } from '../../models/scheduler/ScheduledTaskEntity';
-import { ScheduledTaskJournalEntity } from '../../models/scheduler/ScheduledTaskJournalEntity';
+import { ScheduledTaskJournalEntity, GetJournalQueryRequest } from '../../models/scheduler/ScheduledTaskJournalEntity';
 import { getScheduledTasks } from '../../api/scheduler/schedulerTaskApi';
-import { getJournalPagination, getScheduledTaskJournal } from '../../api/scheduler/schedulerJournalApi';
+import { getPagedScheduledTaskJournal } from '../../api/scheduler/schedulerJournalApi';
 import { SchedulerTaskMasterList } from './components/SchedulerTaskMasterList';
 import { SchedulerTaskDetailPane } from './components/SchedulerTaskDetailPane';
 import { SchedulerJournalTable } from './components/SchedulerJournalTable';
@@ -12,8 +12,8 @@ import { ScheduleConfigModal, ScheduleConfigModalRef } from './components/Schedu
 import { CreateTaskModal, CreateTaskModalRef } from './components/CreateTaskModal';
 import CollectionPagination from '../../shared/components/CollectionPagination/CollectionPagination';
 import PageContainer from '../../shared/components/PageContainer/PageContainer';
-import { PaginationConfig } from '../../shared/models/PaginationConfig';
 import { useSchedulerEvents } from '../../shared/hooks/useSchedulerEvents';
+import usePagedQuery from '../../shared/hooks/usePagedQuery';
 
 const SchedulerPage: React.FC = () => {
     const { t } = useTranslation();
@@ -25,12 +25,29 @@ const SchedulerPage: React.FC = () => {
     const [isTasksLoading, setIsTasksLoading] = useState<boolean>(true);
     const [selectedTaskName, setSelectedTaskName] = useState<string | null>(null);
 
-    const [journal, setJournal] = useState<ScheduledTaskJournalEntity[]>([]);
-    const [isJournalLoading, setIsJournalLoading] = useState<boolean>(false);
     const [selectedTaskFilter, setSelectedTaskFilter] = useState<string>('All');
     const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('All');
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(15);
+
+    const journalFilters = useMemo(() => ({
+        taskName: selectedTaskFilter !== 'All' ? selectedTaskFilter : undefined,
+        status: selectedStatusFilter !== 'All' ? (Number(selectedStatusFilter) as ScheduledTaskExecutionStatus) : undefined
+    }), [selectedTaskFilter, selectedStatusFilter]);
+
+    const {
+        items: journal,
+        totalCount,
+        pageIndex: currentPage,
+        pageSize,
+        isLoading: isJournalLoading,
+        loadPage,
+        refreshPage: reloadJournal
+    } = usePagedQuery<ScheduledTaskJournalEntity, GetJournalQueryRequest>({
+        fetchData: getPagedScheduledTaskJournal,
+        filters: journalFilters,
+        initialPageSize: 15,
+        autoLoad: selectedTaskName === null,
+        keySelector: (entry) => entry.id
+    });
 
     const loadTasks = useCallback(async (showLoading: boolean = false) => {
         if (showLoading) {
@@ -46,47 +63,16 @@ const SchedulerPage: React.FC = () => {
         }
     }, []);
 
-    const loadJournal = useCallback(async (
-        page: number = 1,
-        recordsQuantity: number = pageSize,
-        task: string = selectedTaskFilter,
-        status: string = selectedStatusFilter,
-        showLoading: boolean = true
-    ) => {
-        if (showLoading) {
-            setIsJournalLoading(true);
-        }
-        try {
-            const data = await getScheduledTaskJournal({
-                pageIndex: page,
-                recordsQuantity: recordsQuantity,
-                taskName: task !== 'All' ? task : undefined,
-                status: status !== 'All' ? (Number(status) as ScheduledTaskExecutionStatus) : undefined
-            });
-            setJournal(data);
-        } finally {
-            if (showLoading) {
-                setIsJournalLoading(false);
-            }
-        }
-    }, [pageSize, selectedTaskFilter, selectedStatusFilter]);
-
     useEffect(() => {
         loadTasks(true);
     }, [loadTasks]);
 
-    useEffect(() => {
-        if (selectedTaskName === null) {
-            loadJournal(currentPage, pageSize, selectedTaskFilter, selectedStatusFilter);
-        }
-    }, [selectedTaskName, currentPage, pageSize, selectedTaskFilter, selectedStatusFilter, loadJournal]);
-
     const handleTaskUpdated = useCallback((refreshJournal: boolean = false) => {
         loadTasks(false);
         if (refreshJournal && selectedTaskName === null) {
-            loadJournal(currentPage, pageSize, selectedTaskFilter, selectedStatusFilter, false);
+            reloadJournal();
         }
-    }, [loadTasks, selectedTaskName, loadJournal, currentPage, pageSize, selectedTaskFilter, selectedStatusFilter]);
+    }, [loadTasks, selectedTaskName, reloadJournal]);
 
     useSchedulerEvents({
         onTaskStarted: () => {
@@ -97,29 +83,15 @@ const SchedulerPage: React.FC = () => {
         }
     });
 
-    const getJournalPaginationConfig = useCallback(async (): Promise<PaginationConfig | void> => {
-        const statusEnum = selectedStatusFilter !== 'All' ? (Number(selectedStatusFilter) as ScheduledTaskExecutionStatus) : undefined;
-        return await getJournalPagination(selectedTaskFilter, statusEnum);
-    }, [selectedTaskFilter, selectedStatusFilter]);
-
     const handleTaskFilterChange = (task: string) => {
         setSelectedTaskFilter(task);
-        setCurrentPage(1);
     };
 
     const handleStatusFilterChange = (status: string) => {
         setSelectedStatusFilter(status);
-        setCurrentPage(1);
     };
 
-    const handlePageChanged = (recordsQuantity: number, page: number) => {
-        const actualPage = page === 0 ? 1 : page;
-        setPageSize(recordsQuantity);
-        setCurrentPage(actualPage);
-        loadJournal(actualPage, recordsQuantity, selectedTaskFilter, selectedStatusFilter);
-    };
-
-    const selectedTask = selectedTaskName ? tasks.find((t) => t.taskName === selectedTaskName) || null : null;
+    const selectedTask = selectedTaskName ? tasks.find((task) => task.taskName === selectedTaskName) || null : null;
 
     return (
         <PageContainer>
@@ -159,13 +131,14 @@ const SchedulerPage: React.FC = () => {
                                     selectedStatus={selectedStatusFilter}
                                     onTaskFilterChange={handleTaskFilterChange}
                                     onStatusFilterChange={handleStatusFilterChange}
-                                    onRefresh={() => loadJournal(currentPage, pageSize, selectedTaskFilter, selectedStatusFilter)}
+                                    onRefresh={reloadJournal}
                                 />
 
                                 <CollectionPagination
-                                    key={`${selectedTaskFilter}-${selectedStatusFilter}`}
-                                    getPaginationConfig={getJournalPaginationConfig}
-                                    onPageChanged={handlePageChanged}
+                                    count={totalCount}
+                                    page={currentPage}
+                                    pageSize={pageSize}
+                                    onPageChange={loadPage}
                                 />
                             </VStack>
                         )}

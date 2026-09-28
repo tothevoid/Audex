@@ -1,73 +1,80 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { DividendEntity } from "../../../models/securities/DividendEntity";
-import { createDividend, deleteDividend, getDividends, updateDividend } from "../../../api/securities/dividendApi";
+import {
+    createDividend,
+    deleteDividend,
+    DividendsQuery,
+    getPagedDividends,
+    updateDividend
+} from "../../../api/securities/dividendApi";
+import usePagedQuery from "../../../shared/hooks/usePagedQuery";
 
-export interface DividendsQuery {
-	pageIndex: number,
-	recordsQuantity: number,
-	securityId: string
+export interface UseDividendsOptions {
+    securityId: string;
+    initialPageSize?: number;
 }
 
-export const useDividends = (query: DividendsQuery) => {
-	const [dividends, setDividends] = useState<DividendEntity[]>([]);
-	const [isDividendsLoading, setLoading] = useState(false);
+export const useDividends = (options: UseDividendsOptions) => {
+    const {
+        securityId,
+        initialPageSize = 10
+    } = options;
 
-	const [error, setError] = useState<string | null>(null);
-	const [dividendsQueryParameters, setDividendsQueryParameters] = useState<DividendsQuery>(query);
+    const filters = useMemo(() => ({
+        securityId
+    }), [securityId]);
 
-	const fetchData = useCallback(async () => {
-		setLoading(true)
-		try {
-			const dividends = await getDividends(dividendsQueryParameters);
-			setDividends(dividends);
-		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных')
-		} finally {
-			setLoading(false)
-		}
-	}, [dividendsQueryParameters])
+    const {
+        items: dividends,
+        totalCount,
+        pageIndex,
+        pageSize,
+        isLoading: isDividendsLoading,
+        loadPage,
+        refreshPage,
+        reset
+    } = usePagedQuery<DividendEntity, DividendsQuery>({
+        fetchData: getPagedDividends,
+        filters,
+        initialPageSize,
+        keySelector: (dividend) => dividend.id
+    });
 
-	useEffect(() => {
-		fetchData();
-	}, [fetchData])
+    const createDividendEntity = async (createdDividend: DividendEntity) => {
+        const added = await createDividend(createdDividend);
+        if (!added) {
+            return;
+        }
+        refreshPage();
+    };
 
-	const createDividendEntity = async (createdDividend: DividendEntity) => {
-		const added = await createDividend(createdDividend);
-		if (!added) {
-			return;
-		}
+    const updateDividendEntity = async (updatedDividend: DividendEntity) => {
+        const updated = await updateDividend(updatedDividend);
+        if (!updated) {
+            return;
+        }
+        refreshPage();
+    };
 
-		// TODO: add by order
-		await fetchData();
-	}
+    const deleteDividendEntity = async (deletedDividend: DividendEntity) => {
+        const deleted = await deleteDividend(deletedDividend.id);
+        if (!deleted) {
+            return;
+        }
+        refreshPage();
+    };
 
-	const updateDividendEntity = async (updatedDividend: DividendEntity) => {
-		const updated = await updateDividend(updatedDividend);
-		if (!updated) {
-			return;
-		}
-
-		await fetchData();
-	}
-
-	const deleteDividendEntity = async (deletedDividend: DividendEntity) => {
-		const deleted = await deleteDividend(deletedDividend.id);
-		if (!deleted) {
-			return;
-		}
-
-		await fetchData();
-	}
-
-	return {
-		dividends,
-		isDividendsLoading,
-		error,
-		createDividendEntity,
-		updateDividendEntity,
-		deleteDividendEntity,
-		setDividendsQueryParameters,
-		dividendsQueryParameters,
-		reloadDividends: fetchData
-	}
-}
+    return {
+        dividends,
+        totalCount,
+        pageIndex,
+        pageSize,
+        isDividendsLoading,
+        loadPage,
+        refreshPage,
+        reset,
+        createDividendEntity,
+        updateDividendEntity,
+        deleteDividendEntity
+    };
+};

@@ -14,5 +14,7 @@
     "entity_dividend_received_at": "Received at",
 
     "dividend_payment_form_security": "Security",
-    "dividend_payment_form_payment": "Payment"
+    "dividend_payment_form_payment": "Payment",
+
+    "dividends_empty": "No dividends found"
 }

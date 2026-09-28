@@ -10,18 +10,20 @@ const NotificationsPage: React.FC = () => {
     const {
         notifications,
         unreadCount,
+        totalCount,
+        pageIndex,
+        recordsQuantity,
         isLoading,
         onlyUnreadFilter,
         selectedCategory,
         categories,
         setOnlyUnreadFilter,
         setSelectedCategory,
-        getPaginationConfig,
-        onPageChanged,
+        loadPage,
         markAsRead,
         markAllAsRead,
         deleteNotification
-    } = useNotifications({ autoLoad: false });
+    } = useNotifications({ autoLoad: true, initialPageSize: 15 });
 
     return (
         <Container maxW="1000px" pb={6}>
@@ -48,9 +50,10 @@ const NotificationsPage: React.FC = () => {
                 />
 
                 <CollectionPagination
-                    key={`${onlyUnreadFilter}-${selectedCategory}`}
-                    getPaginationConfig={getPaginationConfig}
-                    onPageChanged={onPageChanged}
+                    count={totalCount}
+                    page={pageIndex}
+                    pageSize={recordsQuantity}
+                    onPageChange={loadPage}
                 />
             </VStack>
         </Container>
@@ -58,3 +61,4 @@ const NotificationsPage: React.FC = () => {
 };
 
 export default NotificationsPage;
+

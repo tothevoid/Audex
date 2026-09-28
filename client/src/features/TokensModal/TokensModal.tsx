@@ -1,50 +1,54 @@
 import { Box } from '@chakra-ui/react';
-import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { BaseModalRef } from '../../shared/utilities/modalUtilities';
 import BaseModal from '../../shared/modals/BaseModal/BaseModal';
-import { UserRefreshTokenEntity } from '../../models/auth/UserRefreshTokenEntity';
 import {
-    getRefreshTokens,
-    getRefreshTokensPagination,
+    getPagedRefreshTokens,
+    RefreshTokensQuery,
     revokeOtherTokens,
     revokeToken
 } from '../../api/auth/tokensApi';
 import CollectionPagination from '../../shared/components/CollectionPagination/CollectionPagination';
 import { TokensHeader } from './components/TokensHeader';
-import { TokensTabs, TokensTabType } from './components/TokensTabs';
+import { TokensTabs } from './components/TokensTabs';
 import { TokensList } from './components/TokensList';
 import { TokensFooter } from './components/TokensFooter';
+import { usePagedQuery } from '../../shared/hooks/usePagedQuery';
+import { UserRefreshTokenEntity } from '../../models/auth/UserRefreshTokenEntity';
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE_OPTIONS = [5, 10, 20, 50];
 
 const TokensModal = forwardRef<BaseModalRef>((_, ref) => {
     const modalRef = useRef<BaseModalRef>(null);
-    const [activeTab, setActiveTab] = useState<TokensTabType>('active');
-    const [tokens, setTokens] = useState<UserRefreshTokenEntity[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [isOnlyActive, setIsOnlyActive] = useState(true);
     const [isRevokingAll, setIsRevokingAll] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [paginationKey, setPaginationKey] = useState(0);
 
-    const loadData = useCallback(async (isActive: boolean, page: number) => {
-        setLoading(true);
-        try {
-            const data = await getRefreshTokens(isActive, page, PAGE_SIZE);
-            setTokens(data);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    const filters = useMemo(() => ({
+        isOnlyActive
+    }), [isOnlyActive]);
 
-    const fetchPaginationConfig = useCallback(async () => {
-        return await getRefreshTokensPagination(activeTab === 'active');
-    }, [activeTab]);
+    const {
+        items: tokens,
+        totalCount,
+        pageIndex: currentPage,
+        pageSize,
+        isLoading: loading,
+        loadPage,
+        refreshPage,
+        reset
+    } = usePagedQuery<UserRefreshTokenEntity, RefreshTokensQuery>({
+        fetchData: getPagedRefreshTokens,
+        filters,
+        initialPageSize: 5,
+        autoLoad: isOpen
+    });
 
     useImperativeHandle(ref, () => ({
         openModal: () => {
-            setActiveTab('active');
-            setCurrentPage(1);
-            setPaginationKey(k => k + 1);
+            setIsOnlyActive(true);
+            setIsOpen(true);
+            reset();
             modalRef.current?.openModal();
         },
         closeModal: () => {
@@ -52,42 +56,27 @@ const TokensModal = forwardRef<BaseModalRef>((_, ref) => {
         }
     }));
 
-    const handleTabChange = (tab: TokensTabType) => {
-        if (tab === activeTab) return;
-        setTokens([]);
-        setActiveTab(tab);
-        setCurrentPage(1);
-        setPaginationKey(k => k + 1);
-    };
-
-    const handlePageChanged = (_pageSize: number, page: number) => {
-        const targetPage = page > 0 ? page : 1;
-        setCurrentPage(targetPage);
-        loadData(activeTab === 'active', targetPage);
-    };
-
-    const handleRevokeSingle = async (id: string) => {
-        const success = await revokeToken(id);
-        if (success) {
-            await loadData(activeTab === 'active', currentPage);
-            setPaginationKey(k => k + 1);
+    const handleRevokeSingle = async (tokenId: string) => {
+        const isSuccess = await revokeToken(tokenId);
+        if (isSuccess) {
+            await refreshPage();
         }
     };
 
     const handleRevokeAllOthers = async () => {
         setIsRevokingAll(true);
         try {
-            await revokeOtherTokens();
-            setCurrentPage(1);
-            await loadData(true, 1);
-            setPaginationKey(k => k + 1);
+            const isSuccess = await revokeOtherTokens();
+            if (isSuccess) {
+                await reset();
+            }
         } finally {
             setIsRevokingAll(false);
         }
     };
 
     const hasOtherActiveTokens =
-        !loading && activeTab === 'active' && tokens.some(token => !token.isCurrent);
+        !loading && isOnlyActive && tokens.some((token) => !token.isCurrent);
 
     return (
         <BaseModal
@@ -103,20 +92,24 @@ const TokensModal = forwardRef<BaseModalRef>((_, ref) => {
                 />
             }
         >
-            <TokensTabs activeTab={activeTab} onTabChange={handleTabChange} />
+            <TokensTabs isOnlyActive={isOnlyActive} onTabChange={setIsOnlyActive} />
 
             <TokensList
                 tokens={tokens}
                 loading={loading}
-                activeTab={activeTab}
+                isOnlyActive={isOnlyActive}
                 onRevokeSingle={handleRevokeSingle}
             />
 
-            <Box minHeight="40px" display="flex" alignItems="center" justifyContent="center" mt={3}>
+            <Box mt={3}>
                 <CollectionPagination
-                    key={`${activeTab}-${paginationKey}`}
-                    getPaginationConfig={fetchPaginationConfig}
-                    onPageChanged={handlePageChanged}
+                    count={totalCount}
+                    page={currentPage}
+                    pageSize={pageSize}
+                    pageSizeOptions={PAGE_SIZE_OPTIONS}
+                    showPageSizeSelector
+                    showTotalCount
+                    onPageChange={(nextPage, newPageSize) => loadPage(nextPage, newPageSize)}
                     size="sm"
                 />
             </Box>

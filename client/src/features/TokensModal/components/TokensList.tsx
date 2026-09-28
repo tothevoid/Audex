@@ -1,22 +1,20 @@
-import React from 'react';
 import { Box, Flex, Icon, Skeleton, Stack, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { MdOutlineDevices } from 'react-icons/md';
 import { UserRefreshTokenEntity } from '../../../models/auth/UserRefreshTokenEntity';
 import { TokenItem } from './TokenItem';
-import { TokensTabType } from './TokensTabs';
 
 interface TokensListProps {
     tokens: UserRefreshTokenEntity[];
     loading: boolean;
-    activeTab: TokensTabType;
+    isOnlyActive: boolean;
     onRevokeSingle?: (id: string) => Promise<void>;
 }
 
 export const TokensList: React.FC<TokensListProps> = ({
     tokens,
     loading,
-    activeTab,
+    isOnlyActive,
     onRevokeSingle
 }) => {
     const { t } = useTranslation();
@@ -50,7 +48,7 @@ export const TokensList: React.FC<TokensListProps> = ({
                         <MdOutlineDevices />
                     </Icon>
                     <Text fontSize="sm">
-                        {activeTab === 'active'
+                        {isOnlyActive
                             ? t('tokens_empty_active')
                             : t('tokens_empty_inactive')}
                     </Text>
@@ -63,11 +61,11 @@ export const TokensList: React.FC<TokensListProps> = ({
                     pointerEvents={loading ? 'none' : 'auto'}
                     transition="opacity 0.18s ease-in-out"
                 >
-                    {tokens.map(token => (
+                    {tokens.map((token) => (
                         <TokenItem
                             key={token.id}
                             token={token}
-                            onRevoke={activeTab === 'active' ? onRevokeSingle : undefined}
+                            onRevoke={isOnlyActive ? onRevokeSingle : undefined}
                         />
                     ))}
                 </VStack>

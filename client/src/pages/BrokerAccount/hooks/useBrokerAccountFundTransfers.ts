@@ -1,70 +1,76 @@
 
-import { useCallback, useEffect, useState } from "react";
-import { createBrokerAccountFundsTransfer, deleteBrokerAccountFundsTransfer, getBrokerAccountFundsTransfers, updateBrokerAccountFundsTransfer } from "../../../api/brokers/brokerAccountFundsTransferApi";
+import { useMemo } from "react";
+import {
+    BrokerAccountFundsTransferQuery,
+    createBrokerAccountFundsTransfer,
+    deleteBrokerAccountFundsTransfer,
+    getPagedBrokerAccountFundsTransfers,
+    updateBrokerAccountFundsTransfer
+} from "../../../api/brokers/brokerAccountFundsTransferApi";
 import { BrokerAccountFundTransferEntity } from "../../../models/brokers/BrokerAccountFundTransfer";
 import { Nullable } from "../../../shared/utilities/nullable";
+import usePagedQuery from "../../../shared/hooks/usePagedQuery";
 
-export interface FundTransfersQuery {
-	pageIndex: number,
-	recordsQuantity: number,
-	brokerAccountId: Nullable<string>
+export interface UseBrokerAccountFundTransfersOptions {
+    brokerAccountId?: Nullable<string>;
+    initialPageSize?: number;
 }
 
-export const useBrokerAccountFundTransfers = (queryParameters: FundTransfersQuery) => {
+export const useBrokerAccountFundTransfers = (options: UseBrokerAccountFundTransfersOptions = {}) => {
+    const {
+        brokerAccountId,
+        initialPageSize = 10
+    } = options;
 
-    const [fundTransfers, setFundTransfers] = useState<BrokerAccountFundTransferEntity[]>([]);
-    const [isFundTransfersLoading, setLoading] = useState(false);
+    const filters = useMemo(() => ({
+        brokerAccountId
+    }), [brokerAccountId]);
 
-    const [error, setError] = useState<string | null>(null);
-    const [fundTransfersQueryParameters, setFundTransfersQueryParameters] = useState<FundTransfersQuery>(queryParameters);
-
-    const fetchData = useCallback(async () => {
-        setLoading(true)
-        try {
-            const transfers = await getBrokerAccountFundsTransfers(fundTransfersQueryParameters)
-            setFundTransfers(transfers);
-        } catch (err: any) {
-            setError(err.message || 'Ошибка загрузки данных')
-        } finally {
-            setLoading(false)
-        }
-    }, [fundTransfersQueryParameters])
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData])
+    const {
+        items: fundTransfers,
+        totalCount,
+        pageIndex,
+        pageSize,
+        isLoading: isFundTransfersLoading,
+        loadPage,
+        refreshPage,
+        reset
+    } = usePagedQuery<BrokerAccountFundTransferEntity, BrokerAccountFundsTransferQuery>({
+        fetchData: getPagedBrokerAccountFundsTransfers,
+        filters,
+        initialPageSize,
+        keySelector: (transfer) => transfer.id
+    });
 
     const createFundTransferEntity = async (createdFundTransfer: BrokerAccountFundTransferEntity) => {
         await createBrokerAccountFundsTransfer(createdFundTransfer);
-
-        await fetchData();
-    }
+        refreshPage();
+    };
 
     const updateFundTransferEntity = async (updatedFundTransfer: BrokerAccountFundTransferEntity) => {
         await updateBrokerAccountFundsTransfer(updatedFundTransfer);
-        
-        await fetchData();
-    }
+        refreshPage();
+    };
 
     const deleteFundTransferEntity = async (deletedFundTransfer: BrokerAccountFundTransferEntity) => {
         const fundTransferDeleted = await deleteBrokerAccountFundsTransfer(deletedFundTransfer.id);
         if (!fundTransferDeleted) {
             return;
         }
-
-        await fetchData();
-    }
+        refreshPage();
+    };
 
     return {
         fundTransfers,
+        totalCount,
+        pageIndex,
+        pageSize,
         isFundTransfersLoading,
-        error,
+        loadPage,
+        refreshPage,
+        reset,
         createFundTransferEntity,
         updateFundTransferEntity,
-        deleteFundTransferEntity,
-        refetch: fetchData,
-        reloadFundTransfers: fetchData,
-        fundTransfersQueryParameters,
-        setFundTransfersQueryParameters
-    }
-}
+        deleteFundTransferEntity
+    };
+};

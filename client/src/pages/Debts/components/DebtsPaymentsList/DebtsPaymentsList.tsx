@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect } from "react";
+import React, { Fragment } from "react";
 import { Box, Flex, Badge, Button } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { DebtPaymentEntity } from "../../../../models/debts/DebtPaymentEntity";
@@ -12,7 +12,6 @@ import AddButton from "../../../../shared/components/AddButton/AddButton";
 import SectionHeader from "../../../../shared/components/SectionHeader";
 import CollectionPagination from "../../../../shared/components/CollectionPagination/CollectionPagination";
 import PlaceholderWrapper from "../../../../shared/components/Placeholder/PlaceholderWrapper";
-import { getDebtPaymentsPagination } from "../../../../api/debts/debtPaymentApi";
 import { MdClose } from "react-icons/md";
 
 interface Props {
@@ -45,20 +44,19 @@ const DebtsPaymentsList: React.FC<Props> = ({
 
     const {
         debtPayments,
+        totalCount,
+        pageIndex,
+        pageSize,
+        loadPage,
         createDebtPaymentEntity,
         updateDebtPaymentEntity,
-        deleteDebtPaymentEntity,
-        setDebtPaymentsQueryParameters
-    } = useDebtPayments({ pageIndex: 1, recordsQuantity: -1, debtId: selectedDebtId || undefined, tagId: selectedTagId || undefined });
-
-    useEffect(() => {
-        setDebtPaymentsQueryParameters((prev) => ({
-            ...prev,
-            pageIndex: 1,
-            debtId: selectedDebtId || undefined,
-            tagId: selectedTagId || undefined
-        }));
-    }, [selectedDebtId, selectedTagId, setDebtPaymentsQueryParameters]);
+        deleteDebtPaymentEntity
+    } = useDebtPayments({
+        debtId: selectedDebtId,
+        tagId: selectedTagId,
+        initialPageSize: 10,
+        onDataChanged: onDebtPaymentsChanged
+    });
 
     const onDebtPaymentSaved = async (createdDebtPayment: DebtPaymentEntity) => {
         if (mode === ActiveEntityMode.Add) {
@@ -66,7 +64,6 @@ const DebtsPaymentsList: React.FC<Props> = ({
         } else if (mode === ActiveEntityMode.Edit) {
             await updateDebtPaymentEntity(createdDebtPayment);
         }
-        onDebtPaymentsChanged();
         onActionEnded();
     };
 
@@ -76,17 +73,8 @@ const DebtsPaymentsList: React.FC<Props> = ({
         }
 
         await deleteDebtPaymentEntity(activeEntity);
-        onDebtPaymentsChanged();
 		onActionEnded();
     };
-
-    const getPagination = useCallback(() => {
-        return getDebtPaymentsPagination(selectedDebtId || undefined, selectedTagId || undefined);
-    }, [selectedDebtId, selectedTagId]);
-
-    const onPageChanged = async (recordsQuantity: number, pageIndex: number) => {
-		setDebtPaymentsQueryParameters({ recordsQuantity, pageIndex, debtId: selectedDebtId || undefined, tagId: selectedTagId || undefined });
-	};
 
     return (
         <Fragment>
@@ -136,7 +124,12 @@ const DebtsPaymentsList: React.FC<Props> = ({
                 </Box>
             </PlaceholderWrapper>
 
-            <CollectionPagination key={`${selectedDebtId || "all"}-${selectedTagId || "all"}`} getPaginationConfig={getPagination} onPageChanged={onPageChanged} />
+            <CollectionPagination
+                count={totalCount}
+                page={pageIndex}
+                pageSize={pageSize}
+                onPageChange={loadPage}
+            />
 
             <ConfirmModal
                 onConfirmed={onDeleteConfirmed}

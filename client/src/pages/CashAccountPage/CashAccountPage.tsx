@@ -1,8 +1,15 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Stack } from "@chakra-ui/react";
 import { getAccountById } from "../../api/accounts/accountApi";
-import { createCurrencyTransaction, deleteCurrencyTransaction, getCurrencyAccountSummary, getCurrencyTransactionsByAccountId, getCurrencyTransactionsPagination, updateCurrencyTransaction } from "../../api/transactions/currencyTransactionApi";
+import {
+    createCurrencyTransaction,
+    CurrencyTransactionsQuery,
+    deleteCurrencyTransaction,
+    getCurrencyAccountSummary,
+    getPagedCurrencyTransactions,
+    updateCurrencyTransaction
+} from "../../api/transactions/currencyTransactionApi";
 import { CurrencyTransactionEntity } from "../../models/transactions/CurrencyTransactionEntity";
 import { useTranslation } from "react-i18next";
 import { getCurrenciesMap } from "../../api/currencies/currencyApi";
@@ -16,11 +23,7 @@ import Placeholder from "../../shared/components/Placeholder/Placeholder";
 import CashAccountHeader from "./components/CashAccountHeader";
 import { CurrencyTransactionsTable } from "./components/CurrencyTransactionsTable/CurrencyTransactionsTable";
 import CollectionPagination from "../../shared/components/CollectionPagination/CollectionPagination";
-import { PaginationConfig } from "../../shared/models/PaginationConfig";
-
-interface State {
-    currencyTransactions: CurrencyTransactionEntity[],
-}
+import usePagedQuery from "../../shared/hooks/usePagedQuery";
 
 const CashAccountPage: React.FC = () => {
     const { cashAccountId } = useParams();
@@ -28,16 +31,11 @@ const CashAccountPage: React.FC = () => {
 
     const { user } = useUserProfile();
 
-    const [state, setState] = useState<State>({ currencyTransactions: [] });
     const [currenciesMap, setCurrenciesMap] = useState<Record<string, number>>({});
     const [account, setAccount] = useState<AccountEntity | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isHeaderLoading, setIsHeaderLoading] = useState<boolean>(true);
     const [totalPnl, setTotalPnl] = useState<number>(0);
     const [transactionsCount, setTransactionsCount] = useState<number>(0);
-
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [pageSize, setPageSize] = useState<number>(10);
-    const [paginationVersion, setPaginationVersion] = useState<number>(0);
 
     const { 
         activeEntity,
@@ -50,41 +48,39 @@ const CashAccountPage: React.FC = () => {
         onActionEnded
     } = useEntityModal<CurrencyTransactionEntity>();
 
-    const getPaginationConfig = useCallback(async (): Promise<PaginationConfig | void> => {
-        if (!cashAccountId) return;
-        return await getCurrencyTransactionsPagination(cashAccountId);
-    }, [cashAccountId, paginationVersion]);
+    const filters = useMemo(() => ({
+        accountId: cashAccountId
+    }), [cashAccountId]);
 
-    const loadTransactions = async (page: number, size: number) => {
-        if (!cashAccountId) return;
-        const currencyTransactions = await getCurrencyTransactionsByAccountId(cashAccountId, page, size);
-        setState({ currencyTransactions });
-    };
+    const {
+        items: currencyTransactions,
+        totalCount,
+        pageIndex,
+        pageSize,
+        isLoading: isTransactionsLoading,
+        loadPage,
+        refreshPage
+    } = usePagedQuery<CurrencyTransactionEntity, CurrencyTransactionsQuery>({
+        fetchData: getPagedCurrencyTransactions,
+        filters,
+        keySelector: (transaction) => transaction.id
+    });
 
-    const handlePageChanged = (recordsQuantity: number, page: number) => {
-        const actualPage = page === 0 ? 1 : page;
-        setPageSize(recordsQuantity);
-        setCurrentPage(actualPage);
-        loadTransactions(actualPage, recordsQuantity);
-    };
-
-    const initData = async () => {
+    const loadAccountAndSummary = async () => {
         if (!cashAccountId) return;
-        setIsLoading(true);
+        setIsHeaderLoading(true);
         try {
-            const [accountData, currencyTransactions, map, summary] = await Promise.all([
+            const [accountData, map, summary] = await Promise.all([
                 getAccountById(cashAccountId),
-                getCurrencyTransactionsByAccountId(cashAccountId, currentPage, pageSize),
                 getCurrenciesMap(),
                 getCurrencyAccountSummary(cashAccountId)
             ]);
             setAccount(accountData);
             setCurrenciesMap(map);
-            setState({ currencyTransactions });
             setTotalPnl(summary?.totalPnl ?? 0);
             setTransactionsCount(summary?.transactionsCount ?? 0);
         } finally {
-            setIsLoading(false);
+            setIsHeaderLoading(false);
         }
     };
 
@@ -93,8 +89,7 @@ const CashAccountPage: React.FC = () => {
             return;
         }
         if (!cashAccountId) return;
-        setPaginationVersion(v => v + 1);
-        initData();
+        loadAccountAndSummary();
     }, [mode, cashAccountId]);
 
     const onCurrencyTransactionSaved = async (transaction: CurrencyTransactionEntity) => {
@@ -104,13 +99,17 @@ const CashAccountPage: React.FC = () => {
             await updateCurrencyTransaction(transaction);
         }
         onActionEnded();
+        refreshPage();
     };
 
     const onDeleteConfirmed = async () => {
         if (!activeEntity) return;
         await deleteCurrencyTransaction(activeEntity.id);
         onActionEnded();
+        refreshPage();
     };
+
+    const isLoading = isHeaderLoading || isTransactionsLoading;
 
     return (
         <Stack pb={6} gap={4}>
@@ -122,21 +121,22 @@ const CashAccountPage: React.FC = () => {
                 onAddClicked={onAddClicked}
             />
 
-            {!isLoading && state.currencyTransactions.length === 0 ? (
+            {!isLoading && currencyTransactions.length === 0 ? (
                 <Placeholder text={t("currency_transactions_no_transactions")} />
             ) : (
                 <>
                     <CurrencyTransactionsTable
-                        transactions={state.currencyTransactions}
+                        transactions={currencyTransactions}
                         currenciesMap={currenciesMap}
                         user={user}
                         onEdit={onEditClicked}
                         onDelete={onDeleteClicked}
                     />
                     <CollectionPagination
-                        key={`${cashAccountId}-${paginationVersion}`}
-                        getPaginationConfig={getPaginationConfig}
-                        onPageChanged={handlePageChanged}
+                        count={totalCount}
+                        page={pageIndex}
+                        pageSize={pageSize}
+                        onPageChange={loadPage}
                     />
                 </>
             )}

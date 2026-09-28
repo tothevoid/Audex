@@ -1,78 +1,89 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { DebtPaymentEntity } from "../../../models/debts/DebtPaymentEntity";
-import { createDebtPayment, deleteDebtPayment, getDebtPayments, updateDebtPayment } from "../../../api/debts/debtPaymentApi";
+import {
+    createDebtPayment,
+    DebtPaymentsQuery,
+    deleteDebtPayment,
+    getPagedDebtPayments,
+    updateDebtPayment
+} from "../../../api/debts/debtPaymentApi";
+import { Nullable } from "../../../shared/utilities/nullable";
+import usePagedQuery from "../../../shared/hooks/usePagedQuery";
 
-export interface DebtPaymentsQuery {
-	pageIndex: number,
-	recordsQuantity: number,
-	debtId?: string,
-	tagId?: string
+export interface UseDebtPaymentsOptions {
+    debtId?: Nullable<string>;
+    tagId?: Nullable<string>;
+    initialPageSize?: number;
+    onDataChanged: () => void;
 }
 
-export const useDebtPayments = (queryParameters: DebtPaymentsQuery) => {
-	const [debtPayments, setDebtPayments] = useState<DebtPaymentEntity[]>([]);
-	const [isDebtPaymentsLoading, setLoading] = useState(false);
+export const useDebtPayments = (options: UseDebtPaymentsOptions) => {
+    const {
+        debtId,
+        tagId,
+        initialPageSize = 10,
+        onDataChanged
+    } = options;
 
-	const [debtPaymentsQueryParameters, setDebtPaymentsQueryParameters] = useState<DebtPaymentsQuery>(queryParameters);
-	const [error, setError] = useState<string | null>(null);
+    const filters = useMemo(() => ({
+        debtId: debtId || undefined,
+        tagId: tagId || undefined
+    }), [debtId, tagId]);
 
-	const fetchData = useCallback(async () => {
-		setLoading(true)
-		try {
-			const debts = await getDebtPayments(debtPaymentsQueryParameters);
-			setDebtPayments(debts);
-		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных')
-		} finally {
-			setLoading(false)
-		}
-	}, [debtPaymentsQueryParameters])
+    const {
+        items: debtPayments,
+        totalCount,
+        pageIndex,
+        pageSize,
+        isLoading: isDebtPaymentsLoading,
+        loadPage,
+        refreshPage,
+        reset
+    } = usePagedQuery<DebtPaymentEntity, DebtPaymentsQuery>({
+        fetchData: getPagedDebtPayments,
+        filters,
+        initialPageSize,
+        keySelector: (payment) => payment.id
+    });
 
-	useEffect(() => {
-		fetchData();
-	}, [fetchData])
+    const createDebtPaymentEntity = async (createdDebtPayment: DebtPaymentEntity) => {
+        const added = await createDebtPayment(createdDebtPayment);
+        if (!added) {
+            return;
+        }
+        refreshPage();
+        onDataChanged();
+    };
 
-	const createDebtPaymentEntity = async (createdDebtPayment: DebtPaymentEntity) => {
-		const debtPayment = await createDebtPayment(createdDebtPayment);
-		if (!debtPayment) {
-			return;
-		}
+    const updateDebtPaymentEntity = async (updatedDebtPayment: DebtPaymentEntity) => {
+        const updated = await updateDebtPayment(updatedDebtPayment);
+        if (!updated) {
+            return;
+        }
+        refreshPage();
+        onDataChanged();
+    };
 
-		await fetchData();
-	}
+    const deleteDebtPaymentEntity = async (deletedDebt: DebtPaymentEntity) => {
+        const deleted = await deleteDebtPayment(deletedDebt.id);
+        if (!deleted) {
+            return;
+        }
+        refreshPage();
+        onDataChanged();
+    };
 
-	const updateDebtPaymentEntity = async (updatedDebtPayment: DebtPaymentEntity) => {
-		const debtPaymentUpdated = await updateDebtPayment(updatedDebtPayment);
-	
-		if (!debtPaymentUpdated) {
-			return;
-		}
-
-		await fetchData();
-	}
-
-	const deleteDebtPaymentEntity = async (deletedDebt: DebtPaymentEntity) => {
-		const deleted = await deleteDebtPayment(deletedDebt.id);
-
-		if (!deleted) {
-			return;
-		}
-
-		const updatedDebtsPayments = debtPayments
-			.filter(debtPayment => debtPayment.id !== deletedDebt.id);
-
-		setDebtPayments(updatedDebtsPayments);
-	}
-
-	return {
-		debtPayments,
-		isDebtPaymentsLoading,
-		error,
-		createDebtPaymentEntity,
-		updateDebtPaymentEntity,
-		deleteDebtPaymentEntity,
-		refetch: fetchData,
-		debtPaymentsQueryParameters,
-		setDebtPaymentsQueryParameters
-	}
-}
+    return {
+        debtPayments,
+        totalCount,
+        pageIndex,
+        pageSize,
+        isDebtPaymentsLoading,
+        loadPage,
+        refreshPage,
+        reset,
+        createDebtPaymentEntity,
+        updateDebtPaymentEntity,
+        deleteDebtPaymentEntity
+    };
+};

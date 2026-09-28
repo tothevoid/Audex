@@ -1,26 +1,20 @@
-import { PaginationConfig } from '../../shared/models/PaginationConfig';
 import { UserRefreshTokenEntity } from '../../models/auth/UserRefreshTokenEntity';
-import { getAllEntities, getEntity } from '../basicApi';
+import { BasePageable } from '../../shared/models/BasePageable';
+import { PagedResult } from '../../shared/models/PagedResult';
+import { getPagedEntities } from '../basicApi';
 import httpClient from '../httpClient';
 import { logPromiseError } from '../../shared/utilities/webApiUtilities';
 
 const basicUrl = 'Auth';
 
-export const getRefreshTokens = async (
-    isActive: boolean = true,
-    pageIndex: number = 1,
-    recordsQuantity: number = 10
-): Promise<UserRefreshTokenEntity[]> => {
-    const url = `${basicUrl}/RefreshTokens?isActive=${isActive}&pageIndex=${pageIndex}&recordsQuantity=${recordsQuantity}`;
-    const result = await getAllEntities<UserRefreshTokenEntity>(url);
-    return result ?? [];
-};
+export interface RefreshTokensQuery extends BasePageable {
+    isOnlyActive: boolean;
+}
 
-export const getRefreshTokensPagination = async (
-    isActive: boolean = true
-): Promise<PaginationConfig | void> => {
-    const url = `${basicUrl}/RefreshTokens/Pagination?isActive=${isActive}`;
-    return await getEntity<PaginationConfig>(url);
+export const getPagedRefreshTokens = async (
+    query: RefreshTokensQuery
+): Promise<PagedResult<UserRefreshTokenEntity>> => {
+    return await getPagedEntities<RefreshTokensQuery, UserRefreshTokenEntity>(`${basicUrl}/RefreshTokens`, query);
 };
 
 export const revokeToken = async (id: string): Promise<boolean> => {

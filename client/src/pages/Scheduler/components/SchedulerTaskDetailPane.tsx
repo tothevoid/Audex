@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     Badge,
     Box,
@@ -22,12 +22,14 @@ import {
     MdSettings
 } from 'react-icons/md';
 import { ScheduledTaskEntity, ScheduledTaskExecutionStatus } from '../../../models/scheduler/ScheduledTaskEntity';
-import { ScheduledTaskJournalEntity } from '../../../models/scheduler/ScheduledTaskJournalEntity';
+import { GetJournalQueryRequest, ScheduledTaskJournalEntity } from '../../../models/scheduler/ScheduledTaskJournalEntity';
 import { deleteScheduledTask, runTaskNow } from '../../../api/scheduler/schedulerTaskApi';
-import { getScheduledTaskJournal } from '../../../api/scheduler/schedulerJournalApi';
+import { getPagedScheduledTaskJournal } from '../../../api/scheduler/schedulerJournalApi';
 import { formatCronExpression, formatDuration, getStatusBadgeProps } from '../schedulerUtils';
 import { SchedulerJournalTable } from './SchedulerJournalTable';
 import { useSchedulerEvents } from '../../../shared/hooks/useSchedulerEvents';
+import usePagedQuery from '../../../shared/hooks/usePagedQuery';
+import CollectionPagination from '../../../shared/components/CollectionPagination/CollectionPagination';
 
 interface SchedulerTaskDetailPaneProps {
     task: ScheduledTaskEntity | null;
@@ -41,45 +43,37 @@ export const SchedulerTaskDetailPane: React.FC<SchedulerTaskDetailPaneProps> = (
     onTaskUpdated
 }) => {
     const { t, i18n } = useTranslation();
-    const [history, setHistory] = useState<ScheduledTaskJournalEntity[]>([]);
-    const [isLoadingHistory, setIsLoadingHistory] = useState<boolean>(false);
     const [isRunning, setIsRunning] = useState<boolean>(false);
     const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [selectedStatusFilter, setSelectedStatusFilter] = useState<string>('All');
 
     const taskName = task?.taskName;
 
-    const loadHistory = useCallback(async (status: string = selectedStatusFilter, showLoading: boolean = true) => {
-        if (!taskName) return;
-        if (showLoading) {
-            setIsLoadingHistory(true);
-        }
-        try {
-            const statusEnum = status !== 'All' ? (Number(status) as ScheduledTaskExecutionStatus) : undefined;
-            const data = await getScheduledTaskJournal({
-                pageIndex: 1,
-                recordsQuantity: 15,
-                taskName: taskName,
-                status: statusEnum
-            });
-            setHistory(data);
-        } finally {
-            if (showLoading) {
-                setIsLoadingHistory(false);
-            }
-        }
-    }, [taskName, selectedStatusFilter]);
+    const journalFilters = useMemo(() => ({
+        taskName: taskName,
+        status: selectedStatusFilter !== 'All' ? (Number(selectedStatusFilter) as ScheduledTaskExecutionStatus) : undefined
+    }), [taskName, selectedStatusFilter]);
 
-    useEffect(() => {
-        if (taskName) {
-            loadHistory(selectedStatusFilter, true);
-        }
-    }, [taskName, selectedStatusFilter, loadHistory]);
+    const {
+        items: history,
+        totalCount,
+        pageIndex: currentPage,
+        pageSize,
+        isLoading: isLoadingHistory,
+        loadPage,
+        refreshPage: reloadHistory
+    } = usePagedQuery<ScheduledTaskJournalEntity, GetJournalQueryRequest>({
+        fetchData: getPagedScheduledTaskJournal,
+        filters: journalFilters,
+        initialPageSize: 15,
+        autoLoad: Boolean(taskName),
+        keySelector: (entry) => entry.id
+    });
 
     useSchedulerEvents({
         onTaskExecutionRecorded: (payload) => {
             if (taskName && payload.taskName === taskName) {
-                loadHistory(selectedStatusFilter, false);
+                reloadHistory();
             }
         }
     });
@@ -90,7 +84,7 @@ export const SchedulerTaskDetailPane: React.FC<SchedulerTaskDetailPaneProps> = (
         try {
             await runTaskNow(task.taskName);
             onTaskUpdated();
-            await loadHistory(selectedStatusFilter);
+            await reloadHistory();
         } finally {
             setIsRunning(false);
         }
@@ -277,11 +271,15 @@ export const SchedulerTaskDetailPane: React.FC<SchedulerTaskDetailPaneProps> = (
                 selectedStatus={selectedStatusFilter}
                 hideTaskFilter
                 hideTaskColumn
-                onStatusFilterChange={(val) => {
-                    setSelectedStatusFilter(val);
-                    loadHistory(val);
-                }}
-                onRefresh={() => loadHistory(selectedStatusFilter)}
+                onStatusFilterChange={setSelectedStatusFilter}
+                onRefresh={reloadHistory}
+            />
+
+            <CollectionPagination
+                count={totalCount}
+                page={currentPage}
+                pageSize={pageSize}
+                onPageChange={loadPage}
             />
         </VStack>
     );

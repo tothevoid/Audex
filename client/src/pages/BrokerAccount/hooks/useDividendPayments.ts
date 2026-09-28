@@ -1,70 +1,80 @@
-import { useCallback, useEffect, useState } from "react";
-import { createDividendPayment, deleteDividendPayment, getDividendPaymentsByBrokerAccount, updateDividendPayment } from "../../../api/brokers/dividendPaymentApi";
+import { useMemo } from "react";
+import {
+    createDividendPayment,
+    deleteDividendPayment,
+    DividendPaymentsQuery,
+    getPagedDividendPayments,
+    updateDividendPayment
+} from "../../../api/brokers/dividendPaymentApi";
 import { DividendPaymentEntity } from "../../../models/brokers/DividendPaymentEntity";
 import { Nullable } from "../../../shared/utilities/nullable";
+import usePagedQuery from "../../../shared/hooks/usePagedQuery";
 
-export interface DividendPaymentsQuery {
-	pageIndex: number,
-	recordsQuantity: number,
-	brokerAccountId: Nullable<string>
+export interface UseDividendPaymentsOptions {
+    brokerAccountId?: Nullable<string>;
+    initialPageSize?: number;
+    onDataChanged: () => void;
 }
 
-export const useDividendPayments = (queryParameters: DividendPaymentsQuery, onDataChanged: () => void) => {
-	const [dividendPayments, setDividendPayments] = useState<DividendPaymentEntity[]>([]);
-	const [isSecurityTransactionsLoading, setLoading] = useState(false);
+export const useDividendPayments = (options: UseDividendPaymentsOptions) => {
+    const {
+        brokerAccountId,
+        initialPageSize = 10,
+        onDataChanged
+    } = options;
 
-	const [error, setError] = useState<string | null>(null);
-	const [dividendPaymentsQueryParameters, setDividendPaymentsQueryParameters] = useState<DividendPaymentsQuery>(queryParameters);
+    const filters = useMemo(() => ({
+        brokerAccountId
+    }), [brokerAccountId]);
 
-	const fetchData = useCallback(async () => {
-		setLoading(true)
-		try {
-			const payments = await getDividendPaymentsByBrokerAccount(dividendPaymentsQueryParameters)
-			setDividendPayments(payments);
-		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных')
-		} finally {
-			setLoading(false)
-		}
-	}, [dividendPaymentsQueryParameters])
+    const {
+        items: dividendPayments,
+        totalCount,
+        pageIndex,
+        pageSize,
+        isLoading: isSecurityTransactionsLoading,
+        loadPage,
+        refreshPage,
+        reset
+    } = usePagedQuery<DividendPaymentEntity, DividendPaymentsQuery>({
+        fetchData: getPagedDividendPayments,
+        filters,
+        initialPageSize,
+        keySelector: (payment) => payment.id
+    });
 
-	useEffect(() => {
-		fetchData();
-	}, [fetchData])
+    const createDividendPaymentEntity = async (createdDividendPayment: DividendPaymentEntity) => {
+        await createDividendPayment(createdDividendPayment);
+        refreshPage();
+        onDataChanged();
+    };
 
-	const createDividendPaymentEntity = async (createdDividendPayment: DividendPaymentEntity) => {
-		await createDividendPayment(createdDividendPayment);
+    const updateDividendPaymentEntity = async (updatedDividendPayment: DividendPaymentEntity) => {
+        await updateDividendPayment(updatedDividendPayment);
+        refreshPage();
+        onDataChanged();
+    };
 
-		await fetchData();
-		onDataChanged();
-	}
+    const deleteDividendPaymentEntity = async (deletedDividendPayment: DividendPaymentEntity) => {
+        const securityTransactionDeleted = await deleteDividendPayment(deletedDividendPayment.id);
+        if (!securityTransactionDeleted) {
+            return;
+        }
+        refreshPage();
+        onDataChanged();
+    };
 
-	const updateDividendPaymentEntity = async (updatedDividendPayment: DividendPaymentEntity) => {
-		await updateDividendPayment(updatedDividendPayment);
-		
-		await fetchData();
-		onDataChanged();
-	}
-
-	const deleteDividendPaymentEntity = async (deletedDividendPayment: DividendPaymentEntity) => {
-		const securityTransactionDeleted = await deleteDividendPayment(deletedDividendPayment.id);
-		if (!securityTransactionDeleted) {
-			return;
-		}
-
-		await fetchData();
-		onDataChanged();
-	}
-
-	return {
-		dividendPayments,
-		isSecurityTransactionsLoading,
-		error,
-		createDividendPaymentEntity,
-		updateDividendPaymentEntity,
-		deleteDividendPaymentEntity,
-		reloadDividendPayments: fetchData,
-		dividendPaymentsQueryParameters,
-		setDividendPaymentsQueryParameters
-	}
-}
+    return {
+        dividendPayments,
+        totalCount,
+        pageIndex,
+        pageSize,
+        isSecurityTransactionsLoading,
+        loadPage,
+        refreshPage,
+        reset,
+        createDividendPaymentEntity,
+        updateDividendPaymentEntity,
+        deleteDividendPaymentEntity
+    };
+};
