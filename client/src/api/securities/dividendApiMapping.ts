@@ -10,7 +10,7 @@ export const prepareDividendRequest = (dividend: DividendEntity): DividendEntity
         securityId: dividend.security.id,
         amount: dividend.amount
     };
-}
+};
 
 export const prepareDividend = (dividend: DividendEntityResponse): DividendEntity => {
     return {
@@ -20,4 +20,4 @@ export const prepareDividend = (dividend: DividendEntityResponse): DividendEntit
         declarationDate: new Date(dividend.declarationDate),
         snapshotDate: new Date(dividend.snapshotDate)
     };
-}
+};

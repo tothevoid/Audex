@@ -1,4 +1,4 @@
-import React, { RefObject, useState } from 'react'
+import React, { RefObject, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseFormModal from '@/shared/modals/BaseFormModal/BaseFormModal';
 import { BaseModalRef } from '@/shared/utilities/modalUtilities';
@@ -23,17 +23,17 @@ const TransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
 
     const [state, setState] = useState<State>({});
 
-    const setSubmitHandler: SetSubmitHandler = async <T extends FieldValues>(submit: UseFormHandleSubmit<T>, handler: (data: T) => Promise<void>) => {
+    const setSubmitHandler: SetSubmitHandler = <T extends FieldValues>(submit: UseFormHandleSubmit<T>, handler: (data: T) => Promise<void>) => {
         const wrappedHandler = async (data: T) => {
             await handler(data);
             props.modalRef?.current?.closeModal();
-        }
+        };
 
 
         setState((currentState) => {
-            return {...currentState, formHandler: submit(wrappedHandler)}
-        })
-    }
+            return {...currentState, formHandler: submit(wrappedHandler)};
+        });
+    };
 
     const onSubmit = (event: React.FormEvent) => {
         if (!state.formHandler) {
@@ -41,11 +41,11 @@ const TransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
         }
 
         state.formHandler(event);
-    }
+    };
 
     return <BaseFormModal ref={props.modalRef} title={t("entity_transaction_name_form_title")} submitHandler={onSubmit}>
         <TransactionForm transaction={props.transaction} setSubmitHandler={setSubmitHandler} onTransactionSaved={props.onSaved} />
-    </BaseFormModal>
-}
+    </BaseFormModal>;
+};
 
 export default TransactionModal;

@@ -1,5 +1,5 @@
-import { Field, Input} from "@chakra-ui/react"
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react"
+import { Field, Input} from "@chakra-ui/react";
+import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -23,12 +23,12 @@ interface State {
 }
 
 const CryptoAccountModal: React.FC<ModalProps> = (props: ModalProps) => {
-    const [state, setState] = useState<State>({cryptoProviders: []})
+    const [state, setState] = useState<State>({cryptoProviders: []});
 
     useEffect(() => {
         const initData = async () => {
             await requestData();
-        }
+        };
         initData();
     }, []);
 
@@ -36,8 +36,8 @@ const CryptoAccountModal: React.FC<ModalProps> = (props: ModalProps) => {
         const cryptoProviders = await getCryptoProviders();
 
         setState((currentState) => {
-            return {...currentState, cryptoProviders }
-        })
+            return {...currentState, cryptoProviders };
+        });
     };
 
     const getFormDefaultValues = useCallback(() => {
@@ -45,7 +45,7 @@ const CryptoAccountModal: React.FC<ModalProps> = (props: ModalProps) => {
             id: props.cryptoAccount?.id ?? generateGuid(),
             name: props.cryptoAccount?.name ?? "",
             cryptoProvider: props.cryptoAccount?.cryptoProvider
-        }
+        };
     }, [props.cryptoAccount]);
 
     const { t } = useTranslation();
@@ -80,7 +80,7 @@ const CryptoAccountModal: React.FC<ModalProps> = (props: ModalProps) => {
                 valueSelector={(cryptoProvider => cryptoProvider.id)}/>
             <Field.ErrorText>{errors.cryptoProvider?.message}</Field.ErrorText>
         </Field.Root>
-    </BaseFormModal>
-}
+    </BaseFormModal>;
+};
 
 export default CryptoAccountModal;

@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, Input } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getTransactionValidationSchema, TransactionFormInput } from './TransactionValidationSchema';
@@ -65,7 +65,7 @@ const TransactionForm: React.FC<ModalProps> = (props: ModalProps) => {
 			cashback: props.transaction?.cashback ?? 0,
 			isSystem: props.transaction?.isSystem ?? false,
 			transactionType: props.transaction?.transactionType
-		}
+		};
 	}, [props.transaction]);
 
 	const validationSchema = useMemo(() => getTransactionValidationSchema(t), [t]);
@@ -77,7 +77,7 @@ const TransactionForm: React.FC<ModalProps> = (props: ModalProps) => {
 	});
 
 	useEffect(() => {
-		reset(getDefaultTransactionFormValues())
+		reset(getDefaultTransactionFormValues());
 	}, [props.transaction, reset, getDefaultTransactionFormValues]);
 
 	const initCollections = async () => {
@@ -85,8 +85,8 @@ const TransactionForm: React.FC<ModalProps> = (props: ModalProps) => {
 		const accounts = await getAccounts({ onlyActive: true });
 
 		setState((currentState) => {
-			return {...currentState, transactionTypes, accounts}
-		})
+			return {...currentState, transactionTypes, accounts};
+		});
 	};
 
 	const onTransactionSaveClick = async (transaction: TransactionFormInput) => {
@@ -103,7 +103,7 @@ const TransactionForm: React.FC<ModalProps> = (props: ModalProps) => {
 			date: transaction.date,
 			cashback: transaction.cashback,
 			transactionType: state.transactionTypes.find(transactionType => transactionType.id === transaction.transactionType.id)!,
-		}
+		};
 
 		await props.onTransactionSaved(transactionEntity);
 	};
@@ -111,7 +111,7 @@ const TransactionForm: React.FC<ModalProps> = (props: ModalProps) => {
 	useEffect(() => {
 		const initData = async () => {
 			await initCollections();
-		}
+		};
 
 		initData();
 	}, []);
@@ -171,7 +171,7 @@ const TransactionForm: React.FC<ModalProps> = (props: ModalProps) => {
 				valueSelector={(transactionType => transactionType.id)}/>
 			<Field.ErrorText>{errors.transactionType?.message}</Field.ErrorText>
 		</Field.Root>
-	</Fragment>
-}
+	</Fragment>;
+};
 
 export default TransactionForm;

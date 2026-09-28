@@ -121,7 +121,7 @@ const CryptoProvidersTable: React.FC = () => {
 			message={t("modals_delete_message")}
 			confirmActionName={t("modals_delete_button")}
 			ref={confirmModalRef}/>
-	</Box>
-}
+	</Box>;
+};
 
 export default CryptoProvidersTable;

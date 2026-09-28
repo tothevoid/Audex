@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useEffect, useMemo, useState } from 'react'
+import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, Input, Flex} from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form";
@@ -33,22 +33,22 @@ const DepositModal: React.FC<ModalProps> = (props: ModalProps) => {
 	const initCurrencies = async () => {
 		const currencies = await getCurrencies();
 		setState((currentState) => {
-			return {...currentState, currencies}
-		})
+			return {...currentState, currencies};
+		});
 	};
 
 	const initBanks = async () => {
 		const banks = await getBanks();
 		setState((currentState) => {
-			return {...currentState, banks}
-		})
+			return {...currentState, banks};
+		});
 	};
 	
 	useEffect(() => {
 		const initData = async () => {
 			await initCurrencies();
 			await initBanks();
-		}
+		};
 		initData();
 	}, []);
 
@@ -63,8 +63,8 @@ const DepositModal: React.FC<ModalProps> = (props: ModalProps) => {
 			initialAmount: props.deposit?.initialAmount ?? 0,
 			estimatedEarn: props.deposit?.estimatedEarn ?? 0,
 			currency: props.deposit?.currency,
-		}
-	}, [props.deposit])
+		};
+	}, [props.deposit]);
 
 	const { t } = useTranslation();
 	const validationSchema = useMemo(() => getDepositValidationSchema(t), [t]);
@@ -76,8 +76,8 @@ const DepositModal: React.FC<ModalProps> = (props: ModalProps) => {
 	});
 
 	useEffect(() => {
-		reset(getDefaultFormState())
-	}, [reset, getDefaultFormState, props.deposit])
+		reset(getDefaultFormState());
+	}, [reset, getDefaultFormState, props.deposit]);
 
 	const selectedCurrencyForm = watch("currency");
 	const depositCurrency = state.currencies.find(c => c.id === selectedCurrencyForm?.id)?.name ?? '';
@@ -85,7 +85,7 @@ const DepositModal: React.FC<ModalProps> = (props: ModalProps) => {
 	const onSubmit = async (deposit: DepositFormInput) => {
 		await props.onSaved(deposit as DepositEntity);
 		props.modalRef?.current?.closeModal();
-	}
+	};
 
 	return <BaseFormModal ref={props.modalRef} title={t("entity_deposit_name_form_title")} submitHandler={handleSubmit(onSubmit)}>
 		<Field.Root invalid={!!errors.name}>
@@ -137,7 +137,7 @@ const DepositModal: React.FC<ModalProps> = (props: ModalProps) => {
 				<Field.ErrorText>{errors.to?.message}</Field.ErrorText>
 			</Field.Root>
 		</Flex>
-	</BaseFormModal>	
-}
+	</BaseFormModal>;	
+};
 
 export default DepositModal;

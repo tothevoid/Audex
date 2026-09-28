@@ -1,4 +1,4 @@
-import React, { RefObject, useEffect, useState } from 'react'
+import React, { RefObject, useEffect, useState } from 'react';
 import { Tabs } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
@@ -13,7 +13,7 @@ import { MdCurrencyExchange } from 'react-icons/md';
 import { GrTransaction } from 'react-icons/gr';
 import { FieldValues, UseFormHandleSubmit } from 'react-hook-form';
 
-export type SetSubmitHandler = <T extends FieldValues>(submit: UseFormHandleSubmit<T>, handler: (data: T) => Promise<void>) => Promise<void>;
+export type SetSubmitHandler = <T extends FieldValues>(submit: UseFormHandleSubmit<T>, handler: (data: T) => Promise<void>) => void;
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>
@@ -38,7 +38,7 @@ const NewTransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
         });
     };
 
-    const setSubmitHandler: SetSubmitHandler = async <T extends FieldValues>(submit: UseFormHandleSubmit<T>, handler: (data: T) => Promise<void>) => {
+    const setSubmitHandler: SetSubmitHandler = <T extends FieldValues>(submit: UseFormHandleSubmit<T>, handler: (data: T) => Promise<void>) => {
         const wrappedHandler = async (data: T) => {
             await handler(data);
             props.modalRef?.current?.closeModal();

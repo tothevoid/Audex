@@ -12,7 +12,7 @@ export const prepareDividendPaymentRequest = (dividendPayment: DividendPaymentEn
         tax: dividendPayment.tax,
         receivedAt: convertToDateOnly(dividendPayment.receivedAt) 
     };
-}
+};
 
 export const prepareDividendPayment = (dividendPayment: DividendPaymentEntityResponse): DividendPaymentEntity => {
     return {
@@ -22,5 +22,5 @@ export const prepareDividendPayment = (dividendPayment: DividendPaymentEntityRes
         tax: dividendPayment.tax,
         brokerAccount: prepareBrokerAccount(dividendPayment.brokerAccount),
         receivedAt: new Date(dividendPayment.receivedAt)
-    }
-}
+    };
+};

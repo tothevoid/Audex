@@ -10,7 +10,7 @@ export interface NotificationEventsHandlers {
 }
 
 export const useNotificationEvents = (handlers: NotificationEventsHandlers) => {
-    const handleSignalRMessage = useCallback(async (rawMessage: string) => {
+    const handleSignalRMessage = useCallback((rawMessage: string) => {
         try {
             const data = typeof rawMessage === "string" ? JSON.parse(rawMessage) : rawMessage;
             if (data?.type === "NotificationReceived" && data.payload) {

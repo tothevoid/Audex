@@ -1,6 +1,6 @@
-import { BankEntity } from "@/models/banks/BankEntity"
-import { CurrencyEntity } from "@/models/currencies/CurrencyEntity"
-import { AccountTypeEntity } from "./AccountTypeEntity"
+import { BankEntity } from "@/models/banks/BankEntity";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
+import { AccountTypeEntity } from "./AccountTypeEntity";
 
 interface CommonAccount {
     id: string,

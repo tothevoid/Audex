@@ -6,7 +6,7 @@ export const prepareCryptoAccountEntityRequest = (cryptoAccount: CryptoAccountEn
         name: cryptoAccount.name,
         cryptoProviderId: cryptoAccount.cryptoProvider.id
     };
-}
+};
 
 export const prepareCryptoAccount = (cryptoAccount: CryptoAccountEntityResponse): CryptoAccountEntity => {
     return {
@@ -14,4 +14,4 @@ export const prepareCryptoAccount = (cryptoAccount: CryptoAccountEntityResponse)
         name: cryptoAccount.name,
         cryptoProvider: cryptoAccount.cryptoProvider
     };
-}
+};

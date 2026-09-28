@@ -1,6 +1,6 @@
-import { CurrencyTransactionEntityResponse, CurrencyTransactionEntity, CurrencyTransactionEntityRequest } from "@/models/transactions/CurrencyTransactionEntity"
-import { convertToDateOnly } from "@/shared/utilities/dateUtils"
-import { prepareAccount } from "@/api/accounts/accountApiMapping"
+import { CurrencyTransactionEntityResponse, CurrencyTransactionEntity, CurrencyTransactionEntityRequest } from "@/models/transactions/CurrencyTransactionEntity";
+import { convertToDateOnly } from "@/shared/utilities/dateUtils";
+import { prepareAccount } from "@/api/accounts/accountApiMapping";
 
 export const prepareCurrencyTransactionRequest = (currencyTransaction: CurrencyTransactionEntity): CurrencyTransactionEntityRequest => {
 	return {
@@ -11,8 +11,8 @@ export const prepareCurrencyTransactionRequest = (currencyTransaction: CurrencyT
 		sourceAccountId: currencyTransaction.sourceAccount.id,
 		date: convertToDateOnly(currencyTransaction.date),
 		name: currencyTransaction.name
-	}
-}
+	};
+};
 
 export const prepareCurrencyTransaction = (currencyTransaction: CurrencyTransactionEntityResponse): CurrencyTransactionEntity => {
 	return {
@@ -23,5 +23,5 @@ export const prepareCurrencyTransaction = (currencyTransaction: CurrencyTransact
 		sourceAccount: prepareAccount(currencyTransaction.sourceAccount),
 		date: new Date(currencyTransaction.date),
 		name: currencyTransaction.name
-	}
-}
+	};
+};

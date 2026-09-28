@@ -16,7 +16,7 @@ export const useCryptoAccountCryptocurrencies = (queryParameters: CryptoAccountC
         useState<CryptoAccountCryptocurrenciesQuery>(queryParameters);
 
     const fetchData = useCallback(async () => {
-        setLoading(true)
+        setLoading(true);
         try {
             const [cryptocurrencies, balance] = await Promise.all([
                 getCryptocurrenciesByCryptoAccount(cryptoAccountCryptocurrenciesQueryParameters.cryptoAccountId),
@@ -25,30 +25,30 @@ export const useCryptoAccountCryptocurrencies = (queryParameters: CryptoAccountC
             setCryptoAccountCryptocurrencies(cryptocurrencies);
             setTotalBalanceUsd(balance);
         } catch (err: any) {
-            setError(err.message || 'Ошибка загрузки данных')
+            setError(err.message || 'Ошибка загрузки данных');
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }, [cryptoAccountCryptocurrenciesQueryParameters])
+    }, [cryptoAccountCryptocurrenciesQueryParameters]);
 
     useEffect(() => {
         fetchData();
-    }, [fetchData])
+    }, [fetchData]);
 
     const addCryptoAccountCryptocurrencyEntity = async (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => {
         await createCryptoAccountCryptocurrency(cryptoAccountCryptocurrency);
         await fetchData();
-    }
+    };
 
     const updateCryptoAccountCryptocurrencyEntity = async (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => {
         await updateCryptoAccountCryptocurrency(cryptoAccountCryptocurrency);
         await fetchData();
-    }
+    };
 
     const deleteCryptoAccountCryptocurrencyEntity = async (id: string) => {
         await deleteCryptoAccountCryptocurrency(id);
         await fetchData();
-    }
+    };
 
     return {
         cryptoAccountCryptocurrencies,
@@ -61,5 +61,5 @@ export const useCryptoAccountCryptocurrencies = (queryParameters: CryptoAccountC
         setCryptoAccountCryptocurrenciesQueryParameters,
         cryptoAccountCryptocurrenciesQueryParameters,
         reloadCryptoAccountCryptocurrencies: fetchData
-    }
-}
+    };
+};

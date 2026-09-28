@@ -17,7 +17,7 @@ export const prepareAccountRequest = (account: AccountEntity): AccountEntityRequ
 		currencyId,
 		bankId
 	};
-}
+};
 
 export const prepareAccount = (account: AccountEntityResponse): AccountEntity => {
 	return {
@@ -30,4 +30,4 @@ export const prepareAccount = (account: AccountEntityResponse): AccountEntity =>
 		createdOn: new Date(account.createdOn),
 		bank: account.bank
 	};
-}
+};

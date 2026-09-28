@@ -31,7 +31,7 @@ const CurrencyTransactionForm: React.FC<Props> = (props: Props) => {
         const initialAmount = props.currencyTransaction?.amount ?? 0;
         const initialRate = props.currencyTransaction?.rate ?? 0;
 
-        let defaultSource = props.currencyTransaction?.sourceAccount;
+        const defaultSource = props.currencyTransaction?.sourceAccount;
         let defaultDest = props.currencyTransaction?.destinationAccount;
 
         if (props.currentAccount && !props.currencyTransaction) {

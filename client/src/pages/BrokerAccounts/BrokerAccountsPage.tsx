@@ -32,15 +32,15 @@ const BrokerAccountsPage: React.FC = () => {
     
     const fetchBrokerAccountsSummary = useCallback(async () => {
         setState((state) => {
-            return {...state, isReloading: false}
+            return {...state, isReloading: false};
         });
 
         const fetchPortfolioValues = async () => {
-            const values = await getPortfolioValues()
+            const values = await getPortfolioValues();
             if (values) {
                 setPortfolio(values);
             }
-        }
+        };
 
         fetchPortfolioValues();
     }, []);
@@ -59,29 +59,29 @@ const BrokerAccountsPage: React.FC = () => {
         }
 
         await onTransactionsChanged();
-    }
+    };
 
     const fetchLastPullDate = async () => {
         const lastPullDate = await getLastPullDate();
         if (lastPullDate) {
             setLastPullDate(lastPullDate);
         }
-    }
+    };
 
     useEffect(() => {
         const getData = async () => {
             await fetchBrokerAccountsSummary();
             await fetchLastPullDate();
-        }
+        };
         getData();
     }, []);
 
     const pullQuotations = async () => {
         setState((currentState) => {
-            return {...currentState, isReloading: true}
-        })
+            return {...currentState, isReloading: true};
+        });
         pullBrokerAccountQuotations();
-    }
+    };
     
     useSignalR(onQuotesRecalculated);
 
@@ -96,7 +96,7 @@ const BrokerAccountsPage: React.FC = () => {
                 await fetchBrokerAccountsSummary();
                 break;
         }
-    }
+    };
 
     return <Fragment>
         {
@@ -118,7 +118,7 @@ const BrokerAccountsPage: React.FC = () => {
             ref={importModalRef}
             onImportSuccess={onTransactionsChanged}
         />
-    </Fragment>
-}
+    </Fragment>;
+};
 
 export default BrokerAccountsPage;

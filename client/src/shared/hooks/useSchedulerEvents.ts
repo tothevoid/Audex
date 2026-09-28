@@ -15,7 +15,7 @@ export interface SchedulerEventsHandlers {
 }
 
 export const useSchedulerEvents = (handlers: SchedulerEventsHandlers) => {
-    const handleSignalRMessage = useCallback(async (rawMessage: string) => {
+    const handleSignalRMessage = useCallback((rawMessage: string) => {
         try {
             const data = typeof rawMessage === "string" ? JSON.parse(rawMessage) : rawMessage;
             if (data?.type === "ScheduledTaskStarted" && data.taskName) {

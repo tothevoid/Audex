@@ -5,10 +5,10 @@ export const prepareBrokerAccountsSecurityStats = (brokerAccountSecurity: Broker
     return {
         ...brokerAccountSecurity
     };
-}
+};
 
 export const prepareDailyStats = (dailyStatsEntity: BrokerAccountDailyStatsEntity): BrokerAccountDailyStatsEntity => {
     return {
         ...dailyStatsEntity
     };
-}
+};

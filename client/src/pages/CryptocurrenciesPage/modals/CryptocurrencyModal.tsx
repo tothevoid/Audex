@@ -1,5 +1,5 @@
-import { Field, Input, Stack, Text } from "@chakra-ui/react"
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react"
+import { Field, Input, Stack, Text } from "@chakra-ui/react";
+import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -28,8 +28,8 @@ const CryptocurrencyModal: React.FC<ModalProps> = (props: ModalProps) => {
             name: props.cryptocurrency?.name ?? "",
             symbol: props.cryptocurrency?.symbol ?? "",
             price: props.cryptocurrency?.price ?? 0
-        }
-    }, [props.cryptocurrency])
+        };
+    }, [props.cryptocurrency]);
 
     const { t } = useTranslation();
     const validationSchema = useMemo(() => getCryptocurrencyValidationSchema(t), [t]);
@@ -54,12 +54,12 @@ const CryptocurrencyModal: React.FC<ModalProps> = (props: ModalProps) => {
     const onSubmit = (cryptocurrency: CryptocurrencyFormInput) => {
         props.onSaved({ ...cryptocurrency, iconKey: props.cryptocurrency?.iconKey } as CryptocurrencyEntity, icon);
         props.modalRef?.current?.closeModal();
-    }
+    };
 
     const onImageSelected = (url: string, image: File) => {
         setIcon(image);
         setIconUrl(url);
-    }
+    };
 
     const onVisibilityChanged = (open: boolean) => {
         if (open) {
@@ -69,7 +69,7 @@ const CryptocurrencyModal: React.FC<ModalProps> = (props: ModalProps) => {
             setIconUrl(null);
             props.onModalClosed();
         }
-    }
+    };
 
     return <BaseFormModal visibilityChanged={onVisibilityChanged} ref={props.modalRef} title={t("cryptocurrency_form_title")} submitHandler={handleSubmit(onSubmit)}>
         <Stack marginBlock={2} gapX={4} alignItems={"center"} direction={"row"}>
@@ -93,7 +93,7 @@ const CryptocurrencyModal: React.FC<ModalProps> = (props: ModalProps) => {
                 </Text>
             </Stack>
         )}
-    </BaseFormModal>
-}
+    </BaseFormModal>;
+};
 
 export default CryptocurrencyModal;

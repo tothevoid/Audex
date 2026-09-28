@@ -12,7 +12,7 @@ export const prepareDebtPaymentRequest = (debtPayment: DebtPaymentEntity): DebtP
         date: convertToDateOnly(debtPayment.date),
         isPercentagePayment: debtPayment.isPercentagePayment
     };
-}
+};
 
 export const prepareDebtPayment = (debtPayment: DebtPaymentEntityResponse): DebtPaymentEntity => {
     return {
@@ -23,4 +23,4 @@ export const prepareDebtPayment = (debtPayment: DebtPaymentEntityResponse): Debt
         date: new Date(debtPayment.date),
         isPercentagePayment: debtPayment.isPercentagePayment
     };
-}
+};

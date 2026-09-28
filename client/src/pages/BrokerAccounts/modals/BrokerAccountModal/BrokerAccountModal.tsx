@@ -1,5 +1,5 @@
-import { Field, Input } from "@chakra-ui/react"
-import { RefObject, useCallback, useEffect, useMemo, useState } from "react"
+import { Field, Input } from "@chakra-ui/react";
+import { RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -33,12 +33,12 @@ interface State {
 }
 
 const BrokerAccountModal: React.FC<ModalProps> = (props: ModalProps) => {
-    const [state, setState] = useState<State>({ currencies: [], accountTypes: [], brokers: [], banks: [] })
+    const [state, setState] = useState<State>({ currencies: [], accountTypes: [], brokers: [], banks: [] });
 
     useEffect(() => {
         const initData = async () => {
             await requestData();
-        }
+        };
         initData();
     }, []);
 
@@ -49,8 +49,8 @@ const BrokerAccountModal: React.FC<ModalProps> = (props: ModalProps) => {
         const banks = await getBanks();
 
         setState((currentState) => {
-            return { ...currentState, currencies, accountTypes, brokers, banks }
-        })
+            return { ...currentState, currencies, accountTypes, brokers, banks };
+        });
     };
 
     const getFormDefaultValues = useCallback(() => {
@@ -62,7 +62,7 @@ const BrokerAccountModal: React.FC<ModalProps> = (props: ModalProps) => {
             broker: props.brokerAccount?.broker,
             mainCurrencyAmount: props.brokerAccount?.mainCurrencyAmount ?? 0,
             bank: props.brokerAccount?.bank
-        }
+        };
     }, [props.brokerAccount]);
 
     const { t } = useTranslation();
@@ -84,7 +84,7 @@ const BrokerAccountModal: React.FC<ModalProps> = (props: ModalProps) => {
     const onSubmit = (brokerAccount: BrokerAccountFormInput) => {
         props.onSaved(brokerAccount as BrokerAccountEntity);
         props.modalRef?.current?.closeModal();
-    }
+    };
 
     return <BaseFormModal ref={props.modalRef} title={t("entity_broker_account_form_title")} submitHandler={handleSubmit(onSubmit)}>
         <Field.Root mt={4} invalid={!!errors.name}>
@@ -129,6 +129,6 @@ const BrokerAccountModal: React.FC<ModalProps> = (props: ModalProps) => {
                 valueSelector={(broker => broker.id)} />
             <Field.ErrorText>{errors.broker?.message}</Field.ErrorText>
         </Field.Root>
-    </BaseFormModal>
-}
-export default BrokerAccountModal
+    </BaseFormModal>;
+};
+export default BrokerAccountModal;

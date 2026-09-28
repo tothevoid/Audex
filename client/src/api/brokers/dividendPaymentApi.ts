@@ -24,13 +24,13 @@ export const getEarningsByBrokerAccount = async (brokerAccountId: string): Promi
 };
 
 export const createDividendPayment = async (modifiedDividendPayment: DividendPaymentEntity): Promise<void> => {
-    await createEntity<DividendPaymentEntityRequest, DividendPaymentEntityResponse>(basicUrl, prepareDividendPaymentRequest(modifiedDividendPayment))
-}
+    await createEntity<DividendPaymentEntityRequest, DividendPaymentEntityResponse>(basicUrl, prepareDividendPaymentRequest(modifiedDividendPayment));
+};
 
 export const updateDividendPayment = async (modifiedDividendPayment: DividendPaymentEntity): Promise<void>=> {
     await updateEntity<DividendPaymentEntityRequest>(basicUrl, prepareDividendPaymentRequest(modifiedDividendPayment));
-}
+};
 
 export const deleteDividendPayment = async (brokerAccountSecurityId: string): Promise<boolean> => {
     return await deleteEntity(basicUrl, brokerAccountSecurityId);
-}
+};

@@ -15,20 +15,20 @@ export const useBrokerAccountsSecurities = (queryParameters: BrokerAccountSecuri
 	const [brokerAccountSecurityQueryParameters, setBrokerAccountSecurityQueryParameters] = useState<BrokerAccountSecuritiesQuery>(queryParameters);
 
 	const fetchData = useCallback(async () => {
-		setLoading(true)
+		setLoading(true);
 		try {
 			const securities = await getSecuritiesByBrokerAccount(brokerAccountSecurityQueryParameters.brokerAccountId);
 			setBrokerAccountSecurities(securities);
 		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных')
+			setError(err.message || 'Ошибка загрузки данных');
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}, [brokerAccountSecurityQueryParameters])
+	}, [brokerAccountSecurityQueryParameters]);
 
 	useEffect(() => {
 		fetchData();
-	}, [fetchData])
+	}, [fetchData]);
 	
 	return {
 		brokerAccountSecurities,
@@ -37,5 +37,5 @@ export const useBrokerAccountsSecurities = (queryParameters: BrokerAccountSecuri
 		setBrokerAccountSecurityQueryParameters,
 		brokerAccountSecurityQueryParameters,
 		reloadBrokerAccountSecurities: fetchData
-	}
-}
+	};
+};

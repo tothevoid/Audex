@@ -8,7 +8,7 @@ export const prepareCryptoAccountCryptocurrencyRequest = (cryptoAccountCryptocur
         cryptocurrencyId: cryptoAccountCryptocurrency.cryptocurrency.id,
         quantity: cryptoAccountCryptocurrency.quantity
     };
-}
+};
 
 export const prepareCryptoAccountCryptocurrency = (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntityResponse): CryptoAccountCryptocurrencyEntity => {
     return {
@@ -16,5 +16,5 @@ export const prepareCryptoAccountCryptocurrency = (cryptoAccountCryptocurrency: 
         quantity: cryptoAccountCryptocurrency.quantity,
         cryptoAccount: prepareCryptoAccount(cryptoAccountCryptocurrency.cryptoAccount),
         cryptocurrency: cryptoAccountCryptocurrency.cryptocurrency 
-    }
-}
+    };
+};

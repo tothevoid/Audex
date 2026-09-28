@@ -1,5 +1,5 @@
-import { Field } from "@chakra-ui/react"
-import { RefObject, useCallback, useEffect, useMemo, useState } from "react"
+import { Field } from "@chakra-ui/react";
+import { RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -66,7 +66,7 @@ const SecurityTransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
 			tax: securityTransaction?.tax ?? 0,
 			quantity: securityTransaction?.quantity ?? 0,
 			operation
-		}
+		};
 	}, [props.context, operations]);
 
 	const validationSchema = useMemo(() => getSecurityTransactionValidationSchema(t), [t]);
@@ -89,12 +89,12 @@ const SecurityTransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
 		const brokerAccounts = await getBrokerAccounts();
 
 		setState({ securities, brokerAccounts });
-	}
+	};
 
 	useEffect(() => {
 		const loadData = async () => {
 			await initData();
-		}
+		};
 		loadData();
 	}, []);
 
@@ -112,11 +112,11 @@ const SecurityTransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
 			date: securityTransaction.date,
 			securityId: securityTransaction.security.id,
 			brokerAccountId: securityTransaction.brokerAccount.id
-		}
+		};
 
 		props.onSaved(transaction);
 		props.modalRef?.current?.closeModal();
-	}
+	};
 
 	return <BaseFormModal ref={props.modalRef} title={t("entity_security_transaction_form_title")} submitHandler={handleSubmit(onSubmit)}>
 		{
@@ -174,7 +174,7 @@ const SecurityTransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
 			<MoneyInput name="tax" control={control} currency={securityCurrency} placeholder='0' />
 			<Field.ErrorText>{errors.tax?.message}</Field.ErrorText>
 		</Field.Root>
-	</BaseFormModal>
-}
+	</BaseFormModal>;
+};
 
-export default SecurityTransactionModal
+export default SecurityTransactionModal;

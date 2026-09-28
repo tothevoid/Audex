@@ -1,5 +1,5 @@
-import { Field, Input } from "@chakra-ui/react"
-import React, { RefObject, useEffect, useMemo, useState } from "react"
+import { Field, Input } from "@chakra-ui/react";
+import React, { RefObject, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -42,7 +42,7 @@ const TransactionTypeModal: React.FC<ModalProps> = (props: ModalProps) => {
 	const onSubmit = (transactionType: TransactionTypeFormInput) => {
 		props.onSaved({...transactionType, iconKey: props.transactionType?.iconKey } as TransactionTypeEntity, icon);
 		props.modalRef?.current?.closeModal();
-	}
+	};
 
 	const [icon, setIcon] = useState<File | null>(null);
 	const [iconUrl, setIconUrl] = useState<string | null>(null);
@@ -55,13 +55,13 @@ const TransactionTypeModal: React.FC<ModalProps> = (props: ModalProps) => {
 	const onImageSelected = (url: string, image: File) => {
         setIcon(image);
         setIconUrl(url);
-    }
+    };
 
 	const onModalVisibilityChanged = (open: boolean) => {
 		if (!open) {
 			props.onModalClosed();
 		}
-	}
+	};
 
 	return <BaseFormModal visibilityChanged={onModalVisibilityChanged} ref={props.modalRef} title={t("entity_transaction_type_name_form_title")} submitHandler={handleSubmit(onSubmit)}>
 		<ImageInput imageUrl={iconUrl} onImageSelected={onImageSelected}/>
@@ -74,7 +74,7 @@ const TransactionTypeModal: React.FC<ModalProps> = (props: ModalProps) => {
 			<CheckboxInput name="active" control={control} title={t("entity_transaction_type_active")}/>
 			<Field.ErrorText>{errors.active?.message}</Field.ErrorText>
 		</Field.Root>
-	</BaseFormModal>
-}
+	</BaseFormModal>;
+};
 
-export default TransactionTypeModal
+export default TransactionTypeModal;

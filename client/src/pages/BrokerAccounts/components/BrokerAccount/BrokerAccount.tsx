@@ -24,19 +24,19 @@ const BrokerAccount = (props: Props) => {
 
 	useEffect(() => {
 		const fetchPortfolioValues = async () => {
-			const values = await getPortfolioValues(id)
+			const values = await getPortfolioValues(id);
 			if (values) {
 				setPortfolio(values);
 			}
-		}
+		};
 
-		fetchPortfolioValues()
+		fetchPortfolioValues();
 	}, [id]);
 
 	const accountLink = `../broker_account/${id}`;
 
 	if (!portfolio) {
-		return <Fragment/>
+		return <Fragment/>;
 	}
 
 	const color = portfolio.profitAndLoss >= 0 ? "gain": "loss";
@@ -72,7 +72,7 @@ const BrokerAccount = (props: Props) => {
 				</Flex>
 			</Card.Body>
 		</EntityCard>
-	</Fragment>
+	</Fragment>;
 };
 
 export default BrokerAccount;

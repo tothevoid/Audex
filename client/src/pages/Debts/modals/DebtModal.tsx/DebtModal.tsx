@@ -74,7 +74,7 @@ const DebtModal: React.FC<Props> = (props: Props) => {
 	const onSubmit = (debt: DebtFormInput) => {
 		props.onSaved(debt as DebtEntity);
 		props.modalRef.current?.closeModal();
-	}
+	};
 
 	return (
 		<BaseFormModal ref={props.modalRef} title={t("entity_debt_form_title")} submitHandler={handleSubmit(onSubmit)}>
@@ -109,6 +109,6 @@ const DebtModal: React.FC<Props> = (props: Props) => {
 			</Stack>
 		</BaseFormModal>
 	);
-}
+};
 
 export default DebtModal;

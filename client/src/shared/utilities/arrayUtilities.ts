@@ -1,19 +1,19 @@
 export const insertByPredicate = <T>(array: T[], newElement: T, predicate: (elm: T) => boolean): T[] => {
     const index = array.findIndex(predicate);
     if (index !== -1){
-        array.splice(index, 0, {...newElement})
+        array.splice(index, 0, {...newElement});
     } else {
-        array.push(newElement)
+        array.push(newElement);
     }
     return array;
-}
+};
 
 export const reorderByPredicate = <T>(array: T[], newElement: T, 
     reorderPredicate: (elm: T) => boolean,
     searchPredicate: (elm: T) => boolean): T[] => {
     const filteredArray = array.filter(searchPredicate);
-    return insertByPredicate(filteredArray, newElement, reorderPredicate)
-}
+    return insertByPredicate(filteredArray, newElement, reorderPredicate);
+};
 
 export const groupByKey = <KeyT, ValueT>(records: ValueT[], keySelector: (value: ValueT) => KeyT) => {
     return records.reduce((accumulator: Map<KeyT, ValueT[]>, currentValue: ValueT) => {
@@ -26,11 +26,11 @@ export const groupByKey = <KeyT, ValueT>(records: ValueT[], keySelector: (value:
 
         return accumulator;
     }, new Map<KeyT, ValueT[]>);
-}
+};
 
 export const sumEntities = <T>(records: T[], entitySumSelector: (entity: T) => number) => {
     return records.reduce((accumulator, currentValue) => {
         accumulator += entitySumSelector(currentValue);
         return accumulator;
-    }, 0)
-}
+    }, 0);
+};

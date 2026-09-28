@@ -57,9 +57,9 @@ export const useCryptoProviders = () => {
         }
 
         const updatedCryptoProviders = cryptoProviders
-            .filter((cryptoProvider: CryptoProviderEntity) => cryptoProvider.id !== deletedCryptoProvider.id)
-        setCryptoProviders(updatedCryptoProviders)
-    }
+            .filter((cryptoProvider: CryptoProviderEntity) => cryptoProvider.id !== deletedCryptoProvider.id);
+        setCryptoProviders(updatedCryptoProviders);
+    };
 
     return {
         cryptoProviders,
@@ -69,5 +69,5 @@ export const useCryptoProviders = () => {
         updateCryptoProviderEntity,
         deleteCryptoProviderEntity,
         refetch: fetchData
-    }
-}
+    };
+};

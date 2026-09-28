@@ -35,9 +35,9 @@ const convertRange = (range: DepositsRange) => {
 
         { value: minMonths, label: formatMonthYear(minDateMonth, minDate.getFullYear()) },
         { value: maxMonths, label: formatMonthYear(maxDateMonth, maxDate.getFullYear()) },
-    ]
+    ];
     return {minMonths, maxMonths, marks, selectedMinMonths: minMonths, selectedMaxMonths: maxMonths};
-}
+};
 
 const DepositsRangeSlider = (props: Props) => {
     const [state, setState] = useState<State>({
@@ -55,23 +55,23 @@ const DepositsRangeSlider = (props: Props) => {
             }
             const ranges = convertRange(range);
             setState((currentState) => {
-                return {...currentState, ...ranges}
+                return {...currentState, ...ranges};
             });
             props.onDepositsRangeChanged(ranges.selectedMinMonths, ranges.selectedMaxMonths);
-        }
+        };
         getData();
     }, [props.refreshTrigger]);
 
     const onSliderValueChanged = (selectedValues: number[]) => {
-        const newSliderValues = {selectedMinMonths: selectedValues[0], selectedMaxMonths: selectedValues[1]}
+        const newSliderValues = {selectedMinMonths: selectedValues[0], selectedMaxMonths: selectedValues[1]};
         setState((currentState) => {
-            return {...currentState, ...newSliderValues}
-        })
+            return {...currentState, ...newSliderValues};
+        });
         props.onDepositsRangeChanged(newSliderValues.selectedMinMonths, newSliderValues.selectedMaxMonths);
-    }
+    };
 
     if (!state.selectedMaxMonths || !state.selectedMinMonths) {
-        return <Fragment/>
+        return <Fragment/>;
     }
 
     return (
@@ -88,6 +88,6 @@ const DepositsRangeSlider = (props: Props) => {
             </Slider.Root>
         </Box>
     );
-}
+};
 
 export default DepositsRangeSlider;

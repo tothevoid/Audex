@@ -9,19 +9,19 @@ export const useCryptoAccounts = () => {
     const [error, setError] = useState<string | null>(null);
 
     const fetchData = useCallback(async () => {
-        setLoading(true)
+        setLoading(true);
         try {
             setCryptoAccounts(await getCryptoAccounts());
         } catch (err: any) {
-            setError(err.message || 'Ошибка загрузки данных')
+            setError(err.message || 'Ошибка загрузки данных');
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }, [])
+    }, []);
 
     useEffect(() => {
         fetchData();
-    }, [fetchData])
+    }, [fetchData]);
 
     const createCryptoAccountEntity = async (createdCryptoAccount: CryptoAccountEntity) => {
         const addedCryptoAccount = await createCryptoAccount(createdCryptoAccount);
@@ -58,5 +58,5 @@ export const useCryptoAccounts = () => {
         updateCryptoAccountEntity,
         deleteCryptoAccountEntity,
         reloadCryptoAccounts: fetchData
-    }
-}
+    };
+};

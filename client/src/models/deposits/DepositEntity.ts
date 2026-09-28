@@ -1,5 +1,5 @@
-import { BankEntity } from "@/models/banks/BankEntity"
-import { CurrencyEntity } from "@/models/currencies/CurrencyEntity"
+import { BankEntity } from "@/models/banks/BankEntity";
+import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
 
 interface CommonDepositEntity {
     id: string,

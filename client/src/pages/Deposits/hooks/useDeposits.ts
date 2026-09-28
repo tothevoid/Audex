@@ -16,7 +16,7 @@ export const useDeposits = (queryParameters: DepositsQuery) => {
 	const [depositsQueryParameters, setDepositsQueryParameters] = useState<DepositsQuery>(queryParameters);
 
 	const fetchData = useCallback(async () => {
-		setLoading(true)
+		setLoading(true);
 		try {
 			const { selectedMinMonths, selectedMaxMonths, onlyActive } = depositsQueryParameters;
 
@@ -29,15 +29,15 @@ export const useDeposits = (queryParameters: DepositsQuery) => {
 			
 			setDeposits(accounts);
 		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных')
+			setError(err.message || 'Ошибка загрузки данных');
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}, [depositsQueryParameters])
+	}, [depositsQueryParameters]);
 
 	useEffect(() => {
 		fetchData();
-	}, [fetchData])
+	}, [fetchData]);
 
 	const createDepositEntity = async (createdDeposit: DepositEntity) => {
 		const addedDeposit = await createDeposit(createdDeposit);
@@ -46,7 +46,7 @@ export const useDeposits = (queryParameters: DepositsQuery) => {
 		}
 
 		await fetchData();
-	}
+	};
 
 	const updateDepositEntity = async (updatedDeposit: DepositEntity) => {
 		const updated = await updateDeposit(updatedDeposit);
@@ -56,7 +56,7 @@ export const useDeposits = (queryParameters: DepositsQuery) => {
 		}
 
 		await fetchData();
-	}
+	};
 
 	const deleteDepositEntity = async (deletedDeposit: DepositEntity) => {
 		const deleted = await deleteDeposit(deletedDeposit.id);
@@ -67,7 +67,7 @@ export const useDeposits = (queryParameters: DepositsQuery) => {
 
 		const updatedDeposits = deposits.filter(deposit => deposit.id !== deletedDeposit.id);
 		setDeposits(updatedDeposits);
-	}
+	};
 
 	return {
 		deposits,
@@ -79,5 +79,5 @@ export const useDeposits = (queryParameters: DepositsQuery) => {
 		refetch: fetchData,
 		depositsQueryParameters, 
 		setDepositsQueryParameters
-	}
-}
+	};
+};

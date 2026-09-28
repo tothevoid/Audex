@@ -1,5 +1,5 @@
-import { Field } from "@chakra-ui/react"
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react"
+import { Field } from "@chakra-ui/react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -28,7 +28,7 @@ const langMapping = new Map<string, string>([
 	["Русский", "ru-RU" ],
 ]);
 
-const languages = [...langMapping.entries()].map(([key, value]) => {return {key, value}});
+const languages = [...langMapping.entries()].map(([key, value]) => {return {key, value};});
 
 const convertToSchemaValues = (userProfile: UserProfileEntity | null, timeZones: TimeZoneEntity[] = []) => {
 	const userTzId = userProfile?.timeZoneId || Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Moscow";
@@ -38,12 +38,12 @@ const convertToSchemaValues = (userProfile: UserProfileEntity | null, timeZones:
 		languageCode: languages.find((lang) => lang.value === userProfile?.languageCode) ?? languages[0],
 		currency: userProfile?.currency,
 		timeZone: matchedTz ?? (timeZones.length > 0 ? timeZones[0] : { id: userTzId, displayName: userTzId, baseUtcOffsetMinutes: 0 })
-	}
-}
+	};
+};
 
 const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {	 
 	const { t } = useTranslation();
-	const [state, setState] = useState<State>({currencies: [], languages: languages, timeZones: []})
+	const [state, setState] = useState<State>({currencies: [], languages: languages, timeZones: []});
 	const { user, updateUser } = useUserProfile();
 	const modalRef = useRef<BaseModalRef>(null);
 
@@ -63,7 +63,7 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 				currencies: currencies ?? [],
 				timeZones: timeZones ?? []
 			}));
-		}
+		};
 		initData();
 	}, []);
 
@@ -86,7 +86,7 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 			reset(convertToSchemaValues(user, state.timeZones));
 			setSelectedTheme(themeOptions.find(opt => opt.value === colorMode) ?? themeOptions[0]);
 		}
-	}
+	};
 
 	const onSubmit = async (userProfileForm: UserProfileFormInput) => {
 		const userProfile: UserProfileEntity = {
@@ -95,13 +95,13 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 			currency: state.currencies.find(currency => userProfileForm.currency.id === currency.id)!,
 			languageCode: userProfileForm.languageCode.value,
 			timeZoneId: userProfileForm.timeZone?.id || user?.timeZoneId || "Europe/Moscow"
-		}
+		};
 
 		await updateUserProfile(userProfile);
 		updateUser(userProfile);
 		setColorMode(selectedTheme.value);
 		modalRef.current?.closeModal();
-	}
+	};
 
 	const themeOptions = [
 		{ key: t("theme_dark"), value: "dark" as const },
@@ -177,7 +177,7 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 				/>
 			</Field.Root>
 		</BaseFormModal>
-	)
-})
+	);
+});
 
-export default UserProfileSettingsModal
+export default UserProfileSettingsModal;

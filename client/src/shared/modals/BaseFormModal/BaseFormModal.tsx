@@ -1,5 +1,5 @@
-import { Button, CloseButton, Dialog, Portal, useDisclosure} from "@chakra-ui/react"
-import { FormEventHandler, forwardRef, useEffect, useImperativeHandle } from "react"
+import { Button, CloseButton, Dialog, Portal, useDisclosure} from "@chakra-ui/react";
+import { FormEventHandler, forwardRef, useEffect, useImperativeHandle } from "react";
 import { useTranslation } from "react-i18next";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
@@ -14,7 +14,7 @@ interface BaseFormModalProps {
 };
 
 const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>((props: BaseFormModalProps, ref) => {
-    const { open, onOpen, onClose } = useDisclosure()
+    const { open, onOpen, onClose } = useDisclosure();
 
     useImperativeHandle(ref, () => ({
         openModal: onOpen,
@@ -26,7 +26,7 @@ const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>((props: BaseF
             return;
         }
         props.visibilityChanged(open);
-    }, [open])
+    }, [open]);
 
     const { t } = useTranslation();
 
@@ -60,6 +60,6 @@ const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>((props: BaseF
             </Dialog.Positioner>
           </Portal>
         </Dialog.Root>
-    )
-})
+    );
+});
 export default BaseFormModal;

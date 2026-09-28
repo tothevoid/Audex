@@ -9,12 +9,12 @@ export const getBrokerAccountTypes = async (): Promise<BrokerAccountTypeEntity[]
 
 export const createBrokerAccountType = async (addedBrokerAccountType: BrokerAccountTypeEntity): Promise<BrokerAccountTypeEntity | void> => {
     return await createEntity<BrokerAccountTypeEntity, BrokerAccountTypeEntity>(basicUrl, addedBrokerAccountType);
-}
+};
 
 export const updateBrokerAccountType = async (modifiedBrokerAccountType: BrokerAccountTypeEntity): Promise<boolean> => {
     return await updateEntity<BrokerAccountTypeEntity>(basicUrl, modifiedBrokerAccountType);
-}
+};
 
 export const deleteBrokerAccountType = async (brokerAccountId: string): Promise<boolean> => {
     return await deleteEntity(basicUrl, brokerAccountId);
-}
+};

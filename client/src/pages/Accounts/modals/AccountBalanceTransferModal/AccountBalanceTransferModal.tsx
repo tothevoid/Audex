@@ -1,5 +1,5 @@
-import { Field } from "@chakra-ui/react"
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react"
+import { Field } from "@chakra-ui/react";
+import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountBalanceTransferFormInput, getAccountBalanceTransferValidationSchema } from "./AccountBalanceTransferModalValidationSchema";
@@ -29,20 +29,20 @@ export type Transfer = {
 }
 
 const AccountBalanceTransferModal: React.FC<ModalProps> = (props: ModalProps) => {
-	const [state, setState] = useState<State>({accounts: []})
+	const [state, setState] = useState<State>({accounts: []});
 	
 	useEffect(() => {
 		const initData = async () => {
 			await initAccounts();
-		}
+		};
 		initData();
 	}, []);
 
 	const initAccounts = async () => {
 		const accounts = await getAccounts();
 		setState((currentState) => {
-			return {...currentState, accounts}
-		})
+			return {...currentState, accounts};
+		});
 	};
 
 	const getFormDefaultValues = useCallback(() => {
@@ -51,7 +51,7 @@ const AccountBalanceTransferModal: React.FC<ModalProps> = (props: ModalProps) =>
 			to: null!,
 			balance: 0,
 			fee: 0
-		}
+		};
 	}, [props.from]);
 
 	const { t } = useTranslation();
@@ -68,7 +68,7 @@ const AccountBalanceTransferModal: React.FC<ModalProps> = (props: ModalProps) =>
 
 	useEffect(() => {
 		reset(getFormDefaultValues());
-	}, [reset, getFormDefaultValues, props.from])
+	}, [reset, getFormDefaultValues, props.from]);
 
 
 	const onSubmit = async (transfer: AccountBalanceTransferFormInput) => {
@@ -77,7 +77,7 @@ const AccountBalanceTransferModal: React.FC<ModalProps> = (props: ModalProps) =>
 		
 		props.onTransferred();
 		props.modalRef?.current?.closeModal();
-	}
+	};
 
 	return <BaseFormModal ref={props.modalRef} title={t("account_balance_transfer_modal_title")} submitHandler={handleSubmit(onSubmit)}>
 		<Field.Root mt={4} invalid={!!errors.from}>
@@ -106,7 +106,7 @@ const AccountBalanceTransferModal: React.FC<ModalProps> = (props: ModalProps) =>
 			<MoneyInput name="fee" control={control} currency={fromCurrency} placeholder='0' />
 			<Field.ErrorText>{errors.fee?.message}</Field.ErrorText>
 		</Field.Root>
-	</BaseFormModal>
-}
+	</BaseFormModal>;
+};
 
-export default AccountBalanceTransferModal
+export default AccountBalanceTransferModal;

@@ -37,12 +37,12 @@ const BrokerAccountTaxDeductionsList: React.FC<Props> = (props) => {
 
     const onDeleteConfirmed = async () => {
         if (!activeEntity) {
-            throw new Error("Deleted entity is not set")
+            throw new Error("Deleted entity is not set");
         }
 
         await deleteTaxDeductionEntity(activeEntity);
         onActionEnded();
-    }
+    };
 
     const [context, setContext] = useState<Nullable<CreateBrokerAccountTaxDeductionContext | EditBrokerAccountTaxDeductionContext>>(null);
 
@@ -91,7 +91,7 @@ const BrokerAccountTaxDeductionsList: React.FC<Props> = (props) => {
             confirmActionName={t("modals_delete_button")}
             ref={confirmModalRef}/>
         {context && <BrokerAccountTaxDeductionModal isGlobalBrokerAccount={isGlobalBrokerAccount} modalRef={modalRef} context={context} onSaved={onTaxDeductionSaved}  />}
-    </Box>
-}
+    </Box>;
+};
 
 export default BrokerAccountTaxDeductionsList;

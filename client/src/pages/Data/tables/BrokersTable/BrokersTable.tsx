@@ -30,12 +30,12 @@ const BrokersTable: React.FC = () => {
             try {
                 const brokers = await getBrokers();
                 setState((currentState) => {
-                    return {...currentState, brokers}
+                    return {...currentState, brokers};
                 });
             } finally {
                 setIsLoading(false);
             }
-        }
+        };
 
         initData();
     }, []);
@@ -47,7 +47,7 @@ const BrokersTable: React.FC = () => {
     }, [updatedBroker]);
     
     const onAdd = () => {
-        modalRef.current?.openModal()
+        modalRef.current?.openModal();
     };
 
     const onEditClicked = (broker: BrokerEntity) => {
@@ -81,10 +81,10 @@ const BrokersTable: React.FC = () => {
 
     const onDeleteClicked = async (broker: BrokerEntity) => {
         setState((currentState) => {
-            return {...currentState, currentBrokerId: broker.id}
-        })
-        confirmModalRef.current?.openModal()
-    }
+            return {...currentState, currentBrokerId: broker.id};
+        });
+        confirmModalRef.current?.openModal();
+    };
 
     const onDeleteConfirmed = async () => {
         const {currentBrokerId} = state;
@@ -104,9 +104,9 @@ const BrokersTable: React.FC = () => {
         });
 
         setState((currentState) => {
-            return {...currentState, brokers, currentBrokerId: null}
-        })
-    }
+            return {...currentState, brokers, currentBrokerId: null};
+        });
+    };
 
     const columns: ColumnDef<BrokerEntity>[] = useMemo(() => [
         {
@@ -169,7 +169,7 @@ const BrokersTable: React.FC = () => {
             message={t("modals_delete_message")}
             confirmActionName={t("modals_delete_button")}
             ref={confirmModalRef}/>
-    </Box>
-}
+    </Box>;
+};
 
 export default BrokersTable;

@@ -9,29 +9,29 @@ export const useBrokerAccounts = () => {
 	const [error, setError] = useState<string | null>(null);
 
 	const fetchData = useCallback(async () => {
-		setLoading(true)
+		setLoading(true);
 		try {
 			const brokerAccounts = await getBrokerAccounts();
 			setBrokerAccounts(brokerAccounts);
 		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных')
+			setError(err.message || 'Ошибка загрузки данных');
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}, [])
+	}, []);
 
 	useEffect(() => {
 		fetchData();
-	}, [fetchData])
+	}, [fetchData]);
 
 	const createBrokerAccountEntity = async (createdBrokerAccount: BrokerAccountEntity) => {
 		const addedBrokerAccount = await createBrokerAccount(createdBrokerAccount);
 		if (!addedBrokerAccount) {
-			return
+			return;
 		}
 
 		await fetchData();
-	}
+	};
 
 	const updateBrokerAccountEntity = async (updatedBrokerAccount: BrokerAccountEntity) => {
 		const brokerAccountUpdated = await updateBrokerAccount(updatedBrokerAccount);
@@ -40,7 +40,7 @@ export const useBrokerAccounts = () => {
 		}
 		
 		await fetchData();
-	}
+	};
 
 	const deleteBrokerAccountEntity = async (deletedBrokerAccount: BrokerAccountEntity) => {
 		const brokerAccountDeleted = await deleteBrokerAccount(deletedBrokerAccount.id);
@@ -50,9 +50,9 @@ export const useBrokerAccounts = () => {
 		}
 
 		const updatedBrokerAccounts = brokerAccounts
-			.filter((brokerAccount: BrokerAccountEntity) => brokerAccount.id !== deletedBrokerAccount.id)
-		setBrokerAccounts(updatedBrokerAccounts)
-	}
+			.filter((brokerAccount: BrokerAccountEntity) => brokerAccount.id !== deletedBrokerAccount.id);
+		setBrokerAccounts(updatedBrokerAccounts);
+	};
 
 	return {
 		brokerAccounts,
@@ -62,5 +62,5 @@ export const useBrokerAccounts = () => {
 		updateBrokerAccountEntity,
 		deleteBrokerAccountEntity,
 		reloadBrokerAccounts: fetchData
-	}
-}
+	};
+};

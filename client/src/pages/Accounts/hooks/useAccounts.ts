@@ -16,20 +16,20 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 	const [accountQueryParameters, setAccountQueryParameters] = useState<AccountsQuery>(queryParameters);
 
 	const fetchData = useCallback(async () => {
-		setLoading(true)
+		setLoading(true);
 		try {
 			const accounts = await getAccounts(accountQueryParameters);
 			setAccounts(accounts);
 		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных')
+			setError(err.message || 'Ошибка загрузки данных');
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}, [accountQueryParameters])
+	}, [accountQueryParameters]);
 
 	useEffect(() => {
 		fetchData();
-	}, [fetchData])
+	}, [fetchData]);
 
 	const createAccountEntity = async (account: AccountEntity) => {
 		const createdAccountId = await createAccount(account);
@@ -38,7 +38,7 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 		}
 
 		await fetchData();
-	}
+	};
 
 	const updateAccountEntity = async (updatedAccount: AccountEntity) => {
 	   	if (!updatedAccount) {
@@ -51,7 +51,7 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 		}
 
 		await fetchData();
-	}
+	};
 
 	const deleteAccountEntity = async (deletedAccount: AccountEntity) => {
 		if (!deletedAccount) {
@@ -64,7 +64,7 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 		}
 
 		await fetchData();
-	}
+	};
 
 	return {
 		accounts,
@@ -76,5 +76,5 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 		setAccountQueryParameters: setAccountQueryParameters,
 		accountQueryParameters: accountQueryParameters,
 		reloadAccounts: fetchData
-	}
-}
+	};
+};

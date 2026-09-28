@@ -22,15 +22,15 @@ export const getPagedCurrencyTransactions = async (query: CurrencyTransactionsQu
 export const createCurrencyTransaction = async (addedSecurityTransaction: CurrencyTransactionEntity): Promise<void> => {
 	await createEntity<CurrencyTransactionEntityRequest, CurrencyTransactionEntityResponse>(basicUrl, 
 		prepareCurrencyTransactionRequest(addedSecurityTransaction));
-}
+};
 
 export const updateCurrencyTransaction = async (modifiedSecurityTransaction: CurrencyTransactionEntity): Promise<boolean> => {
 	return await updateEntity(basicUrl, prepareCurrencyTransactionRequest(modifiedSecurityTransaction));
-}
+};
 
 export const deleteCurrencyTransaction = async (securityTransactionId: string): Promise<boolean> => {
 	return await deleteEntity(basicUrl, securityTransactionId);
-}
+};
 
 export const getCurrencyTransactionById = async (id: string): Promise<CurrencyTransactionEntity | null> => {
 	const dto = await getEntityById<CurrencyTransactionEntityResponse>(basicUrl, id);

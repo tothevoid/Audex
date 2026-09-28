@@ -41,7 +41,7 @@ const CryptocurrenciesPage: React.FC = () => {
             updateCryptocurrencyEntity(cryptocurrency, file);
         }
         onActionEnded();
-    }
+    };
 
     const getHeader = () => {
         const placeholderAddButton = (
@@ -66,16 +66,16 @@ const CryptocurrenciesPage: React.FC = () => {
 
     const onDeleteConfirmed = async () => {
         if (!activeEntity) {
-            throw new Error("Deleted entity is not set")
+            throw new Error("Deleted entity is not set");
         }
 
         await deleteCryptocurrencyEntity(activeEntity);
         onActionEnded();
-    }
+    };
 
     const onModalClosed = () => {
         onActionEnded();
-    }
+    };
 
     return <Fragment>
         {getHeader()}
@@ -94,7 +94,7 @@ const CryptocurrenciesPage: React.FC = () => {
             confirmActionName={t("modals_delete_button")}
             ref={confirmModalRef}/>
         <CryptocurrencyModal onModalClosed={onModalClosed} cryptocurrency={activeEntity} modalRef={modalRef} onSaved={onCryptocurrencySaved}/>
-    </Fragment>
-}
+    </Fragment>;
+};
 
 export default CryptocurrenciesPage;

@@ -11,7 +11,7 @@ export const prepareBrokerAccountFundsTransferRequest = (brokerAccountFundsTrans
         income: brokerAccountFundsTransfer.income,
         date: brokerAccountFundsTransfer.date
     };
-}
+};
 
 export const prepareBrokerAccountFundsTransfer = (brokerAccountFundsTransfer: BrokerAccountFundTransferEntityResponse): BrokerAccountFundTransferEntity => {
     return {
@@ -22,4 +22,4 @@ export const prepareBrokerAccountFundsTransfer = (brokerAccountFundsTransfer: Br
         income: brokerAccountFundsTransfer.income,
         date: new Date(brokerAccountFundsTransfer.date),
     };
-}
+};

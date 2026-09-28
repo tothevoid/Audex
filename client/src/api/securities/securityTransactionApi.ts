@@ -28,12 +28,12 @@ export const createSecurityTransaction = async (addedSecurityTransaction: Securi
         addedSecurityTransaction);
 
     return !!createdSecurityTransaction;
-}
+};
 
 export const updateSecurityTransaction = async (modifiedSecurityTransaction: SecurityTransactionEntityRequest): Promise<boolean> => {
     return await updateEntity<SecurityTransactionEntityRequest>(basicUrl, modifiedSecurityTransaction);
-}
+};
 
 export const deleteSecurityTransaction = async (securityTransactionId: string): Promise<boolean> => {
     return await deleteEntity(basicUrl, securityTransactionId);
-}
+};

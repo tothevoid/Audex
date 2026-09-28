@@ -43,8 +43,8 @@ const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = (props: ModalProp
     const initCryptocurrencies = async () => {
         const cryptocurrencies = await getCryptocurrencies();
         setState((currentState: State) => {
-            return {...currentState, cryptocurrencies}
-        })
+            return {...currentState, cryptocurrencies};
+        });
     };
 
     useEffect(() => {

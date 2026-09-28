@@ -10,20 +10,20 @@ export const useSecurities = () => {
 	const [error, setError] = useState<string | null>(null);
 
 	const fetchData = useCallback(async () => {
-		setLoading(true)
+		setLoading(true);
 		try {
 			const accounts = await getSecurities();
 			setSecurities(accounts);
 		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных')
+			setError(err.message || 'Ошибка загрузки данных');
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}, [])
+	}, []);
 
 	useEffect(() => {
 		fetchData();
-	}, [fetchData])
+	}, [fetchData]);
 
 	const createSecurityEntity = async (createdSecurity: SecurityEntity, icon: File | null): Promise<OperationResult<SecurityEntity>> => {
 		const result = await createSecurity(createdSecurity, icon);
@@ -31,7 +31,7 @@ export const useSecurities = () => {
 			await fetchData();
 		}
 		return result;
-	}
+	};
 
 	const updateSecurityEntity = async (updatedSecurity: SecurityEntity, icon: File | null): Promise<OperationResult<SecurityEntity>> => {
 		const result = await updateSecurity(updatedSecurity, icon);
@@ -39,7 +39,7 @@ export const useSecurities = () => {
 			await fetchData();
 		}
 		return result;
-	}
+	};
 
 	const deleteSecurityEntity = async (deletedSecurity: SecurityEntity) => {
 		const isAccountDeleted = await deleteSecurity(deletedSecurity.id);
@@ -48,7 +48,7 @@ export const useSecurities = () => {
 		}
 
 		await fetchData();
-	}
+	};
 
 	return {
 		securities,
@@ -58,5 +58,5 @@ export const useSecurities = () => {
 		updateSecurityEntity,
 		deleteSecurityEntity,
 		reloadSecurities: fetchData
-	}
-}
+	};
+};

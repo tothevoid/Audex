@@ -1,4 +1,4 @@
-import { Stack } from '@chakra-ui/react'
+import { Stack } from '@chakra-ui/react';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, TooltipValueType, TooltipPayloadEntry } from 'recharts';
 import { DistributionModel } from '@/models/dashboard/DashboardEntity';
 import { getChartLabelConfig } from '@/shared/utilities/chartUtilities';
@@ -27,7 +27,7 @@ const DistributionChart = (props: Props) => {
         return amount !== convertedAmount ? 
             `${formatMoneyByCurrencyCulture(amount, currency)} (${convertedValue})`:
             convertedValue;
-    }
+    };
 
     const chartData = props.data.filter(item => (item.convertedAmount ?? 0) > 0);
     const totalAmount = chartData.reduce((sum, item) => sum + item.convertedAmount, 0);
@@ -61,7 +61,7 @@ const DistributionChart = (props: Props) => {
                 </PieChart>
             </ResponsiveContainer>
         </div>
-    </Stack>
-}
+    </Stack>;
+};
 
 export default DistributionChart;

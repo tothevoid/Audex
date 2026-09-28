@@ -19,7 +19,7 @@ interface State {
 }
 
 const SecurityTransactionsChart: React.FC<Props> = (props) => {
-    const [state, setState] = useState<State>({transactions: []})
+    const [state, setState] = useState<State>({transactions: []});
 
     const { t, i18n } = useTranslation();
 
@@ -32,12 +32,12 @@ const SecurityTransactionsChart: React.FC<Props> = (props) => {
         const transactions = historyValues.map(historyValue => {
             historyValue.date = formatShortDateTime(new Date(historyValue.date), i18n);
             return historyValue;
-        })
+        });
 
         setState((currentState) => {
-            return {...currentState, transactions}
-        })
-    }
+            return {...currentState, transactions};
+        });
+    };
 
     useEffect(() => {
         initData();
@@ -48,7 +48,7 @@ const SecurityTransactionsChart: React.FC<Props> = (props) => {
             return Number(value ?? 0);
         }
 
-        return formatMoneyByCurrencyCulture(Number(value ?? 0), props.currencyName)
+        return formatMoneyByCurrencyCulture(Number(value ?? 0), props.currencyName);
     }, [props.currencyName, t]);
 
     return <Box style={{ width: '100%', height: 400 }}>
@@ -96,7 +96,7 @@ const SecurityTransactionsChart: React.FC<Props> = (props) => {
                 <Tooltip contentStyle={getChartLabelConfig()} formatter={formatTooltipValue} />
             </ComposedChart>
         </ResponsiveContainer>
-    </Box>
-}
+    </Box>;
+};
 
 export default SecurityTransactionsChart;

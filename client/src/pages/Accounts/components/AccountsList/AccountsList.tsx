@@ -45,11 +45,11 @@ const AccountsList: React.FC<Props> = ({ onAccountsChanged, accountCurrencySumma
 		deleteAccountEntity,
 		setAccountQueryParameters,
 		reloadAccounts
-	} = useAccounts({ onlyActive: true })
+	} = useAccounts({ onlyActive: true });
 
 	useEffect(() => {
 		onAccountsChanged();
-	}, [accounts, onAccountsChanged])
+	}, [accounts, onAccountsChanged]);
 
 	const onOnlyActiveChange = (active: boolean) => {	
 		setAccountQueryParameters(prev => ({ ...prev, onlyActive: active }));
@@ -64,37 +64,37 @@ const AccountsList: React.FC<Props> = ({ onAccountsChanged, accountCurrencySumma
 	};
 
 	const getAddButton = () => {
-		return <AddButton buttonTitle={t("accounts_page_summary_add")} onClick={onAddClicked}/>
-	}
+		return <AddButton buttonTitle={t("accounts_page_summary_add")} onClick={onAddClicked}/>;
+	};
 
   	const onAccountSaved = async (account: AccountEntity) => {
 		if (mode === ActiveEntityMode.Add) {
 			await createAccountEntity(account);
 		} else {
-			await updateAccountEntity(account)
+			await updateAccountEntity(account);
 		}
 
 		onActionEnded();
-	}
+	};
 
 	const onDeleteConfirmed = async () => {
 		if (!activeEntity) {
-            throw new Error("Deleted entity is not set")
+            throw new Error("Deleted entity is not set");
         }
 
         await deleteAccountEntity(activeEntity);
 		onActionEnded();
-    }
+    };
 
 	const onTransferClicked = (account: AccountEntity) => {
 		setActiveEntity(account);
-		transferModalRef.current?.openModal()
-	}
+		transferModalRef.current?.openModal();
+	};
 	
 	const onTransferred = () => {
 		reloadAccounts();
 		onActionEnded();
-	}
+	};
 
 	return <Box>
 		<AccountsHeader
@@ -115,7 +115,7 @@ const AccountsList: React.FC<Props> = ({ onAccountsChanged, accountCurrencySumma
 						return <Account key={account.id} account={account} 
 							onEditClicked={onEditClicked}
 							onDeleteClicked={onDeleteClicked}
-							onTransferClicked={onTransferClicked}/>
+							onTransferClicked={onTransferClicked}/>;
 					})
 				}
 				</SimpleGrid>:
@@ -130,7 +130,7 @@ const AccountsList: React.FC<Props> = ({ onAccountsChanged, accountCurrencySumma
             ref={confirmModalRef}/>
         <AccountBalanceTransferModal from={activeEntity} modalRef={transferModalRef} onTransferred={onTransferred}/>
         <AccountModal account={activeEntity} modalRef={modalRef} onSaved={onAccountSaved}/>
-	</Box>
-}
+	</Box>;
+};
 
 export default AccountsList;

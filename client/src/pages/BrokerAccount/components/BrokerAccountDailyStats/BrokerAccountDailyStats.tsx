@@ -90,11 +90,11 @@ const BrokerAccountDailyStats: React.FC<Props> = ({ brokerAccountId, currencyNam
 			<Table.Cell color={color}>{profitAndLoss}</Table.Cell>
 			<Table.Cell color={color}>{profitAndLossPercentage}%</Table.Cell>
 			<Table.Cell color={color}>{formatMoneyByCurrencyCulture(rawProfitAndLoss * stat.quantity, currencyName)}</Table.Cell>
-		</Table.Row>
+		</Table.Row>;
 	}, []);
 
 	if (!dailyStats) {
-		return <Fragment/>
+		return <Fragment/>;
 	}
 
 	const { profitAndLoss, profitAndLossPercentage, color } = calculateDiff(dailyStats.currentPortfolioValue, 

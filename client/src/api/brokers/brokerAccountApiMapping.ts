@@ -10,7 +10,7 @@ export const prepareBrokerAccountRequest = (brokerAccount: BrokerAccountEntity):
         mainCurrencyAmount: brokerAccount.mainCurrencyAmount,
         bankId: brokerAccount.bank?.id
     };
-}
+};
 
 export const prepareBrokerAccount = (brokerAccount: BrokerAccountEntityResponse): BrokerAccountEntity => {
     return {
@@ -22,4 +22,4 @@ export const prepareBrokerAccount = (brokerAccount: BrokerAccountEntityResponse)
         mainCurrencyAmount: brokerAccount.mainCurrencyAmount,
         bank: brokerAccount.bank
     };
-}
+};

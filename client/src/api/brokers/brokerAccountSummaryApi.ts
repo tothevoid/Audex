@@ -17,21 +17,21 @@ export const getBrokerAccountStats = async (brokerAccountId: Nullable<string>): 
 
     return getEntity<BrokerAccountSummaryEntity>(url)
         .then((data: BrokerAccountSummaryEntity | void) => data && prepareBrokerAccountsSecurityStats(data));
-}
+};
 
 export const getMonthTransfersHistory = async (brokerAccountId: Nullable<string>, month: number, year: number): Promise<BrokerAccountMonthTransfersHistoryEntity | void> => {
     const url = brokerAccountId ? 
         `${basicUrl}/GetMonthTransfersHistoryByBrokerAccount?brokerAccountId=${brokerAccountId}&month=${month}&year=${year}` :
         `${basicUrl}/GetMonthTransfersHistory?month=${month}&year=${year}`;
     return await getEntity<BrokerAccountMonthTransfersHistoryEntity>(url);
-}
+};
 
 export const getYearTransfersHistory = async (brokerAccountId: Nullable<string>, year: number): Promise<BrokerAccountYearTransfersHistoryEntity | void> => {
     const url = brokerAccountId ? 
         `${basicUrl}/GetYearTransfersHistoryByBrokerAccount?brokerAccountId=${brokerAccountId}&year=${year}` :
         `${basicUrl}/GetYearTransfersHistory?year=${year}`;
     return await getEntity<BrokerAccountYearTransfersHistoryEntity>(url);
-}
+};
 
 export const getDailyStats = async (brokerAccountId: Nullable<string>): Promise<BrokerAccountDailyStatsEntity | void> => {
     const url = brokerAccountId ?
@@ -40,7 +40,7 @@ export const getDailyStats = async (brokerAccountId: Nullable<string>): Promise<
 
     return await getEntity<BrokerAccountDailyStatsEntity>(url)
         .then((data: BrokerAccountDailyStatsEntity | void) => data && prepareDailyStats(data));
-}
+};
 
 export const getPortfolioValues = async (brokerAccountId: Nullable<string> = null): Promise<BrokerAccountPortfolioEntity | void> => {
     const url = brokerAccountId ?
@@ -49,7 +49,7 @@ export const getPortfolioValues = async (brokerAccountId: Nullable<string> = nul
 
     return await getEntity<BrokerAccountPortfolioEntity>(url)
         .then((data: BrokerAccountPortfolioEntity | void) => data);
-}
+};
 
 export const getTransfersAvailableDates = async (brokerAccountId: Nullable<string> = null): Promise<BrokerAccountTransfersAvailableDatesEntity | void> => {
     const url = brokerAccountId ?
@@ -57,4 +57,4 @@ export const getTransfersAvailableDates = async (brokerAccountId: Nullable<strin
         `${basicUrl}/GetTransfersAvailableDates`;
 
     return await getEntity<BrokerAccountTransfersAvailableDatesEntity>(url);
-}
+};

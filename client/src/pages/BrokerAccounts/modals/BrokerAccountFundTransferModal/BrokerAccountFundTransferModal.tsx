@@ -57,7 +57,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
             { id: props.context.brokerAccountId }: 
             { id: props.context.brokerAccountFundTransfer.brokerAccount.id};
         
-        const transferType = transferTypes.find(tt => tt.value === brokerAccountFundTransfer?.income) ?? transferTypes[0]
+        const transferType = transferTypes.find(tt => tt.value === brokerAccountFundTransfer?.income) ?? transferTypes[0];
         
         return {
             id: brokerAccountFundTransfer?.id ?? generateGuid(),
@@ -66,7 +66,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
             income: transferType,
             date: brokerAccountFundTransfer?.date ?? new Date(),
             amount: brokerAccountFundTransfer?.amount ?? 0
-        }
+        };
     }, [props.context, transferTypes]);
 
     useEffect(() => {
@@ -79,9 +79,9 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
                 const brokerAccounts = await getBrokerAccounts();
                 setBrokerAccounts(brokerAccounts);
             }
-        }
-        fetchData()
-    }, [])
+        };
+        fetchData();
+    }, []);
 
     const validationSchema = useMemo(() => getBrokerAccountFundTransferValidationSchema(t), [t]);
 
@@ -117,7 +117,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
         }
 
         reset(getDefaultValues());
-    }
+    };
 
     return (
         <BaseFormModal ref={props.modalRef} title={t("broker_account_transfer_modal_title")}

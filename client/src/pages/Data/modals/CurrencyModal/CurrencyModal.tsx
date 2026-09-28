@@ -1,5 +1,5 @@
-import { Field, Input} from "@chakra-ui/react"
-import { RefObject, useMemo } from "react"
+import { Field, Input} from "@chakra-ui/react";
+import { RefObject, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getCurrencyModalValidationSchema, CurrencyFormInput } from "./CurrencyValidationSchema";
@@ -33,7 +33,7 @@ const CurrencyModal: React.FC<ModalProps> = (props: ModalProps) => {
 	const onSubmit = (currency: CurrencyFormInput) => {
 		props.onSaved(currency as CurrencyEntity);
 		props.modalRef?.current?.closeModal();
-	}
+	};
 
 	return <BaseFormModal ref={props.modalRef} title={t("entity_currency_name_form_title")} submitHandler={handleSubmit(onSubmit)}>
 		<Field.Root invalid={!!errors.name}>
@@ -45,8 +45,8 @@ const CurrencyModal: React.FC<ModalProps> = (props: ModalProps) => {
 			<CheckboxInput name="active" control={control} title={t("entity_currency_active")}/>
 			<Field.ErrorText>{errors.active?.message}</Field.ErrorText>
 		</Field.Root>
-	</BaseFormModal>
+	</BaseFormModal>;
 
-}
+};
 
-export default CurrencyModal
+export default CurrencyModal;

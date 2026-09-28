@@ -13,7 +13,7 @@ export const prepareSecurity = (security: SecurityEntityResponse): SecurityEntit
         currency: security.currency,
         priceFetchedAt: security.priceFetchedAt && new Date(security.priceFetchedAt)
     };
-}
+};
 
 export const prepareSecurityEntityRequest = (security: SecurityEntity): SecurityEntityRequest => {
     return {
@@ -27,4 +27,4 @@ export const prepareSecurityEntityRequest = (security: SecurityEntity): Security
         currencyId: security.currency.id,
         priceFetchedAt: security.priceFetchedAt
     };
-}
+};

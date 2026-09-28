@@ -19,7 +19,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			if (!userProfile) return;
 
 			setUser(userProfile);
-			changeLanguage(userProfile.languageCode)
+			changeLanguage(userProfile.languageCode);
 		};
 		fetchUser();
 	}, []);
@@ -28,8 +28,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		const isLanguageChanged = user?.languageCode !== updatedUser.languageCode;
 		setUser(updatedUser);
 		if (isLanguageChanged) {
-			changeLanguage(updatedUser.languageCode)
-			localStorage.setItem("lang", updatedUser.languageCode)
+			changeLanguage(updatedUser.languageCode);
+			localStorage.setItem("lang", updatedUser.languageCode);
 		}
 	}, []);
 

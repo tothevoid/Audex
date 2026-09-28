@@ -16,8 +16,8 @@ import { getStoredIconUrl } from '@/api/iconApi';
 import { OperationResult } from '@/shared/models/OperationResult';
 
 const basicUrl = `Security`;
-const ENTITY_NAME = "securityJson"
-const ICON_NAME = "securityIcon"
+const ENTITY_NAME = "securityJson";
+const ICON_NAME = "securityIcon";
 
 export const getSecurities = async (): Promise<SecurityEntity[]> => {
     return await getAllEntities<SecurityEntityResponse>(basicUrl)
@@ -27,11 +27,11 @@ export const getSecurities = async (): Promise<SecurityEntity[]> => {
 export const getSecurityById = async (id: string): Promise<SecurityEntity | void> => {
     return await getEntityById<SecurityEntityResponse>(basicUrl, id)
         .then((response: SecurityEntityResponse | void) => response && prepareSecurity(response));
-}
+};
 
 export const getSecurityStats = async (securityId: string): Promise<SecurityStats | void> => {
     return getEntity<SecurityStats>(`${basicUrl}/GetStats?securityId=${securityId}`);
-}
+};
 
 export const getTickerHistory = async (
     ticker: string,
@@ -72,12 +72,12 @@ export const updateSecurity = async (
 
 export const deleteSecurity = async (securityId: string): Promise<boolean> => {
     return await deleteEntity(basicUrl, securityId);
-}
+};
 
 export const searchMarketSecurity = async (query: string): Promise<MarketSecurityInfoEntity | null> => {
     return getEntity<MarketSecurityInfoEntity>(`${basicUrl}/SearchMarket?query=${encodeURIComponent(query)}`)
         .then(result => result ?? null);
-}
+};
 
 export const getIconUrl = (iconKey: Nullable<string>): string => {
     if (!iconKey) {
@@ -85,4 +85,4 @@ export const getIconUrl = (iconKey: Nullable<string>): string => {
     }
 
     return getStoredIconUrl(basicUrl, iconKey);
-}
+};

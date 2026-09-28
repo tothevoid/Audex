@@ -40,7 +40,7 @@ const Dividend = (props: Props) => {
                 </Flex>
             </Flex>
         </CardBody>
-    </Card.Root>
+    </Card.Root>;
 };
 
 export default Dividend;

@@ -13,24 +13,24 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 	const [transactions, setTransactions] = useState<TransactionEntity[]>([]);
 	const [isTransactionsLoading, setLoading] = useState(false);
 
-	const [error, setError] = useState<string | null>(null)
-	const [params, setParams] = useState<TransactionsQuery>(initialParams)
+	const [error, setError] = useState<string | null>(null);
+	const [params, setParams] = useState<TransactionsQuery>(initialParams);
 
 	const fetchData = useCallback(async () => {
-		setLoading(true)
+		setLoading(true);
 		try {
 			const transactions = await getTransactions(params.month, params.year, params.showSystem);
 			setTransactions(transactions);
 		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных')
+			setError(err.message || 'Ошибка загрузки данных');
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}, [params])
+	}, [params]);
 
 	useEffect(() => {
 		fetchData();
-	}, [fetchData])
+	}, [fetchData]);
 
 	const createTransactionEntity = async (transaction: TransactionEntity) => {
 		const createdTransaction = await createTransaction(transaction);
@@ -42,7 +42,7 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 		const newTransactions = insertByPredicate([...transactions], createdTransaction, 
 			(transactionElm: TransactionEntity) => (transactionElm.date <= createdTransaction.date));
 		setTransactions(newTransactions);
-	}
+	};
 
 	const updateTransactionEntity = async (updatedTransaction: TransactionEntity) => {
 		const updated = await updateTransaction(updatedTransaction);
@@ -67,7 +67,7 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 			(currentElement: TransactionEntity) => (currentElement.id !== updatedTransaction.id));
 
 		setTransactions(updatedTransactions);
-	}
+	};
 
 	const deleteTransactionEntity = async (deletedTransaction: TransactionEntity) => {
 		if (!deletedTransaction) {
@@ -77,18 +77,18 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 		await deleteTransaction(deletedTransaction.id);
 
 		deleteTransactionFromCollection(deletedTransaction);
-	}
+	};
 	
 	const deleteTransactionFromCollection = (deletingTransaction: TransactionEntity) => {
 		const updatedTransactions = transactions
-			.filter((transaction: TransactionEntity) => transaction.id !== deletingTransaction.id)
+			.filter((transaction: TransactionEntity) => transaction.id !== deletingTransaction.id);
 		setTransactions(updatedTransactions);
-	}
+	};
 
 	const isCurrentMonthTransaction = (transaction: TransactionEntity): boolean => {
 		return transaction.date.getMonth() === params.month - 1 &&
-			   transaction.date.getFullYear() === params.year
-	}
+			   transaction.date.getFullYear() === params.year;
+	};
 
 	return {
 		transactions,
@@ -100,5 +100,5 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 		refetch: fetchData,
 		setParams,
 		params
-	}
-}
+	};
+};

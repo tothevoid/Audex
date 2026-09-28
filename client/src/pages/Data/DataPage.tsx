@@ -24,7 +24,7 @@ const DataPage = () => {
     const Component = tabs.get(tab);
 
     if (!Component){
-        return <Fragment/>
+        return <Fragment/>;
     }
 
     return (
@@ -32,6 +32,6 @@ const DataPage = () => {
             <Component/>
         </DataLayout>
     );
-}
+};
 
 export default DataPage;

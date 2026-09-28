@@ -30,12 +30,12 @@ const BrokerAccountTypesTable: React.FC = () => {
             try {
                 const brokerAccountTypes = await getBrokerAccountTypes();
                 setState((currentState) => {
-                    return {...currentState, brokerAccountTypes}
+                    return {...currentState, brokerAccountTypes};
                 });
             } finally {
                 setIsLoading(false);
             }
-        }
+        };
 
         initData();
     }, []);
@@ -47,7 +47,7 @@ const BrokerAccountTypesTable: React.FC = () => {
     }, [updatedBrokerAccountType]);
     
     const onAdd = () => {
-        modalRef.current?.openModal()
+        modalRef.current?.openModal();
     };
 
     const onEditClicked = (brokerAccountType: BrokerAccountTypeEntity) => {
@@ -81,10 +81,10 @@ const BrokerAccountTypesTable: React.FC = () => {
 
     const onDeleteClicked = async (brokerAccountType: BrokerAccountTypeEntity) => {
         setState((currentState) => {
-            return {...currentState, currentBrokerAccountTypeId: brokerAccountType.id}
-        })
-        confirmModalRef.current?.openModal()
-    }
+            return {...currentState, currentBrokerAccountTypeId: brokerAccountType.id};
+        });
+        confirmModalRef.current?.openModal();
+    };
 
     const onDeleteConfirmed = async () => {
         const {currentBrokerAccountTypeId} = state;
@@ -104,9 +104,9 @@ const BrokerAccountTypesTable: React.FC = () => {
         });
 
         setState((currentState) => {
-            return {...currentState, brokerAccountTypes, currentBrokerAccountTypeId: null}
-        })
-    }
+            return {...currentState, brokerAccountTypes, currentBrokerAccountTypeId: null};
+        });
+    };
 
     const columns: ColumnDef<BrokerAccountTypeEntity>[] = useMemo(() => [
         {
@@ -169,7 +169,7 @@ const BrokerAccountTypesTable: React.FC = () => {
             message={t("modals_delete_message")}
             confirmActionName={t("modals_delete_button")}
             ref={confirmModalRef}/>
-    </Box>
-}
+    </Box>;
+};
 
 export default BrokerAccountTypesTable;

@@ -7,5 +7,5 @@ export const prepareUserProfileRequest = (userProfile: UserProfileEntity): UserP
         currencyId: userProfile.currency.id,
         languageCode: userProfile.languageCode,
         timeZoneId: userProfile.timeZoneId
-    }
-}
+    };
+};

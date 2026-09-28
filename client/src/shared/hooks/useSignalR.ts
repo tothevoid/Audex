@@ -2,9 +2,9 @@ import { useEffect, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
 import config from "@/config";
 
-const HANDLER_NAME = "ReceiveServerMessage"
+const HANDLER_NAME = "ReceiveServerMessage";
 
-export const useSignalR = (onMessage: (message: string) => Promise<void>) => {
+export const useSignalR = (onMessage: (message: string) => Promise<void> | void) => {
 	const connectionRef = useRef<signalR.HubConnection | null>(null);
 	const onMessageRef = useRef(onMessage);
 	onMessageRef.current = onMessage;

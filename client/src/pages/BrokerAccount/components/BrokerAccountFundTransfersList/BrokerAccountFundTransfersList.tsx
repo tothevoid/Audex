@@ -45,12 +45,12 @@ const BrokerAccountFundTransfersList: React.FC<Props> = (props) => {
 
     const onDeleteConfirmed = async () => {
        	if (!activeEntity) {
-			throw new Error("Deleted entity is not set")
+			throw new Error("Deleted entity is not set");
 		}
 
 		await deleteFundTransferEntity(activeEntity);
 		onActionEnded();
-    }
+    };
 
     const [context, setContext] = useState<Nullable<CreateBrokerAccountFundTransferContext | EditBrokerAccountFundTransferContext>>(null);
 

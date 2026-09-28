@@ -1,6 +1,6 @@
-import { TransactionEntityResponse, TransactionEntity, TransactionEntityRequest } from "@/models/transactions/TransactionEntity"
-import { convertToDateOnly } from "@/shared/utilities/dateUtils"
-import { prepareAccount } from "@/api/accounts/accountApiMapping"
+import { TransactionEntityResponse, TransactionEntity, TransactionEntityRequest } from "@/models/transactions/TransactionEntity";
+import { convertToDateOnly } from "@/shared/utilities/dateUtils";
+import { prepareAccount } from "@/api/accounts/accountApiMapping";
 
 export const prepareTransactionRequest = (transaction: TransactionEntity): TransactionEntityRequest => {
     return {
@@ -12,8 +12,8 @@ export const prepareTransactionRequest = (transaction: TransactionEntity): Trans
         amount: transaction.amount,
         transactionTypeId: transaction.transactionType.id,
         accountId: transaction.account.id
-    }
-}
+    };
+};
 
 
 export const prepareTransaction = (transaction: TransactionEntityResponse): TransactionEntity => {
@@ -26,5 +26,5 @@ export const prepareTransaction = (transaction: TransactionEntityResponse): Tran
         amount: transaction.amount,
         transactionType: transaction.transactionType,
         account: prepareAccount(transaction.account)
-    }
-}
+    };
+};

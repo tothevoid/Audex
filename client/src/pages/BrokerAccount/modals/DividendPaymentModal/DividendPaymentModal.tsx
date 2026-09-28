@@ -1,6 +1,6 @@
-import { Field, Input} from "@chakra-ui/react"
+import { Field, Input} from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
-import { RefObject, useCallback, useEffect, useMemo, useState } from "react"
+import { RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -56,7 +56,7 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 			securitiesQuantity: dividendPayment?.securitiesQuantity ?? 0,
 			tax: dividendPayment?.tax ?? 0,
 			receivedAt: dividendPayment?.receivedAt ?? new Date(),
-		}
+		};
 	}, [props.context]);
 
 	const validationSchema = useMemo(() => getDividendPaymentValidationSchema(t), [t]);
@@ -80,7 +80,7 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 		return "dividendPayment" in props.context ?
 			props.context.dividendPayment.brokerAccount.id:
 			props.context.brokerAccountId;
-	}
+	};
 
 	const fetchAvailableDividends = async () => {
 		const brokerAccountId = getBrokerAccountId();
@@ -102,8 +102,8 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 			securities.set(securityId, dividend.security);
 		});
 		
-		setAvailableSecurities([...securities.values()])
-	}
+		setAvailableSecurities([...securities.values()]);
+	};
 
 	const fetchBrokerAccounts = async () => {
 		if (!props.isGlobalBrokerAccount) {
@@ -112,7 +112,7 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 
 		const brokerAccounts = await getBrokerAccounts();
 		setBrokerAccounts(brokerAccounts);
-	}
+	};
 
 	useEffect(() => {
 		const security = "dividendPayment" in props.context ?
@@ -125,7 +125,7 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 		const runAsync = async () => {
 			await fetchBrokerAccounts();
 			await fetchAvailableDividends();
-		}
+		};
 		runAsync();
 	}, []);
 
@@ -135,8 +135,8 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 			return;
 		}
 
-		setDividendsBySecurity(availableDividends.filter((dividend) => dividend.security.id === selectedSecurity.id))
-	}, [selectedSecurity, availableDividends])
+		setDividendsBySecurity(availableDividends.filter((dividend) => dividend.security.id === selectedSecurity.id));
+	}, [selectedSecurity, availableDividends]);
 
 	useEffect(() => {
 		reset(getFormDefaultValues());
@@ -147,15 +147,15 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 			return;
 		}
 
-		setPayment(securitiesQuantity * dividend.amount - tax)
-	}, [securitiesQuantity, dividend, tax])
+		setPayment(securitiesQuantity * dividend.amount - tax);
+	}, [securitiesQuantity, dividend, tax]);
 
 	useEffect(() => {
 		const runAsync = async () => {
 			await fetchAvailableDividends();
 		};
 		runAsync();
-	}, [brokerAccount])
+	}, [brokerAccount]);
 
 	useEffect(() => {
 		if (props.isGlobalBrokerAccount) {
@@ -167,7 +167,7 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 	const onSubmit = (dividendPayment: DividendPaymentFormInput) => {
 		props.onSaved(dividendPayment as DividendPaymentEntity);
 		props.modalRef?.current?.closeModal();
-	}
+	};
 
 	const onModalVisibilityChanged = async (open: boolean) => {
 		if (!open) {
@@ -177,7 +177,7 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 		reset(getFormDefaultValues());
 		setPayment(0);
 		await fetchAvailableDividends();
-	}
+	};
   
 	return <BaseFormModal ref={props.modalRef} title={t("entity_dividend_payment_form_title")} 
 		submitHandler={handleSubmit(onSubmit)} visibilityChanged={onModalVisibilityChanged}>
@@ -229,7 +229,7 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 				<Input disabled value={selectedSecurity ? formatMoneyByCurrencyCulture(payment, selectedSecurity?.currency.name): ""}/>
 			</Field.Root>
 		}
-	</BaseFormModal>
-}
+	</BaseFormModal>;
+};
 
-export default DividendPaymentModal
+export default DividendPaymentModal;

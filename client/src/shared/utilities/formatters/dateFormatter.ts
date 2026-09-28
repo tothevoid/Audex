@@ -53,18 +53,18 @@ export const formatNumericDate = (date: Date, format: i18n, showYear: boolean = 
 };
 
 export const formatMonthYear = (month: number, year: number) => {
-	return `${month.toString().padStart(2, "0")}-${year}`
-}
+	return `${month.toString().padStart(2, "0")}-${year}`;
+};
 
 export const formatMonthYearByDate = (date: Date) => {
-	return formatMonthYear(date.getMonth() + 1, date.getFullYear())
-}
+	return formatMonthYear(date.getMonth() + 1, date.getFullYear());
+};
 
 export const formatMonth = (month: number, format: i18n): string => {
 	const date = new Date();
 	date.setMonth(month - 1);
 	return date.toLocaleString(format.language, { month: 'long' });
-}
+};
 
 export type ChartPeriod = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "5Y" | "10Y";
 

@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Input, Image} from "@chakra-ui/react"
+import { Box, Button, Flex, Input, Image} from "@chakra-ui/react";
 import { ChangeEvent, Fragment, useRef } from "react";
 import { Nullable } from "@/shared/utilities/nullable";
 import { MdFileUpload } from "react-icons/md";
@@ -16,7 +16,7 @@ const ImageInput: React.FC<ModalProps> = ({imageUrl, onImageSelected}) => {
         if (selectedFile) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                onImageSelected(reader.result as string, selectedFile)
+                onImageSelected(reader.result as string, selectedFile);
             };
             reader.readAsDataURL(selectedFile);
         }
@@ -52,8 +52,8 @@ const ImageInput: React.FC<ModalProps> = ({imageUrl, onImageSelected}) => {
                 <MdFileUpload/>
             </Button>
         </Box>
-    </Flex>
+    </Flex>;
     
-}
+};
 
 export default ImageInput;

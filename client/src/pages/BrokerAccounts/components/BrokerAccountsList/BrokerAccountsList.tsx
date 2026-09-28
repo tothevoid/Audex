@@ -13,7 +13,7 @@ import SectionHeader from '@/shared/components/SectionHeader/SectionHeader';
 import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 
 const BrokerAccountsList: React.FC = () => {
-	const { t } = useTranslation()
+	const { t } = useTranslation();
 
 	const {
 		activeEntity,
@@ -40,16 +40,16 @@ const BrokerAccountsList: React.FC = () => {
 			await updateBrokerAccountEntity(brokerAccount);
 		}
 		onActionEnded();
-	}
+	};
 
 	const onDeleteConfirmed = async () => {
 		if (!activeEntity) {
-			throw new Error("Deleted entity is not set")
+			throw new Error("Deleted entity is not set");
 		}
 
 		await deleteBrokerAccountEntity(activeEntity);
 		onActionEnded();
-	}
+	};
 
 	const getHeader = () => {
 		const placeholderAddButton = (
@@ -92,6 +92,6 @@ const BrokerAccountsList: React.FC = () => {
 			<BrokerAccountModal brokerAccount={activeEntity} modalRef={modalRef} onSaved={onBrokerAccountSaved}/>
 		</Fragment>
 	);
-}
+};
 
 export default BrokerAccountsList;

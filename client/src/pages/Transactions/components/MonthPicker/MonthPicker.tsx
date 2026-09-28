@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from "react"
-import "./MonthPicker.css"
-import { getMonthByIndex } from "@/shared/utilities/dateUtils"
-import { Calendar } from "@/shared/components/Calendar/Calendar"
-import { MdChevronLeft, MdChevronRight, MdCalendarMonth } from "react-icons/md"
-import { useTranslation } from "react-i18next"
-import { Box, Button, Flex } from "@chakra-ui/react"
+import { useEffect, useRef, useState } from "react";
+import "./MonthPicker.css";
+import { getMonthByIndex } from "@/shared/utilities/dateUtils";
+import { Calendar } from "@/shared/components/Calendar/Calendar";
+import { MdChevronLeft, MdChevronRight, MdCalendarMonth } from "react-icons/md";
+import { useTranslation } from "react-i18next";
+import { Box, Button, Flex } from "@chakra-ui/react";
 
 type State = {
     isCalendarVisible: boolean
@@ -17,7 +17,7 @@ type Props = {
 }
 
 const MonthPicker: React.FC<Props> = (props: Props) => {
-    const [state, setState] = useState<State>({ isCalendarVisible: false })
+    const [state, setState] = useState<State>({ isCalendarVisible: false });
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -50,16 +50,16 @@ const MonthPicker: React.FC<Props> = (props: Props) => {
             month += direction;
         }
         props.onPageSwitched(month, year);
-    }
+    };
 
     const onSwitchCalendarVisibility = () => {
         setState((prev) => ({ isCalendarVisible: !prev.isCalendarVisible }));
-    }
+    };
 
     const { i18n } = useTranslation();
     const { isCalendarVisible } = state;
     const { month, year, onPageSwitched } = props;
-    const date = `${getMonthByIndex(month, i18n)}'${year.toString().substring(2)}`
+    const date = `${getMonthByIndex(month, i18n)}'${year.toString().substring(2)}`;
 
     return (
         <Box ref={containerRef} position="relative" display="inline-flex" flexDirection="column" alignItems="center">
@@ -94,6 +94,6 @@ const MonthPicker: React.FC<Props> = (props: Props) => {
             )}
         </Box>
     );
-}
+};
 
 export default MonthPicker;

@@ -1,6 +1,6 @@
-import { Button, CloseButton, Dialog, Portal, useDisclosure } from "@chakra-ui/react"
+import { Button, CloseButton, Dialog, Portal, useDisclosure } from "@chakra-ui/react";
 import React, { useImperativeHandle } from "react";
-import { forwardRef } from "react"
+import { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
@@ -22,7 +22,7 @@ export const ConfirmModal = forwardRef<BaseModalRef, Props>((props: Props, ref) 
     const onConfirmed = () => {
         onClose();
         props.onConfirmed();
-    }
+    };
 
     const { t } = useTranslation();
 

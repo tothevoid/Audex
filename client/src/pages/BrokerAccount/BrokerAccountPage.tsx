@@ -38,7 +38,7 @@ const BrokerAccountPage: React.FC = () => {
         }
 
         await onTransactionsChanged();
-    }
+    };
 
     const fetchBrokerAccount = useCallback(async () => {
         if (!brokerAccountId) {
@@ -51,16 +51,16 @@ const BrokerAccountPage: React.FC = () => {
         }
 
         setState((currentState) => {
-            return {...currentState, brokerAccount, isReloading: false}
-        })
-    }, [brokerAccountId])
+            return {...currentState, brokerAccount, isReloading: false};
+        });
+    }, [brokerAccountId]);
 
     const fetchLastPullDate = async () => {
         const lastPullDate = await getLastPullDate();
         if (lastPullDate) {
             setLastPullDate(lastPullDate);
         }
-    }
+    };
 
     useSignalR(onQuotesRecalculated);
 
@@ -68,7 +68,7 @@ const BrokerAccountPage: React.FC = () => {
         const getData = async () => {
             await fetchBrokerAccount();
             await fetchLastPullDate();
-        }
+        };
 
         getData();
     }, []);
@@ -81,13 +81,13 @@ const BrokerAccountPage: React.FC = () => {
         const account = state.brokerAccount;
 
         const fetchPortfolioValues = async () => {
-            const values = await getPortfolioValues(account.id)
+            const values = await getPortfolioValues(account.id);
             if (values) {
                 setPortfolio(values);
             }
-        }
+        };
 
-        fetchPortfolioValues()
+        fetchPortfolioValues();
     }, [state.brokerAccount]);
 
     const onTransactionsChanged = useCallback(async () => {
@@ -97,15 +97,15 @@ const BrokerAccountPage: React.FC = () => {
 
 
     if (!brokerAccountId) {
-        return <Fragment/>
+        return <Fragment/>;
     }
 
     const pullQuotations = async () => {
        setState((currentState) => {
-            return {...currentState, isReloading: true}
-        })
+            return {...currentState, isReloading: true};
+        });
         pullBrokerAccountQuotations(brokerAccountId);
-    }
+    };
 
     const onActionTriggered = async (action: ChangeAction) => {
         switch (action) {
@@ -118,10 +118,10 @@ const BrokerAccountPage: React.FC = () => {
                 await fetchBrokerAccount();
                 break;
         }
-    }
+    };
 
     if (!state.brokerAccount) {
-        return <Fragment/>
+        return <Fragment/>;
     }
 
     return <Fragment>
@@ -143,8 +143,8 @@ const BrokerAccountPage: React.FC = () => {
             defaultBrokerAccountId={brokerAccountId}
             onImportSuccess={onTransactionsChanged}
         />
-    </Fragment>
-}
+    </Fragment>;
+};
 
 
 export default BrokerAccountPage;

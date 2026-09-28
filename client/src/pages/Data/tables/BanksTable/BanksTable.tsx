@@ -34,12 +34,12 @@ const BanksTable: React.FC = () => {
         try {
             const banks = await getBanks();
             setState((currentState) => {
-                return {...currentState, banks}
+                return {...currentState, banks};
             });
         } finally {
             setIsLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
         fetchBanks();
@@ -58,16 +58,16 @@ const BanksTable: React.FC = () => {
     }, [updatedBank]);
     
     const onAdd = () => {
-        modalRef.current?.openModal()
+        modalRef.current?.openModal();
     };
 
     const onEditClicked = (bank: BankEntity) => {
         setUpdatedBank(bank);
-    }
+    };
 
     const onModalClosed = () => {
         setUpdatedBank(null);
-    }
+    };
 
     const onBankSaved = async (savedBank: BankEntity, icon: Nullable<File>) => {
         const isModified = state.banks
@@ -87,9 +87,9 @@ const BanksTable: React.FC = () => {
         }
 
         setState((currentState) => {
-            return {...currentState, banks: [...currentState.banks, addedBank]}
-        })
-    }
+            return {...currentState, banks: [...currentState.banks, addedBank]};
+        });
+    };
 
     const onBankUpdated = async (bankToUpdate: BankEntity, icon: Nullable<File>) => {
         const updatedBank = await updateBank(bankToUpdate, icon);
@@ -102,13 +102,13 @@ const BanksTable: React.FC = () => {
                 bankToUpdate.id !== bank.id ?
                     bank:
                     updatedBank
-            )}
-        })
-    }
+            )};
+        });
+    };
 
     const onDeleteClicked = async (bank: BankEntity) => {
-        setBankToDeleteId(bank.id)
-    }
+        setBankToDeleteId(bank.id);
+    };
 
     const onDeleteConfirmed = async () => {
         if (!bankToDeleteId){
@@ -126,10 +126,10 @@ const BanksTable: React.FC = () => {
         });
 
         setState((currentState) => {
-            return {...currentState, banks: banks}
-        })
+            return {...currentState, banks: banks};
+        });
         setBankToDeleteId(null);
-    }
+    };
 
     const columns: ColumnDef<BankEntity>[] = useMemo(() => [
         {
@@ -197,7 +197,7 @@ const BanksTable: React.FC = () => {
             message={t("modals_delete_message")}
             confirmActionName={t("modals_delete_button")}
             ref={confirmModalRef}/>
-    </Box>
-}
+    </Box>;
+};
 
 export default BanksTable;

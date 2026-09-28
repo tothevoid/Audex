@@ -33,12 +33,12 @@ const TransactionTypesTable: React.FC = () => {
             try {
                 const transactionTypes = await getTransactionTypes();
                 setState((currentState) => {
-                    return {...currentState, transactionTypes}
+                    return {...currentState, transactionTypes};
                 });
             } finally {
                 setIsLoading(false);
             }
-        }
+        };
 
         initData();
     }, []);
@@ -56,12 +56,12 @@ const TransactionTypesTable: React.FC = () => {
     }, [updatedTransactionType]);
     
     const onAdd = () => {
-        modalRef.current?.openModal()
+        modalRef.current?.openModal();
     };
 
     const onEditClicked = (transactionType: TransactionTypeEntity) => {
         setUpdatedTransactionType(transactionType);
-    }
+    };
 
     const onTransactionTypeSaved = async (savedTransactionType: TransactionTypeEntity, icon: File | null) => {
         const isModified = state.transactionTypes
@@ -81,9 +81,9 @@ const TransactionTypesTable: React.FC = () => {
         }
 
         setState((currentState) => {
-            return {...currentState, transactionTypes: [...currentState.transactionTypes, addedTransactionType]}
-        })
-    }
+            return {...currentState, transactionTypes: [...currentState.transactionTypes, addedTransactionType]};
+        });
+    };
 
     const onTransactionTypeUpdated = async (savedTransactionType: TransactionTypeEntity, icon: File | null) => {
         const updatedTransactionType = await updateTransactionType(savedTransactionType, icon);
@@ -96,13 +96,13 @@ const TransactionTypesTable: React.FC = () => {
                 transactionType.id !== savedTransactionType.id ?
                     transactionType:
                     updatedTransactionType
-            )}
-        })
-    }
+            )};
+        });
+    };
 
     const onDeleteClicked = async (transactionType: TransactionTypeEntity) => {
-        setTransactionTypeToDeleteId(transactionType.id)
-    }
+        setTransactionTypeToDeleteId(transactionType.id);
+    };
 
     const onDeleteConfirmed = async () => {
         if (!transactionTypeToDeleteId){
@@ -120,14 +120,14 @@ const TransactionTypesTable: React.FC = () => {
         });
 
         setState((currentState) => {
-            return {...currentState, transactionTypes: transactionTypes}
-        })
+            return {...currentState, transactionTypes: transactionTypes};
+        });
         setTransactionTypeToDeleteId(null);
-    }
+    };
 
     const onModalClosed = () => {
         setUpdatedTransactionType(null);
-    }
+    };
 
     const columns: ColumnDef<TransactionTypeEntity>[] = useMemo(() => [
         {
@@ -195,7 +195,7 @@ const TransactionTypesTable: React.FC = () => {
             message={t("modals_delete_message")}
             confirmActionName={t("modals_delete_button")}
             ref={confirmModalRef}/>
-    </Box>
-}
+    </Box>;
+};
 
 export default TransactionTypesTable;

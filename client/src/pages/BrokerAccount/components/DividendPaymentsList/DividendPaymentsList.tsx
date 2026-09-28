@@ -65,16 +65,16 @@ const DividendPaymentsList: React.FC<Props> = (props) => {
 			updateDividendPaymentEntity(dividendPayment);
 		}
 		onActionEnded();
-	}
+	};
 
 	const onDeleteConfirmed = async () => {
 		if (!activeEntity) {
-			throw new Error("Deleted entity is not set")
+			throw new Error("Deleted entity is not set");
 		}
 
 		await deleteDividendPaymentEntity(activeEntity);
 		onActionEnded();
-	}
+	};
 
 	const isGlobalBrokerAccount = !props.brokerAccountId;
 

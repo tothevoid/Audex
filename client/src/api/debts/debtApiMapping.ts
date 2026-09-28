@@ -9,7 +9,7 @@ export const prepareDebtRequest = (debt: DebtEntity): DebtEntityRequest => {
         currencyId: debt.currency.id,
         date: convertToDateOnly(debt.date)
     };
-}
+};
 
 export const prepareDebt = (debt: DebtEntityResponse): DebtEntity => {
     return {
@@ -20,4 +20,4 @@ export const prepareDebt = (debt: DebtEntityResponse): DebtEntity => {
         date: new Date(debt.date),
         debtTags: debt.debtTags || []
     };
-}
+};

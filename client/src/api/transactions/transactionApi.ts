@@ -14,12 +14,12 @@ export const getTransactions = async (month: number, year: number, showSystem: b
 export const createTransaction = async (transaction: TransactionEntity): Promise<TransactionEntity | void> => {
 	return await createAndGetFullEntity<TransactionEntityRequest, TransactionEntityResponse>(basicUrl, prepareTransactionRequest(transaction))
 		.then(createdTransaction => createdTransaction && prepareTransaction(createdTransaction));
-}
+};
 
 export const updateTransaction = async (modifiedTransaction: TransactionEntity): Promise<boolean> => {
 	return await updateEntity<TransactionEntityRequest>(basicUrl, prepareTransactionRequest(modifiedTransaction));
-}
+};
 
 export const deleteTransaction = async (transactionId: string): Promise<boolean> => {
 	return await deleteEntity(basicUrl, transactionId);
-}
+};

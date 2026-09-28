@@ -1,5 +1,5 @@
-import { useState } from "react"
-import "./Calendar.scss"
+import { useState } from "react";
+import "./Calendar.scss";
 import { getMonthsNames } from "@/shared/utilities/dateUtils";
 import { useTranslation } from "react-i18next";
 import { Box } from "@chakra-ui/react";
@@ -21,15 +21,15 @@ export const Calendar: React.FC<Props> = (props: Props) => {
         return (isYearsMode) ? 
             `${year} - ${year + 11}` :
             year.toString();
-    }
+    };
 
     const getDefaultState = () => {
         return {
             minimalYear: props.year,
             isYearsMode: false,
             title: getTitle(false, props.year)
-        }
-    }
+        };
+    };
 
 
     const createArray = (): string[] => {
@@ -38,7 +38,7 @@ export const Calendar: React.FC<Props> = (props: Props) => {
             Array.from({length: 12}, (_, index:number) => 
                 (minimalYear + index).toString()) :
             getMonthsNames(i18n).map((name: string) => name.substring(0, 3));
-    }
+    };
 
     const onElementClick = (value: string) => {
         const {onPageSwitched} = props;
@@ -46,19 +46,19 @@ export const Calendar: React.FC<Props> = (props: Props) => {
         if (isYearsMode){
             const year = parseInt(value);
             onPageSwitched(props.month, year);
-            setState((currentState) => {return {...currentState, isYearsMode: false, title: getTitle(false, year)}});
+            setState((currentState) => {return {...currentState, isYearsMode: false, title: getTitle(false, year)};});
         } else {
             const monthIndex = getMonthIndex(value);
             onPageSwitched(monthIndex, minimalYear);
         }
-    }
+    };
 
     const getMonthIndex = (value: string): number =>{
         const months = getMonthsNames(i18n);
         const month = months
             .filter(x => x.toLowerCase().startsWith(value.toLowerCase()));
-        return months.indexOf(month[0]) + 1
-    }
+        return months.indexOf(month[0]) + 1;
+    };
 
     const getClasses = (value: string): string =>{
         const defaultClass = "calendar-element";
@@ -69,17 +69,17 @@ export const Calendar: React.FC<Props> = (props: Props) => {
             (!isYearsMode && month === monthIndex)) ?
             `${defaultClass} current` :
             defaultClass;
-    }
+    };
 
     const onLabelClick = () => {
         const {year} = props;
         const {isYearsMode} = state;
         if (!isYearsMode) {
             setState((currentState) => {
-                return {...currentState, isYearsMode: true, title: getTitle(true, year)}
+                return {...currentState, isYearsMode: true, title: getTitle(true, year)};
             });
         }
-    }
+    };
 
     const onArrowClick = (value: number) => {
         const {minimalYear, isYearsMode} = state;
@@ -88,14 +88,14 @@ export const Calendar: React.FC<Props> = (props: Props) => {
             minimalYear + value * 12:
             minimalYear + value;
 
-        const title = getTitle(isYearsMode, newMininimal)
+        const title = getTitle(isYearsMode, newMininimal);
 
         setState((currentState) => {
-            return { ...currentState, minimalYear: newMininimal, title}
+            return { ...currentState, minimalYear: newMininimal, title};
         });
-    }
+    };
 
-    const [state, setState] = useState<State>(getDefaultState)
+    const [state, setState] = useState<State>(getDefaultState);
     const {title} = state;
 
     const { i18n} = useTranslation();
@@ -110,8 +110,8 @@ export const Calendar: React.FC<Props> = (props: Props) => {
         <div className="calendar-content">
             {createArray().map((element, index)=>{
                 return <div key={index} onClick={()=>onElementClick(element)}
-                    className={getClasses(element)}>{element}</div>
+                    className={getClasses(element)}>{element}</div>;
             })}
         </div>
-    </Box> 
-}
+    </Box>; 
+};

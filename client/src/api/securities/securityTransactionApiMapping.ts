@@ -1,6 +1,6 @@
-import { SecurityTransactionEntity, SecurityTransactionEntityRequest, SecurityTransactionEntityResponse } from "@/models/securities/SecurityTransactionEntity"
-import { prepareBrokerAccount } from "@/api/brokers/brokerAccountApiMapping"
-import { prepareSecurity } from "./securityApiMapping"
+import { SecurityTransactionEntity, SecurityTransactionEntityRequest, SecurityTransactionEntityResponse } from "@/models/securities/SecurityTransactionEntity";
+import { prepareBrokerAccount } from "@/api/brokers/brokerAccountApiMapping";
+import { prepareSecurity } from "./securityApiMapping";
 
 export const prepareSecurityTransactionRequest = (securityTransaction: SecurityTransactionEntity): SecurityTransactionEntityRequest => {
     return {
@@ -14,8 +14,8 @@ export const prepareSecurityTransactionRequest = (securityTransaction: SecurityT
         brokerAccountId: securityTransaction.brokerAccount.id,
         securityId: securityTransaction.security.id,
         isSell: securityTransaction.isSell
-    }
-}
+    };
+};
 
 export const prepareSecurityTransaction = (securityTransaction: SecurityTransactionEntityResponse): SecurityTransactionEntity => {
     return {
@@ -29,5 +29,5 @@ export const prepareSecurityTransaction = (securityTransaction: SecurityTransact
         brokerAccount: prepareBrokerAccount(securityTransaction.brokerAccount),
         security: prepareSecurity(securityTransaction.security),
         isSell: securityTransaction.isSell
-    }
-}
+    };
+};

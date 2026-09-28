@@ -32,7 +32,7 @@ const DashboardPage: React.FC = () => {
 		setState((currentState) => {
 			return {...currentState, dashboard};
 		});
-	}
+	};
 
 	useEffect(() => {
 		initDashboardData();
@@ -45,7 +45,7 @@ const DashboardPage: React.FC = () => {
 	const currency = user?.currency.name ?? "";
 
 	if (!state.dashboard || !user) {
-		return <Fragment/>
+		return <Fragment/>;
 	}
 
 	const {dashboard} = state;
@@ -62,7 +62,7 @@ const DashboardPage: React.FC = () => {
 
 	const formatDistributionCard = (title: string, total: Nullable<number>, distribution: DistributionModel[]) => {
 		if (!distribution.length) {
-			return <Fragment/>
+			return <Fragment/>;
 		}
 
 		return <Card.Root backgroundColor="background_primary" borderColor="border_primary">
@@ -76,8 +76,8 @@ const DashboardPage: React.FC = () => {
 					<DistributionChart data={distribution} mainCurrency={user.currency.name}/>
 				</Stack>
 			</Card.Body>
-		</Card.Root>
-	}
+		</Card.Root>;
+	};
 
 	const assetsSubCharts = [
 		formatDistributionCard(t("dashboard_cash"), dashboard.accountsGlobalDashboard.totalCash, dashboard.accountsGlobalDashboard.cashDistribution),
@@ -93,7 +93,7 @@ const DashboardPage: React.FC = () => {
 	const transactionsStats = [
 		formatDistributionCard(t("dashboard_transactions_spents"), dashboard.transactionsGlobalDashboard.spentsTotal, dashboard.transactionsGlobalDashboard.spentsDistribution),
 		formatDistributionCard(t("dashboard_transactions_incomes"), dashboard.transactionsGlobalDashboard.incomesTotal, dashboard.transactionsGlobalDashboard.incomesDistribution)
-	]
+	];
 
 	const getChart = () => {
 		return totalsData.length > 0 && <Card.Root backgroundColor="background_primary" borderColor="border_primary">
@@ -105,11 +105,11 @@ const DashboardPage: React.FC = () => {
 					<DistributionChart data={totalsData} mainCurrency={user.currency.name}/>
 				</Grid>
 			</Card.Body>
-		</Card.Root>
-	}
+		</Card.Root>;
+	};
 
 	if (!totalsData.length) {
-		return <Placeholder text={t("dashboard_empty")}/>
+		return <Placeholder text={t("dashboard_empty")}/>;
 	}
 
 	return (
@@ -125,7 +125,7 @@ const DashboardPage: React.FC = () => {
 				</Grid>
 			</Stack>
 		</PageContainer>
-	)
-}
+	);
+};
 
 export default DashboardPage;

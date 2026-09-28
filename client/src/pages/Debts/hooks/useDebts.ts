@@ -9,20 +9,20 @@ export const useDebts = () => {
 	const [error, setError] = useState<string | null>(null);
 
 	const fetchData = useCallback(async () => {
-		setLoading(true)
+		setLoading(true);
 		try {
 			const debts = await getDebts(false);
 			setDebts(debts);
 		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных')
+			setError(err.message || 'Ошибка загрузки данных');
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}, [])
+	}, []);
 
 	useEffect(() => {
 		fetchData();
-	}, [fetchData])
+	}, [fetchData]);
 
 	const createDebtEntity = async (debt: DebtEntity) => {
 		const added = await createDebt(debt);
@@ -31,7 +31,7 @@ export const useDebts = () => {
 		}
 
 		await fetchData();
-	}
+	};
 
 	const updateDebtEntity = async (updatedDebt: DebtEntity) => {
 		const debtUpdated = await updateDebt(updatedDebt);
@@ -46,7 +46,7 @@ export const useDebts = () => {
 		);
 
 		setDebts(updatedDebts);
-	}
+	};
 
 	const deleteDebtEntity = async (deletedDebt: DebtEntity) => {
 		const debtDeleted = await deleteDebt(deletedDebt.id);
@@ -56,7 +56,7 @@ export const useDebts = () => {
 
 		const updatedDebts = debts.filter(debt => debt.id !== deletedDebt.id);
 		setDebts(updatedDebts);
-	}
+	};
 
 	return {
 		debts,
@@ -66,5 +66,5 @@ export const useDebts = () => {
 		updateDebtEntity,
 		deleteDebtEntity,
 		reloadDebts: fetchData
-	}
-}
+	};
+};

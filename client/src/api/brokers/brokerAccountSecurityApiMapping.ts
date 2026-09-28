@@ -12,7 +12,7 @@ export const prepareBrokerAccountSecurityRequest = (brokerAccountSecurity: Broke
         soldPrice: brokerAccountSecurity.soldPrice,
         soldQuantity: brokerAccountSecurity.soldQuantity
     };
-}
+};
 
 export const prepareBrokerAccountSecurity = (brokerAccountSecurity: BrokerAccountSecurityEntityResponse): BrokerAccountSecurityEntity => {
     return {
@@ -24,4 +24,4 @@ export const prepareBrokerAccountSecurity = (brokerAccountSecurity: BrokerAccoun
         soldPrice: brokerAccountSecurity.soldPrice,
         soldQuantity: brokerAccountSecurity.soldQuantity
     };
-}
+};

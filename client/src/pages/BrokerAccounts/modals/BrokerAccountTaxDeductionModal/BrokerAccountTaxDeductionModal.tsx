@@ -46,7 +46,7 @@ const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = (props: ModalProps)
             brokerAccount: taxDeduction?.brokerAccount ?? brokerAccount,
             dateApplied: taxDeduction?.dateApplied ?? new Date(),
             amount: taxDeduction?.amount ?? 0
-        }
+        };
     }, [props.context]);
 
     const validationSchema = useMemo(() => getBrokerAccountTaxDeductionValidationSchema(t), [t]);
@@ -74,7 +74,7 @@ const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = (props: ModalProps)
         }
 
         reset(getDefaultValues());
-    }
+    };
 
     useEffect(() => {
         const runAsync = async () => {
@@ -83,7 +83,7 @@ const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = (props: ModalProps)
             }
             const brokerAccounts = await getBrokerAccounts();
             setBrokerAccounts(brokerAccounts);
-        }
+        };
 
         runAsync();
     }, []);

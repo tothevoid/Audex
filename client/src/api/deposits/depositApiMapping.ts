@@ -1,5 +1,5 @@
-import { DepositEntityResponse, DepositEntity, DepositEntityRequest } from "@/models/deposits/DepositEntity"
-import { convertToDateOnly } from "@/shared/utilities/dateUtils"
+import { DepositEntityResponse, DepositEntity, DepositEntityRequest } from "@/models/deposits/DepositEntity";
+import { convertToDateOnly } from "@/shared/utilities/dateUtils";
 
 export const prepareDepositEntity = (deposit: DepositEntityResponse): DepositEntity => {
     return {
@@ -12,8 +12,8 @@ export const prepareDepositEntity = (deposit: DepositEntityResponse): DepositEnt
         estimatedEarn: deposit.estimatedEarn,
         from: new Date(deposit.from),
         to: new Date(deposit.to),
-    }
-}
+    };
+};
 
 export const prepareDepositEntityRequest = (deposit: DepositEntity): DepositEntityRequest => {
     return {
@@ -26,5 +26,5 @@ export const prepareDepositEntityRequest = (deposit: DepositEntity): DepositEnti
         from: convertToDateOnly(deposit.from),
         to: convertToDateOnly(deposit.to),
         bankId: deposit.bank?.id
-    }
-}
+    };
+};

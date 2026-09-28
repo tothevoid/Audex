@@ -9,19 +9,19 @@ export const useCryptocurrencies = () => {
     const [error, setError] = useState<string | null>(null);
 
     const fetchData = useCallback(async () => {
-        setLoading(true)
+        setLoading(true);
         try {
             setCryptocurrencies(await getCryptocurrencies());
         } catch (err: any) {
-            setError(err.message || 'Ошибка загрузки данных')
+            setError(err.message || 'Ошибка загрузки данных');
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }, [])
+    }, []);
 
     useEffect(() => {
         fetchData();
-    }, [fetchData])
+    }, [fetchData]);
 
     const createCryptocurrencyEntity = async (createdCryptocurrency: CryptocurrencyEntity, icon: File | null) => {
         const createResult = await createCryptocurrency(createdCryptocurrency, icon);
@@ -30,7 +30,7 @@ export const useCryptocurrencies = () => {
         }
 
         setCryptocurrencies([createResult, ...cryptocurrencies]);
-    }
+    };
 
     const updateCryptocurrencyEntity = async (updatedCryptocurrency: CryptocurrencyEntity, icon: File | null) => {
         const updateResult = await updateCryptocurrency(updatedCryptocurrency, icon);
@@ -39,7 +39,7 @@ export const useCryptocurrencies = () => {
         }
     
         await fetchData();
-    }
+    };
 
     const deleteCryptocurrencyEntity = async (deletedCryptocurrency: CryptocurrencyEntity) => {
         const isCryptocurrencyDeleted = await deleteCryptocurrency(deletedCryptocurrency.id);
@@ -48,7 +48,7 @@ export const useCryptocurrencies = () => {
         }
 
         await fetchData();
-    }
+    };
 
     return {
         cryptocurrencies,
@@ -58,5 +58,5 @@ export const useCryptocurrencies = () => {
         updateCryptocurrencyEntity,
         deleteCryptocurrencyEntity,
         reloadCryptocurrencies: fetchData
-    }
-}
+    };
+};

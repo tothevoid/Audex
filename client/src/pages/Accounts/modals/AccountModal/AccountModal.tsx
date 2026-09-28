@@ -1,5 +1,5 @@
-import { Field, Input} from "@chakra-ui/react"
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react"
+import { Field, Input} from "@chakra-ui/react";
+import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountFormInput, getAccountValidationSchema } from "./AccountValidationSchema";
@@ -34,7 +34,7 @@ interface State {
 }
 
 const AccountModal: React.FC<ModalProps> = (props: ModalProps) => {
-  	const [state, setState] = useState<State>({currencies: [], accountTypes: [], banks: []})
+  	const [state, setState] = useState<State>({currencies: [], accountTypes: [], banks: []});
 
 	const [bankFieldVisible, setBankFieldVisible] = useState<boolean>(false);
 
@@ -43,29 +43,29 @@ const AccountModal: React.FC<ModalProps> = (props: ModalProps) => {
 			await initCurrencies();
 			await initAccountTypes();
 			await initBanks();
-		}
+		};
 		initData();
 	}, []);
 
 	const initCurrencies = async () => {
 		const currencies = await getCurrencies();
 		setState((currentState) => {
-			return {...currentState, currencies}
-		})
+			return {...currentState, currencies};
+		});
 	};
 
 	const initAccountTypes = async () => {
 		const accountTypes = await getAccountTypes();
 		setState((currentState) => {
-			return {...currentState, accountTypes}
-		})
-	}
+			return {...currentState, accountTypes};
+		});
+	};
 
 	const initBanks = async () => {
 		const banks = await getBanks();
 		setState((currentState) => {
-			return {...currentState, banks}
-		})
+			return {...currentState, banks};
+		});
 	};
 
 	const getFormDefaultValues = useCallback(() => {
@@ -78,7 +78,7 @@ const AccountModal: React.FC<ModalProps> = (props: ModalProps) => {
 			active: props.account?.active ?? true,
 			createdOn: props.account?.createdOn ?? new Date(),
 			bank: props.account?.bank
-		}
+		};
 	}, [props.account]);
 
 	const { t } = useTranslation();
@@ -97,12 +97,12 @@ const AccountModal: React.FC<ModalProps> = (props: ModalProps) => {
 	useEffect(() => {
 		const visible = accountType?.id === ACCOUNT_TYPE.DEBIT_CARD || 
 			accountType?.id === ACCOUNT_TYPE.CREDIT_CARD;
-		setBankFieldVisible(visible)
+		setBankFieldVisible(visible);
 	}, [accountType]);
 
 	useEffect(() => {
 		reset(getFormDefaultValues());
-	}, [reset, getFormDefaultValues, props.account])
+	}, [reset, getFormDefaultValues, props.account]);
 
 	const onSubmit = async (account: AccountFormInput) => {
 		const accountEntity = account as AccountEntity;
@@ -113,7 +113,7 @@ const AccountModal: React.FC<ModalProps> = (props: ModalProps) => {
 
 		await props.onSaved(accountEntity);
 		props.modalRef?.current?.closeModal();
-	}
+	};
 
 	return <BaseFormModal ref={props.modalRef} title={t("entity_account_name_form_title")} submitHandler={handleSubmit(onSubmit)}>
 		<Field.Root invalid={!!errors.name}>
@@ -161,7 +161,7 @@ const AccountModal: React.FC<ModalProps> = (props: ModalProps) => {
 			<CheckboxInput name="active" control={control} title={t("entity_account_active")}/>
 			<Field.ErrorText>{errors.active?.message}</Field.ErrorText>
 		</Field.Root>
-	</BaseFormModal>
-}
+	</BaseFormModal>;
+};
 
-export default AccountModal
+export default AccountModal;

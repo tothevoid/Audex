@@ -1,4 +1,4 @@
-import React, { RefObject, useCallback, useEffect, useMemo } from 'react'
+import React, { RefObject, useCallback, useEffect, useMemo } from 'react';
 import { Field } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from "react-hook-form";
@@ -39,8 +39,8 @@ const DividendModal: React.FC<ModalProps> = (props: ModalProps) => {
 			amount: dividend?.amount ?? 0,
 			declarationDate: dividend?.declarationDate ?? new Date(),
 			snapshotDate: dividend?.snapshotDate ?? new Date()
-		}
-	}, [props.context])
+		};
+	}, [props.context]);
 
 	const validationSchema = useMemo(() => getDividendValidationSchema(t), [t]);
 
@@ -57,7 +57,7 @@ const DividendModal: React.FC<ModalProps> = (props: ModalProps) => {
 	const onSubmit = (dividend: DividendFormInput) => {
 		props.onSaved(dividend as DividendEntity);
 		props.modalRef?.current?.closeModal();
-	}
+	};
 
 	return <BaseFormModal ref={props.modalRef} title={t("entity_dividend_form_title")} submitHandler={handleSubmit(onSubmit)}>
 		<Field.Root invalid={!!errors.amount} mt={4}>
@@ -80,7 +80,7 @@ const DividendModal: React.FC<ModalProps> = (props: ModalProps) => {
 			<DateSelect name="snapshotDate" control={control}/>
 			<Field.ErrorText>{errors.snapshotDate?.message}</Field.ErrorText>
 		</Field.Root>
-	</BaseFormModal>
-}
+	</BaseFormModal>;
+};
 
 export default DividendModal;

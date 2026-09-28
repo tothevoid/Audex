@@ -41,14 +41,14 @@ const DepositsPage: React.FC = () => {
 	} = useDeposits({selectedMinMonths: 0, selectedMaxMonths: 0, onlyActive: true});
 
 	const getAddButton = () => {
-		return <AddButton onClick={onAddClicked} buttonTitle={t("deposits_list_add_button")} />
-	}
+		return <AddButton onClick={onAddClicked} buttonTitle={t("deposits_list_add_button")} />;
+	};
 
 	const getAddButtonWithoutDeposits = () => {
 		return <Placeholder text={t("deposits_page_no_deposits")}>
 			{getAddButton()}
-		</Placeholder>
-	}
+		</Placeholder>;
+	};
 
 	const onDepositsRangeChanged = async (fromMonths: number, toMonths: number) => {
 		setDepositsQueryParameters(prev => ({
@@ -56,14 +56,14 @@ const DepositsPage: React.FC = () => {
 			selectedMinMonths: fromMonths,
 			selectedMaxMonths: toMonths,
 		}));
-	}
+	};
 
 	const onCheckboxChanged = async (checked: boolean) => {
 		setDepositsQueryParameters(prev => ({
 			...prev,
 			onlyActive: checked,
 		}));
-	}
+	};
 
 	const { selectedMinMonths, selectedMaxMonths, onlyActive } = depositsQueryParameters;
 
@@ -75,22 +75,22 @@ const DepositsPage: React.FC = () => {
 		}
 		setRangeRefreshKey(k => k + 1);
 		onActionEnded();
-	}
+	};
 
 	const onDeleteConfirmed = async () => {
 		if (!activeEntity) {
-            throw new Error("Deleted entity is not set")
+            throw new Error("Deleted entity is not set");
         }
 
         await deleteDepositEntity(activeEntity);
 		setRangeRefreshKey(k => k + 1);
 		onActionEnded();
-    }
+    };
 
 	const onCloneClicked = async (deposit: DepositEntity) => {
         await createDepositEntity(deposit);
 		setRangeRefreshKey(k => k + 1);
-    }
+    };
 
 	return (
 		<PageContainer>

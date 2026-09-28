@@ -23,14 +23,14 @@ const SecurityPage: React.FC = () => {
 
 	const { securityId } = useParams();
 
-	const [state, setState] = useState<State>({ security: null!, securityStats: null! })
+	const [state, setState] = useState<State>({ security: null!, securityStats: null! });
 
 	useEffect(() => {
 		initData();
 	}, []);
 
 	if (!securityId) {
-		return <Fragment/>
+		return <Fragment/>;
 	}
 
 	const initData = async () => {
@@ -41,12 +41,12 @@ const SecurityPage: React.FC = () => {
 		}
 
 		setState((currentState) => {
-			return {...currentState, security, securityStats}
-		})
-	}
+			return {...currentState, security, securityStats};
+		});
+	};
 
 	if (!state.security) {
-		return <Fragment/>
+		return <Fragment/>;
 	}
 
 	const { ticker, actualPrice, currency } = state.security;
@@ -79,7 +79,7 @@ const SecurityPage: React.FC = () => {
 				<DividendList securityId={securityId} currencyName={currency.name}/>
 			</Tabs.Content>
 		</Tabs.Root>
-	</Stack>
-}
+	</Stack>;
+};
 
 export default SecurityPage;

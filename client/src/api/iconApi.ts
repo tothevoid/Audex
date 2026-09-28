@@ -7,4 +7,4 @@ export const getStoredIconUrl = (controllerName: string, iconKey: Nullable<strin
     }
 
     return `${config.api.URL}/${controllerName}/icon?iconKey=${iconKey}`;
-}
+};

@@ -114,7 +114,7 @@ const BrokerAccountTabs: React.FC<Props> = ({ brokerAccountId, currencyName, onA
         <Tabs.Content value="tax_deductions">
             <BrokerAccountTaxDeductionsList onDataChanged={onTaxDeductionsChanged} brokerAccountId={brokerAccountId}/>
         </Tabs.Content>
-    </Tabs.Root>
-}
+    </Tabs.Root>;
+};
 
 export default BrokerAccountTabs;

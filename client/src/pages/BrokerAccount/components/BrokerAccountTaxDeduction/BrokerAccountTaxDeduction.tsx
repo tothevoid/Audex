@@ -44,7 +44,7 @@ const BrokerAccountTaxDeduction = (props: Props) => {
                 </Flex>
             </Flex>
         </CardBody>
-    </Card.Root>
+    </Card.Root>;
 };
 
 export default BrokerAccountTaxDeduction;

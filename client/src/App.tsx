@@ -1,6 +1,6 @@
 import '@/App.scss';
 import Header from '@/features/Navigation/Header/Header';
-import TransactionsPage from '@/pages/Transactions/TransactionsPage'
+import TransactionsPage from '@/pages/Transactions/TransactionsPage';
 import DepositsPage from '@/pages/Deposits/DepositsPage';
 
 import { useState, useEffect } from 'react';
@@ -56,7 +56,7 @@ const RequireAuth = () => {
 	}
 
 	return isAuthenticated ? <Outlet /> : <Navigate to="/auth" replace state={{ from: location.pathname }} />;
-}
+};
 
 const PageWrapper = () => (
 	<UserProvider>
@@ -100,6 +100,6 @@ const App = () => {
 			</Routes>
 		</Router>
 	);
-}
+};
 
 export default App;

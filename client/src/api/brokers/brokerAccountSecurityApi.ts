@@ -11,7 +11,7 @@ export const getSecuritiesByBrokerAccount = async (brokerAccountId: Nullable<str
         getAllEntities<BrokerAccountSecurityEntityResponse>(`${basicUrl}/GetAll`);
 
     return await query
-        .then((securities: BrokerAccountSecurityEntityResponse[]) => securities.map(prepareBrokerAccountSecurity))
+        .then((securities: BrokerAccountSecurityEntityResponse[]) => securities.map(prepareBrokerAccountSecurity));
 };
 
 export const pullBrokerAccountQuotations = async (brokerAccountId: Nullable<string> = null) => {

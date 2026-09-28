@@ -40,12 +40,12 @@ const CurrenciesTable: React.FC = () => {
         try {
             const currencies = await getCurrencies();
             setState((currentState) => {
-                return {...currentState, currencies}
+                return {...currentState, currencies};
             });
         } finally {
             setIsLoading(false);
         }
-    }
+    };
 
     const onActiveChanged = (currencyId: string, newValue: boolean) => {
         let hasChanges = false;
@@ -64,9 +64,9 @@ const CurrenciesTable: React.FC = () => {
         }
 
         setState((currentState) => {
-            return {...currentState, currencies: updatedCurrencies, hasChanges: true}
-        })
-    }
+            return {...currentState, currencies: updatedCurrencies, hasChanges: true};
+        });
+    };
 
     const onCellBlur = async (currencyId: string) => {
         if (!state.hasChanges){
@@ -81,10 +81,10 @@ const CurrenciesTable: React.FC = () => {
         }
 
         await updateCurrency({...currency});
-    }
+    };
     
     const onAdd = () => {
-        modalRef.current?.openModal()
+        modalRef.current?.openModal();
     };
 
     const onCurrencyAdded = async (currency: CurrencyEntity) => {
@@ -96,16 +96,16 @@ const CurrenciesTable: React.FC = () => {
         currency.id = createdCurrencyId;
 
         setState((currentState) => {
-            return {...currentState, currencies: [...currentState.currencies, currency]}
-        })
+            return {...currentState, currencies: [...currentState.currencies, currency]};
+        });
     };
 
     const onDeleteClicked = async (currency: CurrencyEntity) => {
         setState((currentState) => {
-            return {...currentState, currentCurrencyId: currency.id}
-        })
-        confirmModalRef.current?.openModal()
-    }
+            return {...currentState, currentCurrencyId: currency.id};
+        });
+        confirmModalRef.current?.openModal();
+    };
 
     const onDeleteConfirmed = async () => {
         const {currentCurrencyId} = state;
@@ -125,16 +125,16 @@ const CurrenciesTable: React.FC = () => {
         });
 
         setState((currentState) => {
-            return {...currentState, currencies, currentCurrencyId: null}
-        })
-    }
+            return {...currentState, currencies, currentCurrencyId: null};
+        });
+    };
 
     const onSyncRates = async () => {
         setSyncing(true);
         await syncRates();
         await fetchCurrencies();
         setSyncing(false);
-    }
+    };
 
     const columns: ColumnDef<CurrencyEntity>[] = useMemo(() => [
         {
@@ -152,7 +152,7 @@ const CurrenciesTable: React.FC = () => {
             width: 10,
             render: (currency) => (
                 <Checkbox.Root onBlur={() => onCellBlur(currency.id)} checked={currency.active} variant="subtle"
-                    onCheckedChange={(data) => {onActiveChanged(currency.id, !!data.checked)}}>
+                    onCheckedChange={(data) => {onActiveChanged(currency.id, !!data.checked);}}>
                     <Checkbox.HiddenInput />
                     <Checkbox.Control />
                 </Checkbox.Root>
@@ -192,7 +192,7 @@ const CurrenciesTable: React.FC = () => {
             message={t("modals_delete_message")}
             confirmActionName={t("modals_delete_button")}
             ref={confirmModalRef}/>
-    </Box>
-}
+    </Box>;
+};
 
 export default CurrenciesTable;

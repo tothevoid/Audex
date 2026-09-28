@@ -22,12 +22,12 @@ export const getPagedBrokerAccountFundsTransfers = async (query: BrokerAccountFu
 export const createBrokerAccountFundsTransfer = async (addedBrokerAccountFundsTransfer: BrokerAccountFundTransferEntity): Promise<BrokerAccountFundTransferEntityResponse | void> => {
     return await createEntity<BrokerAccountFundTransferEntityRequest, BrokerAccountFundTransferEntityResponse>(basicUrl, 
         prepareBrokerAccountFundsTransferRequest(addedBrokerAccountFundsTransfer));
-}
+};
 
 export const updateBrokerAccountFundsTransfer = async (updatedBrokerAccountFundsTransfer: BrokerAccountFundTransferEntity): Promise<boolean> => {
     return await updateEntity(basicUrl, prepareBrokerAccountFundsTransferRequest(updatedBrokerAccountFundsTransfer));
-}
+};
 
 export const deleteBrokerAccountFundsTransfer = async (brokerAccountFundsTransferId: string): Promise<boolean> => {
     return await deleteEntity(basicUrl, brokerAccountFundsTransferId);
-}
+};
