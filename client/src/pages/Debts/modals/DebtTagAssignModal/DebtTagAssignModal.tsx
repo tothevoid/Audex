@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Button, Stack, Text, Box } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { DebtEntity } from "@/models/debts/DebtEntity";
@@ -21,6 +21,12 @@ export const DebtTagAssignModal = forwardRef<BaseModalRef, Props>(
     ({ debt, availableTags, onSaved, onTagsReloadRequested }, ref) => {
         const { t } = useTranslation();
         const [selectedTags, setSelectedTags] = useState<DebtTagEntity[]>([]);
+        const internalModalRef = useRef<BaseModalRef | null>(null);
+
+        useImperativeHandle(ref, () => ({
+            openModal: () => internalModalRef.current?.openModal(),
+            closeModal: () => internalModalRef.current?.closeModal(),
+        }));
 
         useEffect(() => {
             if (debt) {
@@ -28,12 +34,10 @@ export const DebtTagAssignModal = forwardRef<BaseModalRef, Props>(
             }
         }, [debt]);
 
-        const handleSave = async (closeModal?: () => void) => {
+        const handleSave = async () => {
             if (!debt) return;
             await onSaved(debt, selectedTags);
-            if (closeModal) {
-                closeModal();
-            }
+            internalModalRef.current?.closeModal();
         };
 
         const handleCreateTag = async (name: string, colorHex: string) => {
@@ -46,13 +50,13 @@ export const DebtTagAssignModal = forwardRef<BaseModalRef, Props>(
 
         return (
             <BaseModal
-                ref={ref}
+                ref={internalModalRef}
                 title={t("debt_tag_assign_modal_title", { name: debt?.name || "" })}
                 footer={
                     <>
                         <Button
                             colorPalette="green"
-                            onClick={() => handleSave(() => (ref as any)?.current?.closeModal())}
+                            onClick={handleSave}
                         >
                             {t("modals_save_button")}
                         </Button>
