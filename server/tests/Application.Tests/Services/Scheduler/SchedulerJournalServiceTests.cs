@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +7,8 @@ using Audex.Application.Enums.Scheduler;
 using Audex.Application.Interfaces.Scheduler;
 using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Entities.Scheduler;
+using Audex.Infrastructure.Interfaces.Database;
+using Audex.Shared.Common;
 using TickerQ.Utilities.Entities;
 using Xunit;
 
@@ -19,16 +21,16 @@ namespace Audex.Application.Tests.Services.Scheduler
         }
 
         [Fact]
-        public async Task GetJournalAsync_And_GetJournalPaginationAsync_WorksCorrectly()
+        public async Task GetJournalAsync_WorksCorrectly()
         {
-            await ExecuteScopeAsync(async sp =>
+            await ExecuteScopeAsync(async serviceProvider =>
             {
-                var taskService = sp.GetRequiredService<ISchedulerTaskService>();
-                var journalService = sp.GetRequiredService<ISchedulerJournalService>();
-                var db = sp.GetRequiredService<Audex.Infrastructure.Interfaces.Database.IUnitOfWork>();
-                var occurrenceRepo = db.CreateRepository<CronTickerOccurrenceEntity<ScheduledCronTicker>>();
-                var tickerRepo = db.CreateRepository<ScheduledCronTicker>();
-                var attachmentService = sp.GetRequiredService<ISchedulerAttachmentService>();
+                var taskService = serviceProvider.GetRequiredService<ISchedulerTaskService>();
+                var journalService = serviceProvider.GetRequiredService<ISchedulerJournalService>();
+                var unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+                var occurrenceRepo = unitOfWork.CreateRepository<CronTickerOccurrenceEntity<ScheduledCronTicker>>();
+                var tickerRepo = unitOfWork.CreateRepository<ScheduledCronTicker>();
+                var attachmentService = serviceProvider.GetRequiredService<ISchedulerAttachmentService>();
 
                 await taskService.CreateTaskAsync(new CreateScheduledTaskDto
                 {
@@ -37,7 +39,7 @@ namespace Audex.Application.Tests.Services.Scheduler
                     IsEnabled = true
                 });
 
-                var ticker = await tickerRepo.FindAsync(t => t.Function == "GenerateAllAssetsReport");
+                var ticker = await tickerRepo.FindAsync(tickerEntity => tickerEntity.Function == "GenerateAllAssetsReport");
                 Assert.NotNull(ticker);
 
                 var occurrenceId = Guid.NewGuid();
@@ -54,7 +56,7 @@ namespace Audex.Application.Tests.Services.Scheduler
                 };
 
                 await occurrenceRepo.AddAsync(occurrence);
-                await db.CommitAsync();
+                await unitOfWork.CommitAsync();
 
                 var attachment = new ScheduledTaskAttachment
                 {
@@ -70,19 +72,22 @@ namespace Audex.Application.Tests.Services.Scheduler
 
                 await attachmentService.SaveAttachmentAsync(occurrenceId, attachment);
 
-                var journal = await journalService.GetJournalAsync(1, 10, "GenerateAllAssetsReport", status: ScheduledTaskExecutionStatus.Done);
-                Assert.NotNull(journal);
-                var list = journal.ToList();
-                Assert.NotEmpty(list);
+                var journal = await journalService.GetJournalAsync(new SchedulerJournalFilterDto
+                {
+                    TaskName = "GenerateAllAssetsReport",
+                    Status = ScheduledTaskExecutionStatus.Done,
+                    PageIndex = 1,
+                    RecordsQuantity = 10
+                });
 
-                var entry = list.FirstOrDefault(j => j.Id == occurrenceId);
+                Assert.NotNull(journal);
+                Assert.True(journal.TotalCount > 0);
+                Assert.NotEmpty(journal.Items);
+
+                var entry = journal.Items.FirstOrDefault(item => item.Id == occurrenceId);
                 Assert.NotNull(entry);
                 Assert.Equal(ScheduledTaskExecutionStatus.Done, entry.Status);
                 Assert.NotEmpty(entry.Attachments);
-
-                var pagination = await journalService.GetJournalPaginationAsync("GenerateAllAssetsReport", status: ScheduledTaskExecutionStatus.Done);
-                Assert.NotNull(pagination);
-                Assert.True(pagination.RecordsQuantity > 0);
             });
         }
     }

@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Accounts;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.Interfaces.Accounts;
 using Audex.Application.Interfaces.Brokers;
 using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
+using System.Linq;
 
 namespace Audex.Application.Tests.Services.Brokers
 {
@@ -35,23 +36,29 @@ namespace Audex.Application.Tests.Services.Brokers
             Assert.NotNull(added);
             Assert.NotEqual(Guid.Empty, added.Id);
 
-            var all = await ExecuteScopeAsync(async sp =>
+            var all = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
-                return await service.GetAllAsync();
+                var service = serviceProvider.GetRequiredService<IBrokerAccountFundsTransferService>();
+                return await service.GetAllAsync(new BrokerAccountFundsTransferFilterDto());
             });
 
             Assert.NotNull(all);
-            Assert.Contains(all, t => t.Id == added.Id && t.Amount == 1000m);
+            Assert.Contains(all.Items, transfer => transfer.Id == added.Id && transfer.Amount == 1000m);
 
-            var accountTransfers = await ExecuteScopeAsync(async sp =>
+            var accountTransfers = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
-                return await service.GetAllAsync(brokerAccountId);
+                var service = serviceProvider.GetRequiredService<IBrokerAccountFundsTransferService>();
+                return await service.GetAllAsync(new BrokerAccountFundsTransferFilterDto
+                {
+                    BrokerAccountId = brokerAccountId,
+                    PageIndex = 1,
+                    RecordsQuantity = 10
+                });
             });
 
             Assert.NotNull(accountTransfers);
-            Assert.Contains(accountTransfers, t => t.Id == added.Id);
+            Assert.Contains(accountTransfers.Items, transfer => transfer.Id == added.Id);
+            Assert.Equal(1, accountTransfers.TotalCount);
         }
 
         [Fact]
@@ -59,22 +66,22 @@ namespace Audex.Application.Tests.Services.Brokers
         {
             var (brokerAccountId, accountId) = await SetupDependencies();
 
-            var added = await ExecuteScopeAsync(async sp =>
+            var added = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
+                var service = serviceProvider.GetRequiredService<IBrokerAccountFundsTransferService>();
                 return await service.AddAsync(new BrokerAccountFundsTransferDto
                 {
                     BrokerAccountId = brokerAccountId,
                     AccountId = accountId,
-                    Amount = 500m,
+                    Amount = 1000m,
                     Income = true,
                     Date = DateTime.UtcNow
                 });
             });
 
-            await ExecuteScopeAsync(async sp =>
+            await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
+                var service = serviceProvider.GetRequiredService<IBrokerAccountFundsTransferService>();
                 await service.UpdateAsync(new BrokerAccountFundsTransferDto
                 {
                     Id = added.Id,
@@ -86,13 +93,13 @@ namespace Audex.Application.Tests.Services.Brokers
                 });
             });
 
-            var all = await ExecuteScopeAsync(async sp =>
+            var all = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
-                return await service.GetAllAsync();
+                var service = serviceProvider.GetRequiredService<IBrokerAccountFundsTransferService>();
+                return await service.GetAllAsync(new BrokerAccountFundsTransferFilterDto());
             });
 
-            var updated = all.FirstOrDefault(t => t.Id == added.Id);
+            var updated = all.Items.FirstOrDefault(transfer => transfer.Id == added.Id);
             Assert.NotNull(updated);
             Assert.Equal(750m, updated.Amount);
             Assert.False(updated.Income);
@@ -103,9 +110,9 @@ namespace Audex.Application.Tests.Services.Brokers
         {
             var (brokerAccountId, accountId) = await SetupDependencies();
 
-            var added = await ExecuteScopeAsync(async sp =>
+            var added = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
+                var service = serviceProvider.GetRequiredService<IBrokerAccountFundsTransferService>();
                 return await service.AddAsync(new BrokerAccountFundsTransferDto
                 {
                     BrokerAccountId = brokerAccountId,
@@ -116,19 +123,19 @@ namespace Audex.Application.Tests.Services.Brokers
                 });
             });
 
-            await ExecuteScopeAsync(async sp =>
+            await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
+                var service = serviceProvider.GetRequiredService<IBrokerAccountFundsTransferService>();
                 await service.DeleteAsync(added.Id);
             });
 
-            var listAfterDelete = await ExecuteScopeAsync(async sp =>
+            var listAfterDelete = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
-                return await service.GetAllAsync();
+                var service = serviceProvider.GetRequiredService<IBrokerAccountFundsTransferService>();
+                return await service.GetAllAsync(new BrokerAccountFundsTransferFilterDto());
             });
 
-            Assert.DoesNotContain(listAfterDelete, t => t.Id == added.Id);
+            Assert.DoesNotContain(listAfterDelete.Items, transfer => transfer.Id == added.Id);
         }
 
         [Fact]
@@ -250,6 +257,61 @@ namespace Audex.Application.Tests.Services.Brokers
             });
             Assert.Equal(3000m, depositedAll);
             Assert.Equal(1000m, withdrawnAll);
+        }
+
+        [Fact]
+        public async Task TestPagination()
+        {
+            var (brokerAccountId, accountId) = await SetupDependencies();
+
+            for (int index = 1; index <= 5; index++)
+            {
+                await ExecuteScopeAsync(async sp =>
+                {
+                    var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
+                    await service.AddAsync(new BrokerAccountFundsTransferDto
+                    {
+                        BrokerAccountId = brokerAccountId,
+                        AccountId = accountId,
+                        Amount = index * 100m,
+                        Income = true,
+                        Date = DateTime.UtcNow.AddDays(-index)
+                    });
+                });
+            }
+
+            var page1 = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
+                return await service.GetAllAsync(new BrokerAccountFundsTransferFilterDto
+                {
+                    BrokerAccountId = brokerAccountId,
+                    PageIndex = 1,
+                    RecordsQuantity = 2
+                });
+            });
+
+            Assert.NotNull(page1);
+            Assert.Equal(2, page1.Items.Count());
+            Assert.Equal(5, page1.TotalCount);
+            Assert.Equal(1, page1.PageIndex);
+            Assert.Equal(2, page1.PageSize);
+
+            var page3 = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IBrokerAccountFundsTransferService>();
+                return await service.GetAllAsync(new BrokerAccountFundsTransferFilterDto
+                {
+                    BrokerAccountId = brokerAccountId,
+                    PageIndex = 3,
+                    RecordsQuantity = 2
+                });
+            });
+
+            Assert.NotNull(page3);
+            Assert.Single(page3.Items);
+            Assert.Equal(5, page3.TotalCount);
+            Assert.Equal(3, page3.PageIndex);
         }
 
         private async Task<(Guid brokerAccountId, Guid accountId)> SetupDependencies()

@@ -5,6 +5,7 @@ using Audex.Application.Interfaces.Accounts;
 using Audex.Application.Interfaces.Transactions;
 using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
+using Audex.Shared.Common;
 
 namespace Audex.Application.Tests.Services.Transactions
 {
@@ -65,7 +66,7 @@ namespace Audex.Application.Tests.Services.Transactions
         {
             var (sourceId, destId) = await SetupAccounts();
 
-            var dto = new CurrencyTransactionDto
+            var transactionDto = new CurrencyTransactionDto
             {
                 Name = "Fx Transfer",
                 SourceAccountId = sourceId,
@@ -75,29 +76,39 @@ namespace Audex.Application.Tests.Services.Transactions
                 Date = DateOnly.FromDateTime(DateTime.Now)
             };
 
-            var id = await ExecuteScopeAsync(async sp =>
+            var transactionId = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICurrencyTransactionService>();
-                return await service.AddAsync(dto);
+                var service = serviceProvider.GetRequiredService<ICurrencyTransactionService>();
+                return await service.AddAsync(transactionDto);
             });
 
-            var sourceTransactions = await ExecuteScopeAsync(async sp =>
+            var sourceTransactions = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICurrencyTransactionService>();
-                return await service.GetAllByAccountIdAsync(sourceId);
+                var service = serviceProvider.GetRequiredService<ICurrencyTransactionService>();
+                return await service.GetAllAsync(new CurrencyTransactionFilterDto
+                {
+                    AccountId = sourceId,
+                    PageIndex = 1,
+                    RecordsQuantity = 10
+                });
             });
 
             Assert.NotNull(sourceTransactions);
-            Assert.Contains(sourceTransactions, t => t.Id == id);
+            Assert.Contains(sourceTransactions.Items, transaction => transaction.Id == transactionId);
 
-            var destTransactions = await ExecuteScopeAsync(async sp =>
+            var destTransactions = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICurrencyTransactionService>();
-                return await service.GetAllByAccountIdAsync(destId);
+                var service = serviceProvider.GetRequiredService<ICurrencyTransactionService>();
+                return await service.GetAllAsync(new CurrencyTransactionFilterDto
+                {
+                    AccountId = destId,
+                    PageIndex = 1,
+                    RecordsQuantity = 10
+                });
             });
 
             Assert.NotNull(destTransactions);
-            Assert.Contains(destTransactions, t => t.Id == id);
+            Assert.Contains(destTransactions.Items, transaction => transaction.Id == transactionId);
         }
 
         [Fact]
@@ -252,13 +263,13 @@ namespace Audex.Application.Tests.Services.Transactions
         }
 
         [Fact]
-        public async Task TestGetPaginationAndSorting()
+        public async Task TestPaginationAndSorting()
         {
             var (sourceId, destId) = await SetupAccounts();
 
-            await ExecuteScopeAsync(async sp =>
+            await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICurrencyTransactionService>();
+                var service = serviceProvider.GetRequiredService<ICurrencyTransactionService>();
                 await service.AddAsync(new CurrencyTransactionDto
                 {
                     Name = "FX Older",
@@ -279,23 +290,21 @@ namespace Audex.Application.Tests.Services.Transactions
                 });
             });
 
-            var pagination = await ExecuteScopeAsync(async sp =>
+            var pageOne = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICurrencyTransactionService>();
-                return await service.GetPaginationAsync(sourceId);
+                var service = serviceProvider.GetRequiredService<ICurrencyTransactionService>();
+                return await service.GetAllAsync(new CurrencyTransactionFilterDto
+                {
+                    AccountId = sourceId,
+                    PageIndex = 1,
+                    RecordsQuantity = 1
+                });
             });
 
-            Assert.NotNull(pagination);
-            Assert.Equal(2, pagination.RecordsQuantity);
-
-            var page1 = await ExecuteScopeAsync(async sp =>
-            {
-                var service = sp.GetRequiredService<ICurrencyTransactionService>();
-                return await service.GetAllByAccountIdAsync(sourceId, 1, 1);
-            });
-
-            Assert.Single(page1);
-            Assert.Equal("FX Newer", page1.First().Name);
+            Assert.NotNull(pageOne);
+            Assert.Equal(2, pageOne.TotalCount);
+            Assert.Single(pageOne.Items);
+            Assert.Equal("FX Newer", pageOne.Items.First().Name);
         }
 
         private async Task<(Guid sourceId, Guid destId)> SetupAccounts()

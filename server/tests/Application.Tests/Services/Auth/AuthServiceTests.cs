@@ -334,25 +334,23 @@ namespace Audex.Application.Tests.Services.Auth
             });
 
             // Get active tokens
-            var activeTokens = await ExecuteScopeAsync(async sp =>
+            var activeTokensResult = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.GetRefreshTokensAsync(user.Id, isActive: true, 1, 10, session1.Data!.RefreshToken);
+                var authService = serviceProvider.GetRequiredService<IAuthService>();
+                return await authService.GetRefreshTokensAsync(new UserRefreshTokenFilterDto
+                {
+                    UserProfileId = user.Id,
+                    IsOnlyActive = true,
+                    PageIndex = 1,
+                    RecordsQuantity = 10,
+                    CurrentRefreshToken = session1.Data!.RefreshToken
+                });
             });
 
-            Assert.NotNull(activeTokens);
-            Assert.Contains(activeTokens, s => s.IsCurrent && s.CreatedByIp == "192.168.1.1");
-            Assert.Contains(activeTokens, s => !s.IsCurrent && s.CreatedByIp == "10.0.0.1");
-
-            // Pagination config
-            var paginationConfig = await ExecuteScopeAsync(async sp =>
-            {
-                var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.GetRefreshTokensPaginationAsync(user.Id, isActive: true);
-            });
-
-            Assert.NotNull(paginationConfig);
-            Assert.True(paginationConfig.RecordsQuantity >= 2);
+            Assert.NotNull(activeTokensResult);
+            Assert.True(activeTokensResult.TotalCount >= 2);
+            Assert.Contains(activeTokensResult.Items, token => token.IsCurrent && token.CreatedByIp == "192.168.1.1");
+            Assert.Contains(activeTokensResult.Items, token => !token.IsCurrent && token.CreatedByIp == "10.0.0.1");
         }
 
         [Fact]
@@ -360,23 +358,29 @@ namespace Audex.Application.Tests.Services.Auth
         {
             var (user, password) = await EnsureUserWithKnownPasswordAsync();
 
-            var session = await ExecuteScopeAsync(async sp =>
+            var session = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var authService = sp.GetRequiredService<IAuthService>();
+                var authService = serviceProvider.GetRequiredService<IAuthService>();
                 return await authService.LoginAsync(user.UserName, password, "192.168.1.50", "Firefox on Linux");
             });
 
-            var activeTokens = await ExecuteScopeAsync(async sp =>
+            var activeTokensResult = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var authService = sp.GetRequiredService<IAuthService>();
-                return await authService.GetRefreshTokensAsync(user.Id, isActive: true);
+                var authService = serviceProvider.GetRequiredService<IAuthService>();
+                return await authService.GetRefreshTokensAsync(new UserRefreshTokenFilterDto
+                {
+                    UserProfileId = user.Id,
+                    IsOnlyActive = true,
+                    PageIndex = 1,
+                    RecordsQuantity = 10
+                });
             });
 
-            var targetToken = Assert.Single(activeTokens, s => s.CreatedByIp == "192.168.1.50");
+            var targetToken = Assert.Single(activeTokensResult.Items, token => token.CreatedByIp == "192.168.1.50");
 
-            var revoked = await ExecuteScopeAsync(async sp =>
+            var revoked = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var authService = sp.GetRequiredService<IAuthService>();
+                var authService = serviceProvider.GetRequiredService<IAuthService>();
                 return await authService.RevokeTokenAsync(targetToken.Id, user.Id);
             });
 

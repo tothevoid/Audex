@@ -3,6 +3,7 @@ using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Securities;
 using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
+using Audex.Shared.Common;
 
 namespace Audex.Application.Tests.Services.Securities
 {
@@ -18,9 +19,9 @@ namespace Audex.Application.Tests.Services.Securities
             var securityId = await SetupSecurity();
             var today = DateOnly.FromDateTime(DateTime.Now);
 
-            var divId = await ExecuteScopeAsync(async sp =>
+            var dividendId = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IDividendService>();
+                var service = serviceProvider.GetRequiredService<IDividendService>();
                 return await service.AddAsync(new DividendDto
                 {
                     SecurityId = securityId,
@@ -30,16 +31,72 @@ namespace Audex.Application.Tests.Services.Securities
                 });
             });
 
-            Assert.NotEqual(Guid.Empty, divId);
+            Assert.NotEqual(Guid.Empty, dividendId);
 
-            var all = await ExecuteScopeAsync(async sp =>
+            var pagedResult = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IDividendService>();
-                return await service.GetAllAsync(securityId, 1, 10);
+                var service = serviceProvider.GetRequiredService<IDividendService>();
+                return await service.GetAllAsync(new DividendFilterDto
+                {
+                    SecurityId = securityId,
+                    PageIndex = 1,
+                    RecordsQuantity = 10
+                });
             });
 
-            Assert.NotNull(all);
-            Assert.Contains(all, d => d.Id == divId && d.Amount == 2.5m);
+            Assert.NotNull(pagedResult);
+            Assert.Equal(1, pagedResult.TotalCount);
+            Assert.Contains(pagedResult.Items, item => item.Id == dividendId && item.Amount == 2.5m);
+        }
+
+        [Fact]
+        public async Task TestPagination()
+        {
+            var securityId = await SetupSecurity();
+            var today = DateOnly.FromDateTime(DateTime.Now);
+
+            for (int index = 1; index <= 5; index++)
+            {
+                await ExecuteScopeAsync(async serviceProvider =>
+                {
+                    var service = serviceProvider.GetRequiredService<IDividendService>();
+                    await service.AddAsync(new DividendDto
+                    {
+                        SecurityId = securityId,
+                        Amount = index * 1.5m,
+                        DeclarationDate = today.AddDays(-index),
+                        SnapshotDate = today.AddDays(-index)
+                    });
+                });
+            }
+
+            var pageOne = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<IDividendService>();
+                return await service.GetAllAsync(new DividendFilterDto
+                {
+                    SecurityId = securityId,
+                    PageIndex = 1,
+                    RecordsQuantity = 2
+                });
+            });
+
+            Assert.Equal(2, pageOne.Items.Count());
+            Assert.Equal(5, pageOne.TotalCount);
+
+            var pageThree = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<IDividendService>();
+                return await service.GetAllAsync(new DividendFilterDto
+                {
+                    SecurityId = securityId,
+                    PageIndex = 3,
+                    RecordsQuantity = 2
+                });
+            });
+
+            Assert.Single(pageThree.Items);
+            Assert.Equal(5, pageThree.TotalCount);
         }
 
         [Fact]
@@ -48,9 +105,9 @@ namespace Audex.Application.Tests.Services.Securities
             var securityId = await SetupSecurity();
             var today = DateOnly.FromDateTime(DateTime.Now);
 
-            var divId = await ExecuteScopeAsync(async sp =>
+            var dividendId = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IDividendService>();
+                var service = serviceProvider.GetRequiredService<IDividendService>();
                 return await service.AddAsync(new DividendDto
                 {
                     SecurityId = securityId,
@@ -60,12 +117,12 @@ namespace Audex.Application.Tests.Services.Securities
                 });
             });
 
-            await ExecuteScopeAsync(async sp =>
+            await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IDividendService>();
+                var service = serviceProvider.GetRequiredService<IDividendService>();
                 await service.UpdateAsync(new DividendDto
                 {
-                    Id = divId,
+                    Id = dividendId,
                     SecurityId = securityId,
                     Amount = 3.0m,
                     DeclarationDate = today,
@@ -73,13 +130,18 @@ namespace Audex.Application.Tests.Services.Securities
                 });
             });
 
-            var all = await ExecuteScopeAsync(async sp =>
+            var pagedResult = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IDividendService>();
-                return await service.GetAllAsync(securityId, 1, 10);
+                var service = serviceProvider.GetRequiredService<IDividendService>();
+                return await service.GetAllAsync(new DividendFilterDto
+                {
+                    SecurityId = securityId,
+                    PageIndex = 1,
+                    RecordsQuantity = 10
+                });
             });
 
-            var updated = all.FirstOrDefault(d => d.Id == divId);
+            var updated = pagedResult.Items.FirstOrDefault(item => item.Id == dividendId);
             Assert.NotNull(updated);
             Assert.Equal(3.0m, updated.Amount);
         }
@@ -90,9 +152,9 @@ namespace Audex.Application.Tests.Services.Securities
             var securityId = await SetupSecurity();
             var today = DateOnly.FromDateTime(DateTime.Now);
 
-            var divId = await ExecuteScopeAsync(async sp =>
+            var dividendId = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IDividendService>();
+                var service = serviceProvider.GetRequiredService<IDividendService>();
                 return await service.AddAsync(new DividendDto
                 {
                     SecurityId = securityId,
@@ -102,33 +164,38 @@ namespace Audex.Application.Tests.Services.Securities
                 });
             });
 
-            await ExecuteScopeAsync(async sp =>
+            await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IDividendService>();
-                await service.DeleteAsync(divId);
+                var service = serviceProvider.GetRequiredService<IDividendService>();
+                await service.DeleteAsync(dividendId);
             });
 
-            var listAfterDelete = await ExecuteScopeAsync(async sp =>
+            var listAfterDelete = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<IDividendService>();
-                return await service.GetAllAsync(securityId, 1, 10);
+                var service = serviceProvider.GetRequiredService<IDividendService>();
+                return await service.GetAllAsync(new DividendFilterDto
+                {
+                    SecurityId = securityId,
+                    PageIndex = 1,
+                    RecordsQuantity = 10
+                });
             });
 
-            Assert.DoesNotContain(listAfterDelete, d => d.Id == divId);
+            Assert.DoesNotContain(listAfterDelete.Items, item => item.Id == dividendId);
         }
 
         private async Task<Guid> SetupSecurity()
         {
-            var securityTypeId = await ExecuteScopeAsync(async sp =>
+            var securityTypeId = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ISecurityTypeService>();
+                var service = serviceProvider.GetRequiredService<ISecurityTypeService>();
                 return await service.AddAsync(new SecurityTypeDto { Name = "Dividend Stock Type" });
             });
 
-            return await ExecuteScopeAsync(async sp =>
+            return await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ISecurityService>();
-                var sec = await service.AddAsync(new SecurityDto
+                var service = serviceProvider.GetRequiredService<ISecurityService>();
+                var securityResult = await service.AddAsync(new SecurityDto
                 {
                     Name = "Dividend Payer Inc",
                     Ticker = "DIV",
@@ -136,7 +203,7 @@ namespace Audex.Application.Tests.Services.Securities
                     CurrencyId = CurrencyConstants.USD,
                     ActualPrice = 100m
                 }, null);
-                return sec.Data!.Id;
+                return securityResult.Data!.Id;
             });
         }
     }

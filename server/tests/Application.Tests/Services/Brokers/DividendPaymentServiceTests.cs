@@ -5,6 +5,7 @@ using Audex.Application.Interfaces.Brokers;
 using Audex.Application.Interfaces.Securities;
 using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
+using System.Linq;
 
 namespace Audex.Application.Tests.Services.Brokers
 {
@@ -86,10 +87,15 @@ namespace Audex.Application.Tests.Services.Brokers
             var all = await ExecuteScopeAsync(async sp =>
             {
                 var service = sp.GetRequiredService<IDividendPaymentService>();
-                return await service.GetAllAsync(brokerAccountId, 1, 10);
+                return await service.GetAllAsync(new DividendPaymentFilterDto
+                {
+                    BrokerAccountId = brokerAccountId,
+                    PageIndex = 1,
+                    RecordsQuantity = 10
+                });
             });
 
-            var updated = all.FirstOrDefault(p => p.Id == paymentId);
+            var updated = all.Items.FirstOrDefault(p => p.Id == paymentId);
             Assert.NotNull(updated);
             Assert.Equal(200, updated.SecuritiesQuantity);
             Assert.Equal(10m, updated.Tax);
@@ -122,10 +128,15 @@ namespace Audex.Application.Tests.Services.Brokers
             var allAfterDelete = await ExecuteScopeAsync(async sp =>
             {
                 var service = sp.GetRequiredService<IDividendPaymentService>();
-                return await service.GetAllAsync(brokerAccountId, 1, 10);
+                return await service.GetAllAsync(new DividendPaymentFilterDto
+                {
+                    BrokerAccountId = brokerAccountId,
+                    PageIndex = 1,
+                    RecordsQuantity = 10
+                });
             });
 
-            Assert.DoesNotContain(allAfterDelete, p => p.Id == paymentId);
+            Assert.DoesNotContain(allAfterDelete.Items, p => p.Id == paymentId);
         }
 
         [Fact]
@@ -216,6 +227,61 @@ namespace Audex.Application.Tests.Services.Brokers
                 return await service.GetSumTillSpecificDateAsync(targetDate, null);
             });
             Assert.Equal(218m, sumAll);
+        }
+
+        [Fact]
+        public async Task TestPagination()
+        {
+            var (brokerAccountId, dividendId) = await SetupDependencies();
+
+            for (int index = 1; index <= 5; index++)
+            {
+                await ExecuteScopeAsync(async sp =>
+                {
+                    var service = sp.GetRequiredService<IDividendPaymentService>();
+                    await service.AddAsync(new DividendPaymentDto
+                    {
+                        BrokerAccountId = brokerAccountId,
+                        DividendId = dividendId,
+                        SecuritiesQuantity = index * 10,
+                        Tax = index * 1m,
+                        ReceivedAt = DateOnly.FromDateTime(DateTime.Now.AddDays(-index))
+                    });
+                });
+            }
+
+            var page1 = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IDividendPaymentService>();
+                return await service.GetAllAsync(new DividendPaymentFilterDto
+                {
+                    BrokerAccountId = brokerAccountId,
+                    PageIndex = 1,
+                    RecordsQuantity = 2
+                });
+            });
+
+            Assert.NotNull(page1);
+            Assert.Equal(2, page1.Items.Count());
+            Assert.Equal(5, page1.TotalCount);
+            Assert.Equal(1, page1.PageIndex);
+            Assert.Equal(2, page1.PageSize);
+
+            var page3 = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<IDividendPaymentService>();
+                return await service.GetAllAsync(new DividendPaymentFilterDto
+                {
+                    BrokerAccountId = brokerAccountId,
+                    PageIndex = 3,
+                    RecordsQuantity = 2
+                });
+            });
+
+            Assert.NotNull(page3);
+            Assert.Single(page3.Items);
+            Assert.Equal(5, page3.TotalCount);
+            Assert.Equal(3, page3.PageIndex);
         }
 
         private async Task<(Guid brokerAccountId, Guid dividendId)> SetupDependencies()
