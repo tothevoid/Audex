@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { BrokerAccountSecurityEntity } from "@/models/brokers/BrokerAccountSecurityEntity";
 import { getSecuritiesByBrokerAccount } from "@/api/brokers/brokerAccountSecurityApi";
 import { Nullable } from "@/shared/utilities/nullable";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export interface BrokerAccountSecuritiesQuery {
 	brokerAccountId: Nullable<string>
 }
 
 export const useBrokerAccountsSecurities = (queryParameters: BrokerAccountSecuritiesQuery) => {
+	const { t } = useTranslation();
 	const [brokerAccountSecurities, setBrokerAccountSecurities] = useState<BrokerAccountSecurityEntity[]>([]);
 	const [isBrokerAccountSecuritiesLoading, setLoading] = useState(false);
 
@@ -19,12 +22,12 @@ export const useBrokerAccountsSecurities = (queryParameters: BrokerAccountSecuri
 		try {
 			const securities = await getSecuritiesByBrokerAccount(brokerAccountSecurityQueryParameters.brokerAccountId);
 			setBrokerAccountSecurities(securities);
-		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных');
+		} catch (err: unknown) {
+			setError(parseErrorMessage(err, t("error_data_load")));
 		} finally {
 			setLoading(false);
 		}
-	}, [brokerAccountSecurityQueryParameters]);
+	}, [brokerAccountSecurityQueryParameters, t]);
 
 	useEffect(() => {
 		fetchData();

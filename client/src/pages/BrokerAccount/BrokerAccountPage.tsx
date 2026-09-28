@@ -104,7 +104,7 @@ const BrokerAccountPage: React.FC = () => {
        setState((currentState) => {
             return {...currentState, isReloading: true};
         });
-        pullBrokerAccountQuotations(brokerAccountId);
+        await pullBrokerAccountQuotations(brokerAccountId);
     };
 
     const onActionTriggered = async (action: ChangeAction) => {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { createSecurityTransaction, deleteSecurityTransaction, getSecurityTransactions, updateSecurityTransaction } from "@/api/securities/securityTransactionApi";
 import { SecurityTransactionEntity, SecurityTransactionEntityRequest } from "@/models/securities/SecurityTransactionEntity";
 import { Nullable } from "@/shared/utilities/nullable";
@@ -6,8 +7,10 @@ import {
 	createDefaultSecurityTransactionsRequest,
 	SecurityTransactionsRequest
 } from "@/models/securities/SecurityTransactionsRequest";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export const useSecurityTransactions = (brokerAccountId: Nullable<string>) => {
+	const { t } = useTranslation();
 	const [securityTransactions, setSecurityTransactions] = useState<SecurityTransactionEntity[]>([]);
 	const [totalCount, setTotalCount] = useState<number>(0);
 	const [isSecurityTransactionsLoading, setLoading] = useState(false);
@@ -30,12 +33,12 @@ export const useSecurityTransactions = (brokerAccountId: Nullable<string>) => {
 			const pagedResult = await getSecurityTransactions(securityTransactionsQueryParameters);
 			setSecurityTransactions(pagedResult.items);
 			setTotalCount(pagedResult.totalCount);
-		} catch (exception: any) {
-			setError(exception?.message || 'Ошибка загрузки данных');
+		} catch (exception: unknown) {
+			setError(parseErrorMessage(exception, t("error_data_load")));
 		} finally {
 			setLoading(false);
 		}
-	}, [securityTransactionsQueryParameters]);
+	}, [securityTransactionsQueryParameters, t]);
 
 	useEffect(() => {
 		fetchData();

@@ -1,81 +1,58 @@
-import httpClient from '@/api/httpClient';
+import { downloadFileByConfig, FileDownloadResult, getEntityByConfig } from '@/api/basicApi';
 import { BackupValidationResult, RestoreBackupResult } from '@/models/system/backupModels';
-import { logPromiseError } from '@/shared/utilities/webApiUtilities';
+import { Nullable } from '@/shared/utilities/nullable';
+import { parseErrorMessage } from '@/shared/utilities/webApiUtilities';
 
-export interface ExportBackupResponse {
-    blob: Blob;
-    fileName: string;
-}
+const basicUrl = '/DatabaseBackup';
 
-export const exportDatabaseBackup = async (password?: string): Promise<ExportBackupResponse | null> => {
-    try {
-        const response = await httpClient.post(
-            '/DatabaseBackup/export',
-            { password: password || null },
-            { responseType: 'blob' }
-        );
+export type ExportBackupResponse = FileDownloadResult;
 
-        const fileName = response.headers?.['x-file-name'];
-
-        return {
-            blob: response.data,
-            fileName
-        };
-    } catch (e) {
-        logPromiseError(e);
-        return null;
-    }
+export const exportDatabaseBackup = async (password?: string): Promise<Nullable<ExportBackupResponse>> => {
+    return await downloadFileByConfig(`${basicUrl}/export`, { password: password || null });
 };
 
 export const validateDatabaseBackup = async (file: File, password?: string): Promise<BackupValidationResult> => {
-    try {
-        const formData = new FormData();
-        formData.append('file', file);
-        if (password) {
-            formData.append('password', password);
-        }
+    const formData = new FormData();
+    formData.append('file', file);
+    if (password) {
+        formData.append('password', password);
+    }
 
-        const response = await httpClient.post<BackupValidationResult>(
-            '/DatabaseBackup/validate',
-            formData
-        );
-        return response.data;
-    } catch (e: unknown) {
-        logPromiseError(e);
-        const error = e as { response?: { data?: BackupValidationResult } };
-        if (error.response?.data) {
-            return error.response.data;
-        }
-        return {
+    try {
+        const response = await getEntityByConfig<BackupValidationResult>(`${basicUrl}/validate`, formData);
+        return response ?? {
             isValid: false,
             isEncrypted: false,
             errorMessage: 'Failed to validate backup file'
+        };
+    } catch (e: unknown) {
+        console.error(e);
+        return {
+            isValid: false,
+            isEncrypted: false,
+            errorMessage: parseErrorMessage(e, 'Failed to validate backup file')
         };
     }
 };
 
 export const restoreDatabaseBackup = async (file: File, password?: string): Promise<RestoreBackupResult> => {
-    try {
-        const formData = new FormData();
-        formData.append('file', file);
-        if (password) {
-            formData.append('password', password);
-        }
+    const formData = new FormData();
+    formData.append('file', file);
+    if (password) {
+        formData.append('password', password);
+    }
 
-        const response = await httpClient.post<RestoreBackupResult>(
-            '/DatabaseBackup/restore',
-            formData
-        );
-        return response.data;
-    } catch (e: unknown) {
-        logPromiseError(e);
-        const error = e as { response?: { data?: RestoreBackupResult } };
-        if (error.response?.data) {
-            return error.response.data;
-        }
-        return {
+    try {
+        const response = await getEntityByConfig<RestoreBackupResult>(`${basicUrl}/restore`, formData);
+        return response ?? {
             success: false,
             message: 'Failed to restore database from backup'
+        };
+    } catch (e: unknown) {
+        console.error(e);
+        return {
+            success: false,
+            message: parseErrorMessage(e, 'Failed to restore database from backup')
         };
     }
 };

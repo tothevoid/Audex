@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { SecurityEntity } from "@/models/securities/SecurityEntity";
 import { createSecurity, deleteSecurity, getSecurities, updateSecurity } from "@/api/securities/securityApi";
 import { OperationResult } from "@/shared/models/OperationResult";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export const useSecurities = () => {
+	const { t } = useTranslation();
 	const [securities, setSecurities] = useState<SecurityEntity[]>([]);
 	const [isSecuritiesLoading, setLoading] = useState(false);
 
@@ -14,12 +17,12 @@ export const useSecurities = () => {
 		try {
 			const accounts = await getSecurities();
 			setSecurities(accounts);
-		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных');
+		} catch (err: unknown) {
+			setError(parseErrorMessage(err, t("error_data_load")));
 		} finally {
 			setLoading(false);
 		}
-	}, []);
+	}, [t]);
 
 	useEffect(() => {
 		fetchData();

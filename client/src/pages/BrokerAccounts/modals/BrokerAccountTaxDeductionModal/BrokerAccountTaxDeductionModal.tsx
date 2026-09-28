@@ -64,11 +64,11 @@ const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = (props: ModalProps)
     const brokerAccountCurrency = brokerAccounts.find(ba => ba.id === selectedBrokerAccount?.id)?.currency?.name ?? '';
 
     const onSubmit = async (formData: BrokerAccountTaxDeductionFormInput) => {
-        props.onSaved(formData as BrokerAccountTaxDeductionEntity);
+        await props.onSaved(formData as BrokerAccountTaxDeductionEntity);
         props.modalRef.current?.closeModal();
     };
 
-    const onModalVisibilityChanged = async (open: boolean) => {
+    const onModalVisibilityChanged = (open: boolean) => {
         if (!open) {
             return;
         }

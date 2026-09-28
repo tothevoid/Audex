@@ -66,6 +66,8 @@
     "number_unit_billion": "B",
     "general_total_count": "Total: {{count}}",
     "pagination_page_size_item": "{{size}} / page",
-    "pagination_page_size_label": "Rows per page:"
+    "pagination_page_size_label": "Rows per page:",
+
+    "error_data_load": "Error loading data"
 }
 

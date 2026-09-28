@@ -83,14 +83,12 @@ export const CreateTaskModal = forwardRef<CreateTaskModalRef, CreateTaskModalPro
                 isEnabled: isEnabled
             });
 
-            if (result) {
-                onCreated?.(result);
+            if (result.isSuccess && result.data) {
+                onCreated?.(result.data);
                 formModalRef.current?.closeModal();
             } else {
-                setErrorMessage(t('scheduler_create_error'));
+                setErrorMessage(result.errorMessage || t('scheduler_create_error'));
             }
-        } catch (err: any) {
-            setErrorMessage(err?.response?.data?.detail || t('scheduler_create_error'));
         } finally {
             setIsSubmitting(false);
         }

@@ -80,7 +80,7 @@ const DebtPaymentModal: React.FC<Props> = (props: Props) => {
 	const { t } = useTranslation();
 	const validationSchema = useMemo(() => getDebtPaymentValidationSchema(t), [t]);
 
-	const { handleSubmit, control, formState: { errors }, reset, setValue } = useForm<DebtPaymentFormInput>({
+	const { handleSubmit, control, formState: { errors }, reset, resetField } = useForm<DebtPaymentFormInput>({
 		resolver: zodResolver(validationSchema),
 		mode: "onBlur",
 		defaultValues: getDefaultFormState()
@@ -111,10 +111,10 @@ const DebtPaymentModal: React.FC<Props> = (props: Props) => {
 		if (selectedDebtEntity && selectedDebtEntity.currency && selectedAccountFormValue?.id) {
 			const selectedAccountEntity = state.accounts.find((a) => a.id === selectedAccountFormValue.id);
 			if (selectedAccountEntity && selectedAccountEntity.currency?.id !== selectedDebtEntity.currency.id) {
-				setValue("targetAccount", undefined as any);
+				resetField("targetAccount");
 			}
 		}
-	}, [selectedDebtEntity, selectedAccountFormValue, state.accounts, setValue]);
+	}, [selectedDebtEntity, selectedAccountFormValue, state.accounts, resetField]);
 
 	const onModalVisibilityChanged = async (open: boolean) => {
 		if (open) {

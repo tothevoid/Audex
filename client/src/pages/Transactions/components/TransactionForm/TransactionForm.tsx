@@ -90,7 +90,7 @@ const TransactionForm: React.FC<ModalProps> = (props: ModalProps) => {
 	};
 
 	const onTransactionSaveClick = async (transaction: TransactionFormInput) => {
-		const multiplier = transaction.direction.value == TransactionDirection.Income ?
+		const multiplier = transaction.direction.value === TransactionDirection.Income ?
 			1:
 			-1;
 

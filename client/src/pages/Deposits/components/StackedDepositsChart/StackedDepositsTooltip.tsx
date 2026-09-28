@@ -10,9 +10,17 @@ import {
     ChartTooltipItem,
 } from "@/shared/components/ChartTooltip/ChartTooltip";
 
+interface StackedDepositsTooltipPayloadItem {
+    value?: number;
+    dataKey?: string | number;
+    name?: string;
+    fill?: string;
+    color?: string;
+}
+
 interface Props {
     active?: boolean;
-    payload?: any[];
+    payload?: StackedDepositsTooltipPayloadItem[];
     label?: string;
     currencyName: string;
     depositsMap: Map<string, string>;
@@ -35,10 +43,10 @@ const StackedDepositsTooltip: React.FC<Props> = ({
 
     // Filter deposits with positive payout in this month and sort by descending value
     const activeDeposits = payload
-        .filter((item) => typeof item.value === "number" && item.value > 0)
-        .sort((a, b) => (b.value ?? 0) - (a.value ?? 0));
+        .filter((item): item is StackedDepositsTooltipPayloadItem & { value: number } => typeof item.value === "number" && item.value > 0)
+        .sort((a, b) => b.value - a.value);
 
-    const totalMonthSum = activeDeposits.reduce((acc, curr) => acc + (curr.value ?? 0), 0);
+    const totalMonthSum = activeDeposits.reduce((acc, curr) => acc + curr.value, 0);
 
     return (
         <ChartTooltipContainer minW="220px" maxW="340px">
@@ -52,7 +60,7 @@ const StackedDepositsTooltip: React.FC<Props> = ({
                 <Box borderTop="1px solid" borderColor={CHART_THEME_COLORS.divider} pt={2} mt={1}>
                     <Flex direction="column" gap={1.5} maxH="220px" overflowY="auto">
                         {activeDeposits.map((item) => {
-                            const depositId = item.dataKey;
+                            const depositId = String(item.dataKey ?? "");
                             const depositName = depositsMap.get(depositId) || item.name || depositId;
                             const color = item.fill || item.color || "#38bdf8";
 

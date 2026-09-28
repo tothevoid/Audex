@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 import { createBrokerAccount, deleteBrokerAccount, getBrokerAccounts, updateBrokerAccount } from "@/api/brokers/brokerAccountApi";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export const useBrokerAccounts = () => {
+	const { t } = useTranslation();
 	const [brokerAccounts, setBrokerAccounts] = useState<BrokerAccountEntity[]>([]);
 	const [isBrokerAccountsLoading, setLoading] = useState(false);
 
@@ -13,12 +16,12 @@ export const useBrokerAccounts = () => {
 		try {
 			const brokerAccounts = await getBrokerAccounts();
 			setBrokerAccounts(brokerAccounts);
-		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных');
+		} catch (err: unknown) {
+			setError(parseErrorMessage(err, t("error_data_load")));
 		} finally {
 			setLoading(false);
 		}
-	}, []);
+	}, [t]);
 
 	useEffect(() => {
 		fetchData();

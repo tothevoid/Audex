@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AccountEntity } from "@/models/accounts/AccountEntity";
 import { createAccount, getAccounts, updateAccount, deleteAccount } from "@/api/accounts/accountApi";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export interface AccountsQuery {
 	onlyActive: boolean;
@@ -9,6 +11,7 @@ export interface AccountsQuery {
 }
 
 export const useAccounts = (queryParameters: AccountsQuery) => {
+	const { t } = useTranslation();
 	const [accounts, setAccounts] = useState<AccountEntity[]>([]);
 	const [isAccountsLoading, setLoading] = useState(false);
 
@@ -20,12 +23,12 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 		try {
 			const accounts = await getAccounts(accountQueryParameters);
 			setAccounts(accounts);
-		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных');
+		} catch (err: unknown) {
+			setError(parseErrorMessage(err, t("error_data_load")));
 		} finally {
 			setLoading(false);
 		}
-	}, [accountQueryParameters]);
+	}, [accountQueryParameters, t]);
 
 	useEffect(() => {
 		fetchData();

@@ -1,9 +1,7 @@
 import { UserRefreshTokenEntity } from '@/models/auth/UserRefreshTokenEntity';
 import { BasePageable } from '@/shared/models/BasePageable';
 import { PagedResult } from '@/shared/models/PagedResult';
-import { getPagedEntities } from '@/api/basicApi';
-import httpClient from '@/api/httpClient';
-import { logPromiseError } from '@/shared/utilities/webApiUtilities';
+import { deleteAction, getPagedEntities, postAction } from '@/api/basicApi';
 
 const basicUrl = 'Auth';
 
@@ -18,17 +16,9 @@ export const getPagedRefreshTokens = async (
 };
 
 export const revokeToken = async (id: string): Promise<boolean> => {
-    const url = `${basicUrl}/RefreshTokens/${id}`;
-    const result = await httpClient.delete(url)
-        .then(() => true)
-        .catch(logPromiseError);
-    return result ?? false;
+    return await deleteAction(`${basicUrl}/RefreshTokens/${id}`);
 };
 
 export const revokeOtherTokens = async (): Promise<boolean> => {
-    const url = `${basicUrl}/RevokeOthers`;
-    const result = await httpClient.post(url, {})
-        .then(() => true)
-        .catch(logPromiseError);
-    return result ?? false;
+    return await postAction(`${basicUrl}/RevokeOthers`);
 };

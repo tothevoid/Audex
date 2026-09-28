@@ -19,7 +19,7 @@ interface SliderMark {
 
 interface Props {
     onDepositsRangeChanged: (fromMonths: number, toMonths: number) => void;
-    refreshTrigger?: any;
+    refreshTrigger?: number;
 }
 
 const convertRange = (range: DepositsRange) => {

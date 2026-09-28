@@ -28,8 +28,7 @@ const CryptoAccountCryptocurrenciesList: React.FC<Props> = (props: Props) => {
 		onEditClicked,
 		onDeleteClicked,
 		mode,
-		handleDelete,
-		executeWithCleanup
+		onActionEnded,
 	} = useEntityModal<CryptoAccountCryptocurrencyEntity>();
 	
 	const { 
@@ -46,21 +45,24 @@ const CryptoAccountCryptocurrenciesList: React.FC<Props> = (props: Props) => {
 		[cryptoAccountCryptocurrencies]
 	);
 
-	const onCryptocurrencyCryptoaccountSaved = executeWithCleanup(async (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => {
+	const onCryptocurrencyCryptoaccountSaved = async (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => {
 		if (mode === ActiveEntityMode.Add) {
 			await addCryptoAccountCryptocurrencyEntity(cryptoAccountCryptocurrency);
 		} else if (mode === ActiveEntityMode.Edit) {
 			await updateCryptoAccountCryptocurrencyEntity(cryptoAccountCryptocurrency);
 		}
 		props.onDataChanged();
-	});
+		onActionEnded();
+	};
 
 	const { t } = useTranslation();
 
-	const onDeleteConfirmed = handleDelete(async (cryptoAccountCryptocurrency) => {
-		await deleteCryptoAccountCryptocurrencyEntity(cryptoAccountCryptocurrency.id);
+	const onDeleteConfirmed = async () => {
+		if (!activeEntity) return;
+		await deleteCryptoAccountCryptocurrencyEntity(activeEntity.id);
 		props.onDataChanged();
-	});
+		onActionEnded();
+	};
 
 	return (
 		<Fragment>

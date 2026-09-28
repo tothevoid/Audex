@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CryptoAccountCryptocurrencyEntity } from "@/models/crypto/CryptoAccountCryptocurrencyEntity";
 import { createCryptoAccountCryptocurrency, deleteCryptoAccountCryptocurrency, updateCryptoAccountCryptocurrency, getCryptocurrenciesByCryptoAccount, getTotalBalance } from "@/api/crypto/cryptoAccountCryptocurrencyApi";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export interface CryptoAccountCryptocurrenciesQuery {
     cryptoAccountId: string
 }
 
 export const useCryptoAccountCryptocurrencies = (queryParameters: CryptoAccountCryptocurrenciesQuery) => {
+    const { t } = useTranslation();
     const [cryptoAccountCryptocurrencies, setCryptoAccountCryptocurrencies] = useState<CryptoAccountCryptocurrencyEntity[]>([]);
     const [totalBalanceUsd, setTotalBalanceUsd] = useState<number>(0);
     const [isBrokerAccountSecuritiesLoading, setLoading] = useState(false);
@@ -24,12 +27,12 @@ export const useCryptoAccountCryptocurrencies = (queryParameters: CryptoAccountC
             ]);
             setCryptoAccountCryptocurrencies(cryptocurrencies);
             setTotalBalanceUsd(balance);
-        } catch (err: any) {
-            setError(err.message || 'Ошибка загрузки данных');
+        } catch (err: unknown) {
+			setError(parseErrorMessage(err, t("error_data_load")));
         } finally {
             setLoading(false);
         }
-    }, [cryptoAccountCryptocurrenciesQueryParameters]);
+    }, [cryptoAccountCryptocurrenciesQueryParameters, t]);
 
     useEffect(() => {
         fetchData();

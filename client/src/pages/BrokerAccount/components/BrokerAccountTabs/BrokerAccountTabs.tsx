@@ -33,20 +33,20 @@ const BrokerAccountTabs: React.FC<Props> = ({ brokerAccountId, currencyName, onA
     const { t } = useTranslation();
 
     const onTransactionsChanged = useCallback(async () => {
-        onActionTriggered(ChangeAction.TransactionsChanged);
-    }, []);
+        await onActionTriggered(ChangeAction.TransactionsChanged);
+    }, [onActionTriggered]);
 
     const onBrokerAccountFundTransfersChanged = useCallback(async () => {
-       onActionTriggered(ChangeAction.FundTransfersChanged);
-    }, []);
+       await onActionTriggered(ChangeAction.FundTransfersChanged);
+    }, [onActionTriggered]);
 
     const onDividendsChanged = useCallback(async () => {
-        onActionTriggered(ChangeAction.DividendsChanged);
-    }, []);
+        await onActionTriggered(ChangeAction.DividendsChanged);
+    }, [onActionTriggered]);
 
     const onTaxDeductionsChanged = useCallback(async () => {
-        onActionTriggered(ChangeAction.TaxDeductionsChanged);
-    }, []);
+        await onActionTriggered(ChangeAction.TaxDeductionsChanged);
+    }, [onActionTriggered]);
 
     return <Tabs.Root lazyMount={true} unmountOnExit={true} variant="enclosed" 
         defaultValue={"daily_stats"}>

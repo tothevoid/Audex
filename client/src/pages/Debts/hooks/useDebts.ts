@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DebtEntity } from "@/models/debts/DebtEntity";
 import { createDebt, deleteDebt, getDebts, updateDebt } from "@/api/debts/debtApi";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export const useDebts = () => {
+	const { t } = useTranslation();
 	const [debts, setDebts] = useState<DebtEntity[]>([]);
 	const [isDebtsLoading, setLoading] = useState(false);
 
@@ -13,12 +16,12 @@ export const useDebts = () => {
 		try {
 			const debts = await getDebts(false);
 			setDebts(debts);
-		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных');
+		} catch (err: unknown) {
+			setError(parseErrorMessage(err, t("error_data_load")));
 		} finally {
 			setLoading(false);
 		}
-	}, []);
+	}, [t]);
 
 	useEffect(() => {
 		fetchData();

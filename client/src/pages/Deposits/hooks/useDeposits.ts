@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DepositEntity } from "@/models/deposits/DepositEntity";
 import { createDeposit, deleteDeposit, getDeposits, updateDeposit } from "@/api/deposits/depositApi";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export interface DepositsQuery {
 	selectedMinMonths: number,
@@ -9,6 +11,7 @@ export interface DepositsQuery {
 }
 
 export const useDeposits = (queryParameters: DepositsQuery) => {
+	const { t } = useTranslation();
 	const [deposits, setDeposits] = useState<DepositEntity[]>([]);
 	const [isDepositsLoading, setLoading] = useState(false);
 
@@ -28,12 +31,12 @@ export const useDeposits = (queryParameters: DepositsQuery) => {
 			const accounts = await getDeposits(selectedMinMonths, selectedMaxMonths, onlyActive);
 			
 			setDeposits(accounts);
-		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных');
+		} catch (err: unknown) {
+			setError(parseErrorMessage(err, t("error_data_load")));
 		} finally {
 			setLoading(false);
 		}
-	}, [depositsQueryParameters]);
+	}, [depositsQueryParameters, t]);
 
 	useEffect(() => {
 		fetchData();

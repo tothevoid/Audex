@@ -50,7 +50,7 @@ const DepositsPage: React.FC = () => {
 		</Placeholder>;
 	};
 
-	const onDepositsRangeChanged = async (fromMonths: number, toMonths: number) => {
+	const onDepositsRangeChanged = (fromMonths: number, toMonths: number) => {
 		setDepositsQueryParameters(prev => ({
 			...prev,
 			selectedMinMonths: fromMonths,
@@ -58,7 +58,7 @@ const DepositsPage: React.FC = () => {
 		}));
 	};
 
-	const onCheckboxChanged = async (checked: boolean) => {
+	const onCheckboxChanged = (checked: boolean) => {
 		setDepositsQueryParameters(prev => ({
 			...prev,
 			onlyActive: checked,

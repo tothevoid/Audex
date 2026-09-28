@@ -106,7 +106,7 @@ const BanksTable: React.FC = () => {
         });
     };
 
-    const onDeleteClicked = async (bank: BankEntity) => {
+    const onDeleteClicked = (bank: BankEntity) => {
         setBankToDeleteId(bank.id);
     };
 

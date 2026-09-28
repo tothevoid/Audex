@@ -1,13 +1,12 @@
 import React, { RefObject, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { SecurityEntity } from "@/models/securities/SecurityEntity";
+import { MarketSecurityInfoEntity, SecurityEntity } from "@/models/securities/SecurityEntity";
 import { SecurityTypeEntity } from "@/models/securities/SecurityTypeEntity";
 import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseModal from "@/shared/modals/BaseModal/BaseModal";
 import { getSecurityTypes } from "@/api/securities/securityTypeApi";
 import { getCurrencies } from "@/api/currencies/currencyApi";
-import { MarketSecurityInfoEntity } from "@/models/securities/SecurityEntity";
 import { SecurityFormInput } from "./SecurityValidationSchema";
 import SecuritySearchForm from "./components/SecuritySearchForm";
 import SecurityDetailsForm from "./components/SecurityDetailsForm";

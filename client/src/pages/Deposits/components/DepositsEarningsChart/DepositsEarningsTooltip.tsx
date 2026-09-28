@@ -9,9 +9,13 @@ import {
     ChartTooltipItem,
 } from "@/shared/components/ChartTooltip/ChartTooltip";
 
+interface DepositsEarningsTooltipPayloadItem {
+    value?: number;
+}
+
 interface Props {
     active?: boolean;
-    payload?: any[];
+    payload?: DepositsEarningsTooltipPayloadItem[];
     label?: string;
     currencyName: string;
 }

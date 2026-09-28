@@ -22,6 +22,15 @@ export interface ProcessedHistoryItem {
     value: number;
 }
 
+interface CustomTickProps {
+    x?: string | number;
+    y?: string | number;
+    payload?: {
+        value?: string | number;
+    };
+    index?: number;
+}
+
 interface Props {
     data: ProcessedHistoryItem[];
     startPrice: number;
@@ -54,8 +63,8 @@ const SecurityHistoryChart: React.FC<Props> = ({
         return result;
     }, [data]);
 
-    const renderCustomXAxisTick = useCallback((props: any) => {
-        const { x, y, payload, index } = props;
+    const renderCustomXAxisTick = useCallback((tickProps: CustomTickProps) => {
+        const { x = 0, y = 0, payload, index = 0 } = tickProps;
         if (!payload || !payload.value) return null;
         const text = formatChartAxisDate(new Date(payload.value), selectedPeriod, i18n);
 

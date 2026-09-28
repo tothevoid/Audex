@@ -39,5 +39,5 @@ export interface TransfersChartRow {
     totalIncome: number;
     totalWithdraw: number;
     accountValues: BrokerAccountTransferAccountValueEntity[];
-    [key: string]: any;
+    [accountId: string]: string | number | BrokerAccountTransferAccountValueEntity[] | undefined;
 }

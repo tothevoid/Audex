@@ -32,27 +32,6 @@ export function useEntityModal<T>() {
         setMode(ActiveEntityMode.None);
     }, []);
 
-    const handleDelete = useCallback((deleteAction: (entity: T) => Promise<void>) => {
-        return async () => {
-            if (!activeEntity) return;
-            try {
-                await deleteAction(activeEntity);
-            } finally {
-                onActionEnded();
-            }
-        };
-    }, [activeEntity, onActionEnded]);
-
-    const executeWithCleanup = useCallback(<Args extends any[]>(action: (...args: Args) => Promise<void>) => {
-        return async (...args: Args) => {
-            try {
-                await action(...args);
-            } finally {
-                onActionEnded();
-            }
-        };
-    }, [onActionEnded]);
-
     return {
         activeEntity,
         mode,
@@ -63,8 +42,6 @@ export function useEntityModal<T>() {
         onDeleteClicked,
         setActiveEntity,
         onActionEnded,
-        handleDelete,
-        executeWithCleanup,
         setMode,
     };
 }

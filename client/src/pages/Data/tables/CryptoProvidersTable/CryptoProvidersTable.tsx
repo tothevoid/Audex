@@ -24,8 +24,6 @@ const CryptoProvidersTable: React.FC = () => {
 		onEditClicked,
 		onDeleteClicked,
 		onActionEnded,
-		handleDelete,
-		executeWithCleanup
 	} = useEntityModal<CryptoProviderEntity>();
 
 	const {
@@ -36,7 +34,7 @@ const CryptoProvidersTable: React.FC = () => {
 		deleteCryptoProviderEntity
 	} = useCryptoProviders();
 
-	const onCryptoProviderSaved = executeWithCleanup(async (cryptoProvider: CryptoProviderEntity, icon: Nullable<File>) => {
+	const onCryptoProviderSaved = async (cryptoProvider: CryptoProviderEntity, icon: Nullable<File>) => {
 		const isModified = cryptoProviders.some(p => p.id === cryptoProvider.id);
 
 		if (isModified) {
@@ -44,11 +42,14 @@ const CryptoProvidersTable: React.FC = () => {
 		} else {
 			await createCryptoProviderEntity(cryptoProvider, icon);
 		}
-	});
+		onActionEnded();
+	};
 
-	const onCryptoProviderDeleteConfirmed = handleDelete(async (cryptoProvider) => {
-		await deleteCryptoProviderEntity(cryptoProvider);
-	});
+	const onCryptoProviderDeleteConfirmed = async () => {
+		if (!activeEntity) return;
+		await deleteCryptoProviderEntity(activeEntity);
+		onActionEnded();
+	};
 
 	const columns: ColumnDef<CryptoProviderEntity>[] = useMemo(() => [
 		{

@@ -1,6 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Box, Card, Grid, Stack} from "@chakra-ui/react";
-import { Text} from "@chakra-ui/react";
+import { Box, Card, Grid, Stack, Text } from "@chakra-ui/react";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { Fragment, useEffect, useState } from "react";
 import { getDashboard } from "@/api/dashboard/dashboardApi";

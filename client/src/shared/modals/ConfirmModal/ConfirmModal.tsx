@@ -1,6 +1,5 @@
 import { Button, CloseButton, Dialog, Portal, useDisclosure } from "@chakra-ui/react";
-import React, { useImperativeHandle } from "react";
-import { forwardRef } from "react";
+import React, { forwardRef, useImperativeHandle } from "react";
 import { useTranslation } from "react-i18next";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 

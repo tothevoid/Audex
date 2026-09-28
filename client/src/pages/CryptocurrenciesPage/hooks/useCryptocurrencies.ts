@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CryptocurrencyEntity } from "@/models/crypto/CryptocurrencyEntity";
 import { createCryptocurrency, deleteCryptocurrency, getCryptocurrencies, updateCryptocurrency } from "@/api/crypto/cryptocurrencyApi";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export const useCryptocurrencies = () => {
+    const { t } = useTranslation();
     const [cryptocurrencies, setCryptocurrencies] = useState<CryptocurrencyEntity[]>([]);
     const [isCryptocurrenciesLoading, setLoading] = useState(false);
 
@@ -12,12 +15,12 @@ export const useCryptocurrencies = () => {
         setLoading(true);
         try {
             setCryptocurrencies(await getCryptocurrencies());
-        } catch (err: any) {
-            setError(err.message || 'Ошибка загрузки данных');
+        } catch (err: unknown) {
+			setError(parseErrorMessage(err, t("error_data_load")));
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         fetchData();

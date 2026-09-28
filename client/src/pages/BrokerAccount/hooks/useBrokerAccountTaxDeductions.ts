@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { createBrokerAccountTaxDeduction, deleteBrokerAccountTaxDeduction, getBrokerAccountTaxDeductions, updateBrokerAccountTaxDeduction } from "@/api/brokers/brokerAccountTaxDeductionApi";
 import { BrokerAccountTaxDeductionEntity, TaxDeductionsQuery } from "@/models/brokers/BrokerAccountTaxDeductionEntity";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export type { TaxDeductionsQuery };
 
@@ -8,6 +10,7 @@ export const useBrokerAccountTaxDeductions = (
     queryParameters: TaxDeductionsQuery, 
     onDataChanged?: () => void
 ) => {
+    const { t } = useTranslation();
     const [taxDeductions, setTaxDeductions] = useState<BrokerAccountTaxDeductionEntity[]>([]);
     const [isTaxDeductionsLoading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -18,12 +21,12 @@ export const useBrokerAccountTaxDeductions = (
         try {
             const deductions = await getBrokerAccountTaxDeductions(taxDeductionsQueryParameters);
             setTaxDeductions(deductions);
-        } catch (err: any) {
-            setError(err.message || 'Ошибка загрузки данных');
+        } catch (err: unknown) {
+			setError(parseErrorMessage(err, t("error_data_load")));
         } finally {
             setLoading(false);
         }
-    }, [taxDeductionsQueryParameters]);
+    }, [taxDeductionsQueryParameters, t]);
 
     useEffect(() => {
         fetchData();

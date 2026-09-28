@@ -107,11 +107,11 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
 
     const onSubmit = async (formData: BrokerAccountFundTransferFormInput) => {
         const transfer = {...formData, income: formData.income.value} as BrokerAccountFundTransferEntity;
-        props.onSaved(transfer);
+        await props.onSaved(transfer);
         props.modalRef.current?.closeModal();
     };
 
-    const onModalVisibilityChanged = async (open: boolean) => {
+    const onModalVisibilityChanged = (open: boolean) => {
         if (!open) {
             return;
         }

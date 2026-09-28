@@ -7,9 +7,14 @@ import { CHART_THEME_COLORS } from "@/shared/constants/chartColors";
 import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import { AccountItem, MONTH_RANGE, TransfersChartRow } from "./types";
 
+interface TransfersHistoryTooltipPayloadItem {
+    payload?: TransfersChartRow;
+    value?: number;
+}
+
 interface Props {
     active?: boolean;
-    payload?: any[];
+    payload?: TransfersHistoryTooltipPayloadItem[];
     label?: string;
     selectedRangeTypeValue: string;
     selectedYearValue: number;

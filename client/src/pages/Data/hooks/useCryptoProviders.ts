@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { CryptoProviderEntity } from "@/models/crypto/CryptoProviderEntity";
 import { createCryptoProvider, deleteCryptoProvider, getCryptoProviders, updateCryptoProvider } from "@/api/crypto/cryptoProviderApi";
 import { Nullable } from "@/shared/utilities/nullable";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export const useCryptoProviders = () => {
+    const { t } = useTranslation();
     const [cryptoProviders, setCryptoProviders] = useState<CryptoProviderEntity[]>([]);
     const [isCryptoProvidersLoading, setLoading] = useState(false);
 
@@ -14,12 +17,12 @@ export const useCryptoProviders = () => {
         try {
             const providers = await getCryptoProviders();
             setCryptoProviders(providers);
-        } catch (err: any) {
-            setError(err.message || 'Ошибка загрузки данных');
+        } catch (err: unknown) {
+			setError(parseErrorMessage(err, t("error_data_load")));
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [t]);
 
     useEffect(() => {
         fetchData();

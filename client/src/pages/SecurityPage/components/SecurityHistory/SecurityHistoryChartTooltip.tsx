@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, HStack, Icon, Text } from "@chakra-ui/react";
 import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
+import { i18n as I18nInstance } from "i18next";
 import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import { formatChartTooltipDate, ChartPeriod } from "@/shared/utilities/formatters/dateFormatter";
 
@@ -11,7 +12,7 @@ interface Props {
     currencyName: string;
     startPrice: number;
     period: ChartPeriod;
-    i18n: any;
+    i18n: I18nInstance;
 }
 
 const SecurityHistoryChartTooltip: React.FC<Props> = ({

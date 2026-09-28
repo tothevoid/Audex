@@ -37,7 +37,7 @@ export const CronScheduleEditor: React.FC<CronScheduleEditorProps> = ({ config, 
     const frequencyOptions = useMemo(() => (
         FREQUENCY_OPTIONS.map((opt) => ({
             value: opt.key,
-            label: t(opt.labelKey as any)
+            label: t(opt.labelKey)
         }))
     ), [t]);
 

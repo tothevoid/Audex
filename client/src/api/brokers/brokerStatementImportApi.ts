@@ -1,6 +1,5 @@
-import httpClient from "@/api/httpClient";
+import { getAllEntities, getEntityByConfig, postEntityResult } from "@/api/basicApi";
 import { Nullable } from "@/shared/utilities/nullable";
-import { logPromiseError } from "@/shared/utilities/webApiUtilities";
 import { OperationResult } from "@/shared/models/OperationResult";
 import {
     ApplyStatementDiffsRequestEntity,
@@ -12,11 +11,7 @@ import {
 const basicUrl = "/BrokerStatementImport";
 
 export const getStatementImporters = async (): Promise<BrokerStatementImporterEntity[]> => {
-    const importers = await httpClient.get(`${basicUrl}/importers`)
-        .then((response) => response.data)
-        .catch(logPromiseError);
-
-    return importers ?? [];
+    return await getAllEntities<BrokerStatementImporterEntity>(`${basicUrl}/importers`);
 };
 
 export const analyzeBrokerStatement = async (
@@ -31,36 +26,15 @@ export const analyzeBrokerStatement = async (
     formData.append("importerId", importerId);
     formData.append("timeZoneId", timeZoneId);
 
-    const result = await httpClient.post(`${basicUrl}/analyze`, formData, {
-        headers: {
-            "Content-Type": "multipart/form-data"
-        }
-    })
-        .then((response) => response.data)
-        .catch(logPromiseError);
-
+    const result = await getEntityByConfig<BrokerStatementAnalysisResultEntity>(`${basicUrl}/analyze`, formData);
     return result ?? null;
 };
 
 export const applyStatementDiffs = async (
     request: ApplyStatementDiffsRequestEntity
-): Promise<Nullable<OperationResult<ApplyStatementDiffsSummaryEntity>>> => {
-    try {
-        const response = await httpClient.post(`${basicUrl}/apply`, request);
-        return response.data ?? null;
-    } catch (error: any) {
-        logPromiseError(error);
-        const serverError =
-            error?.response?.data?.detail ||
-            error?.response?.data?.message ||
-            error?.response?.data?.errorMessage ||
-            error?.message;
-        const serverErrorCode = error?.response?.data?.errorCode;
-        return {
-            isSuccess: false,
-            errorMessage: serverError || undefined,
-            errorCode: serverErrorCode || undefined,
-            data: undefined
-        };
-    }
+): Promise<OperationResult<ApplyStatementDiffsSummaryEntity>> => {
+    return await postEntityResult<ApplyStatementDiffsRequestEntity, ApplyStatementDiffsSummaryEntity>(
+        `${basicUrl}/apply`,
+        request
+    );
 };

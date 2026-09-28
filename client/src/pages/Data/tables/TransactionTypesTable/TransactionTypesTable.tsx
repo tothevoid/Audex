@@ -100,7 +100,7 @@ const TransactionTypesTable: React.FC = () => {
         });
     };
 
-    const onDeleteClicked = async (transactionType: TransactionTypeEntity) => {
+    const onDeleteClicked = (transactionType: TransactionTypeEntity) => {
         setTransactionTypeToDeleteId(transactionType.id);
     };
 

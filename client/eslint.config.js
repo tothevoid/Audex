@@ -29,6 +29,18 @@ export default tseslint.config(
       ],
       'semi': ['error', 'always'],
       '@typescript-eslint/require-await': 'error',
+      'prefer-const': 'error',
+      'eqeqeq': ['error', 'always', { null: 'ignore' }],
+      'no-duplicate-imports': 'error',
+      'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
   },
 )

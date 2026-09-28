@@ -35,20 +35,16 @@ const BrokerAccountsPage: React.FC = () => {
             return {...state, isReloading: false};
         });
 
-        const fetchPortfolioValues = async () => {
-            const values = await getPortfolioValues();
-            if (values) {
-                setPortfolio(values);
-            }
-        };
-
-        fetchPortfolioValues();
+        const values = await getPortfolioValues();
+        if (values) {
+            setPortfolio(values);
+        }
     }, []);
     
     const onTransactionsChanged = useCallback(async () => {
         await fetchBrokerAccountsSummary();
         await securitiesRef.current?.reloadData();
-    }, []);
+    }, [fetchBrokerAccountsSummary]);
 
     const onQuotesRecalculated = async (message: string) => {
         const data = JSON.parse(message);
@@ -74,13 +70,13 @@ const BrokerAccountsPage: React.FC = () => {
             await fetchLastPullDate();
         };
         getData();
-    }, []);
+    }, [fetchBrokerAccountsSummary]);
 
     const pullQuotations = async () => {
         setState((currentState) => {
             return {...currentState, isReloading: true};
         });
-        pullBrokerAccountQuotations();
+        await pullBrokerAccountQuotations();
     };
     
     useSignalR(onQuotesRecalculated);

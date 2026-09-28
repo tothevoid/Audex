@@ -27,8 +27,7 @@ const CryptoAccountsList: React.FC<Props> = (props: Props) => {
         onEditClicked,
         onDeleteClicked,
         mode,
-        handleDelete,
-        executeWithCleanup
+        onActionEnded,
     } = useEntityModal<CryptoAccountEntity>();
 
     const {
@@ -38,19 +37,22 @@ const CryptoAccountsList: React.FC<Props> = (props: Props) => {
         deleteCryptoAccountEntity,
     } = useCryptoAccounts();
 
-    const onCryptoAccountSaved = executeWithCleanup(async (cryptoAccount: CryptoAccountEntity) => {
+    const onCryptoAccountSaved = async (cryptoAccount: CryptoAccountEntity) => {
         if (mode === ActiveEntityMode.Add) {
             await createCryptoAccountEntity(cryptoAccount);
         } else if (mode === ActiveEntityMode.Edit) {
             await updateCryptoAccountEntity(cryptoAccount);
         }
         props.onDataChanged();
-    });
+        onActionEnded();
+    };
 
-    const onDeleteConfirmed = handleDelete(async (cryptoAccount) => {
-        await deleteCryptoAccountEntity(cryptoAccount);
+    const onDeleteConfirmed = async () => {
+        if (!activeEntity) return;
+        await deleteCryptoAccountEntity(activeEntity);
         props.onDataChanged();
-    });
+        onActionEnded();
+    };
 
     const getHeader = () => {
         const placeholderAddButton = (

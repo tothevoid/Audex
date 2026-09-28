@@ -100,7 +100,7 @@ const CurrenciesTable: React.FC = () => {
         });
     };
 
-    const onDeleteClicked = async (currency: CurrencyEntity) => {
+    const onDeleteClicked = (currency: CurrencyEntity) => {
         setState((currentState) => {
             return {...currentState, currentCurrencyId: currency.id};
         });

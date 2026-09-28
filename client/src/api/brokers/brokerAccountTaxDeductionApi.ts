@@ -10,7 +10,7 @@ export const getBrokerAccountTaxDeductions = async (query: TaxDeductionsQuery): 
 };
 
 export const createBrokerAccountTaxDeduction = async (addedTaxDeduction: BrokerAccountTaxDeductionEntity): Promise<void> => {
-    await createEntity<any, any>(basicUrl, prepareBrokerAccountTaxDeductionRequest(addedTaxDeduction));
+    await createEntity(basicUrl, prepareBrokerAccountTaxDeductionRequest(addedTaxDeduction));
 };
 
 export const getAmountByBrokerAccount = async (brokerAccountId: string): Promise<number> => {

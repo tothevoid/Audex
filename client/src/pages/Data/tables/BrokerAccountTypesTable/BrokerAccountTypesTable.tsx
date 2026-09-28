@@ -79,7 +79,7 @@ const BrokerAccountTypesTable: React.FC = () => {
         }
     };
 
-    const onDeleteClicked = async (brokerAccountType: BrokerAccountTypeEntity) => {
+    const onDeleteClicked = (brokerAccountType: BrokerAccountTypeEntity) => {
         setState((currentState) => {
             return {...currentState, currentBrokerAccountTypeId: brokerAccountType.id};
         });

@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { TransactionEntity } from "@/models/transactions/TransactionEntity";
 import { createTransaction, getTransactions, updateTransaction, deleteTransaction } from "@/api/transactions/transactionApi";
 import { insertByPredicate, reorderByPredicate } from "@/shared/utilities/arrayUtilities";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
 export interface TransactionsQuery {
 	month: number,
@@ -10,6 +12,7 @@ export interface TransactionsQuery {
 }
 
 export const useTransactions = (initialParams: TransactionsQuery) => {
+	const { t } = useTranslation();
 	const [transactions, setTransactions] = useState<TransactionEntity[]>([]);
 	const [isTransactionsLoading, setLoading] = useState(false);
 
@@ -21,12 +24,12 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 		try {
 			const transactions = await getTransactions(params.month, params.year, params.showSystem);
 			setTransactions(transactions);
-		} catch (err: any) {
-			setError(err.message || 'Ошибка загрузки данных');
+		} catch (err: unknown) {
+			setError(parseErrorMessage(err, t("error_data_load")));
 		} finally {
 			setLoading(false);
 		}
-	}, [params]);
+	}, [params, t]);
 
 	useEffect(() => {
 		fetchData();
