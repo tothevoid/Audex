@@ -17,12 +17,14 @@ import CryptocurrenciesPage from '@/pages/CryptocurrenciesPage/CryptocurrenciesP
 import CryptoAccountsPage from '@/pages/CryptoAccountsPage/CryptoAccountsPage';
 import CryptoAccountPage from '@/pages/CryptoAccountPage/CryptoAccountPage';
 import AuthPage from '@/pages/Auth/AuthPage';
-import { UserProvider } from '@/features/UserProfileSettingsModal/hooks/UserProfileContext';
+import { UserProvider } from '@/features/UserProfileSettingsModal/hooks/UserProvider';
 import NotificationsPage from '@/pages/Notifications/NotificationsPage';
 import CashAccountPage from '@/pages/CashAccountPage/CashAccountPage.tsx';
 import SchedulerPage from '@/pages/Scheduler/SchedulerPage.tsx';
 import { getAccessToken } from '@/api/tokenStorage';
 import { refreshToken } from '@/api/auth/authApi';
+import { Box, Theme } from '@chakra-ui/react';
+import { useColorMode } from '@/shared/context/useColorMode';
 
 const RequireAuth = () => {
 	const token = getAccessToken();
@@ -72,33 +74,39 @@ const PageWrapper = () => (
 );
 
 const App = () => {
+	const { resolvedColorMode } = useColorMode();
+
 	return (
-		<Router>
-			<Routes>
-				<Route path="/auth" element={<AuthPage />} />
-				<Route element={<RequireAuth />}>
-					<Route element={<PageWrapper />}>
-						<Route path="/" element={<DashboardPage />} />
-						<Route path="/accounts" element={<AccountsPage />} />
-						<Route path="/transactions" element={<TransactionsPage />} />
-						<Route path="/deposits" element={<DepositsPage />} />
-						<Route path="/broker_accounts" element={<BrokerAccountsPage />} />
-						<Route path="/securities" element={<SecuritiesPage />} />
-						<Route path="/debts" element={<DebtsPage />} />
-						<Route path="/cryptocurrencies" element={<CryptocurrenciesPage />} />
-						<Route path="/crypto_accounts" element={<CryptoAccountsPage />} />
-						<Route path="/crypto_account/:cryptoAccountId" element={<CryptoAccountPage />} />
-						<Route path="/data" element={<DataPage />} />
-						<Route path="/data/:tab" element={<DataPage />} />
-						<Route path="/broker_account/:brokerAccountId" element={<BrokerAccountPage />} />
-						<Route path="/security/:securityId" element={<SecurityPage />} />
-						<Route path="/cash_account/:cashAccountId" element={<CashAccountPage />} />
-						<Route path="/notifications" element={<NotificationsPage />} />
-						<Route path="/scheduler" element={<SchedulerPage />} />
-					</Route>
-				</Route>
-			</Routes>
-		</Router>
+		<Theme appearance={resolvedColorMode} hasBackground={false}>
+			<Box backgroundColor="background_main" minH="100vh">
+				<Router>
+					<Routes>
+						<Route path="/auth" element={<AuthPage />} />
+						<Route element={<RequireAuth />}>
+							<Route element={<PageWrapper />}>
+								<Route path="/" element={<DashboardPage />} />
+								<Route path="/accounts" element={<AccountsPage />} />
+								<Route path="/transactions" element={<TransactionsPage />} />
+								<Route path="/deposits" element={<DepositsPage />} />
+								<Route path="/broker_accounts" element={<BrokerAccountsPage />} />
+								<Route path="/securities" element={<SecuritiesPage />} />
+								<Route path="/debts" element={<DebtsPage />} />
+								<Route path="/cryptocurrencies" element={<CryptocurrenciesPage />} />
+								<Route path="/crypto_accounts" element={<CryptoAccountsPage />} />
+								<Route path="/crypto_account/:cryptoAccountId" element={<CryptoAccountPage />} />
+								<Route path="/data" element={<DataPage />} />
+								<Route path="/data/:tab" element={<DataPage />} />
+								<Route path="/broker_account/:brokerAccountId" element={<BrokerAccountPage />} />
+								<Route path="/security/:securityId" element={<SecurityPage />} />
+								<Route path="/cash_account/:cashAccountId" element={<CashAccountPage />} />
+								<Route path="/notifications" element={<NotificationsPage />} />
+								<Route path="/scheduler" element={<SchedulerPage />} />
+							</Route>
+						</Route>
+					</Routes>
+				</Router>
+			</Box>
+		</Theme>
 	);
 };
 

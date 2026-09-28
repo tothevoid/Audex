@@ -54,7 +54,7 @@ const BrokerAccountDailyStats: React.FC<Props> = ({ brokerAccountId, currencyNam
 			await fetchDailyStats();
 		};
 		fetchData();
-	}, []);
+	}, [dailyStats, fetchDailyStats]);
 
 	const formatStat = useCallback((stat: BrokerAccountDailySecurityStatsEntity) => {
 		const currencyName = stat.security.currency.name;

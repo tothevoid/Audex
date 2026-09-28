@@ -13,7 +13,7 @@ export interface BaseSelectProps<T, IsClearable extends boolean = false> {
     isClearable?: IsClearable;
 }
 
-export const selectChakraStyles: ChakraStylesConfig = {
+const selectChakraStyles: ChakraStylesConfig = {
     control: (provided, state) => ({
         ...provided,
         backgroundColor: state.isDisabled ? "background_secondary" : "background_primary",

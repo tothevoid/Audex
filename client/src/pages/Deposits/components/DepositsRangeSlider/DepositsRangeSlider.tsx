@@ -39,7 +39,7 @@ const convertRange = (range: DepositsRange) => {
     return {minMonths, maxMonths, marks, selectedMinMonths: minMonths, selectedMaxMonths: maxMonths};
 };
 
-const DepositsRangeSlider = (props: Props) => {
+const DepositsRangeSlider = ({ refreshTrigger, onDepositsRangeChanged }: Props) => {
     const [state, setState] = useState<State>({
         minMonths: null, 
         maxMonths: null, 
@@ -57,17 +57,17 @@ const DepositsRangeSlider = (props: Props) => {
             setState((currentState) => {
                 return {...currentState, ...ranges};
             });
-            props.onDepositsRangeChanged(ranges.selectedMinMonths, ranges.selectedMaxMonths);
+            onDepositsRangeChanged(ranges.selectedMinMonths, ranges.selectedMaxMonths);
         };
         getData();
-    }, [props.refreshTrigger]);
+    }, [refreshTrigger, onDepositsRangeChanged]);
 
     const onSliderValueChanged = (selectedValues: number[]) => {
         const newSliderValues = {selectedMinMonths: selectedValues[0], selectedMaxMonths: selectedValues[1]};
         setState((currentState) => {
             return {...currentState, ...newSliderValues};
         });
-        props.onDepositsRangeChanged(newSliderValues.selectedMinMonths, newSliderValues.selectedMaxMonths);
+        onDepositsRangeChanged(newSliderValues.selectedMinMonths, newSliderValues.selectedMaxMonths);
     };
 
     if (!state.selectedMaxMonths || !state.selectedMinMonths) {

@@ -57,40 +57,42 @@ const CurrencyTransactionForm: React.FC<Props> = (props: Props) => {
         defaultValues: getDefaultTransactionFormState()
     });
 
-    const [isCustomName, setIsCustomName] = useState<boolean>(!!props.currencyTransaction?.name);
+    const { currentAccount, currencyTransaction, onCurrencyTransactionSaved, setSubmitHandler } = props;
+
+    const [isCustomName, setIsCustomName] = useState<boolean>(!!currencyTransaction?.name);
     const [accounts, setAccounts] = useState<AccountEntity[]>([]);
 
     useEffect(() => {
         reset(getDefaultTransactionFormState());
-        setIsCustomName(!!props.currencyTransaction?.name);
-    }, [props.currencyTransaction, reset, getDefaultTransactionFormState]);
+        setIsCustomName(!!currencyTransaction?.name);
+    }, [currencyTransaction, reset, getDefaultTransactionFormState]);
 
     useEffect(() => {
         getAccounts({ onlyActive: true }).then(setAccounts);
     }, []);
 
-    const onCurrencyTransactionSaveClick = async (currencyTransaction: CurrencyTransactionFormInput) => {
+    const onCurrencyTransactionSaveClick = useCallback(async (formInput: CurrencyTransactionFormInput) => {
         const formData: CurrencyTransactionEntity = {
-            id: currencyTransaction.id!,
-            name: currencyTransaction.name,
-            amount: currencyTransaction.amount,
-            rate: currencyTransaction.rate,
-            date: currencyTransaction.date,
-            sourceAccount: currencyTransaction.sourceAccount as AccountEntity,
-            destinationAccount: currencyTransaction.destinationAccount as AccountEntity
+            id: formInput.id!,
+            name: formInput.name,
+            amount: formInput.amount,
+            rate: formInput.rate,
+            date: formInput.date,
+            sourceAccount: formInput.sourceAccount as AccountEntity,
+            destinationAccount: formInput.destinationAccount as AccountEntity
         };
-        await props.onCurrencyTransactionSaved(formData);
-    };
+        await onCurrencyTransactionSaved(formData);
+    }, [onCurrencyTransactionSaved]);
 
     useEffect(() => {
-        props.setSubmitHandler(handleSubmit, onCurrencyTransactionSaveClick);
-    }, [accounts]);
+        setSubmitHandler(handleSubmit, onCurrencyTransactionSaveClick);
+    }, [handleSubmit, onCurrencyTransactionSaveClick, setSubmitHandler]);
 
     const selectedSourceAccount = watch("sourceAccount");
     const selectedDestAccount = watch("destinationAccount");
 
-    const isCurrentAccountSource = Boolean(props.currentAccount && selectedSourceAccount?.id === props.currentAccount.id);
-    const isCurrentAccountDest = Boolean(props.currentAccount && selectedDestAccount?.id === props.currentAccount.id);
+    const isCurrentAccountSource = Boolean(currentAccount && selectedSourceAccount?.id === currentAccount.id);
+    const isCurrentAccountDest = Boolean(currentAccount && selectedDestAccount?.id === currentAccount.id);
 
     const findAccount = useCallback((account?: { id?: string } | null) => {
         if (!account?.id) return null;

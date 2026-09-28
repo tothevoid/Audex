@@ -37,7 +37,7 @@ const TransactionTypeModal: React.FC<ModalProps> = (props: ModalProps) => {
 		if (props.transactionType) {
 			reset(props.transactionType);
 		}
-	}, [props.transactionType]);
+	}, [props.transactionType, reset]);
 
 	const onSubmit = (transactionType: TransactionTypeFormInput) => {
 		props.onSaved({...transactionType, iconKey: props.transactionType?.iconKey } as TransactionTypeEntity, icon);

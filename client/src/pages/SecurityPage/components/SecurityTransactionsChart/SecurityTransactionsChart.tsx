@@ -18,38 +18,38 @@ interface State {
     transactions: SecurityTransactionsHistory[],
 }
 
-const SecurityTransactionsChart: React.FC<Props> = (props) => {
+const SecurityTransactionsChart: React.FC<Props> = ({ securityId, currencyName, currentPrice }) => {
     const [state, setState] = useState<State>({transactions: []});
 
     const { t, i18n } = useTranslation();
 
-    const initData = async () => {
-        const historyValues = await getTransactionsBySecurity(props.securityId);
-        if (!historyValues) {
-            return;
-        }
-
-        const transactions = historyValues.map(historyValue => {
-            historyValue.date = formatShortDateTime(new Date(historyValue.date), i18n);
-            return historyValue;
-        });
-
-        setState((currentState) => {
-            return {...currentState, transactions};
-        });
-    };
-
     useEffect(() => {
+        const initData = async () => {
+            const historyValues = await getTransactionsBySecurity(securityId);
+            if (!historyValues) {
+                return;
+            }
+
+            const transactions = historyValues.map(historyValue => {
+                historyValue.date = formatShortDateTime(new Date(historyValue.date), i18n);
+                return historyValue;
+            });
+
+            setState((currentState) => {
+                return {...currentState, transactions};
+            });
+        };
+
         initData();
-    }, []);
+    }, [securityId, i18n]);
 
     const formatTooltipValue = useCallback((value: TooltipValueType | undefined, name: TooltipValueType | undefined) => {
         if (String(name) === t("securities_transactions_volume")) {
             return Number(value ?? 0);
         }
 
-        return formatMoneyByCurrencyCulture(Number(value ?? 0), props.currencyName);
-    }, [props.currencyName, t]);
+        return formatMoneyByCurrencyCulture(Number(value ?? 0), currencyName);
+    }, [currencyName, t]);
 
     return <Box style={{ width: '100%', height: 400 }}>
         <ResponsiveContainer>
@@ -92,7 +92,7 @@ const SecurityTransactionsChart: React.FC<Props> = (props) => {
                 />
 
                 <Legend />
-                <ReferenceLine yAxisId="left" y={props.currentPrice} stroke="var(--chakra-colors-loss)" strokeDasharray="5 5" label={t("securities_transactions_current_price")} />
+                <ReferenceLine yAxisId="left" y={currentPrice} stroke="var(--chakra-colors-loss)" strokeDasharray="5 5" label={t("securities_transactions_current_price")} />
                 <Tooltip contentStyle={getChartLabelConfig()} formatter={formatTooltipValue} />
             </ComposedChart>
         </ResponsiveContainer>

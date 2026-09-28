@@ -5,7 +5,8 @@ import { BsClockHistory } from "react-icons/bs";
 import { getTickerHistory } from "@/api/securities/securityApi";
 import { SecurityHistory as SecurityHistoryModel } from "@/models/securities/SecurityHistory";
 import { formatDate, ChartPeriod } from "@/shared/utilities/formatters/dateFormatter";
-import SecurityHistoryHeader, { PERIOD_OPTIONS, HistoryStats } from "./SecurityHistoryHeader";
+import SecurityHistoryHeader from "./SecurityHistoryHeader";
+import { PERIOD_OPTIONS, HistoryStats } from "./types";
 import SecurityHistoryChart, { ProcessedHistoryItem } from "./SecurityHistoryChart";
 
 interface Props {

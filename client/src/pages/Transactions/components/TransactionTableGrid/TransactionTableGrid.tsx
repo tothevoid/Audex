@@ -8,11 +8,11 @@ import { generateGuid } from '@/shared/utilities/idUtilities';
 import { BaseModalRef } from '@/shared/utilities/modalUtilities';
 import {
     CommitDiffPayload,
+    hasOutOfPeriodTransactions,
     RowDiff,
     TransactionsListHeaderProps,
 } from './types';
 import {
-    hasOutOfPeriodTransactions,
     OutOfMonthWarningModal,
     TransactionTableActionBar,
     TransactionTableRow,

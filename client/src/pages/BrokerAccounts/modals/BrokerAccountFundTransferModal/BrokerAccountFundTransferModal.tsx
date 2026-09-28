@@ -40,14 +40,14 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
     const [brokerAccounts, setBrokerAccounts] = useState<BrokerAccountEntity[]>([]);
 
 
-    const { i18n, t } = useTranslation();
+    const { t } = useTranslation();
 
     const transferTypes: TransferType[] = useMemo(
         () => [
             { label: t("broker_account_transfer_modal_operation_deposit"), value: true },
             { label: t("broker_account_transfer_modal_operation_withdraw"), value: false }
         ],
-        [i18n.language, t]
+        [t]
     );
     
     const getDefaultValues = useCallback(() => {
@@ -81,7 +81,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
             }
         };
         fetchData();
-    }, []);
+    }, [props.isGlobalBrokerAccount]);
 
     const validationSchema = useMemo(() => getBrokerAccountFundTransferValidationSchema(t), [t]);
 

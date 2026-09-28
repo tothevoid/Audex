@@ -26,26 +26,26 @@ const SecurityPage: React.FC = () => {
 	const [state, setState] = useState<State>({ security: null!, securityStats: null! });
 
 	useEffect(() => {
-		initData();
-	}, []);
-
-	if (!securityId) {
-		return <Fragment/>;
-	}
-
-	const initData = async () => {
-		const security = await getSecurityById(securityId);
-		const securityStats = await getSecurityStats(securityId);
-		if (!security || !securityStats) {
+		if (!securityId) {
 			return;
 		}
 
-		setState((currentState) => {
-			return {...currentState, security, securityStats};
-		});
-	};
+		const initData = async () => {
+			const security = await getSecurityById(securityId);
+			const securityStats = await getSecurityStats(securityId);
+			if (!security || !securityStats) {
+				return;
+			}
 
-	if (!state.security) {
+			setState((currentState) => {
+				return { ...currentState, security, securityStats };
+			});
+		};
+
+		initData();
+	}, [securityId]);
+
+	if (!securityId || !state.security) {
 		return <Fragment/>;
 	}
 

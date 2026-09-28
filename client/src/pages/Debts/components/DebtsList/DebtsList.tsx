@@ -91,7 +91,7 @@ const DebtsList: React.FC<Props> = ({
         if (selectedTagFilter && !availableFilterTags.some((t) => t.id === selectedTagFilter)) {
             setSelectedTagFilter(null);
         }
-    }, [availableFilterTags, selectedTagFilter]);
+    }, [availableFilterTags, selectedTagFilter, setSelectedTagFilter]);
 
     const filteredDebts = debts.filter((debt) => {
         if (onlyActive && !debt.amount) return false;

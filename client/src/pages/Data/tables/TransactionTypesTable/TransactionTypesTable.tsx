@@ -174,7 +174,7 @@ const TransactionTypesTable: React.FC = () => {
                 </Button>
             )
         }
-    ], [t, state.transactionTypes]);
+    ], [t]);
 
     return <Box color="text_primary">
         <SectionHeader

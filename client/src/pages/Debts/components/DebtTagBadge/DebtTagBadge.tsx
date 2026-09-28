@@ -1,6 +1,6 @@
 import React from "react";
 import { Badge, BadgeProps } from "@chakra-ui/react";
-import { useColorMode } from "@/shared/context/ColorModeContext";
+import { useColorMode } from "@/shared/context/useColorMode";
 import { getAccessibleTagStyles } from "@/shared/utilities/colorUtilities";
 
 export interface DebtTagBadgeProps extends Omit<BadgeProps, "name"> {

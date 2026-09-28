@@ -32,41 +32,41 @@ enum TransactionDirection {
 	Spent = "spent",
 }
 
-const TransactionForm: React.FC<ModalProps> = (props: ModalProps) => {
+const TransactionForm: React.FC<ModalProps> = ({ transaction, onTransactionSaved, setSubmitHandler }: ModalProps) => {
 	const {t} = useTranslation();
 
 	const [state, setState] = useState<State>({transactionTypes: [], accounts: []});
 
-	const amount = props.transaction?.amount ? 
-		Math.abs(props.transaction.amount) :
-		0;
-
-	const transactionOptions = {
-		[TransactionDirection.Income]: { label: t("entity_transaction_direction_income"), value: TransactionDirection.Income },
-		[TransactionDirection.Spent]: { label: t("entity_transaction_direction_outcome"), value: TransactionDirection.Spent },
-	} as const;
-
-	const direction = props.transaction && props.transaction.amount > 0 ?
-		transactionOptions[TransactionDirection.Income]:
-		transactionOptions[TransactionDirection.Spent];
-
-	const source = (state.accounts?.length > 0) ? 
-		state.accounts[0] :
-		{id: ""} as AccountEntity;
+	const transactionOptions = useMemo(() => [
+		{ label: t("entity_transaction_direction_income"), value: TransactionDirection.Income },
+		{ label: t("entity_transaction_direction_outcome"), value: TransactionDirection.Spent },
+	], [t]);
 
 	const getDefaultTransactionFormValues = useCallback(() => {
+		const amount = transaction?.amount ? 
+			Math.abs(transaction.amount) :
+			0;
+
+		const direction = transaction && transaction.amount > 0 ?
+			transactionOptions[0]:
+			transactionOptions[1];
+
+		const source = (state.accounts?.length > 0) ? 
+			state.accounts[0] :
+			{id: ""} as AccountEntity;
+
 		return {
-			id: props.transaction?.id ?? generateGuid(),
-			name: props.transaction?.name ?? "",
-			date: props.transaction?.date ?? new Date(),
+			id: transaction?.id ?? generateGuid(),
+			name: transaction?.name ?? "",
+			date: transaction?.date ?? new Date(),
 			amount,
-			account: props.transaction?.account ?? source,
+			account: transaction?.account ?? source,
 			direction: direction,
-			cashback: props.transaction?.cashback ?? 0,
-			isSystem: props.transaction?.isSystem ?? false,
-			transactionType: props.transaction?.transactionType
+			cashback: transaction?.cashback ?? 0,
+			isSystem: transaction?.isSystem ?? false,
+			transactionType: transaction?.transactionType
 		};
-	}, [props.transaction]);
+	}, [transaction, state.accounts, transactionOptions]);
 
 	const validationSchema = useMemo(() => getTransactionValidationSchema(t), [t]);
 
@@ -78,47 +78,43 @@ const TransactionForm: React.FC<ModalProps> = (props: ModalProps) => {
 
 	useEffect(() => {
 		reset(getDefaultTransactionFormValues());
-	}, [props.transaction, reset, getDefaultTransactionFormValues]);
+	}, [transaction, reset, getDefaultTransactionFormValues]);
 
-	const initCollections = async () => {
-		const transactionTypes = await getTransactionTypes(true);
-		const accounts = await getAccounts({ onlyActive: true });
-
-		setState((currentState) => {
-			return {...currentState, transactionTypes, accounts};
-		});
-	};
-
-	const onTransactionSaveClick = async (transaction: TransactionFormInput) => {
-		const multiplier = transaction.direction.value === TransactionDirection.Income ?
+	const onTransactionSaveClick = useCallback(async (formTransaction: TransactionFormInput) => {
+		const multiplier = formTransaction.direction.value === TransactionDirection.Income ?
 			1:
 			-1;
 
 		const transactionEntity: TransactionEntity = {
-			id: transaction.id!, 
-			name: transaction.name,
-			amount: multiplier * transaction.amount,
-			account: state.accounts.find(account => account.id === transaction.account.id)!,
-			isSystem: transaction.isSystem,
-			date: transaction.date,
-			cashback: transaction.cashback,
-			transactionType: state.transactionTypes.find(transactionType => transactionType.id === transaction.transactionType.id)!,
+			id: formTransaction.id!, 
+			name: formTransaction.name,
+			amount: multiplier * formTransaction.amount,
+			account: state.accounts.find(account => account.id === formTransaction.account.id)!,
+			isSystem: formTransaction.isSystem,
+			date: formTransaction.date,
+			cashback: formTransaction.cashback,
+			transactionType: state.transactionTypes.find(transactionType => transactionType.id === formTransaction.transactionType.id)!,
 		};
 
-		await props.onTransactionSaved(transactionEntity);
-	};
+		await onTransactionSaved(transactionEntity);
+	}, [onTransactionSaved, state.accounts, state.transactionTypes]);
 	
 	useEffect(() => {
 		const initData = async () => {
-			await initCollections();
+			const transactionTypes = await getTransactionTypes(true);
+			const accounts = await getAccounts({ onlyActive: true });
+
+			setState((currentState) => {
+				return {...currentState, transactionTypes, accounts};
+			});
 		};
 
 		initData();
 	}, []);
 
 	useEffect(() => {
-		props.setSubmitHandler(handleSubmit, onTransactionSaveClick);
-	}, [state]);
+		setSubmitHandler(handleSubmit, onTransactionSaveClick);
+	}, [handleSubmit, onTransactionSaveClick, setSubmitHandler]);
 
 	const selectedDirection = watch("direction");
 	const selectedAccount = watch("account");
@@ -132,9 +128,9 @@ const TransactionForm: React.FC<ModalProps> = (props: ModalProps) => {
 		<Field.Root mt={4}>
 			<Field.Label>{t("entity_transaction_direction")}</Field.Label>
 			<CollectionSelect name="direction" control={control} placeholder="Select direction"
-				collection={Object.values(transactionOptions)} 
-				labelSelector={(currency => currency.label)} 
-				valueSelector={(currency => currency.value)}/>
+				collection={transactionOptions} 
+				labelSelector={(option => option.label)} 
+				valueSelector={(option => option.value)}/>
 		</Field.Root>
 		<Field.Root mt={4} invalid={!!errors.amount}>
 			<Field.Label>{t("entity_transaction_money_quantity")}</Field.Label>

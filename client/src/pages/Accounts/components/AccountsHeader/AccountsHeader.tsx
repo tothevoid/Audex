@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { AccountCurrencySummary } from "@/models/accounts/accountsSummary";
 import { NumericMetricItem } from "@/shared/components/MetricItem";
 import { getCurrencyColor, getCurrencyIcon } from "@/shared/utilities/currencyUtils";
-import { useColorMode } from "@/shared/context/ColorModeContext";
+import { useColorMode } from "@/shared/context/useColorMode";
 import SectionHeader from "@/shared/components/SectionHeader";
 import FilterBlock, { FilterBlockDivider } from "@/shared/components/FilterBlock";
 import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";

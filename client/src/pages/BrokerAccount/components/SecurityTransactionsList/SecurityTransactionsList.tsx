@@ -27,7 +27,7 @@ interface Props {
 	onTransactionsChanged: () => void;
 }
 
-const SecurityTransactionsList: React.FC<Props> = (props) => {
+const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransactionsChanged }) => {
 	const { t } = useTranslation();
 
 	const {
@@ -41,7 +41,7 @@ const SecurityTransactionsList: React.FC<Props> = (props) => {
 		onActionEnded
 	} = useEntityModal<SecurityTransactionEntity>();
 
-	const isGlobalBrokerAccount = !props.brokerAccountId;
+	const isGlobalBrokerAccount = !brokerAccountId;
 
 	const {
 		securityTransactions,
@@ -52,13 +52,13 @@ const SecurityTransactionsList: React.FC<Props> = (props) => {
 		deleteSecurityTransactionEntity,
 		securityTransactionsQueryParameters,
 		setSecurityTransactionsQueryParameters
-	} = useSecurityTransactions(props.brokerAccountId);
+	} = useSecurityTransactions(brokerAccountId);
 
 	const showSkeleton = useDelayedLoading(isSecurityTransactionsLoading);
 
 	useEffect(() => {
-		props.onTransactionsChanged();
-	}, [securityTransactions]);
+		onTransactionsChanged();
+	}, [onTransactionsChanged, securityTransactions]);
 
 	const [context, setContext] = useState<Nullable<CreateSecurityTransactionContext | EditSecurityTransactionContext>>(null);
 
@@ -67,12 +67,12 @@ const SecurityTransactionsList: React.FC<Props> = (props) => {
 			...previousQueryParameters,
 			pageIndex: 1,
 			...newFilters,
-			brokerAccountId: props.brokerAccountId ?? newFilters.brokerAccountId
+			brokerAccountId: brokerAccountId ?? newFilters.brokerAccountId
 		}));
 	};
 
 	const onResetFilters = () => {
-		onFilterChange(createDefaultSecurityTransactionsFilter(props.brokerAccountId));
+		onFilterChange(createDefaultSecurityTransactionsFilter(brokerAccountId));
 	};
 
 	const onPageChanged = (pageNumber: number, pageSize: number) => {
@@ -86,9 +86,9 @@ const SecurityTransactionsList: React.FC<Props> = (props) => {
 	useEffect(() => {
 		const context = activeEntity ?
 			{ securityTransaction: activeEntity } as EditSecurityTransactionContext :
-			{ brokerAccountId: props.brokerAccountId } as CreateSecurityTransactionContext;
+			{ brokerAccountId } as CreateSecurityTransactionContext;
 		setContext(context);
-	}, [props.brokerAccountId, activeEntity]);
+	}, [brokerAccountId, activeEntity]);
 
 	const onSecurityTransactionSaved = async (securityTransaction: SecurityTransactionEntityRequest) => {
 		if (mode === ActiveEntityMode.Add) {

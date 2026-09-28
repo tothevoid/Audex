@@ -176,7 +176,7 @@ const BanksTable: React.FC = () => {
                 </Button>
             )
         }
-    ], [t, state.banks]);
+    ], [t]);
 
     return <Box color="text_primary">
         <SectionHeader

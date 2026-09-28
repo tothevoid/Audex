@@ -84,5 +84,17 @@ export interface TransactionsListHeaderProps {
     onViewDisplayModeChange: (mode: ViewDisplayMode) => void;
 }
 
+export const hasOutOfPeriodTransactions = (
+    diff: CommitDiffPayload,
+    month?: number,
+    year?: number
+): boolean => {
+    if (!month || !year) return false;
+    return [...diff.added, ...diff.updated].some((item) => {
+        const d = new Date(item.date);
+        return d.getMonth() + 1 !== month || d.getFullYear() !== year;
+    });
+};
+
 export type TransactionTableGridProps = TransactionsListHeaderProps;
 

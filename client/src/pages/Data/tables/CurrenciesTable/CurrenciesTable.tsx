@@ -1,6 +1,6 @@
 import { Box, Button, Checkbox, Icon, Text } from "@chakra-ui/react";
 import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
@@ -47,41 +47,40 @@ const CurrenciesTable: React.FC = () => {
         }
     };
 
-    const onActiveChanged = (currencyId: string, newValue: boolean) => {
-        let hasChanges = false;
+    const onActiveChanged = useCallback((currencyId: string, newValue: boolean) => {
+        setState((currentState) => {
+            let hasChanges = false;
+            const updatedCurrencies = currentState.currencies.map((currency: CurrencyEntity) => {
+                if (currency.id !== currencyId || currency.active === newValue) {
+                    return currency;
+                }
 
-        const updatedCurrencies = state.currencies.map((currency: CurrencyEntity) => {
-            if (currency.id !== currencyId || currency.active === newValue) {
-                return currency;
+                hasChanges = true;
+                return {...currency, active: newValue};
+            });
+
+            if (!hasChanges) {
+                return currentState;
             }
 
-            hasChanges = true;
-            return {...currency, active: newValue};
-        });
-
-        if (!hasChanges) {
-            return;
-        }
-
-        setState((currentState) => {
             return {...currentState, currencies: updatedCurrencies, hasChanges: true};
         });
-    };
+    }, []);
 
-    const onCellBlur = async (currencyId: string) => {
+    const onCellBlur = useCallback(async (currencyId: string) => {
         if (!state.hasChanges){
             return;
         }
 
-        const currency = state.currencies.find((currency: CurrencyEntity) => {
-            return currency.id === currencyId;
+        const currency = state.currencies.find((c: CurrencyEntity) => {
+            return c.id === currencyId;
         });
         if (!currency) {
             return;
         }
 
         await updateCurrency({...currency});
-    };
+    }, [state.currencies, state.hasChanges]);
     
     const onAdd = () => {
         modalRef.current?.openModal();
@@ -168,7 +167,7 @@ const CurrenciesTable: React.FC = () => {
                 </Button>
             )
         }
-    ], [t, user, state.currencies]);
+    ], [t, user, onActiveChanged, onCellBlur]);
 
     return <Box color="text_primary">
         <SectionHeader

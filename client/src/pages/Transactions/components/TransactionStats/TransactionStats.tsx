@@ -28,7 +28,7 @@ type PieChartData = {
     color?: string;
 };
 
-export enum DataGrouping {
+enum DataGrouping {
     ByType = 0,
     BySource = 1,
 }
@@ -69,7 +69,7 @@ const TransactionStats: React.FC<TransactionStatsProps> = ({
     selectedAccountId,
     onAccountClick,
 }) => {
-    const accountsMap = new Map(accounts.map((acc) => [acc.id, acc.name]));
+    const accountsMap = React.useMemo(() => new Map(accounts.map((acc) => [acc.id, acc.name])), [accounts]);
     const [selectedGrouping, setSelectedGrouping] = useState(DataGrouping.ByType);
     const [chartData, setChartData] = useState<PieChartData[]>([]);
     const { t } = useTranslation();
@@ -114,7 +114,7 @@ const TransactionStats: React.FC<TransactionStatsProps> = ({
         }));
 
         setChartData(styledData);
-    }, [transactions, selectedGrouping, typeFilter]);
+    }, [transactions, selectedGrouping, typeFilter, accountsMap, t, colors]);
 
     const totalSum = chartData.reduce((acc, curr) => acc + curr.value, 0);
 

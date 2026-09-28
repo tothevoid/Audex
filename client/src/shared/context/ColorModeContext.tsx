@@ -1,16 +1,8 @@
-import React, { createContext, useContext, useEffect, useState, useTransition } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { ColorMode, ResolvedColorMode } from '@/theme/types';
-
-interface ColorModeContextType {
-    colorMode: ColorMode;
-    resolvedColorMode: ResolvedColorMode;
-    setColorMode: (mode: ColorMode) => void;
-    toggleColorMode: () => void;
-}
+import { ColorModeContext } from './useColorMode';
 
 const STORAGE_KEY = 'audex_theme';
-
-const ColorModeContext = createContext<ColorModeContextType | undefined>(undefined);
 
 const getSystemColorMode = (): ResolvedColorMode => {
     if (typeof window === 'undefined') return 'dark';
@@ -87,10 +79,3 @@ export const ColorModeProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     );
 };
 
-export const useColorMode = (): ColorModeContextType => {
-    const context = useContext(ColorModeContext);
-    if (!context) {
-        throw new Error('useColorMode must be used within a ColorModeProvider');
-    }
-    return context;
-};

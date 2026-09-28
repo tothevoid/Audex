@@ -86,7 +86,7 @@ const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = (props: ModalProps)
         };
 
         runAsync();
-    }, []);
+    }, [props.isGlobalBrokerAccount]);
 
     return (
         <BaseFormModal ref={props.modalRef} title={t("broker_account_tax_deduction_modal_title")}

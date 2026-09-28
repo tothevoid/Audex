@@ -13,7 +13,15 @@ interface BaseFormModalProps {
     maxW?: string
 };
 
-const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>((props: BaseFormModalProps, ref) => {
+const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>(({
+    title,
+    submitHandler,
+    children,
+    visibilityChanged,
+    saveButtonTitle,
+    size,
+    maxW,
+}: BaseFormModalProps, ref) => {
     const { open, onOpen, onClose } = useDisclosure();
 
     useImperativeHandle(ref, () => ({
@@ -22,35 +30,35 @@ const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>((props: BaseF
     }));
 
     useEffect(() => {
-        if (!props.visibilityChanged) {
+        if (!visibilityChanged) {
             return;
         }
-        props.visibilityChanged(open);
-    }, [open]);
+        visibilityChanged(open);
+    }, [open, visibilityChanged]);
 
     const { t } = useTranslation();
 
     return (
-        <Dialog.Root size={props.size} placement="center" open={open} onEscapeKeyDown={onClose} onOpenChange={(e) => { if (!e.open) onClose(); }}>
+        <Dialog.Root size={size} placement="center" open={open} onEscapeKeyDown={onClose} onOpenChange={(e) => { if (!e.open) onClose(); }}>
           <Portal>
             <Dialog.Backdrop/>
             <Dialog.Positioner>
                 <Dialog.Content
                     as="form"
-                    onSubmit={props.submitHandler}
+                    onSubmit={submitHandler}
                     backgroundColor="background_primary"
                     borderColor="border_primary"
                     color="text_primary"
-                    maxW={props.maxW}
+                    maxW={maxW}
                 >
                     <Dialog.Header>
-                        <Dialog.Title color="text_primary">{props.title}</Dialog.Title>
+                        <Dialog.Title color="text_primary">{title}</Dialog.Title>
                     </Dialog.Header>
                     <Dialog.Body pb={6}>
-                        {props.children}
+                        {children}
                     </Dialog.Body>
                     <Dialog.Footer gap={3}>
-                        <Button type="submit" variant="solid">{props.saveButtonTitle ?? t("modals_save_button")}</Button>
+                        <Button type="submit" variant="solid">{saveButtonTitle ?? t("modals_save_button")}</Button>
                         <Button onClick={onClose} variant="outline">{t("modals_cancel_button")}</Button>
                     </Dialog.Footer>
                     <Dialog.CloseTrigger asChild>

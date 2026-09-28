@@ -72,17 +72,17 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 	const dividend = watch('dividend');
 	const tax = watch('tax');
 
-	const getBrokerAccountId = () => {
+	const getBrokerAccountId = useCallback(() => {
 		if (props.isGlobalBrokerAccount) {
-			return brokerAccount.id;
+			return brokerAccount?.id;
 		}
 
 		return "dividendPayment" in props.context ?
 			props.context.dividendPayment.brokerAccount.id:
 			props.context.brokerAccountId;
-	};
+	}, [props.isGlobalBrokerAccount, props.context, brokerAccount?.id]);
 
-	const fetchAvailableDividends = async () => {
+	const fetchAvailableDividends = useCallback(async () => {
 		const brokerAccountId = getBrokerAccountId();
 
 		if (!brokerAccountId) {
@@ -103,16 +103,16 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 		});
 		
 		setAvailableSecurities([...securities.values()]);
-	};
+	}, [getBrokerAccountId]);
 
-	const fetchBrokerAccounts = async () => {
+	const fetchBrokerAccounts = useCallback(async () => {
 		if (!props.isGlobalBrokerAccount) {
 			return;
 		}
 
 		const brokerAccounts = await getBrokerAccounts();
 		setBrokerAccounts(brokerAccounts);
-	};
+	}, [props.isGlobalBrokerAccount]);
 
 	useEffect(() => {
 		const security = "dividendPayment" in props.context ?
@@ -127,7 +127,7 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 			await fetchAvailableDividends();
 		};
 		runAsync();
-	}, []);
+	}, [fetchBrokerAccounts, fetchAvailableDividends]);
 
 	useEffect(() => {
 		if (!selectedSecurity) {
@@ -151,16 +151,8 @@ const DividendPaymentModal: React.FC<ModalProps> = (props: ModalProps) => {
 	}, [securitiesQuantity, dividend, tax]);
 
 	useEffect(() => {
-		const runAsync = async () => {
-			await fetchAvailableDividends();
-		};
-		runAsync();
-	}, [brokerAccount]);
-
-	useEffect(() => {
 		if (props.isGlobalBrokerAccount) {
 			setSelectedSecurity(null);
-			// reset dividends
 		}
 	}, [props.isGlobalBrokerAccount, brokerAccount, reset]);
 

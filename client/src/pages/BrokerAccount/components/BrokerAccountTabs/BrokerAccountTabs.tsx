@@ -15,18 +15,12 @@ import DividendPaymentsList from "@/pages/BrokerAccount/components/DividendPayme
 import SecurityTransactionsList from "@/pages/BrokerAccount/components/SecurityTransactionsList/SecurityTransactionsList";
 import { Nullable } from "@/shared/utilities/nullable";
 import BrokerAccountsList from "@/pages/BrokerAccounts/components/BrokerAccountsList/BrokerAccountsList";
+import { ChangeAction } from "./types";
 
 interface Props {
     brokerAccountId?: Nullable<string>
     currencyName: string
     onActionTriggered: (action: ChangeAction) => void
-}
-
-export enum ChangeAction {
-	TransactionsChanged,
-    FundTransfersChanged,
-    DividendsChanged,
-    TaxDeductionsChanged
 }
 
 const BrokerAccountTabs: React.FC<Props> = ({ brokerAccountId, currencyName, onActionTriggered }) => {

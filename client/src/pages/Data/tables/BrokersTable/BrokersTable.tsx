@@ -143,7 +143,7 @@ const BrokersTable: React.FC = () => {
                 </Button>
             )
         }
-    ], [t, state.brokers]);
+    ], [t]);
 
     return <Box color="text_primary">
         <SectionHeader

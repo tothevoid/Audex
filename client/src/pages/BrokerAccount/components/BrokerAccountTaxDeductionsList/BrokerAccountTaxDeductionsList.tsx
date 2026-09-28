@@ -13,16 +13,16 @@ import BrokerAccountTaxDeductionModal, { CreateBrokerAccountTaxDeductionContext,
 
 interface Props {
     brokerAccountId: Nullable<string>,
-    onDataChanged?: () => void
+    onDataChanged: () => void
 }
 
-const BrokerAccountTaxDeductionsList: React.FC<Props> = (props) => {
+const BrokerAccountTaxDeductionsList: React.FC<Props> = ({ brokerAccountId, onDataChanged }) => {
     const {
         taxDeductions,
         createTaxDeductionEntity,
         updateTaxDeductionEntity,
         deleteTaxDeductionEntity,
-    } = useBrokerAccountTaxDeductions({ brokerAccountId: props.brokerAccountId }, props.onDataChanged);
+    } = useBrokerAccountTaxDeductions({ brokerAccountId }, onDataChanged);
 
     const { 
         modalRef,
@@ -59,12 +59,12 @@ const BrokerAccountTaxDeductionsList: React.FC<Props> = (props) => {
     useEffect(() => {
         const context = activeEntity ?
             { taxDeduction: activeEntity } as EditBrokerAccountTaxDeductionContext:
-            { brokerAccountId: props.brokerAccountId } as CreateBrokerAccountTaxDeductionContext;
+            { brokerAccountId } as CreateBrokerAccountTaxDeductionContext;
         setContext(context);
-    }, [props.brokerAccountId, activeEntity]);
+    }, [brokerAccountId, activeEntity]);
 
     const {t} = useTranslation();
-    const isGlobalBrokerAccount = !props.brokerAccountId;
+    const isGlobalBrokerAccount = !brokerAccountId;
 
     return <Box>
         <SectionHeader

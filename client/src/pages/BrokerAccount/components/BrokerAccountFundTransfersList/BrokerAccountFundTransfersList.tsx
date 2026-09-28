@@ -15,10 +15,10 @@ import DateGroupedList from '@/shared/components/DateGroupedList/DateGroupedList
 
 interface Props {
     brokerAccountId: Nullable<string>,
-    onDataChanged?: () => void
+    onDataChanged: () => void
 }
 
-const BrokerAccountFundTransfersList: React.FC<Props> = (props) => {
+const BrokerAccountFundTransfersList: React.FC<Props> = ({ brokerAccountId, onDataChanged }) => {
     const { t } = useTranslation();
 
     const {
@@ -30,7 +30,7 @@ const BrokerAccountFundTransfersList: React.FC<Props> = (props) => {
         createFundTransferEntity,
         updateFundTransferEntity,
         deleteFundTransferEntity
-    } = useBrokerAccountFundTransfers({ brokerAccountId: props.brokerAccountId });
+    } = useBrokerAccountFundTransfers({ brokerAccountId });
 
     const { 
         modalRef,
@@ -67,17 +67,15 @@ const BrokerAccountFundTransfersList: React.FC<Props> = (props) => {
 	useEffect(() => {
 		const context = activeEntity ?
 			{ brokerAccountFundTransfer: activeEntity } as EditBrokerAccountFundTransferContext:
-			{ brokerAccountId: props.brokerAccountId } as CreateBrokerAccountFundTransferContext;
+			{ brokerAccountId } as CreateBrokerAccountFundTransferContext;
 		setContext(context);
-	}, [props.brokerAccountId, activeEntity]);
+	}, [brokerAccountId, activeEntity]);
 
     useEffect(() => {
-        if (props?.onDataChanged){
-            props.onDataChanged();
-        }
-    }, [props.onDataChanged, fundTransfers]);
+        onDataChanged();
+    }, [onDataChanged, fundTransfers]);
 
-    const isGlobalBrokerAccount = !props.brokerAccountId;
+    const isGlobalBrokerAccount = !brokerAccountId;
 
     return (
         <Box>

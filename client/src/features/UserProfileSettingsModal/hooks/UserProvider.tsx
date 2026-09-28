@@ -1,14 +1,8 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { UserProfileEntity } from '@/models/user/UserProfileEntity';
 import { getUserProfile } from '@/api/user/userProfileApi';
 import { changeLanguage } from 'i18next';
-
-type UserContextType = {
-	user: UserProfileEntity | null;
-	updateUser: (updatedUser: UserProfileEntity) => void;
-};
-
-const UserContext = createContext<UserContextType | undefined>(undefined);
+import { UserContext } from './UserProfileContext';
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const [user, setUser] = useState<UserProfileEntity | null>(null);
@@ -31,7 +25,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			changeLanguage(updatedUser.languageCode);
 			localStorage.setItem("lang", updatedUser.languageCode);
 		}
-	}, []);
+	}, [user?.languageCode]);
 
 	return (
 		<UserContext.Provider value={{ user, updateUser }}>
@@ -39,12 +33,3 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		</UserContext.Provider>
 	);
 };
-
-export const useUserProfile = () => {
-	const context = useContext(UserContext);
-	if (!context) {
-		throw new Error('useUser must be used within a UserProvider');
-	}
-	return context;
-};
-

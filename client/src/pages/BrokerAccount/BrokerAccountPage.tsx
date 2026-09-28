@@ -3,9 +3,10 @@ import { useParams } from "react-router-dom";
 import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 import { getBrokerAccountById } from "@/api/brokers/brokerAccountApi";
 import { getLastPullDate, pullBrokerAccountQuotations } from "@/api/brokers/brokerAccountSecurityApi";
-import BrokerAccountSecuritiesList, { BrokerAccountSecuritiesListRef } from "./components/BrokerAccountSecuritiesList/BrokerAccountSecuritiesList";
 import { useSignalR } from "@/shared/hooks/useSignalR";
-import BrokerAccountTabs, { ChangeAction } from "./components/BrokerAccountTabs/BrokerAccountTabs";
+import BrokerAccountSecuritiesList, { BrokerAccountSecuritiesListRef } from "./components/BrokerAccountSecuritiesList/BrokerAccountSecuritiesList";
+import BrokerAccountTabs from "./components/BrokerAccountTabs/BrokerAccountTabs";
+import { ChangeAction } from "./components/BrokerAccountTabs/types";
 import BrokerAccountHeader from "./components/BrokerAccountHeader/BrokerAccountHeader";
 import { getPortfolioValues } from "@/api/brokers/brokerAccountSummaryApi";
 import { BrokerAccountPortfolioEntity } from "@/models/brokers/BrokerAccountPortfolioEntity";
@@ -71,7 +72,7 @@ const BrokerAccountPage: React.FC = () => {
         };
 
         getData();
-    }, []);
+    }, [fetchBrokerAccount]);
 
     useEffect(() => {
         if (!state.brokerAccount) {
@@ -93,7 +94,7 @@ const BrokerAccountPage: React.FC = () => {
     const onTransactionsChanged = useCallback(async () => {
         await fetchBrokerAccount();
         await securitiesRef.current?.reloadData();
-    }, []);
+    }, [fetchBrokerAccount]);
 
 
     if (!brokerAccountId) {

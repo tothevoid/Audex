@@ -14,14 +14,17 @@ export interface SchedulerEventsHandlers {
     onTaskExecutionRecorded?: (payload: TaskExecutionRecordedPayload) => void;
 }
 
-export const useSchedulerEvents = (handlers: SchedulerEventsHandlers) => {
+export const useSchedulerEvents = ({
+    onTaskStarted,
+    onTaskExecutionRecorded,
+}: SchedulerEventsHandlers) => {
     const handleSignalRMessage = useCallback((rawMessage: string) => {
         try {
             const data = typeof rawMessage === "string" ? JSON.parse(rawMessage) : rawMessage;
             if (data?.type === "ScheduledTaskStarted" && data.taskName) {
-                handlers.onTaskStarted?.(data.taskName);
+                onTaskStarted?.(data.taskName);
             } else if (data?.type === "ScheduledTaskExecutionRecorded" && data.taskName) {
-                handlers.onTaskExecutionRecorded?.({
+                onTaskExecutionRecorded?.({
                     taskName: data.taskName,
                     status: data.status as ScheduledTaskExecutionStatus,
                     durationMs: data.durationMs,
@@ -31,7 +34,7 @@ export const useSchedulerEvents = (handlers: SchedulerEventsHandlers) => {
         } catch {
             // Ignore non-JSON or irrelevant messages
         }
-    }, [handlers.onTaskStarted, handlers.onTaskExecutionRecorded]);
+    }, [onTaskStarted, onTaskExecutionRecorded]);
 
     useSignalR(handleSignalRMessage);
 };

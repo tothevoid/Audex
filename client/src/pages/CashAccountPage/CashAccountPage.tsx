@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Stack } from "@chakra-ui/react";
 import { getAccountById } from "@/api/accounts/accountApi";
@@ -66,7 +66,7 @@ const CashAccountPage: React.FC = () => {
         keySelector: (transaction) => transaction.id
     });
 
-    const loadAccountAndSummary = async () => {
+    const loadAccountAndSummary = useCallback(async () => {
         if (!cashAccountId) return;
         setIsHeaderLoading(true);
         try {
@@ -82,7 +82,7 @@ const CashAccountPage: React.FC = () => {
         } finally {
             setIsHeaderLoading(false);
         }
-    };
+    }, [cashAccountId]);
 
     useEffect(() => {
         if (mode !== ActiveEntityMode.None) {
@@ -90,7 +90,7 @@ const CashAccountPage: React.FC = () => {
         }
         if (!cashAccountId) return;
         loadAccountAndSummary();
-    }, [mode, cashAccountId]);
+    }, [mode, cashAccountId, loadAccountAndSummary]);
 
     const onCurrencyTransactionSaved = async (transaction: CurrencyTransactionEntity) => {
         if (mode === ActiveEntityMode.Add) {

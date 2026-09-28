@@ -15,7 +15,7 @@ import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { useUserProfile } from "./hooks/UserProfileContext";
-import { useColorMode } from "@/shared/context/ColorModeContext";
+import { useColorMode } from "@/shared/context/useColorMode";
 
 interface State {
 	currencies: CurrencyEntity[]
@@ -103,11 +103,11 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 		modalRef.current?.closeModal();
 	};
 
-	const themeOptions = [
+	const themeOptions = useMemo(() => [
 		{ key: t("theme_dark"), value: "dark" as const },
 		{ key: t("theme_light"), value: "light" as const },
 		{ key: t("theme_system"), value: "system" as const },
-	];
+	], [t]);
 
 	const { colorMode, setColorMode } = useColorMode();
 	const [selectedTheme, setSelectedTheme] = useState(
@@ -116,7 +116,7 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 
 	useEffect(() => {
 		setSelectedTheme(themeOptions.find(opt => opt.value === colorMode) ?? themeOptions[0]);
-	}, [colorMode, t]);
+	}, [colorMode, themeOptions]);
 
 	return (
 		<BaseFormModal

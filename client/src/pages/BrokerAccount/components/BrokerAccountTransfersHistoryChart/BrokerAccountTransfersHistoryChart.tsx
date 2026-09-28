@@ -13,7 +13,6 @@ import {
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { Box, Card, Flex, HStack, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import i18n from "@/i18n";
 import { CHART_THEME_COLORS, getChartColor } from "@/shared/constants/chartColors";
 import { Nullable } from "@/shared/utilities/nullable";
 import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
@@ -39,7 +38,7 @@ const BrokerAccountTransfersHistoryChart: React.FC<Props> = ({
     brokerAccounts = [],
     currencyName
 }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const effectiveAccountId = brokerAccountId ?? selectedAccountId;
 

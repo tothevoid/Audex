@@ -16,14 +16,13 @@ type Props = {
     onPageSwitched: (month: number, year: number) => void
 }
 
-const MonthPicker: React.FC<Props> = (props: Props) => {
+const MonthPicker: React.FC<Props> = ({ month, year, onPageSwitched }: Props) => {
     const [state, setState] = useState<State>({ isCalendarVisible: false });
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const { month, year } = props;
-        props.onPageSwitched(month, year);
-    }, []);
+        onPageSwitched(month, year);
+    }, [month, year, onPageSwitched]);
 
     useEffect(() => {
         if (!state.isCalendarVisible) return;
@@ -39,17 +38,18 @@ const MonthPicker: React.FC<Props> = (props: Props) => {
     }, [state.isCalendarVisible]);
 
     const pageSwitchClick = (direction: number) => () => {
-        let { month, year } = props;
-        if (direction === -1 && month === 1) {
-            month = 12;
-            year += direction;
-        } else if (direction === 1 && month === 12) {
-            month = 1;
-            year += direction;
+        let newMonth = month;
+        let newYear = year;
+        if (direction === -1 && newMonth === 1) {
+            newMonth = 12;
+            newYear += direction;
+        } else if (direction === 1 && newMonth === 12) {
+            newMonth = 1;
+            newYear += direction;
         } else {
-            month += direction;
+            newMonth += direction;
         }
-        props.onPageSwitched(month, year);
+        onPageSwitched(newMonth, newYear);
     };
 
     const onSwitchCalendarVisibility = () => {
@@ -58,7 +58,6 @@ const MonthPicker: React.FC<Props> = (props: Props) => {
 
     const { i18n } = useTranslation();
     const { isCalendarVisible } = state;
-    const { month, year, onPageSwitched } = props;
     const date = `${getMonthByIndex(month, i18n)}'${year.toString().substring(2)}`;
 
     return (

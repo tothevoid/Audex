@@ -6,18 +6,6 @@ import { BaseModalRef } from '@/shared/utilities/modalUtilities';
 import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
 import { CommitDiffPayload, OutOfMonthItem } from '@/pages/Transactions/components/TransactionTableGrid/types';
 
-export const hasOutOfPeriodTransactions = (
-    diff: CommitDiffPayload,
-    month?: number,
-    year?: number
-): boolean => {
-    if (!month || !year) return false;
-    return [...diff.added, ...diff.updated].some((item) => {
-        const d = new Date(item.date);
-        return d.getMonth() + 1 !== month || d.getFullYear() !== year;
-    });
-};
-
 interface OutOfMonthWarningModalProps {
     diff: CommitDiffPayload | null;
     selectedMonth?: number;
