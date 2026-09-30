@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Box } from '@chakra-ui/react';
 import { useBrokerAccountFundTransfers } from '@/pages/BrokerAccount/hooks/useBrokerAccountFundTransfers';
 import BrokerAccountFundTransfer from '@/pages/BrokerAccount/components/BrokerAccountFundTransfer/BrokerAccountFundTransfer';
@@ -50,9 +50,8 @@ const BrokerAccountFundTransfersList: React.FC<Props> = ({ brokerAccountId, onDa
 
 		await deleteFundTransferEntity(activeEntity);
 		onActionEnded();
+		onDataChanged();
     };
-
-    const [context, setContext] = useState<Nullable<CreateBrokerAccountFundTransferContext | EditBrokerAccountFundTransferContext>>(null);
 
     const onTransferSaved = async (transfer: BrokerAccountFundTransferEntity) => {
         if (mode === ActiveEntityMode.Add) {
@@ -62,18 +61,15 @@ const BrokerAccountFundTransfersList: React.FC<Props> = ({ brokerAccountId, onDa
         }
 
         onActionEnded();
+		onDataChanged();
     };
 
-	useEffect(() => {
-		const context = activeEntity ?
-			{ brokerAccountFundTransfer: activeEntity } as EditBrokerAccountFundTransferContext:
-			{ brokerAccountId } as CreateBrokerAccountFundTransferContext;
-		setContext(context);
-	}, [brokerAccountId, activeEntity]);
-
-    useEffect(() => {
-        onDataChanged();
-    }, [onDataChanged, fundTransfers]);
+    const context = useMemo<CreateBrokerAccountFundTransferContext | EditBrokerAccountFundTransferContext>(() => {
+        if (activeEntity) {
+            return { brokerAccountFundTransfer: activeEntity };
+        }
+        return { brokerAccountId };
+    }, [activeEntity, brokerAccountId]);
 
     const isGlobalBrokerAccount = !brokerAccountId;
 

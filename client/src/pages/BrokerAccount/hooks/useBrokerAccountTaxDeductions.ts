@@ -7,8 +7,7 @@ import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 export type { TaxDeductionsQuery };
 
 export const useBrokerAccountTaxDeductions = (
-    queryParameters: TaxDeductionsQuery, 
-    onDataChanged?: () => void
+    queryParameters: TaxDeductionsQuery
 ) => {
     const { t } = useTranslation();
     const [taxDeductions, setTaxDeductions] = useState<BrokerAccountTaxDeductionEntity[]>([]);
@@ -35,13 +34,11 @@ export const useBrokerAccountTaxDeductions = (
     const createTaxDeductionEntity = async (createdTaxDeduction: BrokerAccountTaxDeductionEntity) => {
         await createBrokerAccountTaxDeduction(createdTaxDeduction);
         await fetchData();
-        onDataChanged?.();
     };
 
     const updateTaxDeductionEntity = async (updatedTaxDeduction: BrokerAccountTaxDeductionEntity) => {
         await updateBrokerAccountTaxDeduction(updatedTaxDeduction);
         await fetchData();
-        onDataChanged?.();
     };
 
     const deleteTaxDeductionEntity = async (deletedTaxDeduction: BrokerAccountTaxDeductionEntity) => {
@@ -50,7 +47,6 @@ export const useBrokerAccountTaxDeductions = (
             return;
         }
         await fetchData();
-        onDataChanged?.();
     };
 
     return {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Box } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { SecurityTransactionEntity, SecurityTransactionEntityRequest } from '@/models/securities/SecurityTransactionEntity';
@@ -56,12 +56,6 @@ const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransact
 
 	const showSkeleton = useDelayedLoading(isSecurityTransactionsLoading);
 
-	useEffect(() => {
-		onTransactionsChanged();
-	}, [onTransactionsChanged, securityTransactions]);
-
-	const [context, setContext] = useState<Nullable<CreateSecurityTransactionContext | EditSecurityTransactionContext>>(null);
-
 	const onFilterChange = (newFilters: SecurityTransactionsFilterValues) => {
 		setSecurityTransactionsQueryParameters(previousQueryParameters => ({
 			...previousQueryParameters,
@@ -83,11 +77,11 @@ const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransact
 		}));
 	};
 
-	useEffect(() => {
-		const context = activeEntity ?
-			{ securityTransaction: activeEntity } as EditSecurityTransactionContext :
-			{ brokerAccountId } as CreateSecurityTransactionContext;
-		setContext(context);
+	const context = useMemo<CreateSecurityTransactionContext | EditSecurityTransactionContext>(() => {
+		if (activeEntity) {
+			return { securityTransaction: activeEntity };
+		}
+		return { brokerAccountId };
 	}, [brokerAccountId, activeEntity]);
 
 	const onSecurityTransactionSaved = async (securityTransaction: SecurityTransactionEntityRequest) => {
@@ -97,6 +91,7 @@ const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransact
 			await updatedSecurityTransactionEntity(securityTransaction);
 		}
 		onActionEnded();
+		onTransactionsChanged();
 	};
 
 	const onDeleteConfirmed = async () => {
@@ -106,6 +101,7 @@ const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransact
 
 		await deleteSecurityTransactionEntity(activeEntity);
 		onActionEnded();
+		onTransactionsChanged();
 	};
 
 	return (

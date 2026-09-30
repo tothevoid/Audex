@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Box } from '@chakra-ui/react';
 import { useBrokerAccountTaxDeductions } from '@/pages/BrokerAccount/hooks/useBrokerAccountTaxDeductions';
 import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
@@ -22,7 +22,7 @@ const BrokerAccountTaxDeductionsList: React.FC<Props> = ({ brokerAccountId, onDa
         createTaxDeductionEntity,
         updateTaxDeductionEntity,
         deleteTaxDeductionEntity,
-    } = useBrokerAccountTaxDeductions({ brokerAccountId }, onDataChanged);
+    } = useBrokerAccountTaxDeductions({ brokerAccountId });
 
     const { 
         modalRef,
@@ -42,9 +42,8 @@ const BrokerAccountTaxDeductionsList: React.FC<Props> = ({ brokerAccountId, onDa
 
         await deleteTaxDeductionEntity(activeEntity);
         onActionEnded();
+        onDataChanged();
     };
-
-    const [context, setContext] = useState<Nullable<CreateBrokerAccountTaxDeductionContext | EditBrokerAccountTaxDeductionContext>>(null);
 
     const onTaxDeductionSaved = async (deduction: BrokerAccountTaxDeductionEntity) => {
         if (mode === ActiveEntityMode.Add) {
@@ -54,13 +53,14 @@ const BrokerAccountTaxDeductionsList: React.FC<Props> = ({ brokerAccountId, onDa
         }
 
         onActionEnded();
+        onDataChanged();
     };
 
-    useEffect(() => {
-        const context = activeEntity ?
-            { taxDeduction: activeEntity } as EditBrokerAccountTaxDeductionContext:
-            { brokerAccountId } as CreateBrokerAccountTaxDeductionContext;
-        setContext(context);
+    const context = useMemo<CreateBrokerAccountTaxDeductionContext | EditBrokerAccountTaxDeductionContext>(() => {
+        if (activeEntity) {
+            return { taxDeduction: activeEntity };
+        }
+        return { brokerAccountId };
     }, [brokerAccountId, activeEntity]);
 
     const {t} = useTranslation();

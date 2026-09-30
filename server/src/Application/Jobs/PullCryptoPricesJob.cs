@@ -20,7 +20,7 @@ namespace Audex.Application.Jobs
         displayNameKey: LocalizationKeys.Jobs.PullCryptoPrices.Name,
         descriptionKey: LocalizationKeys.Jobs.PullCryptoPrices.Description,
         categoryKey: LocalizationKeys.Jobs.Categories.Crypto,
-        defaultCronExpression: "0 */1 * * * *")]
+        defaultCronExpression: "0 */15 * * * *")]
     public class PullCryptoPricesJob : ScheduledJobBase
     {
         private readonly ICryptocurrencyService _cryptocurrencyService;
