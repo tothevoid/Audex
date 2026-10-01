@@ -51,8 +51,7 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         fetchData: getPagedNotifications,
         filters,
         initialPageSize,
-        autoLoad,
-        keySelector: (notification) => notification.id
+        autoLoad
     });
 
     const loadUnreadCount = useCallback(async () => {

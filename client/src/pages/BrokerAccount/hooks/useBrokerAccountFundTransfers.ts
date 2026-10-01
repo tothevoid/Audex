@@ -38,8 +38,7 @@ export const useBrokerAccountFundTransfers = (options: UseBrokerAccountFundTrans
     } = usePagedQuery<BrokerAccountFundTransferEntity, BrokerAccountFundsTransferQuery>({
         fetchData: getPagedBrokerAccountFundsTransfers,
         filters,
-        initialPageSize,
-        keySelector: (transfer) => transfer.id
+        initialPageSize
     });
 
     const createFundTransferEntity = async (createdFundTransfer: BrokerAccountFundTransferEntity) => {

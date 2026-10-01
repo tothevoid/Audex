@@ -13,6 +13,13 @@ export interface UsePagedQueryOptions<TItem, TFilter extends BasePageable> {
 	onError?: (error: unknown) => void;
 }
 
+const defaultKeySelector = <TItem>(item: TItem): string | number => {
+	if (item && typeof item === "object" && "id" in item) {
+		return (item as { id: string | number }).id;
+	}
+	return JSON.stringify(item);
+};
+
 export function usePagedQuery<TItem, TFilter extends BasePageable>({
 	fetchData,
 	filters,
@@ -30,20 +37,8 @@ export function usePagedQuery<TItem, TFilter extends BasePageable>({
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [isLoadingNextPage, setIsLoadingNextPage] = useState<boolean>(false);
 
-	const defaultKeySelector = useCallback(
-		(item: TItem): string | number => {
-			if (item && typeof item === "object" && "id" in item) {
-				return (item as { id: string | number }).id;
-			}
-			return JSON.stringify(item);
-		},
-		[]
-	);
-
-	const effectiveKeySelector = keySelector ?? defaultKeySelector;
-
-	const fetchPage = useCallback(
-		async (targetPage: number, targetSize: number, isAppend = false) => {
+	const executeFetch = useCallback(
+		async (targetPage: number, targetSize: number, isAppend: boolean) => {
 			const setLoadingState = isAppend ? setIsLoadingNextPage : setIsLoading;
 			setLoadingState(true);
 			try {
@@ -58,19 +53,17 @@ export function usePagedQuery<TItem, TFilter extends BasePageable>({
 				const fetchedTotalCount = result?.totalCount ?? 0;
 
 				if (isAppend) {
-					setItems((prev) => {
-						const existingKeys = new Set(prev.map(effectiveKeySelector));
-						const uniqueNew = fetchedItems.filter((item) => !existingKeys.has(effectiveKeySelector(item)));
-						return [...prev, ...uniqueNew];
+					const keyFn = keySelector ?? defaultKeySelector;
+					setItems((prevItems) => {
+						const existingKeys = new Set(prevItems.map(keyFn));
+						const uniqueNew = fetchedItems.filter((item) => !existingKeys.has(keyFn(item)));
+						return [...prevItems, ...uniqueNew];
 					});
 				} else {
 					setItems(fetchedItems);
 				}
 
 				setTotalCount(fetchedTotalCount);
-				setPageIndex(targetPage);
-				setPageSize(targetSize);
-
 				onSuccess?.(result);
 				return result;
 			} catch (error) {
@@ -81,34 +74,49 @@ export function usePagedQuery<TItem, TFilter extends BasePageable>({
 				setLoadingState(false);
 			}
 		},
-		[fetchData, filters, effectiveKeySelector, onSuccess, onError]
+		[fetchData, filters, keySelector, onSuccess, onError]
 	);
 
+	useEffect(() => {
+		if (autoLoad) {
+			setPageIndex(1);
+			executeFetch(1, pageSize, false);
+		}
+	}, [autoLoad, filters, pageSize, executeFetch]);
+
 	const loadPage = useCallback(
-		(targetPage: number, targetSize: number) => fetchPage(targetPage, targetSize, false),
-		[fetchPage]
+		(targetPage: number, targetSize?: number) => {
+			const newPageSize = targetSize ?? pageSize;
+			setPageIndex(targetPage);
+
+			const isTargetSizeChanged = targetSize && targetSize !== pageSize
+			if (isTargetSizeChanged) {
+				setPageSize(targetSize);
+			}
+			return executeFetch(targetPage, newPageSize, false);
+		},
+		[pageSize, executeFetch]
 	);
 
 	const hasNextPage = items.length < totalCount;
 
-	const loadNextPage = useCallback(() => {
+	const loadNextPage = useCallback(async () => {
 		if (isLoadingNextPage || !hasNextPage) return;
-		return fetchPage(pageIndex + 1, pageSize, true);
-	}, [fetchPage, isLoadingNextPage, hasNextPage, pageIndex, pageSize]);
+		const nextPage = pageIndex + 1;
+		setPageIndex(nextPage);
+		return executeFetch(nextPage, pageSize, true);
+	}, [executeFetch, isLoadingNextPage, hasNextPage, pageIndex, pageSize]);
 
 	const refreshPage = useCallback(() => {
-		return loadPage(pageIndex, pageSize);
-	}, [loadPage, pageIndex, pageSize]);
+		return executeFetch(pageIndex, pageSize, false);
+	}, [executeFetch, pageIndex, pageSize]);
 
 	const reset = useCallback(() => {
-		return loadPage(1, pageSize);
-	}, [loadPage, pageSize]);
+		const defaultPageIndex = 1;
 
-	useEffect(() => {
-		if (autoLoad) {
-			loadPage(1, pageSize);
-		}
-	}, [loadPage, autoLoad, pageSize]);
+		setPageIndex(defaultPageIndex);
+		return executeFetch(defaultPageIndex, pageSize, false);
+	}, [executeFetch, pageSize]);
 
 	return {
 		items,

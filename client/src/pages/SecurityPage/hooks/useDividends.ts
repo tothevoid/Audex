@@ -36,8 +36,7 @@ export const useDividends = (options: UseDividendsOptions) => {
     } = usePagedQuery<DividendEntity, DividendsQuery>({
         fetchData: getPagedDividends,
         filters,
-        initialPageSize,
-        keySelector: (dividend) => dividend.id
+        initialPageSize
     });
 
     const createDividendEntity = async (createdDividend: DividendEntity) => {

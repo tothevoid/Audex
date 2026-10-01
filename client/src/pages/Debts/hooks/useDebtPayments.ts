@@ -42,8 +42,7 @@ export const useDebtPayments = (options: UseDebtPaymentsOptions) => {
     } = usePagedQuery<DebtPaymentEntity, DebtPaymentsQuery>({
         fetchData: getPagedDebtPayments,
         filters,
-        initialPageSize,
-        keySelector: (payment) => payment.id
+        initialPageSize
     });
 
     const createDebtPaymentEntity = async (createdDebtPayment: DebtPaymentEntity) => {
