@@ -1,5 +1,5 @@
-import { Button, CloseButton, Dialog, Portal, useDisclosure} from "@chakra-ui/react";
-import { FormEventHandler, forwardRef, useEffect, useImperativeHandle } from "react";
+import { Button, CloseButton, Dialog, Portal, useDisclosure } from "@chakra-ui/react";
+import { FormEventHandler, forwardRef, useImperativeHandle } from "react";
 import { useTranslation } from "react-i18next";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
@@ -24,22 +24,37 @@ const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>(({
 }: BaseFormModalProps, ref) => {
     const { open, onOpen, onClose } = useDisclosure();
 
-    useImperativeHandle(ref, () => ({
-        openModal: onOpen,
-        closeModal: onClose
-    }));
+    const handleOpen = () => {
+        onOpen();
+        visibilityChanged?.(true);
+    };
 
-    useEffect(() => {
-        if (!visibilityChanged) {
-            return;
-        }
-        visibilityChanged(open);
-    }, [open, visibilityChanged]);
+    const handleClose = () => {
+        onClose();
+        visibilityChanged?.(false);
+    };
+
+    useImperativeHandle(ref, () => ({
+        openModal: handleOpen,
+        closeModal: handleClose
+    }));
 
     const { t } = useTranslation();
 
     return (
-        <Dialog.Root size={size} placement="center" open={open} onEscapeKeyDown={onClose} onOpenChange={(e) => { if (!e.open) onClose(); }}>
+        <Dialog.Root
+            size={size}
+            placement="center"
+            open={open}
+            onEscapeKeyDown={handleClose}
+            onOpenChange={(e) => {
+                if (e.open) {
+                    handleOpen();
+                } else {
+                    handleClose();
+                }
+            }}
+        >
           <Portal>
             <Dialog.Backdrop/>
             <Dialog.Positioner>
@@ -59,10 +74,10 @@ const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>(({
                     </Dialog.Body>
                     <Dialog.Footer gap={3}>
                         <Button type="submit" variant="solid">{saveButtonTitle ?? t("modals_save_button")}</Button>
-                        <Button onClick={onClose} variant="outline">{t("modals_cancel_button")}</Button>
+                        <Button onClick={handleClose} variant="outline">{t("modals_cancel_button")}</Button>
                     </Dialog.Footer>
                     <Dialog.CloseTrigger asChild>
-                        <CloseButton onClick={onClose} size="sm" color="text_primary" />
+                        <CloseButton onClick={handleClose} size="sm" color="text_primary" />
                     </Dialog.CloseTrigger>
                 </Dialog.Content>
             </Dialog.Positioner>
