@@ -1,16 +1,6 @@
-import { Fragment, useEffect, useState } from "react";
-import { getDepositsRange } from "@/api/deposits/depositApi";
+import React, { useMemo } from "react";
 import { Box, Slider } from "@chakra-ui/react";
-import { DepositsRange } from "@/models/deposits/depositsRange";
 import { formatMonthYear } from "@/shared/utilities/formatters/dateFormatter";
-
-interface State {
-    minMonths: number | null,
-    maxMonths: number | null,
-    selectedMinMonths: number | null,
-    selectedMaxMonths: number | null,
-    marks: SliderMark[]
-}
 
 interface SliderMark {
     value: number;
@@ -18,72 +8,56 @@ interface SliderMark {
 }
 
 interface Props {
-    onDepositsRangeChanged: (fromMonths: number, toMonths: number) => void;
-    refreshTrigger?: number;
+    minMonths: number;
+    maxMonths: number;
+    selectedMinMonths: number;
+    selectedMaxMonths: number;
+    onRangeChange: (fromMonths: number, toMonths: number) => void;
 }
 
-const convertRange = (range: DepositsRange) => {
-    const minDate = new Date(range.from);
-    const minDateMonth = minDate.getMonth() + 1;
-    const minMonths = minDate.getFullYear() * 12 + minDateMonth;
-    const maxDate = new Date(range.to);
-    const maxDateMonth =  maxDate.getMonth() + 1;
-    const maxMonths = maxDate.getFullYear() * 12 + maxDateMonth;
+const DepositsRangeSlider: React.FC<Props> = ({
+    minMonths,
+    maxMonths,
+    selectedMinMonths,
+    selectedMaxMonths,
+    onRangeChange
+}) => {
+    const marks: SliderMark[] = useMemo(() => {
+        if (!minMonths || !maxMonths) {
+            return [];
+        }
 
-    //TODO: use culture to display date
-    const marks: SliderMark[] = [
+        const minDateMonth = ((minMonths - 1) % 12) + 1;
+        const minDateYear = Math.floor((minMonths - 1) / 12);
+        const maxDateMonth = ((maxMonths - 1) % 12) + 1;
+        const maxDateYear = Math.floor((maxMonths - 1) / 12);
 
-        { value: minMonths, label: formatMonthYear(minDateMonth, minDate.getFullYear()) },
-        { value: maxMonths, label: formatMonthYear(maxDateMonth, maxDate.getFullYear()) },
-    ];
-    return {minMonths, maxMonths, marks, selectedMinMonths: minMonths, selectedMaxMonths: maxMonths};
-};
+        return [
+            { value: minMonths, label: formatMonthYear(minDateMonth, minDateYear) },
+            { value: maxMonths, label: formatMonthYear(maxDateMonth, maxDateYear) }
+        ];
+    }, [minMonths, maxMonths]);
 
-const DepositsRangeSlider = ({ refreshTrigger, onDepositsRangeChanged }: Props) => {
-    const [state, setState] = useState<State>({
-        minMonths: null, 
-        maxMonths: null, 
-        selectedMinMonths: null, 
-        selectedMaxMonths: null, 
-        marks: []});
-
-    useEffect(() => {
-        const getData = async () => {
-            const range = await getDepositsRange();
-            if (!range) {
-                return;
-            }
-            const ranges = convertRange(range);
-            setState((currentState) => {
-                return {...currentState, ...ranges};
-            });
-            onDepositsRangeChanged(ranges.selectedMinMonths, ranges.selectedMaxMonths);
-        };
-        getData();
-    }, [refreshTrigger, onDepositsRangeChanged]);
-
-    const onSliderValueChanged = (selectedValues: number[]) => {
-        const newSliderValues = {selectedMinMonths: selectedValues[0], selectedMaxMonths: selectedValues[1]};
-        setState((currentState) => {
-            return {...currentState, ...newSliderValues};
-        });
-        onDepositsRangeChanged(newSliderValues.selectedMinMonths, newSliderValues.selectedMaxMonths);
-    };
-
-    if (!state.selectedMaxMonths || !state.selectedMinMonths) {
-        return <Fragment/>;
+    if (!selectedMinMonths || !selectedMaxMonths) {
+        return null;
     }
 
     return (
-        <Box width={"100%"} pb={6} pt={2} px={1}>
-            <Slider.Root width={"100%"} min={state.minMonths!} max={state.maxMonths!} onValueChange={(details) => onSliderValueChanged(details.value)} 
-                value={[state.selectedMinMonths!, state.selectedMaxMonths!]} step={1}>
+        <Box width="100%" pb={6} pt={2} px={1}>
+            <Slider.Root
+                width="100%"
+                min={minMonths}
+                max={maxMonths}
+                value={[selectedMinMonths, selectedMaxMonths]}
+                step={1}
+                onValueChange={(details) => onRangeChange(details.value[0], details.value[1])}
+            >
                 <Slider.Control>
                     <Slider.Track>
-                        <Slider.Range background={"action_primary"} />
+                        <Slider.Range background="action_primary" />
                     </Slider.Track>
                     <Slider.Thumbs />
-                    <Slider.Marks whiteSpace="nowrap" marks={state.marks}/>
+                    <Slider.Marks whiteSpace="nowrap" marks={marks} />
                 </Slider.Control>
             </Slider.Root>
         </Box>

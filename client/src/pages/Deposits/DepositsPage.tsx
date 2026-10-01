@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { DepositEntity } from "@/models/deposits/DepositEntity";
 import { SimpleGrid, Box } from "@chakra-ui/react";
 import DepositStats from "./components/DepositStats/DepositStats";
@@ -18,7 +18,6 @@ import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
 
 const DepositsPage: React.FC = () => {
 	const { t } = useTranslation();
-	const [rangeRefreshKey, setRangeRefreshKey] = useState<number>(0);
 
 	const { 
 		activeEntity,
@@ -33,39 +32,13 @@ const DepositsPage: React.FC = () => {
 
 	const {
 		deposits,
+		boundaries,
+		filters,
+		updateFilters,
 		createDepositEntity,
 		updateDepositEntity,
-		deleteDepositEntity,
-		depositsQueryParameters, 
-		setDepositsQueryParameters
-	} = useDeposits({selectedMinMonths: 0, selectedMaxMonths: 0, onlyActive: true});
-
-	const getAddButton = () => {
-		return <AddButton onClick={onAddClicked} buttonTitle={t("deposits_list_add_button")} />;
-	};
-
-	const getAddButtonWithoutDeposits = () => {
-		return <Placeholder text={t("deposits_page_no_deposits")}>
-			{getAddButton()}
-		</Placeholder>;
-	};
-
-	const onDepositsRangeChanged = (fromMonths: number, toMonths: number) => {
-		setDepositsQueryParameters(prev => ({
-			...prev,
-			selectedMinMonths: fromMonths,
-			selectedMaxMonths: toMonths,
-		}));
-	};
-
-	const onCheckboxChanged = (checked: boolean) => {
-		setDepositsQueryParameters(prev => ({
-			...prev,
-			onlyActive: checked,
-		}));
-	};
-
-	const { selectedMinMonths, selectedMaxMonths, onlyActive } = depositsQueryParameters;
+		deleteDepositEntity
+	} = useDeposits();
 
 	const onDepositSaved = async (deposit: DepositEntity) => {
 		if (mode === ActiveEntityMode.Add) {
@@ -73,34 +46,45 @@ const DepositsPage: React.FC = () => {
 		} else if (mode === ActiveEntityMode.Edit) {
 			await updateDepositEntity(deposit);
 		}
-		setRangeRefreshKey(k => k + 1);
 		onActionEnded();
 	};
 
 	const onDeleteConfirmed = async () => {
 		if (!activeEntity) {
-            throw new Error("Deleted entity is not set");
-        }
+			throw new Error("Deleted entity is not set");
+		}
 
-        await deleteDepositEntity(activeEntity);
-		setRangeRefreshKey(k => k + 1);
+		await deleteDepositEntity(activeEntity);
 		onActionEnded();
-    };
+	};
 
 	const onCloneClicked = async (deposit: DepositEntity) => {
-        await createDepositEntity(deposit);
-		setRangeRefreshKey(k => k + 1);
-    };
+		await createDepositEntity(deposit);
+	};
 
 	return (
 		<PageContainer>
-			{deposits.length > 0 && selectedMaxMonths ? (
+			{deposits.length > 0 && filters.selectedMaxMonths ? (
 				<Box mb={6}>
-					<DepositStats onlyActive={onlyActive} selectedMinMonths={selectedMinMonths} selectedMaxMonths={selectedMaxMonths}/>
+					<DepositStats
+						onlyActive={filters.onlyActive}
+						selectedMinMonths={filters.selectedMinMonths}
+						selectedMaxMonths={filters.selectedMaxMonths}
+					/>
 				</Box>
 			) : null}
 
-			<DepositsRangeSlider onDepositsRangeChanged={onDepositsRangeChanged} refreshTrigger={rangeRefreshKey} />
+			{boundaries && (
+				<DepositsRangeSlider
+					minMonths={boundaries.minMonths}
+					maxMonths={boundaries.maxMonths}
+					selectedMinMonths={filters.selectedMinMonths}
+					selectedMaxMonths={filters.selectedMaxMonths}
+					onRangeChange={(selectedMinMonths, selectedMaxMonths) =>
+						updateFilters({ selectedMinMonths, selectedMaxMonths })
+					}
+				/>
+			)}
 
 			{deposits.length > 0 ? (
 				<>
@@ -111,32 +95,37 @@ const DepositsPage: React.FC = () => {
 						pt={4}
 					/>
 					<FilterBlock
-						active={onlyActive}
+						active={filters.onlyActive}
 						activeTitle={t("deposits_list_only_active")}
-						onActiveChange={onCheckboxChanged}
+						onActiveChange={(onlyActive) => updateFilters({ onlyActive })}
 					/>
 				</>
 			) : (
 				<Box mt={6}>
-					{getAddButtonWithoutDeposits()}
+					<Placeholder text={t("deposits_page_no_deposits")}>
+						<AddButton onClick={onAddClicked} buttonTitle={t("deposits_list_add_button")} />
+					</Placeholder>
 				</Box>
 			)}
-			<SimpleGrid pb={5} gap={6} templateColumns='repeat(auto-fill, minmax(300px, 4fr))'>
-				{
-					deposits.map((deposit: DepositEntity) => 
-						<Deposit key={deposit.id} deposit={deposit} 
-							onEditClicked={onEditClicked} 
-							onCloneClicked={onCloneClicked} 
-							onDeleteClicked={onDeleteClicked}/>
-					)
-				}
+			<SimpleGrid pb={5} gap={6} templateColumns="repeat(auto-fill, minmax(300px, 4fr))">
+				{deposits.map((deposit: DepositEntity) => (
+					<Deposit
+						key={deposit.id}
+						deposit={deposit}
+						onEditClicked={onEditClicked}
+						onCloneClicked={onCloneClicked}
+						onDeleteClicked={onDeleteClicked}
+					/>
+				))}
 			</SimpleGrid>
-			<ConfirmModal onConfirmed={onDeleteConfirmed}
+			<ConfirmModal
+				onConfirmed={onDeleteConfirmed}
 				title={t("deposit_delete_title")}
 				message={t("modals_delete_message")}
 				confirmActionName={t("modals_delete_button")}
-				ref={confirmModalRef}/>
-			<DepositModal deposit={activeEntity} modalRef={modalRef} onSaved={onDepositSaved}/>
+				ref={confirmModalRef}
+			/>
+			<DepositModal deposit={activeEntity} modalRef={modalRef} onSaved={onDepositSaved} />
 		</PageContainer>
 	);
 };
