@@ -96,19 +96,7 @@ const BrokerAccountPage: React.FC = () => {
         await securitiesRef.current?.reloadData();
     }, [fetchBrokerAccount]);
 
-
-    if (!brokerAccountId) {
-        return <Fragment/>;
-    }
-
-    const pullQuotations = async () => {
-       setState((currentState) => {
-            return {...currentState, isReloading: true};
-        });
-        await pullBrokerAccountQuotations(brokerAccountId);
-    };
-
-    const onActionTriggered = async (action: ChangeAction) => {
+    const onActionTriggered = useCallback(async (action: ChangeAction) => {
         switch (action) {
             case ChangeAction.TransactionsChanged:
                 await onTransactionsChanged();
@@ -119,9 +107,19 @@ const BrokerAccountPage: React.FC = () => {
                 await fetchBrokerAccount();
                 break;
         }
-    };
+    }, [onTransactionsChanged, fetchBrokerAccount]);
 
-    if (!state.brokerAccount) {
+    const pullQuotations = useCallback(async () => {
+        if (!brokerAccountId) {
+            return;
+        }
+        setState((currentState) => {
+            return { ...currentState, isReloading: true };
+        });
+        await pullBrokerAccountQuotations(brokerAccountId);
+    }, [brokerAccountId]);
+
+    if (!brokerAccountId || !state.brokerAccount) {
         return <Fragment/>;
     }
 

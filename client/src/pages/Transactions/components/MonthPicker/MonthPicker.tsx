@@ -6,36 +6,28 @@ import { MdChevronLeft, MdChevronRight, MdCalendarMonth } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { Box, Button, Flex } from "@chakra-ui/react";
 
-type State = {
-    isCalendarVisible: boolean
-}
-
 type Props = {
-    month: number,
-    year: number,
-    onPageSwitched: (month: number, year: number) => void
-}
+    month: number;
+    year: number;
+    onPageSwitched: (month: number, year: number) => void;
+};
 
 const MonthPicker: React.FC<Props> = ({ month, year, onPageSwitched }: Props) => {
-    const [state, setState] = useState<State>({ isCalendarVisible: false });
+    const [isCalendarVisible, setIsCalendarVisible] = useState<boolean>(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        onPageSwitched(month, year);
-    }, [month, year, onPageSwitched]);
+        if (!isCalendarVisible) return;
 
-    useEffect(() => {
-        if (!state.isCalendarVisible) return;
-
-        const handleClickOutside = (e: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-                setState({ isCalendarVisible: false });
+        const handleClickOutside = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setIsCalendarVisible(false);
             }
         };
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [state.isCalendarVisible]);
+    }, [isCalendarVisible]);
 
     const pageSwitchClick = (direction: number) => () => {
         let newMonth = month;
@@ -53,11 +45,10 @@ const MonthPicker: React.FC<Props> = ({ month, year, onPageSwitched }: Props) =>
     };
 
     const onSwitchCalendarVisibility = () => {
-        setState((prev) => ({ isCalendarVisible: !prev.isCalendarVisible }));
+        setIsCalendarVisible((previousVisibility) => !previousVisibility);
     };
 
     const { i18n } = useTranslation();
-    const { isCalendarVisible } = state;
     const date = `${getMonthByIndex(month, i18n)}'${year.toString().substring(2)}`;
 
     return (
@@ -84,9 +75,9 @@ const MonthPicker: React.FC<Props> = ({ month, year, onPageSwitched }: Props) =>
                     <Calendar
                         month={month}
                         year={year}
-                        onPageSwitched={(m, y) => {
-                            onPageSwitched(m, y);
-                            setState({ isCalendarVisible: false });
+                        onPageSwitched={(selectedMonth, selectedYear) => {
+                            onPageSwitched(selectedMonth, selectedYear);
+                            setIsCalendarVisible(false);
                         }}
                     />
                 </Box>

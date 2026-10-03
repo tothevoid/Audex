@@ -1,6 +1,6 @@
 import "./TransactionsPage.scss";
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Icon } from '@chakra-ui/react';
 import { MdAdd } from 'react-icons/md';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
@@ -84,31 +84,31 @@ const TransactionsPage: React.FC = () => {
         setState({ accounts, transactionTypes });
     };
 
-    const handleViewDisplayModeChange = (mode: ViewDisplayMode) => {
+    const handleViewDisplayModeChange = useCallback((mode: ViewDisplayMode) => {
         setViewDisplayMode(mode);
         localStorage.setItem('audex_transactions_view_mode', mode);
-    };
+    }, []);
 
-    const onPageSwitched = (month: number, year: number) => {
-        setParams({ month, year, showSystem: params.showSystem });
-    };
+    const onPageSwitched = useCallback((month: number, year: number) => {
+        setParams((previousParams) => ({ ...previousParams, month, year }));
+    }, [setParams]);
 
-    const onShowSystemSwitched = (showSystem: boolean) => {
-        setParams({ ...params, showSystem });
-    };
+    const onShowSystemSwitched = useCallback((showSystem: boolean) => {
+        setParams((previousParams) => ({ ...previousParams, showSystem }));
+    }, [setParams]);
 
-    const handleCategoryClick = (categoryId: string) => {
+    const handleCategoryClick = useCallback((categoryId: string) => {
         setSelectedCategoryId((prev) => (prev === categoryId ? '' : categoryId));
-    };
+    }, []);
 
-    const handleAccountClick = (accountId: string) => {
+    const handleAccountClick = useCallback((accountId: string) => {
         setSelectedAccountId((prev) => (prev === accountId ? '' : accountId));
-    };
+    }, []);
 
-    const handleDuplicateFromList = (transaction: TransactionEntity) => {
+    const handleDuplicateFromList = useCallback((transaction: TransactionEntity) => {
         // Open edit/create modal pre-populated with copied values (new id)
         onEditClicked({ ...transaction, id: '' });
-    };
+    }, [onEditClicked]);
 
     // Base filtered transactions (by type, account, search) used for stats chart
     const statsTransactions = useMemo(() => {
@@ -144,15 +144,15 @@ const TransactionsPage: React.FC = () => {
 
     const addTransactionModalRef = useRef<BaseModalRef>(null);
 
-    const onAddTransactionClick = () => {
+    const onAddTransactionClick = useCallback(() => {
         addTransactionModalRef.current?.openModal();
-    };
+    }, []);
 
-    const onCreateCurrencyTransaction = async (currencyTransactionEntity: CurrencyTransactionEntity) => {
+    const onCreateCurrencyTransaction = useCallback(async (currencyTransactionEntity: CurrencyTransactionEntity) => {
         await createCurrencyTransaction(currencyTransactionEntity);
-    };
+    }, []);
 
-    const onTransactionSaved = async (transaction: TransactionEntity) => {
+    const onTransactionSaved = useCallback(async (transaction: TransactionEntity) => {
         if (mode === ActiveEntityMode.Add) {
             await createTransactionEntity(transaction);
         } else {
@@ -160,19 +160,19 @@ const TransactionsPage: React.FC = () => {
         }
 
         onActionEnded();
-    };
+    }, [createTransactionEntity, mode, onActionEnded, updateTransactionEntity]);
 
-    const onDeleteConfirmed = async () => {
+    const onDeleteConfirmed = useCallback(async () => {
         if (!activeEntity) {
             throw new Error("Deleted entity is not set");
         }
 
         await deleteTransactionEntity(activeEntity);
         onActionEnded();
-    };
+    }, [activeEntity, deleteTransactionEntity, onActionEnded]);
 
     // Batch Commit handler for Table Grid Mode
-    const handleCommitTableDiff = async (diff: {
+    const handleCommitTableDiff = useCallback(async (diff: {
         added: TransactionEntity[];
         updated: TransactionEntity[];
         deletedIds: string[];
@@ -183,7 +183,7 @@ const TransactionsPage: React.FC = () => {
             ...diff.deletedIds.map((deletedId) => deleteTransaction(deletedId)),
         ]);
         await refetch();
-    };
+    }, [refetch]);
 
     const daysInMonth = new Date(params.year, params.month, 0).getDate();
 
