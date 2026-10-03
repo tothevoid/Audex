@@ -14,8 +14,10 @@ import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 
+import { Nullable } from "@/shared/utilities/nullable";
+
 export interface CreateBrokerAccountTaxDeductionContext {
-    brokerAccountId: string
+    brokerAccountId?: Nullable<string>;
 }
 
 export interface EditBrokerAccountTaxDeductionContext {
@@ -34,18 +36,23 @@ const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = (props: ModalProps)
     const [brokerAccounts, setBrokerAccounts] = useState<BrokerAccountEntity[]>([]);
 
     const getDefaultValues = useCallback(() => {
-        const taxDeduction = "taxDeduction" in props.context ? props.context.taxDeduction: null;
-        
-        const brokerAccount = "brokerAccountId" in props.context ? 
-            { id: props.context.brokerAccountId }: 
-            { id: props.context.taxDeduction.brokerAccount.id};
-                
+        if ("taxDeduction" in props.context) {
+            const deduction = props.context.taxDeduction;
+            return {
+                id: deduction.id,
+                name: deduction.name,
+                brokerAccount: deduction.brokerAccount,
+                dateApplied: deduction.dateApplied,
+                amount: deduction.amount
+            };
+        }
+
         return {
-            id: taxDeduction?.id ?? generateGuid(),
-            name: taxDeduction?.name ?? "",
-            brokerAccount: taxDeduction?.brokerAccount ?? brokerAccount,
-            dateApplied: taxDeduction?.dateApplied ?? new Date(),
-            amount: taxDeduction?.amount ?? 0
+            id: generateGuid(),
+            name: "",
+            brokerAccount: { id: props.context.brokerAccountId ?? undefined },
+            dateApplied: new Date(),
+            amount: 0
         };
     }, [props.context]);
 

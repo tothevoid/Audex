@@ -16,13 +16,15 @@ import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { generateGuid } from "@/shared/utilities/idUtilities";
 
+import { Nullable } from "@/shared/utilities/nullable";
+
 enum SecurityTransactionOperation {
 	Buy = "buy",
 	Sell = "sell",
 }
 
 export interface CreateSecurityTransactionContext {
-	brokerAccountId: string
+	brokerAccountId?: Nullable<string>;
 }
 
 export interface EditSecurityTransactionContext {
@@ -51,21 +53,34 @@ const SecurityTransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
 	], [t]);
 
 	const getFormDefaultValues = useCallback(() => {
-		const securityTransaction = "securityTransaction" in props.context ? props.context.securityTransaction : null;
-		const brokerAccount = "brokerAccountId" in props.context ? { id: props.context.brokerAccountId } : { id: undefined };
-		const operation = securityTransaction?.isSell ? operations[1] : operations[0];
+		if ("securityTransaction" in props.context) {
+			const transaction = props.context.securityTransaction;
+			const operation = transaction.isSell ? operations[1] : operations[0];
+			return {
+				id: transaction.id,
+				security: transaction.security,
+				brokerAccount: transaction.brokerAccount,
+				brokerCommission: transaction.brokerCommission,
+				stockExchangeCommission: transaction.stockExchangeCommission,
+				date: transaction.date,
+				price: transaction.price,
+				tax: transaction.tax,
+				quantity: transaction.quantity,
+				operation
+			};
+		}
 
 		return {
-			id: securityTransaction?.id ?? generateGuid(),
-			security: securityTransaction?.security,
-			brokerAccount: securityTransaction?.brokerAccount ?? brokerAccount,
-			brokerCommission: securityTransaction?.brokerCommission ?? 0,
-			stockExchangeCommission: securityTransaction?.stockExchangeCommission ?? 0,
-			date: securityTransaction?.date ?? new Date(),
-			price: securityTransaction?.price ?? 0,
-			tax: securityTransaction?.tax ?? 0,
-			quantity: securityTransaction?.quantity ?? 0,
-			operation
+			id: generateGuid(),
+			security: undefined,
+			brokerAccount: { id: props.context.brokerAccountId ?? undefined },
+			brokerCommission: 0,
+			stockExchangeCommission: 0,
+			date: new Date(),
+			price: 0,
+			tax: 0,
+			quantity: 0,
+			operation: operations[0]
 		};
 	}, [props.context, operations]);
 

@@ -16,8 +16,10 @@ import { BrokerAccountFundTransferFormInput, getBrokerAccountFundTransferValidat
 import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
 import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 
+import { Nullable } from "@/shared/utilities/nullable";
+
 export interface CreateBrokerAccountFundTransferContext {
-    brokerAccountId: string
+    brokerAccountId?: Nullable<string>;
 }
 
 export interface EditBrokerAccountFundTransferContext {
@@ -51,21 +53,26 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
     );
     
     const getDefaultValues = useCallback(() => {
-        const brokerAccountFundTransfer = "brokerAccountFundTransfer" in props.context ? props.context.brokerAccountFundTransfer: null;
-		
-        const brokerAccount = "brokerAccountId" in props.context ? 
-            { id: props.context.brokerAccountId }: 
-            { id: props.context.brokerAccountFundTransfer.brokerAccount.id};
-        
-        const transferType = transferTypes.find(tt => tt.value === brokerAccountFundTransfer?.income) ?? transferTypes[0];
-        
+        if ("brokerAccountFundTransfer" in props.context) {
+            const transfer = props.context.brokerAccountFundTransfer;
+            const transferType = transferTypes.find(tt => tt.value === transfer.income) ?? transferTypes[0];
+            return {
+                id: transfer.id,
+                account: transfer.account,
+                brokerAccount: transfer.brokerAccount,
+                income: transferType,
+                date: transfer.date,
+                amount: transfer.amount
+            };
+        }
+
         return {
-            id: brokerAccountFundTransfer?.id ?? generateGuid(),
-            account: brokerAccountFundTransfer?.account,
-            brokerAccount: brokerAccountFundTransfer?.brokerAccount ?? brokerAccount,
-            income: transferType,
-            date: brokerAccountFundTransfer?.date ?? new Date(),
-            amount: brokerAccountFundTransfer?.amount ?? 0
+            id: generateGuid(),
+            account: undefined,
+            brokerAccount: { id: props.context.brokerAccountId ?? undefined },
+            income: transferTypes[0],
+            date: new Date(),
+            amount: 0
         };
     }, [props.context, transferTypes]);
 

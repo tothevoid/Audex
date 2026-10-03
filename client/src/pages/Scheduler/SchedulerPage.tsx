@@ -45,8 +45,7 @@ const SchedulerPage: React.FC = () => {
         fetchData: getPagedScheduledTaskJournal,
         filters: journalFilters,
         initialPageSize: 15,
-        autoLoad: selectedTaskName === null,
-        keySelector: (entry) => entry.id
+        autoLoad: selectedTaskName === null
     });
 
     const loadTasks = useCallback(async (showLoading: boolean = false) => {
@@ -74,13 +73,17 @@ const SchedulerPage: React.FC = () => {
         }
     }, [loadTasks, selectedTaskName, reloadJournal]);
 
+    const handleTaskStarted = useCallback(() => {
+        loadTasks(false);
+    }, [loadTasks]);
+
+    const handleTaskExecutionRecorded = useCallback(() => {
+        handleTaskUpdated(true);
+    }, [handleTaskUpdated]);
+
     useSchedulerEvents({
-        onTaskStarted: () => {
-            loadTasks(false);
-        },
-        onTaskExecutionRecorded: () => {
-            handleTaskUpdated(true);
-        }
+        onTaskStarted: handleTaskStarted,
+        onTaskExecutionRecorded: handleTaskExecutionRecorded
     });
 
     const handleTaskFilterChange = (task: string) => {

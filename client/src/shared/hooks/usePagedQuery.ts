@@ -89,7 +89,7 @@ export function usePagedQuery<TItem, TFilter extends BasePageable>({
 			const newPageSize = targetSize ?? pageSize;
 			setPageIndex(targetPage);
 
-			const isTargetSizeChanged = targetSize && targetSize !== pageSize
+			const isTargetSizeChanged = targetSize && targetSize !== pageSize;
 			if (isTargetSizeChanged) {
 				setPageSize(targetSize);
 			}

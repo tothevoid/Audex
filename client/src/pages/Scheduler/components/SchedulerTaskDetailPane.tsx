@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
     Badge,
     Box,
@@ -66,16 +66,17 @@ export const SchedulerTaskDetailPane: React.FC<SchedulerTaskDetailPaneProps> = (
         fetchData: getPagedScheduledTaskJournal,
         filters: journalFilters,
         initialPageSize: 15,
-        autoLoad: Boolean(taskName),
-        keySelector: (entry) => entry.id
+        autoLoad: Boolean(taskName)
     });
 
-    useSchedulerEvents({
-        onTaskExecutionRecorded: (payload) => {
-            if (taskName && payload.taskName === taskName) {
-                reloadHistory();
-            }
+    const handleTaskExecutionRecorded = useCallback((payload: { taskName: string }) => {
+        if (taskName && payload.taskName === taskName) {
+            reloadHistory();
         }
+    }, [taskName, reloadHistory]);
+
+    useSchedulerEvents({
+        onTaskExecutionRecorded: handleTaskExecutionRecorded
     });
 
     const handleRunNow = async () => {
