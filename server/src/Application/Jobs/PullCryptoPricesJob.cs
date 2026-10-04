@@ -53,11 +53,16 @@ namespace Audex.Application.Jobs
             ScheduledTaskTriggerSource triggerSource,
             CancellationToken cancellationToken)
         {
-            var updatedCount = await _cryptocurrencyService.PullPricesAsync(cancellationToken);
+            var pullResult = await _cryptocurrencyService.PullPricesAsync(cancellationToken);
+            if (!pullResult.IsSuccess)
+            {
+                throw new InvalidOperationException(pullResult.ErrorMessage);
+            }
+
             var logMessage = await _localizer.GetForUserAsync(
                 LocalizationKeys.Scheduler.PullCryptoPricesSuccess,
                 UserProfileConstants.UserProfileId,
-                updatedCount);
+                pullResult.Data!.UpdatedCount);
 
             return JobExecutionResult.Success(logMessage);
         }

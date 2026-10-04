@@ -55,14 +55,33 @@ namespace Audex.Application.Tests.Integrations.Crypto
         [Fact]
         public async Task GetPricesAsync_EmptyList_ReturnsEmpty()
         {
-            var handler = new MockHttpMessageHandler(req => new HttpResponseMessage(HttpStatusCode.OK));
+            var handler = new MockHttpMessageHandler(request => new HttpResponseMessage(HttpStatusCode.OK));
             var factory = new MockHttpClientFactory(handler);
-            var apiClient = new CoinGeckoApiClient(factory, NullLogger<CoinGeckoApiClient>.Instance);
-            var connector = new CoinGeckoConnector(apiClient, NullLogger<CoinGeckoConnector>.Instance);
+            var connector = new CoinGeckoConnector(factory, NullLogger<CoinGeckoConnector>.Instance);
 
             var result = await connector.GetPricesAsync(new List<CryptocurrencyDto>());
 
-            Assert.Empty(result);
+            Assert.True(result.IsSuccess);
+            Assert.NotNull(result.Data);
+            Assert.Empty(result.Data);
+        }
+
+        [Fact]
+        public async Task GetPricesAsync_ProviderError_ReturnsProviderUnavailable()
+        {
+            var handler = new MockHttpMessageHandler(request => new HttpResponseMessage(HttpStatusCode.InternalServerError));
+            var factory = new MockHttpClientFactory(handler);
+            var connector = new CoinGeckoConnector(factory, NullLogger<CoinGeckoConnector>.Instance);
+
+            var cryptos = new List<CryptocurrencyDto>
+            {
+                new() { Id = Guid.NewGuid(), Name = "Bitcoin", Symbol = "BTC" }
+            };
+
+            var pullResult = await connector.GetPricesAsync(cryptos);
+
+            Assert.False(pullResult.IsSuccess);
+            Assert.Null(pullResult.Data);
         }
 
         [Fact]
@@ -71,9 +90,9 @@ namespace Audex.Application.Tests.Integrations.Crypto
             var btcId = Guid.NewGuid();
             var ethId = Guid.NewGuid();
 
-            var handler = new MockHttpMessageHandler(req =>
+            var handler = new MockHttpMessageHandler(request =>
             {
-                var uri = req.RequestUri!.ToString();
+                var uri = request.RequestUri!.ToString();
                 if (uri.Contains("simple/price"))
                 {
                     Assert.Contains("bitcoin", uri);
@@ -88,8 +107,7 @@ namespace Audex.Application.Tests.Integrations.Crypto
             });
 
             var factory = new MockHttpClientFactory(handler);
-            var apiClient = new CoinGeckoApiClient(factory, NullLogger<CoinGeckoApiClient>.Instance);
-            var connector = new CoinGeckoConnector(apiClient, NullLogger<CoinGeckoConnector>.Instance);
+            var connector = new CoinGeckoConnector(factory, NullLogger<CoinGeckoConnector>.Instance);
 
             var cryptos = new List<CryptocurrencyDto>
             {
@@ -97,26 +115,29 @@ namespace Audex.Application.Tests.Integrations.Crypto
                 new() { Id = ethId, Name = "Ethereum", Symbol = "ETH" }
             };
 
-            var prices = (await connector.GetPricesAsync(cryptos)).ToList();
+            var pullResult = await connector.GetPricesAsync(cryptos);
 
+            Assert.True(pullResult.IsSuccess);
+            Assert.NotNull(pullResult.Data);
+            var prices = pullResult.Data;
             Assert.Equal(2, prices.Count);
-            var btcPrice = prices.FirstOrDefault(p => p.CryptocurrencyId == btcId);
+            var btcPrice = prices.FirstOrDefault(priceRow => priceRow.CryptocurrencyId == btcId);
             Assert.NotNull(btcPrice);
             Assert.Equal(68500.50m, btcPrice.PriceUsd);
             Assert.Equal("BTC", btcPrice.Symbol);
 
-            var ethPrice = prices.FirstOrDefault(p => p.CryptocurrencyId == ethId);
+            var ethPrice = prices.FirstOrDefault(priceRow => priceRow.CryptocurrencyId == ethId);
             Assert.NotNull(ethPrice);
             Assert.Equal(3450.25m, ethPrice.PriceUsd);
             Assert.Equal("ETH", ethPrice.Symbol);
         }
 
         [Fact]
-        public async Task GetCoinInfoBySymbolAsync_ResolvesNameAndPrice()
+        public async Task GetCoinBySymbolAsync_ResolvesNameAndPrice()
         {
-            var handler = new MockHttpMessageHandler(req =>
+            var handler = new MockHttpMessageHandler(request =>
             {
-                var uri = req.RequestUri!.ToString();
+                var uri = request.RequestUri!.ToString();
                 if (uri.Contains("coins/markets"))
                 {
                     return new HttpResponseMessage(HttpStatusCode.OK)
@@ -129,22 +150,22 @@ namespace Audex.Application.Tests.Integrations.Crypto
             });
 
             var factory = new MockHttpClientFactory(handler);
-            var apiClient = new CoinGeckoApiClient(factory, NullLogger<CoinGeckoApiClient>.Instance);
-            var connector = new CoinGeckoConnector(apiClient, NullLogger<CoinGeckoConnector>.Instance);
+            var connector = new CoinGeckoConnector(factory, NullLogger<CoinGeckoConnector>.Instance);
 
-            var info = await connector.GetCoinInfoBySymbolAsync("btc");
+            var response = await connector.GetCoinBySymbolAsync("btc");
 
-            Assert.NotNull(info);
-            Assert.Equal("Bitcoin", info.Value.Name);
-            Assert.Equal(68500.50m, info.Value.PriceUsd);
+            Assert.True(response.IsSuccess);
+            Assert.NotNull(response.Data);
+            Assert.Equal("Bitcoin", response.Data.Name);
+            Assert.Equal(68500.50m, response.Data.PriceUsd);
         }
 
         [Fact]
-        public async Task GetCoinInfoBySymbolAsync_NotFound_ReturnsNull()
+        public async Task GetCoinBySymbolAsync_NotFound_ReturnsNotFoundResponse()
         {
-            var handler = new MockHttpMessageHandler(req =>
+            var handler = new MockHttpMessageHandler(request =>
             {
-                var uri = req.RequestUri!.ToString();
+                var uri = request.RequestUri!.ToString();
                 if (uri.Contains("coins/markets"))
                 {
                     return new HttpResponseMessage(HttpStatusCode.OK)
@@ -157,12 +178,46 @@ namespace Audex.Application.Tests.Integrations.Crypto
             });
 
             var factory = new MockHttpClientFactory(handler);
-            var apiClient = new CoinGeckoApiClient(factory, NullLogger<CoinGeckoApiClient>.Instance);
-            var connector = new CoinGeckoConnector(apiClient, NullLogger<CoinGeckoConnector>.Instance);
+            var connector = new CoinGeckoConnector(factory, NullLogger<CoinGeckoConnector>.Instance);
 
-            var info = await connector.GetCoinInfoBySymbolAsync("UNKNOWNXYZ");
+            var response = await connector.GetCoinBySymbolAsync("UNKNOWNXYZ");
 
-            Assert.Null(info);
+            Assert.False(response.IsSuccess);
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.Null(response.Data);
+        }
+
+        [Fact]
+        public async Task GetCoinBySymbolAsync_PriceZeroAndFallbackFails_ReturnsFailure()
+        {
+            const string marketsWithZeroPriceJson = "[{\"id\":\"custom-coin\",\"symbol\":\"custom\",\"name\":\"Custom Coin\",\"current_price\":0.0,\"market_cap\":0}]";
+
+            var handler = new MockHttpMessageHandler(request =>
+            {
+                var uri = request.RequestUri!.ToString();
+                if (uri.Contains("coins/markets"))
+                {
+                    return new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(marketsWithZeroPriceJson, Encoding.UTF8, "application/json")
+                    };
+                }
+
+                if (uri.Contains("simple/price"))
+                {
+                    return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+                }
+
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            });
+
+            var factory = new MockHttpClientFactory(handler);
+            var connector = new CoinGeckoConnector(factory, NullLogger<CoinGeckoConnector>.Instance);
+
+            var response = await connector.GetCoinBySymbolAsync("custom");
+
+            Assert.False(response.IsSuccess);
+            Assert.Null(response.Data);
         }
     }
 }

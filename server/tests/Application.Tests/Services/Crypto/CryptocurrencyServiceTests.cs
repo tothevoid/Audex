@@ -247,24 +247,27 @@ namespace Audex.Application.Tests.Services.Crypto
                 Symbol = "DOGE"
             };
 
-            var added = await ExecuteScopeAsync(async sp =>
+            var added = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICryptocurrencyService>();
+                var service = serviceProvider.GetRequiredService<ICryptocurrencyService>();
                 return await service.AddAsync(dto, null);
             });
 
-            var count = await ExecuteScopeAsync(async sp =>
+            var pullResult = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICryptocurrencyService>();
+                var service = serviceProvider.GetRequiredService<ICryptocurrencyService>();
                 return await service.PullPricesAsync();
             });
 
-            Assert.True(count >= 0);
+            Assert.NotNull(pullResult);
+            Assert.True(pullResult.IsSuccess);
+            Assert.NotNull(pullResult.Data);
+            Assert.True(pullResult.Data.UpdatedCount >= 0);
 
             // Cleanup
-            await ExecuteScopeAsync(async sp =>
+            await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICryptocurrencyService>();
+                var service = serviceProvider.GetRequiredService<ICryptocurrencyService>();
                 await service.DeleteAsync(added.Id);
             });
         }

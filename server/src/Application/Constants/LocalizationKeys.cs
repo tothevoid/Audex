@@ -139,6 +139,19 @@ namespace Audex.Application.Constants
             public const string ImportSessionExpired = "statements.import_session_expired";
         }
 
+        public static class Crypto
+        {
+            public static class Errors
+            {
+                public const string ProviderUnavailable = "crypto.provider_unavailable";
+                public const string NoMatchingPricesFound = "crypto.no_matching_prices_found";
+                public const string SymbolRequired = "crypto.symbol_required";
+                public const string SymbolNotFound = "crypto.symbol_not_found";
+                public const string BaseCurrencyNotFound = "crypto.base_currency_not_found";
+                public const string PriceResolutionFailed = "crypto.price_resolution_failed";
+            }
+        }
+
         public static class Errors
         {
             public const string GeneralError = "errors.general_error";

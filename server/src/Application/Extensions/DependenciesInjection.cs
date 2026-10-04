@@ -114,7 +114,6 @@ namespace Audex.Application.Extensions
             //TODO: possible change AddTransient to AddSingleton
             services.AddTransient<IStockConnector, MoexConnector>();
             services.AddTransient<ICurrencyGrabber, CbrCurrencyGrabber>();
-            services.AddTransient<CoinGeckoApiClient>();
             services.AddTransient<ICryptoConnector, CoinGeckoConnector>();
 
             services.AddScoped<IFileStorageService, FileStorageService>();

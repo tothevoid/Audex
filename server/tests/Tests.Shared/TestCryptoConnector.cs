@@ -1,9 +1,12 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Audex.Application.Constants;
 using Audex.Application.DTO.Crypto;
+using Audex.Application.Integrations.Common;
 using Audex.Application.Integrations.Crypto.Model;
 using Audex.Application.Interfaces.Integrations.Crypto;
 
@@ -11,28 +14,31 @@ namespace Audex.Tests.Shared
 {
     public class TestCryptoConnector : ICryptoConnector
     {
-        public Task<IEnumerable<CryptoMarketDataRow>> GetPricesAsync(
+        public Task<IntegrationApiResponse<IReadOnlyList<CryptoMarketDataRow>>> GetPricesAsync(
             IEnumerable<CryptocurrencyDto> cryptocurrencies,
             CancellationToken cancellationToken = default)
         {
             var rows = (cryptocurrencies ?? Enumerable.Empty<CryptocurrencyDto>())
-                .Select(c => new CryptoMarketDataRow
+                .Select(cryptoItem => new CryptoMarketDataRow
                 {
-                    CryptocurrencyId = c.Id,
-                    Symbol = c.Symbol,
-                    PriceUsd = c.Price > 0 ? c.Price : 50000m,
+                    CryptocurrencyId = cryptoItem.Id,
+                    Symbol = cryptoItem.Symbol,
+                    PriceUsd = cryptoItem.Price > 0 ? cryptoItem.Price : 50000m,
                     Date = DateTime.UtcNow
-                });
-            return Task.FromResult(rows);
+                })
+                .ToList();
+
+            return Task.FromResult(IntegrationApiResponse<IReadOnlyList<CryptoMarketDataRow>>.Success(rows));
         }
 
-        public Task<(string Name, decimal PriceUsd)?> GetCoinInfoBySymbolAsync(
+        public Task<IntegrationApiResponse<CryptoCoinInfo>> GetCoinBySymbolAsync(
             string symbol,
             CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(symbol))
             {
-                return Task.FromResult<(string Name, decimal PriceUsd)?>(null);
+                return Task.FromResult(IntegrationApiResponse<CryptoCoinInfo>.NotFound(
+                    errorCode: LocalizationKeys.Crypto.Errors.SymbolRequired));
             }
 
             var upper = symbol.Trim().ToUpperInvariant();
@@ -59,7 +65,11 @@ namespace Audex.Tests.Shared
                 _ => 100m
             };
 
-            return Task.FromResult<(string Name, decimal PriceUsd)?>((name, price));
+            return Task.FromResult(IntegrationApiResponse<CryptoCoinInfo>.Success(new CryptoCoinInfo
+            {
+                Name = name,
+                PriceUsd = price
+            }));
         }
     }
 }

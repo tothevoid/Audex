@@ -1,0 +1,8 @@
+{
+  "provider_unavailable": "Crypto market data provider is unavailable or returned an empty response",
+  "no_matching_prices_found": "Failed to resolve market prices for any of the registered cryptocurrencies",
+  "symbol_required": "Cryptocurrency symbol is required",
+  "symbol_not_found": "Cryptocurrency with symbol '{0}' was not found or has no price",
+  "base_currency_not_found": "Base cryptocurrency currency (USD) was not found",
+  "price_resolution_failed": "Failed to resolve price for coin '{0}'"
+}

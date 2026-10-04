@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 
 namespace Audex.Application.Integrations.Crypto.Model
@@ -6,7 +7,7 @@ namespace Audex.Application.Integrations.Crypto.Model
     {
         public Guid CryptocurrencyId { get; set; }
 
-        public string Symbol { get; set; }
+        public string Symbol { get; set; } = string.Empty;
 
         public decimal PriceUsd { get; set; }
 

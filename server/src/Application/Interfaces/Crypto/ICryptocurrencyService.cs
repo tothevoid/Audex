@@ -1,9 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Audex.Application.DTO.Common;
 using Audex.Application.DTO.Crypto;
 using Audex.Application.DTO.Currencies;
 using Audex.Application.DTO.FileStorage;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
 namespace Audex.Application.Interfaces.Crypto
@@ -17,6 +19,6 @@ namespace Audex.Application.Interfaces.Crypto
         Task DeleteAsync(Guid id);
         Task<FileStreamDto> GetIconStreamAsync(string iconKey);
         Task<string> GetIconUrlAsync(string iconKey);
-        Task<int> PullPricesAsync(System.Threading.CancellationToken cancellationToken = default);
+        Task<OperationResultDto<PullCryptoPricesResultDto>> PullPricesAsync(CancellationToken cancellationToken = default);
     }
 }
