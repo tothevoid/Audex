@@ -19,6 +19,7 @@ import data from './data/data.json';
 import validation from './validation/validation.json';
 import auth from './auth/auth.json';
 import scheduler from './scheduler/scheduler.json';
+import widgets from './dashboard/widgets.json';
 
 const en = {
     ...commonGeneral,
@@ -41,7 +42,8 @@ const en = {
     ...data,
     ...validation,
     ...auth,
-    ...scheduler
+    ...scheduler,
+    ...widgets
 };
 
 export default en;
