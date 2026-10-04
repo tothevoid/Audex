@@ -152,6 +152,11 @@ namespace Audex.Application.Constants
             }
         }
 
+        public static class Dashboard
+        {
+            public const string DefaultTitle = "dashboard.default_title";
+        }
+
         public static class Errors
         {
             public const string GeneralError = "errors.general_error";

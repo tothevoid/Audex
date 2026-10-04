@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Audex.Infrastructure.Configurations.Accounts;
 using Audex.Infrastructure.Configurations.Banks;
 using Audex.Infrastructure.Configurations.Brokers;
@@ -51,6 +51,7 @@ namespace Audex.Infrastructure.Database
             modelBuilder.ApplyConfiguration(new TransactionConfiguration());
             modelBuilder.ApplyConfiguration(new TransactionTypeConfiguration());
             modelBuilder.ApplyConfiguration(new UserProfileConfiguration());
+            modelBuilder.ApplyConfiguration(new UserDashboardConfiguration());
             modelBuilder.ApplyConfiguration(new UserRefreshTokenConfiguration());
             modelBuilder.ApplyConfiguration(new DebtConfiguration());
             modelBuilder.ApplyConfiguration(new DebtTagConfiguration());

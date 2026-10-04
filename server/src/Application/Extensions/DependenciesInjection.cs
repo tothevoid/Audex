@@ -74,6 +74,7 @@ namespace Audex.Application.Extensions
             services.AddTransient<ISecurityTypeService, SecurityTypeService>();
             services.AddTransient<IDividendService, DividendService>();
             services.AddTransient<IUserProfileService, UserProfileService>();
+            services.AddTransient<IUserDashboardService, UserDashboardService>();
             services.AddTransient<IDashboardService, DashboardService>();
             services.AddTransient<IDebtService, DebtService>();
             services.AddTransient<IDebtTagService, DebtTagService>();

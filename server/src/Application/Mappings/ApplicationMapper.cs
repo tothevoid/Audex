@@ -150,6 +150,10 @@ namespace Audex.Application.Mappings
         public partial NotificationDto Map(Notification entity);
         public partial IEnumerable<NotificationDto> Map(IEnumerable<Notification> entities);
 
+        public partial UserDashboard Map(UserDashboardDto dto);
+        public partial UserDashboardDto Map(UserDashboard entity);
+        public partial IEnumerable<UserDashboardDto> Map(IEnumerable<UserDashboard> entities);
+
         public partial PagedResult<BrokerAccountFundsTransferDto> Map(PagedResult<BrokerAccountFundsTransfer> pagedResult);
         public partial PagedResult<DividendPaymentDto> Map(PagedResult<DividendPayment> pagedResult);
         public partial PagedResult<DividendDto> Map(PagedResult<Dividend> pagedResult);
