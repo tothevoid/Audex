@@ -274,5 +274,9 @@ namespace Audex.WebApi.Mappings
 
         public partial UpdateScheduleDto Map(UpdateScheduleModel model);
         public partial CryptoAccountStatsModel Map(CryptoAccountStatsDto dto);
+
+        public partial UserDashboardModel Map(UserDashboardDto dto);
+        public partial UserDashboardDto Map(UserDashboardModel model);
+        public partial IEnumerable<UserDashboardModel> Map(IEnumerable<UserDashboardDto> dtos);
     }
 }
