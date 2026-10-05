@@ -1,10 +1,12 @@
 import React, { useEffect, useState, forwardRef } from "react";
 import { Box, Card } from "@chakra-ui/react";
-import { DashboardWidgetType, WidgetConfig } from "@/models/dashboard/WidgetEntity";
+import { WidgetConfig } from "@/models/dashboard/WidgetEntity";
 import { WidgetHeader } from "./WidgetHeader";
+import { getWidgetDescriptor, getWidgetIcon } from "../../widgets";
 
 export interface WidgetContainerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
     widget: WidgetConfig;
+    dashboardId: string;
     isEditMode: boolean;
     icon?: React.ReactNode;
     children?: React.ReactNode;
@@ -14,6 +16,7 @@ export interface WidgetContainerProps extends Omit<React.HTMLAttributes<HTMLDivE
 
 export const WidgetContainer = forwardRef<HTMLDivElement, WidgetContainerProps>(({
     widget,
+    dashboardId,
     isEditMode,
     icon,
     children,
@@ -25,11 +28,12 @@ export const WidgetContainer = forwardRef<HTMLDivElement, WidgetContainerProps>(
 }, ref) => {
     const [lastFetchedAt, setLastFetchedAt] = useState<Date | null>(new Date());
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [refreshSignal, setRefreshSignal] = useState(0);
 
     const triggerRefresh = () => {
         setIsRefreshing(true);
+        setRefreshSignal(prev => prev + 1);
         setTimeout(() => {
-            setLastFetchedAt(new Date());
             setIsRefreshing(false);
         }, 600);
     };
@@ -47,19 +51,27 @@ export const WidgetContainer = forwardRef<HTMLDivElement, WidgetContainerProps>(
         return () => clearInterval(intervalId);
     }, [widget.refreshIntervalSeconds]);
 
+    const handleFetched = React.useCallback((date: Date) => {
+        setLastFetchedAt(date);
+    }, []);
+
+    const resolvedIcon = icon ?? getWidgetIcon(widget.type);
+    const descriptor = getWidgetDescriptor(widget.type);
+
     const renderWidgetContent = () => {
-        switch (widget.type) {
-            case DashboardWidgetType.OilCommodities:
-                return <></>;
-            case DashboardWidgetType.CurrencyRates:
-                return <></>;
-            case DashboardWidgetType.Indices:
-                return <></>;
-            case DashboardWidgetType.Watchlist:
-                return <></>;
-            default:
-                return <></>;
+        if (!descriptor) {
+            return null;
         }
+
+        const Component = descriptor.component;
+        return (
+            <Component
+                widget={widget}
+                dashboardId={dashboardId}
+                refreshSignal={refreshSignal}
+                onFetched={handleFetched}
+            />
+        );
     };
 
     return (
@@ -81,7 +93,7 @@ export const WidgetContainer = forwardRef<HTMLDivElement, WidgetContainerProps>(
                 flexDirection="column"
                 backgroundColor="background_primary"
                 borderColor={isEditMode ? "action_primary" : "border_primary"}
-                borderWidth={isEditMode ? "1px" : "1px"}
+                borderWidth="1px"
                 borderStyle={isEditMode ? "dashed" : "solid"}
                 borderRadius="lg"
                 boxShadow="sm"
@@ -97,7 +109,7 @@ export const WidgetContainer = forwardRef<HTMLDivElement, WidgetContainerProps>(
                     lastFetchedAt={lastFetchedAt}
                     isRefreshing={isRefreshing}
                     isEditMode={isEditMode}
-                    icon={icon}
+                    icon={resolvedIcon}
                     onRefresh={triggerRefresh}
                     onOpenSettings={() => onOpenSettings(widget)}
                     onRemove={() => onRemoveWidget(widget.id)}

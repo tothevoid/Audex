@@ -9,7 +9,7 @@
     "dashboard_switch_dashboard": "Дашборд",
     "dashboard_create_new": "Новый дашборд",
     "dashboard_create_title": "Название дашборда",
-    "dashboard_create_placeholder": "Например: Сырье и валюты",
+    "dashboard_create_placeholder": "Например: Нефть и валюты",
     "dashboard_rename": "Переименовать",
     "dashboard_rename_title": "Переименование дашборда",
     "dashboard_delete": "Удалить дашборд",
@@ -21,7 +21,6 @@
     "dashboard_add_modal_title": "Добавление виджета",
     "dashboard_add_modal_desc": "Выберите виджет для добавления на дашборд",
     "dashboard_no_available_widgets": "Виджеты находятся в разработке.",
-
     "widget_refresh_interval": "Интервал обновления",
     "widget_refresh_manual": "Вручную",
     "widget_refresh_30s": "Каждые 30 сек",
@@ -31,5 +30,7 @@
     "widget_remove": "Удалить виджет",
     "widget_settings": "Настройки виджета",
     "widget_save_settings": "Сохранить",
-    "widget_in_development": "Виджет в разработке"
+    "widget_oil_title": "Нефть",
+    "widget_oil_desc": "Котировки фьючерсов на нефть",
+    "widget_oil_select_symbols": "Отображаемые сорта нефти"
 }

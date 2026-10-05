@@ -7,6 +7,7 @@ import { DashboardToolbar } from "./components/DashboardToolbar/DashboardToolbar
 import { DashboardGrid } from "./components/DashboardGrid/DashboardGrid";
 import { AddWidgetModal } from "./components/AddWidgetModal/AddWidgetModal";
 import { BaseWidgetSettingsModal, BaseWidgetSettingsModalRef } from "./components/WidgetSettingsModal/BaseWidgetSettingsModal";
+import { getWidgetDescriptor } from "./widgets";
 import { useDashboards } from "./hooks/useDashboards";
 
 export const WidgetsDashboardPage: React.FC = () => {
@@ -35,6 +36,28 @@ export const WidgetsDashboardPage: React.FC = () => {
 
     const handleOpenWidgetSettings = (widget: WidgetConfig) => {
         widgetSettingsModalRef.current?.openWithWidget(widget);
+    };
+
+    const renderCustomSettings = (
+        settings: Record<string, unknown>,
+        updateSettings: (newSettings: Partial<Record<string, unknown>>) => void,
+        currentWidget: WidgetConfig | null
+    ) => {
+        if (!currentWidget) return null;
+
+        const descriptor = getWidgetDescriptor(currentWidget.type);
+        if (!descriptor || !descriptor.settingsComponent) {
+            return null;
+        }
+
+        const SettingsComponent = descriptor.settingsComponent;
+        return (
+            <SettingsComponent
+                settings={settings}
+                updateSettings={updateSettings}
+                currentWidget={currentWidget}
+            />
+        );
     };
 
     if (isLoading) {
@@ -71,6 +94,7 @@ export const WidgetsDashboardPage: React.FC = () => {
                 <Box minH="500px">
                     <DashboardGrid
                         widgets={widgets}
+                        dashboardId={activeDashboardId ?? ""}
                         isEditMode={isEditMode}
                         onLayoutChange={handleLayoutChange}
                         onRemoveWidget={handleRemoveWidget}
@@ -90,6 +114,7 @@ export const WidgetsDashboardPage: React.FC = () => {
             <BaseWidgetSettingsModal
                 ref={widgetSettingsModalRef}
                 onSaveWidget={handleSaveWidgetSettings}
+                renderCustomSettings={renderCustomSettings}
             />
         </PageContainer>
     );

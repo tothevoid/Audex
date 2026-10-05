@@ -15,7 +15,8 @@ export interface BaseWidgetSettingsModalProps<TSettings = Record<string, unknown
     onSaveWidget: (updatedWidget: WidgetConfig<TSettings>) => void;
     renderCustomSettings?: (
         settings: TSettings,
-        updateSettings: (newSettings: Partial<TSettings>) => void
+        updateSettings: (newSettings: Partial<TSettings>) => void,
+        currentWidget: WidgetConfig<TSettings> | null
     ) => React.ReactNode;
 }
 
@@ -110,7 +111,7 @@ export const BaseWidgetSettingsModal = forwardRef(<TSettings extends Record<stri
                     </NativeSelect.Root>
                 </Field.Root>
 
-                {renderCustomSettings && renderCustomSettings(customSettings, handleUpdateSettings)}
+                {renderCustomSettings && renderCustomSettings(customSettings, handleUpdateSettings, currentWidget)}
             </Stack>
         </BaseFormModal>
     );

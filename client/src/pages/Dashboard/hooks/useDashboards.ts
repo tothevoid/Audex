@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Layout } from "react-grid-layout";
 import { UserDashboardEntity } from "@/models/dashboard/UserDashboardEntity";
-import { WidgetConfig } from "@/models/dashboard/WidgetEntity";
+import { normalizeWidgetGrid, WidgetConfig } from "@/models/dashboard/WidgetEntity";
 import {
     createUserDashboard,
     deleteUserDashboard,
@@ -165,9 +165,21 @@ export const useDashboards = () => {
     // Save widget (either add new or update existing)
     const handleSaveWidgetSettings = (savedWidget: WidgetConfig) => {
         const exists = widgets.some(w => w.id === savedWidget.id);
-        const updated = exists
-            ? widgets.map(w => (w.id === savedWidget.id ? savedWidget : w))
-            : [...widgets, savedWidget];
+        let updated: WidgetConfig[];
+
+        if (exists) {
+            updated = widgets.map(w => (w.id === savedWidget.id ? savedWidget : w));
+        } else {
+            const maxY = widgets.reduce(
+                (max, w) => Math.max(max, normalizeWidgetGrid(w.grid).y + normalizeWidgetGrid(w.grid).h),
+                0
+            );
+            const normalizedWidget: WidgetConfig = {
+                ...savedWidget,
+                grid: normalizeWidgetGrid(savedWidget.grid, maxY)
+            };
+            updated = [...widgets, normalizedWidget];
+        }
 
         setWidgets(updated);
         saveWidgetsToBackend(updated);

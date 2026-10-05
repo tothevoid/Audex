@@ -21,7 +21,6 @@
     "dashboard_add_modal_title": "Add Widget",
     "dashboard_add_modal_desc": "Select a widget to add to your dashboard",
     "dashboard_no_available_widgets": "Widgets are currently under development.",
-
     "widget_refresh_interval": "Refresh interval",
     "widget_refresh_manual": "Manual",
     "widget_refresh_30s": "Every 30 sec",
@@ -31,5 +30,7 @@
     "widget_remove": "Remove widget",
     "widget_settings": "Widget Settings",
     "widget_save_settings": "Save",
-    "widget_in_development": "Widget under development"
+    "widget_oil_title": "Oil",
+    "widget_oil_desc": "Live quotes for crude oil futures.",
+    "widget_oil_select_symbols": "Displayed Benchmarks"
 }

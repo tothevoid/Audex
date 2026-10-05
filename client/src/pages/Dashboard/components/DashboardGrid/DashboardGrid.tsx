@@ -4,13 +4,14 @@ import { ResponsiveGridLayout, useContainerWidth, Layout } from "react-grid-layo
 import "react-grid-layout/css/styles.css";
 import "./DashboardGrid.scss";
 import { MdDashboardCustomize } from "react-icons/md";
-import { WidgetConfig } from "@/models/dashboard/WidgetEntity";
+import { normalizeWidgetGrid, WidgetConfig } from "@/models/dashboard/WidgetEntity";
 import Placeholder from "@/shared/components/Placeholder/Placeholder";
 import AddButton from "@/shared/components/AddButton/AddButton";
 import { WidgetContainer } from "../WidgetContainer/WidgetContainer";
 
 interface DashboardGridProps {
     widgets: WidgetConfig[];
+    dashboardId: string;
     isEditMode: boolean;
     onLayoutChange: (layout: Layout) => void;
     onRemoveWidget: (widgetId: string) => void;
@@ -20,6 +21,7 @@ interface DashboardGridProps {
 
 export const DashboardGrid: React.FC<DashboardGridProps> = ({
     widgets,
+    dashboardId,
     isEditMode,
     onLayoutChange,
     onRemoveWidget,
@@ -29,30 +31,19 @@ export const DashboardGrid: React.FC<DashboardGridProps> = ({
     const { t } = useTranslation();
     const { width, containerRef: measuredRef } = useContainerWidth();
 
-    if (widgets.length === 0) {
-        return (
-            <Placeholder
-                text={t("dashboard_no_widgets")}
-                icon={<MdDashboardCustomize />}
-            >
-                <AddButton
-                    buttonTitle={t("dashboard_add_widget")}
-                    onClick={onOpenAddWidget}
-                />
-            </Placeholder>
-        );
-    }
-
     const layouts = {
-        lg: widgets.map(widget => ({
-            i: widget.id,
-            x: Number(widget.grid.x ?? 0),
-            y: Number(widget.grid.y ?? 0),
-            w: Number(widget.grid.w ?? 6),
-            h: Number(widget.grid.h ?? 3),
-            minW: Number(widget.grid.minW ?? 4),
-            minH: Number(widget.grid.minH ?? 3)
-        }))
+        lg: widgets.map(widget => {
+            const grid = normalizeWidgetGrid(widget.grid);
+            return {
+                i: widget.id,
+                x: grid.x,
+                y: grid.y,
+                w: grid.w,
+                h: grid.h,
+                minW: grid.minW,
+                minH: grid.minH
+            };
+        })
     };
 
     const handleLayoutChange = (currentLayout: Layout) => {
@@ -61,9 +52,19 @@ export const DashboardGrid: React.FC<DashboardGridProps> = ({
 
     return (
         <div ref={measuredRef} style={{ width: "100%", minHeight: "450px" }}>
-            {width > 0 && (
+            {widgets.length === 0 ? (
+                <Placeholder
+                    text={t("dashboard_no_widgets")}
+                    icon={<MdDashboardCustomize />}
+                >
+                    <AddButton
+                        buttonTitle={t("dashboard_add_widget")}
+                        onClick={onOpenAddWidget}
+                    />
+                </Placeholder>
+            ) : (
                 <ResponsiveGridLayout
-                    width={width}
+                    width={width > 0 ? width : 1200}
                     className="layout"
                     layouts={layouts}
                     breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
@@ -84,6 +85,7 @@ export const DashboardGrid: React.FC<DashboardGridProps> = ({
                         <WidgetContainer
                             key={widget.id}
                             widget={widget}
+                            dashboardId={dashboardId}
                             isEditMode={isEditMode}
                             onRemoveWidget={onRemoveWidget}
                             onOpenSettings={onOpenSettings}

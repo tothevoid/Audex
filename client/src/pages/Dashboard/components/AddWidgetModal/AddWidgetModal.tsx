@@ -2,9 +2,10 @@ import { forwardRef, useImperativeHandle, useRef } from "react";
 import { Box, Card, Flex, HStack, SimpleGrid, Stack, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { WidgetConfig } from "@/models/dashboard/WidgetEntity";
-import { WidgetTemplate, createDefaultWidgetFromTemplate } from "@/models/dashboard/WidgetTemplate";
+import { createDefaultWidgetFromTemplate } from "@/models/dashboard/WidgetTemplate";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseModal from "@/shared/modals/BaseModal/BaseModal";
+import { getAllWidgetTemplates, getWidgetDescriptor, WidgetTemplateInfo } from "../../widgets";
 
 interface AddWidgetModalProps {
     onSelectWidget: (widget: WidgetConfig) => void;
@@ -16,17 +17,24 @@ export const AddWidgetModal = forwardRef<BaseModalRef, AddWidgetModalProps>(({
     const { t } = useTranslation();
     const modalRef = useRef<BaseModalRef>(null);
 
-    const widgetTemplates: WidgetTemplate[] = [];
+    const widgetTemplates = getAllWidgetTemplates();
 
     useImperativeHandle(ref, () => ({
         openModal: () => modalRef.current?.openModal(),
         closeModal: () => modalRef.current?.closeModal()
     }));
 
-    const handleSelect = (template: WidgetTemplate) => {
+    const handleSelect = (template: WidgetTemplateInfo) => {
         if (!template.isAvailable) return;
         modalRef.current?.closeModal();
-        const draftWidget = createDefaultWidgetFromTemplate(template, t(template.titleKey));
+        const descriptor = getWidgetDescriptor(template.type);
+        const defaultSettings = descriptor ? descriptor.getDefaultSettings() : {};
+        const draftWidget = createDefaultWidgetFromTemplate(
+            template,
+            t(template.titleKey),
+            0,
+            defaultSettings
+        );
         onSelectWidget(draftWidget);
     };
 
