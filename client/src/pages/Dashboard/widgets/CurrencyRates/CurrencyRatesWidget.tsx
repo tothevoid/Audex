@@ -3,7 +3,7 @@ import { Box, SimpleGrid, Skeleton, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { WidgetComponentProps } from "../types";
 import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
-import { getCurrencies, syncRates } from "@/api/currencies/currencyApi";
+import { getCurrencies } from "@/api/currencies/currencyApi";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { CurrencyRateCard } from "./CurrencyRateCard";
 
@@ -18,20 +18,12 @@ export const CurrencyRatesWidget: React.FC<WidgetComponentProps<Record<string, u
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchData = useCallback(async (isSilent: boolean = false, syncWithCbr: boolean = false) => {
+    const fetchData = useCallback(async (isSilent: boolean = false) => {
         if (!isSilent) {
             setIsLoading(true);
         }
 
         try {
-            if (syncWithCbr) {
-                try {
-                    await syncRates();
-                } catch {
-                    // If CBR sync fails, continue to display current database rates
-                }
-            }
-
             const result = await getCurrencies();
             setCurrencies(result || []);
             setError(null);
@@ -49,7 +41,7 @@ export const CurrencyRatesWidget: React.FC<WidgetComponentProps<Record<string, u
 
     useEffect(() => {
         if (refreshSignal && refreshSignal > 0) {
-            fetchData(true, true);
+            fetchData(true);
         }
     }, [refreshSignal, fetchData]);
 
@@ -97,10 +89,10 @@ export const CurrencyRatesWidget: React.FC<WidgetComponentProps<Record<string, u
 
     const maxColumns =
         widget.grid.w <= 2 ? 1 :
-        widget.grid.w <= 4 ? 2 :
-        widget.grid.w <= 8 ? 4 :
-        widget.grid.w <= 10 ? 6 :
-        8;
+            widget.grid.w <= 4 ? 2 :
+                widget.grid.w <= 8 ? 4 :
+                    widget.grid.w <= 10 ? 6 :
+                        8;
 
     const columnCount = Math.min(displayedCurrencies.length, maxColumns);
 
