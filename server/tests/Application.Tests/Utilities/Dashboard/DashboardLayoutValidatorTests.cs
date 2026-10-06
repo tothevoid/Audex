@@ -172,7 +172,7 @@ namespace Audex.Application.Tests.Utilities.Dashboard
         }
 
         [Fact]
-        public void ValidateAndParse_WithEmptyOilSymbols_ThrowsArgumentException()
+        public void ValidateAndParse_WithEmptyOilSymbols_ReturnsParsedWidgets()
         {
             const string emptySymbolsJson = """
             [
@@ -186,10 +186,50 @@ namespace Audex.Application.Tests.Utilities.Dashboard
             ]
             """;
 
-            var exception = Assert.Throws<ArgumentException>(() =>
-                DashboardLayoutValidator.ValidateAndParse(emptySymbolsJson));
+            var widgets = DashboardLayoutValidator.ValidateAndParse(emptySymbolsJson);
 
-            Assert.Contains("must have at least one oil symbol", exception.Message);
+            Assert.Single(widgets);
+            Assert.Equal("widget-1", widgets[0].Id);
+        }
+
+        [Fact]
+        public void ValidateAndParse_WithEmptySettingsObject_ReturnsParsedWidgets()
+        {
+            const string emptySettingsJson = """
+            [
+                {
+                    "id": "widget-1",
+                    "type": "Oil",
+                    "settings": {}
+                }
+            ]
+            """;
+
+            var widgets = DashboardLayoutValidator.ValidateAndParse(emptySettingsJson);
+
+            Assert.Single(widgets);
+            Assert.Equal("widget-1", widgets[0].Id);
+        }
+
+        [Fact]
+        public void ValidateAndParse_WithUnsupportedOilSymbol_ThrowsArgumentException()
+        {
+            const string unsupportedSymbolJson = """
+            [
+                {
+                    "id": "widget-1",
+                    "type": "Oil",
+                    "settings": {
+                        "symbols": ["UNSUPPORTED_OIL"]
+                    }
+                }
+            ]
+            """;
+
+            var exception = Assert.Throws<ArgumentException>(() =>
+                DashboardLayoutValidator.ValidateAndParse(unsupportedSymbolJson));
+
+            Assert.Contains("unsupported oil symbols", exception.Message);
         }
 
         [Fact]

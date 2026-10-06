@@ -27,5 +27,12 @@ export interface OilWidgetEntity {
 }
 
 export interface OilWidgetSettings {
-    symbols?: string[];
+    symbols: string[];
 }
+
+export interface OilWidgetRequest {
+    dashboardId: string;
+    widgetId: string;
+    symbols: string[];
+}
+

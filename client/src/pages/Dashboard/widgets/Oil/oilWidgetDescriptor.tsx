@@ -21,5 +21,5 @@ export const oilWidgetDescriptor: WidgetDescriptor<OilWidgetSettings> = {
     },
     component: OilWidget,
     settingsComponent: OilSettings,
-    getDefaultSettings: () => ({})
+    getDefaultSettings: () => ({ symbols: [] })
 };

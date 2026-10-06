@@ -8,5 +8,7 @@ namespace Audex.Application.Interfaces.Integrations.Oil
     public interface IOilConnector
     {
         Task<IEnumerable<OilQuoteDto>> GetOilQuotesAsync(IEnumerable<string>? oilSymbols = null);
+
+        Task<IReadOnlyList<string>> GetSupportedSymbolsAsync();
     }
 }

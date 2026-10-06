@@ -25,7 +25,11 @@ export const OilWidget: React.FC<WidgetComponentProps<OilWidgetSettings>> = ({
         }
 
         try {
-            const result = await getOilWidget(dashboardId, widget.id);
+            const result = await getOilWidget({
+                dashboardId,
+                widgetId: widget.id,
+                symbols: widget.settings?.symbols ?? []
+            });
             if (result) {
                 setData(result);
                 setError(null);
@@ -36,11 +40,11 @@ export const OilWidget: React.FC<WidgetComponentProps<OilWidgetSettings>> = ({
         } finally {
             setIsLoading(false);
         }
-    }, [dashboardId, widget.id, onFetched, t]);
+    }, [dashboardId, widget.id, widget.settings?.symbols, onFetched, t]);
 
     useEffect(() => {
         fetchData();
-    }, [fetchData, widget.settings?.symbols]);
+    }, [fetchData]);
 
     useEffect(() => {
         if (refreshSignal && refreshSignal > 0) {

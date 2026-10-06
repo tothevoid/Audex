@@ -13,6 +13,8 @@ namespace Audex.Tests.Shared.Mock
         public Func<IEnumerable<string>?, Task<IEnumerable<OilQuoteDto>>>? GetOilQuotesHandler { get; set; }
         public int CallCount { get; private set; }
 
+        public Func<Task<IReadOnlyList<string>>>? GetSupportedSymbolsHandler { get; set; }
+
         public Task<IEnumerable<OilQuoteDto>> GetOilQuotesAsync(IEnumerable<string>? oilSymbols = null)
         {
             CallCount++;
@@ -22,6 +24,16 @@ namespace Audex.Tests.Shared.Mock
             }
 
             return Task.FromResult(Enumerable.Empty<OilQuoteDto>());
+        }
+
+        public Task<IReadOnlyList<string>> GetSupportedSymbolsAsync()
+        {
+            if (GetSupportedSymbolsHandler != null)
+            {
+                return GetSupportedSymbolsHandler();
+            }
+
+            return Task.FromResult<IReadOnlyList<string>>(new List<string> { "BRENT", "WTI" });
         }
 
         Task<IEnumerable<OilQuoteDto>> IMoexOilConnector.GetOilQuotesAsync(IEnumerable<string> oilSymbols) =>

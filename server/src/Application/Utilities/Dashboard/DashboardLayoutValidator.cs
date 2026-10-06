@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using Audex.Application.DTO.Dashboard.Widgets;
 using Audex.Application.Enums.Dashboard;
+using Audex.Application.Services.Dashboard.Widgets.Oil;
 
 namespace Audex.Application.Utilities.Dashboard
 {
@@ -122,9 +123,19 @@ namespace Audex.Application.Utilities.Dashboard
             try
             {
                 var settings = widget.Settings.Deserialize<OilWidgetSettingsDto>(SerializerOptions);
-                if (settings == null || settings.Symbols.Count == 0)
+                if (settings?.Symbols == null || settings.Symbols.Count == 0)
                 {
-                    throw new ArgumentException($"Widget with id '{widget.Id}' must have at least one oil symbol specified in settings.");
+                    return;
+                }
+
+                var unsupportedSymbols = settings.Symbols
+                    .Where(symbol => !OilQuotationService.BenchmarkDefinitions.ContainsKey(symbol.Trim()))
+                    .ToList();
+
+                if (unsupportedSymbols.Count > 0)
+                {
+                    throw new ArgumentException(
+                        $"Widget with id '{widget.Id}' contains unsupported oil symbols: {string.Join(", ", unsupportedSymbols)}.");
                 }
             }
             catch (JsonException jsonException)

@@ -155,5 +155,14 @@ namespace Audex.Application.Services.Dashboard.Widgets.Oil
                 _ => Enumerable.Empty<OilQuoteDto>()
             };
         }
+
+        public Task<IReadOnlyList<string>> GetSupportedSymbolsAsync()
+        {
+            IReadOnlyList<string> supportedSymbols = SupportedBenchmarks
+                .Select(benchmark => benchmark.Symbol)
+                .ToList();
+
+            return Task.FromResult(supportedSymbols);
+        }
     }
 }

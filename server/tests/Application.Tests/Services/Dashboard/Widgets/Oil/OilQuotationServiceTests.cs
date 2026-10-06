@@ -123,5 +123,15 @@ namespace Audex.Application.Tests.Services.Dashboard.Widgets.Oil
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _oilQuotationService.GetOilQuotesAsync(requestedSymbols));
         }
+
+        [Fact]
+        public async Task GetSupportedSymbolsAsync_ReturnsConfiguredBenchmarkSymbols()
+        {
+            var symbols = await _oilQuotationService.GetSupportedSymbolsAsync();
+
+            Assert.Equal(2, symbols.Count);
+            Assert.Contains("BRENT", symbols);
+            Assert.Contains("WTI", symbols);
+        }
     }
 }

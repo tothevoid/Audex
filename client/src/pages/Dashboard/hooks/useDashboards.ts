@@ -76,41 +76,43 @@ export const useDashboards = () => {
         if (!activeDashboardId) return;
 
         const layoutJson = JSON.stringify(newWidgets);
-        await updateUserDashboardLayout({
-            id: activeDashboardId,
-            layoutJson
-        });
+        try {
+            await updateUserDashboardLayout({
+                id: activeDashboardId,
+                layoutJson
+            });
 
-        // Update local dashboards state
-        setDashboards(current =>
-            current.map(d => (d.id === activeDashboardId ? { ...d, layoutJson } : d))
-        );
+            // Update local dashboards state
+            setDashboards(current =>
+                current.map(d => (d.id === activeDashboardId ? { ...d, layoutJson } : d))
+            );
+        } catch (error: unknown) {
+            console.error("Failed to save dashboard layout:", error);
+        }
     };
 
     // Handle layout reposition / resize from react-grid-layout
-    const handleLayoutChange = (currentLayout: Layout) => {
+    const handleLayoutChange = async (currentLayout: Layout) => {
         if (!isEditMode) return;
 
-        setWidgets(currentWidgets => {
-            const updated = currentWidgets.map(widget => {
-                const layoutItem = currentLayout.find(item => item.i === widget.id);
-                if (!layoutItem) return widget;
+        const updated = widgets.map(widget => {
+            const layoutItem = currentLayout.find(item => item.i === widget.id);
+            if (!layoutItem) return widget;
 
-                return {
-                    ...widget,
-                    grid: {
-                        ...widget.grid,
-                        x: layoutItem.x,
-                        y: layoutItem.y,
-                        w: layoutItem.w,
-                        h: layoutItem.h
-                    }
-                };
-            });
-
-            saveWidgetsToBackend(updated);
-            return updated;
+            return {
+                ...widget,
+                grid: {
+                    ...widget.grid,
+                    x: layoutItem.x,
+                    y: layoutItem.y,
+                    w: layoutItem.w,
+                    h: layoutItem.h
+                }
+            };
         });
+
+        setWidgets(updated);
+        await saveWidgetsToBackend(updated);
     };
 
     // Create new dashboard
@@ -163,7 +165,7 @@ export const useDashboards = () => {
     };
 
     // Save widget (either add new or update existing)
-    const handleSaveWidgetSettings = (savedWidget: WidgetConfig) => {
+    const handleSaveWidgetSettings = async (savedWidget: WidgetConfig) => {
         const exists = widgets.some(w => w.id === savedWidget.id);
         let updated: WidgetConfig[];
 
@@ -182,14 +184,14 @@ export const useDashboards = () => {
         }
 
         setWidgets(updated);
-        saveWidgetsToBackend(updated);
+        await saveWidgetsToBackend(updated);
     };
 
     // Remove widget
-    const handleRemoveWidget = (widgetId: string) => {
+    const handleRemoveWidget = async (widgetId: string) => {
         const updated = widgets.filter(w => w.id !== widgetId);
         setWidgets(updated);
-        saveWidgetsToBackend(updated);
+        await saveWidgetsToBackend(updated);
     };
 
     // Trigger global refresh for all widgets

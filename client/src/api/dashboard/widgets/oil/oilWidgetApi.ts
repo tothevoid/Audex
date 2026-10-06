@@ -1,16 +1,20 @@
-import { getEntity } from "@/api/basicApi";
-import { OilWidgetEntity, OilWidgetResponse } from "@/models/dashboard/widgets/oil/OilWidgetEntity";
+import { getAllEntities, getEntityByConfig } from "@/api/basicApi";
+import { OilWidgetEntity, OilWidgetRequest, OilWidgetResponse } from "@/models/dashboard/widgets/oil/OilWidgetEntity";
 import { mapOilWidget } from "./oilWidgetApiMapping";
 
 const basicUrl = "DashboardWidgets";
 
 export const getOilWidget = async (
-    dashboardId: string,
-    widgetId: string
+    request: OilWidgetRequest
 ): Promise<OilWidgetEntity> => {
-    const data = await getEntity<OilWidgetResponse>(`${basicUrl}/GetOil?dashboardId=${dashboardId}&widgetId=${widgetId}`);
+    const data = await getEntityByConfig<OilWidgetResponse>(`${basicUrl}/GetOil`, request);
     if (!data) {
         return { quotes: [] };
     }
     return mapOilWidget(data);
+};
+
+export const getOilSymbols = async (): Promise<string[]> => {
+    const data = await getAllEntities<string>(`${basicUrl}/GetOilSymbols`);
+    return data ?? [];
 };

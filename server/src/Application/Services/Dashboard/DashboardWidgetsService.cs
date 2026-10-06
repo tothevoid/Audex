@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Dashboard.Widgets;
@@ -24,15 +25,23 @@ namespace Audex.Application.Services.Dashboard
             _oilConnector = oilConnector;
         }
 
-        public async Task<OilWidgetDto> GetOilWidgetAsync(Guid userId, Guid dashboardId, string widgetId)
+        public async Task<OilWidgetDto> GetOilWidgetAsync(Guid userId, OilWidgetRequestDto request)
         {
-            var settings = await GetWidgetSettingsAsync<OilWidgetSettingsDto>(userId, dashboardId, widgetId);
-            var quotes = (await _oilConnector.GetOilQuotesAsync(settings?.Symbols)).ToList();
+            var targetSymbols = request.Symbols.Count > 0
+                ? request.Symbols
+                : (await GetWidgetSettingsAsync<OilWidgetSettingsDto>(userId, request.DashboardId, request.WidgetId))?.Symbols;
+
+            var quotes = (await _oilConnector.GetOilQuotesAsync(targetSymbols)).ToList();
 
             return new OilWidgetDto
             {
                 Quotes = quotes
             };
+        }
+
+        public Task<IReadOnlyList<string>> GetSupportedOilSymbolsAsync()
+        {
+            return _oilConnector.GetSupportedSymbolsAsync();
         }
 
         private async Task<TSettings?> GetWidgetSettingsAsync<TSettings>(Guid userId, Guid dashboardId, string widgetId)

@@ -48,7 +48,12 @@ namespace Audex.Application.Tests.Services.Dashboard
                 };
 
                 var widgetsService = serviceProvider.GetRequiredService<IDashboardWidgetsService>();
-                return await widgetsService.GetOilWidgetAsync(userId, dashboardId, widgetId);
+                var request = new OilWidgetRequestDto
+                {
+                    DashboardId = dashboardId,
+                    WidgetId = widgetId
+                };
+                return await widgetsService.GetOilWidgetAsync(userId, request);
             });
 
             Assert.NotNull(result);
@@ -86,7 +91,12 @@ namespace Audex.Application.Tests.Services.Dashboard
                 };
 
                 var widgetsService = serviceProvider.GetRequiredService<IDashboardWidgetsService>();
-                return await widgetsService.GetOilWidgetAsync(userId, dashboard.Id, widgetId);
+                var request = new OilWidgetRequestDto
+                {
+                    DashboardId = dashboard.Id,
+                    WidgetId = widgetId
+                };
+                return await widgetsService.GetOilWidgetAsync(userId, request);
             });
 
             Assert.NotNull(result);
@@ -119,11 +129,75 @@ namespace Audex.Application.Tests.Services.Dashboard
                 };
 
                 var widgetsService = serviceProvider.GetRequiredService<IDashboardWidgetsService>();
-                return await widgetsService.GetOilWidgetAsync(userId, nonExistentDashboardId, "missing-widget");
+                var request = new OilWidgetRequestDto
+                {
+                    DashboardId = nonExistentDashboardId,
+                    WidgetId = "missing-widget"
+                };
+                return await widgetsService.GetOilWidgetAsync(userId, request);
             });
 
             Assert.NotNull(result);
             Assert.Equal(2, result.Quotes.Count);
+        }
+
+        [Fact]
+        public async Task TestGetOilWidget_WithExplicitSymbols_UsesPassedSymbolsDirectly()
+        {
+            var userId = UserProfileConstants.UserProfileId;
+            var dashboardId = Guid.NewGuid();
+            var widgetId = "oil-widget-1";
+
+            var result = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var mockConnector = (MockOilConnector)serviceProvider.GetRequiredService<IOilConnector>();
+                mockConnector.GetOilQuotesHandler = symbols =>
+                {
+                    var requestedList = (symbols != null && symbols.Any()) ? symbols.ToList() : new List<string> { "BRENT", "WTI" };
+                    return Task.FromResult<IEnumerable<OilQuoteDto>>(
+                        requestedList.Select(sym => new OilQuoteDto
+                        {
+                            Symbol = sym,
+                            Price = 80m,
+                            Currency = "USD",
+                            Source = "Yahoo Finance",
+                            LastTradeTime = DateTime.UtcNow
+                        })
+                    );
+                };
+
+                var widgetsService = serviceProvider.GetRequiredService<IDashboardWidgetsService>();
+                var request = new OilWidgetRequestDto
+                {
+                    DashboardId = dashboardId,
+                    WidgetId = widgetId,
+                    Symbols = new List<string> { "BRENT" }
+                };
+                return await widgetsService.GetOilWidgetAsync(userId, request);
+            });
+
+            Assert.NotNull(result);
+            Assert.Single(result.Quotes);
+            Assert.Equal("BRENT", result.Quotes[0].Symbol);
+        }
+
+        [Fact]
+        public async Task TestGetSupportedOilSymbolsAsync_ReturnsSymbolsFromConnector()
+        {
+            var result = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var mockConnector = (MockOilConnector)serviceProvider.GetRequiredService<IOilConnector>();
+                mockConnector.GetSupportedSymbolsHandler = () =>
+                    Task.FromResult<IReadOnlyList<string>>(new List<string> { "BRENT", "WTI" });
+
+                var widgetsService = serviceProvider.GetRequiredService<IDashboardWidgetsService>();
+                return await widgetsService.GetSupportedOilSymbolsAsync();
+            });
+
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count);
+            Assert.Contains("BRENT", result);
+            Assert.Contains("WTI", result);
         }
     }
 }

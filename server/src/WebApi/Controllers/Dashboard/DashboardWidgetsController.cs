@@ -1,4 +1,6 @@
+#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Dashboard.Widgets;
@@ -22,14 +24,19 @@ namespace Audex.WebApi.Controllers.Dashboard
             _dashboardWidgetsService = dashboardWidgetsService;
         }
 
-        [HttpGet("GetOil")]
-        public async Task<ActionResult<OilWidgetDto>> GetOilAsync(
-            [FromQuery] Guid dashboardId,
-            [FromQuery] string widgetId)
+        [HttpPost("GetOil")]
+        public async Task<ActionResult<OilWidgetDto>> GetOilAsync([FromBody] OilWidgetRequestDto request)
         {
             var userId = GetUserId();
-            var widgetData = await _dashboardWidgetsService.GetOilWidgetAsync(userId, dashboardId, widgetId);
+            var widgetData = await _dashboardWidgetsService.GetOilWidgetAsync(userId, request);
             return Ok(widgetData);
+        }
+
+        [HttpGet("GetOilSymbols")]
+        public async Task<ActionResult<IReadOnlyList<string>>> GetOilSymbolsAsync()
+        {
+            var symbols = await _dashboardWidgetsService.GetSupportedOilSymbolsAsync();
+            return Ok(symbols);
         }
 
         private Guid GetUserId()
