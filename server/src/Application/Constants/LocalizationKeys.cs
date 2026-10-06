@@ -155,6 +155,7 @@ namespace Audex.Application.Constants
         public static class Dashboard
         {
             public const string DefaultTitle = "dashboard.default_title";
+            public const string InvalidLayoutTitle = "dashboard.invalid_layout_title";
         }
 
         public static class Errors

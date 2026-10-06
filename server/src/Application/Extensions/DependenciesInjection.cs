@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.Integrations.Crypto.CoinGecko;
 using Audex.Application.Integrations.Currency;
+using Audex.Application.Integrations.Oil.Moex;
+using Audex.Application.Integrations.Oil.Yahoo;
 using Audex.Application.Integrations.Stock.Moex;
 using Audex.Application.Interfaces.Accounts;
 using Audex.Application.Interfaces.Auth;
@@ -14,6 +16,7 @@ using Audex.Application.Interfaces.Deposits;
 using Audex.Application.Interfaces.FileStorage;
 using Audex.Application.Interfaces.Integrations.Crypto;
 using Audex.Application.Interfaces.Integrations.Currency;
+using Audex.Application.Interfaces.Integrations.Oil;
 using Audex.Application.Interfaces.Integrations.Stock;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Notifications;
@@ -34,6 +37,7 @@ using Audex.Application.Services.Deposits;
 using Audex.Application.Services.FileStorage;
 using Audex.Application.Services.Localization;
 using Audex.Application.Services.Notifications;
+using Audex.Application.Services.Dashboard.Widgets.Oil;
 using Audex.Application.Services.Reports;
 using Audex.Application.Services.Securities;
 using Audex.Application.Services.Transactions;
@@ -76,6 +80,7 @@ namespace Audex.Application.Extensions
             services.AddTransient<IUserProfileService, UserProfileService>();
             services.AddTransient<IUserDashboardService, UserDashboardService>();
             services.AddTransient<IDashboardService, DashboardService>();
+            services.AddTransient<IDashboardWidgetsService, DashboardWidgetsService>();
             services.AddTransient<IDebtService, DebtService>();
             services.AddTransient<IDebtTagService, DebtTagService>();
             services.AddTransient<INotificationService, NotificationService>();
@@ -113,7 +118,11 @@ namespace Audex.Application.Extensions
 
             //TODO: make factory
             //TODO: possible change AddTransient to AddSingleton
+            services.AddSingleton<IYahooFinanceApiClient, YahooFinanceApiClient>();
             services.AddTransient<IStockConnector, MoexConnector>();
+            services.AddTransient<IMoexOilConnector, MoexOilConnector>();
+            services.AddTransient<IYahooOilConnector, YahooOilConnector>();
+            services.AddTransient<IOilConnector, OilQuotationService>();
             services.AddTransient<ICurrencyGrabber, CbrCurrencyGrabber>();
             services.AddTransient<ICryptoConnector, CoinGeckoConnector>();
 

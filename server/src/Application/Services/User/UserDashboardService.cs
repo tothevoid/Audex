@@ -8,6 +8,8 @@ using Audex.Application.DTO.User;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.User;
 using Audex.Application.Mappings;
+using Audex.Application.Utilities;
+using Audex.Application.Utilities.Dashboard;
 using Audex.Infrastructure.Entities.User;
 using Audex.Infrastructure.Interfaces.Database;
 
@@ -72,6 +74,11 @@ namespace Audex.Application.Services.User
                 ? await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.DefaultTitle, userId)
                 : title.Trim();
 
+            if (!string.IsNullOrWhiteSpace(initialLayoutJson))
+            {
+                DashboardLayoutValidator.ValidateAndParse(initialLayoutJson);
+            }
+
             var newDashboardEntity = new UserDashboard
             {
                 Id = Guid.NewGuid(),
@@ -96,6 +103,11 @@ namespace Audex.Application.Services.User
             if (dashboardEntity == null || dashboardEntity.UserProfileId != userId)
             {
                 return null;
+            }
+
+            if (!string.IsNullOrWhiteSpace(layoutJson))
+            {
+                DashboardLayoutValidator.ValidateAndParse(layoutJson);
             }
 
             dashboardEntity.LayoutJson = string.IsNullOrWhiteSpace(layoutJson) ? EmptyLayoutJson : layoutJson;

@@ -1,3 +1,4 @@
 {
-  "default_title": "Главный дашборд"
+  "default_title": "Главный дашборд",
+  "invalid_layout_title": "Некорректная разметка дашборда"
 }

@@ -12,6 +12,7 @@ using Audex.Application.DTO.Securities;
 using Audex.Application.Integrations.Stock.Moex.Model;
 using Audex.Application.Interfaces.Integrations.Stock;
 using Audex.Application.Interfaces.Securities;
+using Audex.Application.Utilities;
 using Audex.Infrastructure.Constants;
 
 namespace Audex.Application.Integrations.Stock.Moex
@@ -142,29 +143,17 @@ namespace Audex.Application.Integrations.Stock.Moex
                 .Select(row =>
                     new MarketDataRow()
                     {
-                        Ticker = Convert.ToString(row[tickerIndex]),
-                        BoardId = Convert.ToString(row[boardIdIndex]),
-                        LastValue = TryGetDecimalValue(row[lastValueIndex]),
-                        Date = Convert.ToDateTime(row[dateIndex].ToString()),
-                        MarketPrice = TryGetDecimalValue(row[marketPriceIndex]),
-                        Open = TryGetDecimalValue(row[openIndex]),
-                        Low = TryGetDecimalValue(row[lowIndex], 0),
-                        High = TryGetDecimalValue(row[highIndex], 0)
+                        Ticker = row.GetString(tickerIndex),
+                        BoardId = row.GetString(boardIdIndex),
+                        LastValue = row.TryGetDecimal(lastValueIndex),
+                        Date = row.GetDateTime(dateIndex),
+                        MarketPrice = row.TryGetDecimal(marketPriceIndex),
+                        Open = row.TryGetDecimal(openIndex),
+                        Low = row.GetDecimal(lowIndex, 0),
+                        High = row.GetDecimal(highIndex, 0)
                     }
                 )
                 .OrderBy(row => GetBoardPriority(row.BoardId));
-        }
-
-        private static decimal? TryGetDecimalValue(object value)
-        {
-            return value != null
-                ? Convert.ToDecimal(value.ToString(), CultureInfo.InvariantCulture)
-                : null;
-        }
-
-        private static decimal TryGetDecimalValue(object value, decimal defaultValue)
-        {
-            return TryGetDecimalValue(value) ?? defaultValue;
         }
 
         private static IEnumerable<MarketDataRow> ParseAndApplySecuritiesRows(IEnumerable<MarketDataRow> marketDataRows, 
@@ -181,9 +170,9 @@ namespace Audex.Application.Integrations.Stock.Moex
                 .Select(row =>
                     new SecurityRow()
                     {
-                        Ticker = Convert.ToString(row[tickerIndex]),
-                        BoardId = Convert.ToString(row[boardIdIndex]),
-                        PrevPrice = TryGetDecimalValue(row[prevPrice])
+                        Ticker = row.GetString(tickerIndex),
+                        BoardId = row.GetString(boardIdIndex),
+                        PrevPrice = row.TryGetDecimal(prevPrice)
                     }
                 )
                 .OrderBy(row => GetBoardPriority(row.BoardId))
@@ -217,18 +206,7 @@ namespace Audex.Application.Integrations.Stock.Moex
             _ => 100
         };
 
-        private static Dictionary<string, int> GetColumnIndexMapping(IEnumerable<string> columns)
-        {
-            var columnsIndexes = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-            int i = 0;
-            foreach (var col in columns)
-            {
-                columnsIndexes[col] = i++;
-            }
-
-            return columnsIndexes;
-        }
+        private static Dictionary<string, int> GetColumnIndexMapping(IEnumerable<string> columns) => ParsingUtilities.GetColumnIndexMapping(columns);
 
         public async Task<IEnumerable<SecurityCandleDto>> GetCandlesAsync(SecurityDto security, DateOnly from, DateOnly to, int interval = 24)
         {
@@ -262,26 +240,7 @@ namespace Audex.Application.Integrations.Stock.Moex
             return candles;
         }
 
-        private static decimal GetDecimalValue(object[] row, int index, decimal defaultValue = 0m)
-        {
-            return index >= 0 && index < row.Length && row[index] != null
-                ? TryGetDecimalValue(row[index], defaultValue)
-                : defaultValue;
-        }
 
-        private static DateTime GetDateTimeValue(object[] row, int index, DateTime defaultValue = default)
-        {
-            return index >= 0 && index < row.Length && row[index] != null
-                ? Convert.ToDateTime(row[index].ToString(), CultureInfo.InvariantCulture)
-                : defaultValue;
-        }
-
-        private static string GetStringValue(object[] row, int index, string defaultValue = "")
-        {
-            return index >= 0 && index < row.Length && row[index] != null
-                ? Convert.ToString(row[index]) ?? defaultValue
-                : defaultValue;
-        }
 
         private static async Task<List<SecurityCandleDto>> FetchCandlesBatchAsync(string query, HttpClient httpClient)
         {
@@ -299,14 +258,14 @@ namespace Audex.Application.Integrations.Stock.Moex
             }
 
             var columnsIndexes = GetColumnIndexMapping(response.Candles.Columns);
-            int openIdx = columnsIndexes.GetValueOrDefault("open", -1);
-            int closeIdx = columnsIndexes.GetValueOrDefault("close", -1);
-            int highIdx = columnsIndexes.GetValueOrDefault("high", -1);
-            int lowIdx = columnsIndexes.GetValueOrDefault("low", -1);
-            int valueIdx = columnsIndexes.GetValueOrDefault("value", -1);
-            int volumeIdx = columnsIndexes.GetValueOrDefault("volume", -1);
-            int beginIdx = columnsIndexes.GetValueOrDefault("begin", -1);
-            int endIdx = columnsIndexes.GetValueOrDefault("end", -1);
+            int openIndex = columnsIndexes.GetValueOrDefault("open", -1);
+            int closeIndex = columnsIndexes.GetValueOrDefault("close", -1);
+            int highIndex = columnsIndexes.GetValueOrDefault("high", -1);
+            int lowIndex = columnsIndexes.GetValueOrDefault("low", -1);
+            int valueIndex = columnsIndexes.GetValueOrDefault("value", -1);
+            int volumeIndex = columnsIndexes.GetValueOrDefault("volume", -1);
+            int beginIndex = columnsIndexes.GetValueOrDefault("begin", -1);
+            int endIndex = columnsIndexes.GetValueOrDefault("end", -1);
 
             var candles = new List<SecurityCandleDto>();
             foreach (var row in dataList)
@@ -315,14 +274,14 @@ namespace Audex.Application.Integrations.Stock.Moex
 
                 var candle = new SecurityCandleDto
                 {
-                    Open = GetDecimalValue(row, openIdx),
-                    Close = GetDecimalValue(row, closeIdx),
-                    High = GetDecimalValue(row, highIdx),
-                    Low = GetDecimalValue(row, lowIdx),
-                    Value = GetDecimalValue(row, valueIdx),
-                    Volume = GetDecimalValue(row, volumeIdx),
-                    Begin = GetDateTimeValue(row, beginIdx),
-                    End = GetDateTimeValue(row, endIdx)
+                    Open = row.GetDecimal(openIndex),
+                    Close = row.GetDecimal(closeIndex),
+                    High = row.GetDecimal(highIndex),
+                    Low = row.GetDecimal(lowIndex),
+                    Value = row.GetDecimal(valueIndex),
+                    Volume = row.GetDecimal(volumeIndex),
+                    Begin = row.GetDateTime(beginIndex),
+                    End = row.GetDateTime(endIndex)
                 };
 
                 candles.Add(candle);
@@ -364,13 +323,13 @@ namespace Audex.Application.Integrations.Stock.Moex
             }
 
             var columnsIndexes = GetColumnIndexMapping(moexResponse.Securities.Columns);
-            int secIdIdx = columnsIndexes.GetValueOrDefault("secid", -1);
-            int shortNameIdx = columnsIndexes.GetValueOrDefault("shortname", -1);
-            int nameIdx = columnsIndexes.GetValueOrDefault("name", -1);
-            int isinIdx = columnsIndexes.GetValueOrDefault("isin", -1);
-            int isTradedIdx = columnsIndexes.GetValueOrDefault("is_traded", -1);
-            int groupIdx = columnsIndexes.GetValueOrDefault("group", -1);
-            int typeIdx = columnsIndexes.GetValueOrDefault("type", -1);
+            int secIdIndex = columnsIndexes.GetValueOrDefault("secid", -1);
+            int shortNameIndex = columnsIndexes.GetValueOrDefault("shortname", -1);
+            int nameIndex = columnsIndexes.GetValueOrDefault("name", -1);
+            int isinIndex = columnsIndexes.GetValueOrDefault("isin", -1);
+            int isTradedIndex = columnsIndexes.GetValueOrDefault("is_traded", -1);
+            int groupIndex = columnsIndexes.GetValueOrDefault("group", -1);
+            int typeIndex = columnsIndexes.GetValueOrDefault("type", -1);
 
             var rows = moexResponse.Securities.Data.ToList();
             if (rows.Count == 0)
@@ -378,23 +337,23 @@ namespace Audex.Application.Integrations.Stock.Moex
                 return null;
             }
 
-            bool IsTraded(object[] row) => isTradedIdx >= 0 && Convert.ToInt32(row[isTradedIdx]?.ToString() ?? "0") == 1;
-            bool IsSecIdMatch(object[] row) => string.Equals(GetStringValue(row, secIdIdx), query, StringComparison.OrdinalIgnoreCase);
-            bool IsIsinMatch(object[] row) => isinIdx >= 0 && string.Equals(GetStringValue(row, isinIdx), query, StringComparison.OrdinalIgnoreCase);
+            bool IsTraded(object[] row) => row.GetInt32(isTradedIndex) == 1;
+            bool IsSecIdMatch(object[] row) => string.Equals(row.GetString(secIdIndex), query, StringComparison.OrdinalIgnoreCase);
+            bool IsIsinMatch(object[] row) => isinIndex >= 0 && string.Equals(row.GetString(isinIndex), query, StringComparison.OrdinalIgnoreCase);
             bool IsStandard(object[] row) =>
-                IsStandardSecurity(GetStringValue(row, groupIdx), GetStringValue(row, typeIdx));
+                IsStandardSecurity(row.GetString(groupIndex), row.GetString(typeIndex));
 
             int GetMatchScore(object[] row) =>
                 CalculateMatchScore(IsTraded(row), IsSecIdMatch(row), IsIsinMatch(row), IsStandard(row));
 
             var bestRow = rows.MaxBy(GetMatchScore)!;
 
-            string secId = GetStringValue(bestRow, secIdIdx, query.ToUpper());
-            string shortName = GetStringValue(bestRow, shortNameIdx);
-            string fullName = GetStringValue(bestRow, nameIdx, shortName);
-            string? isin = isinIdx >= 0 && bestRow[isinIdx] != null ? Convert.ToString(bestRow[isinIdx]) : null;
-            string group = GetStringValue(bestRow, groupIdx).ToLower();
-            string type = GetStringValue(bestRow, typeIdx).ToLower();
+            string secId = bestRow.GetString(secIdIndex, query.ToUpper());
+            string shortName = bestRow.GetString(shortNameIndex);
+            string fullName = bestRow.GetString(nameIndex, shortName);
+            string? isin = bestRow.TryGetString(isinIndex);
+            string group = bestRow.GetString(groupIndex).ToLower();
+            string type = bestRow.GetString(typeIndex).ToLower();
 
             Guid typeId = DetermineSecurityTypeId(group, type);
 

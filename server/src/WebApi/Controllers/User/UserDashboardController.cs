@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Audex.Application.Constants;
+using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.User;
 using Audex.Infrastructure.Constants;
 using Audex.WebApi.Mappings;
 using Audex.WebApi.Models.User;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Audex.WebApi.Controllers.User
@@ -18,13 +21,16 @@ namespace Audex.WebApi.Controllers.User
     public class UserDashboardController : ControllerBase
     {
         private readonly IUserDashboardService _userDashboardService;
+        private readonly ILocalizationService _localizer;
         private readonly WebApiMapper _mapper;
 
         public UserDashboardController(
             IUserDashboardService userDashboardService,
+            ILocalizationService localizer,
             WebApiMapper mapper)
         {
             _userDashboardService = userDashboardService;
+            _localizer = localizer;
             _mapper = mapper;
         }
 
@@ -61,21 +67,47 @@ namespace Audex.WebApi.Controllers.User
         public async Task<ActionResult<UserDashboardModel>> Create([FromBody] CreateUserDashboardModel model)
         {
             var userId = GetUserId();
-            var createdDashboard = await _userDashboardService.CreateAsync(userId, model.Title, model.LayoutJson);
-            return Ok(_mapper.Map(createdDashboard));
+            try
+            {
+                var createdDashboard = await _userDashboardService.CreateAsync(userId, model.Title, model.LayoutJson);
+                return Ok(_mapper.Map(createdDashboard));
+            }
+            catch (ArgumentException argumentException)
+            {
+                var title = await _localizer.GetForUserAsync(LocalizationKeys.Dashboard.InvalidLayoutTitle, userId);
+                return BadRequest(new ProblemDetails
+                {
+                    Title = title,
+                    Detail = argumentException.Message,
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
         }
 
         [HttpPut("UpdateLayout")]
         public async Task<ActionResult<UserDashboardModel>> UpdateLayout([FromBody] UpdateUserDashboardLayoutModel model)
         {
             var userId = GetUserId();
-            var updatedDashboard = await _userDashboardService.UpdateLayoutAsync(model.Id, userId, model.LayoutJson);
-            if (updatedDashboard == null)
+            try
             {
-                return NotFound();
-            }
+                var updatedDashboard = await _userDashboardService.UpdateLayoutAsync(model.Id, userId, model.LayoutJson);
+                if (updatedDashboard == null)
+                {
+                    return NotFound();
+                }
 
-            return Ok(_mapper.Map(updatedDashboard));
+                return Ok(_mapper.Map(updatedDashboard));
+            }
+            catch (ArgumentException argumentException)
+            {
+                var title = await _localizer.GetForUserAsync(LocalizationKeys.Dashboard.InvalidLayoutTitle, userId);
+                return BadRequest(new ProblemDetails
+                {
+                    Title = title,
+                    Detail = argumentException.Message,
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
         }
 
         [HttpPut("Rename")]
