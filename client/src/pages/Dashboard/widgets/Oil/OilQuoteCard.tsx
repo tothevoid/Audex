@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, HStack, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { LuTrendingUp, LuTrendingDown } from "react-icons/lu";
 import { BsDropletFill } from "react-icons/bs";
+import TrendDiff from "@/shared/components/TrendDiff";
 import { getCurrencySymbol } from "@/shared/utilities/currencyUtils";
 import { OilQuoteEntity } from "@/models/dashboard/widgets/oil/OilWidgetEntity";
 
@@ -13,24 +13,10 @@ interface OilQuoteCardProps {
 export const OilQuoteCard: React.FC<OilQuoteCardProps> = ({ quote }) => {
     const { i18n } = useTranslation();
 
-    const isPositive = quote.change > 0;
-    const isNegative = quote.change < 0;
-
-    const changeColor = isPositive ? "gain" : isNegative ? "loss" : "text_secondary";
-    const TrendIcon = isPositive ? LuTrendingUp : isNegative ? LuTrendingDown : null;
-
-    const formattedPrice = quote.price.toLocaleString("ru-RU", {
+    const formattedPrice = quote.price.toLocaleString(i18n.language, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
-
-    const formattedChange = Math.abs(quote.change).toLocaleString("ru-RU", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-
-    const formattedPercent = Math.abs(quote.changePercent).toFixed(2);
-    const sign = isPositive ? "+" : isNegative ? "−" : "";
 
     const titleText = quote.symbol;
 
@@ -132,12 +118,7 @@ export const OilQuoteCard: React.FC<OilQuoteCardProps> = ({ quote }) => {
             </HStack>
 
             {/* Diff & Trend */}
-            <HStack gap={1} color={changeColor} fontSize="sm" fontWeight="semibold" mt={1.5} justify="center">
-                {TrendIcon && <TrendIcon size={14} />}
-                <Text fontSize="xs" fontWeight="semibold">
-                    {sign}{formattedChange} ({sign}{formattedPercent}%)
-                </Text>
-            </HStack>
+            <TrendDiff change={quote.change} changePercent={quote.changePercent} />
 
             {/* Source & Timestamp Footer */}
             {(quote.source || formattedTime) && (

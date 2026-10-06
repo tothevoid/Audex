@@ -331,5 +331,28 @@ namespace Audex.Application.Tests.Utilities.Dashboard
             Assert.NotNull(settings);
             Assert.Equal(new List<string> { "BRENT" }, settings!.Symbols);
         }
+
+        [Fact]
+        public void ValidateAndParse_WithSecuritiesDailyWidget_ReturnsParsedWidgets()
+        {
+            const string layoutJson = """
+            [
+                {
+                    "id": "securities-daily-1",
+                    "type": "SecuritiesDaily",
+                    "title": "Ценные бумаги",
+                    "refreshIntervalSeconds": 60,
+                    "grid": { "x": 0, "y": 0, "w": 6, "h": 3 },
+                    "settings": {}
+                }
+            ]
+            """;
+
+            var widgets = DashboardLayoutValidator.ValidateAndParse(layoutJson);
+
+            Assert.Single(widgets);
+            Assert.Equal("securities-daily-1", widgets[0].Id);
+            Assert.Equal("SecuritiesDaily", widgets[0].Type);
+        }
     }
 }

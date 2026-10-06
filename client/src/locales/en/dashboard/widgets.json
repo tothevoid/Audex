@@ -32,5 +32,9 @@
     "widget_save_settings": "Save",
     "widget_oil_title": "Oil",
     "widget_oil_desc": "Live quotes for crude oil futures.",
-    "widget_oil_select_symbols": "Displayed Benchmarks"
+    "widget_oil_select_symbols": "Displayed Benchmarks",
+
+    "widget_securities_daily_title": "Daily Securities",
+    "widget_securities_daily_desc": "Daily performance and dynamics of portfolio securities",
+    "widget_securities_daily_empty": "No securities in portfolio"
 }

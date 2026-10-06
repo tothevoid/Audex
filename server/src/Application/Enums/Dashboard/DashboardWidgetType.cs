@@ -5,6 +5,7 @@ namespace Audex.Application.Enums.Dashboard
         Oil = 1,
         CurrencyRates = 2,
         Indices = 3,
-        Watchlist = 4
+        Watchlist = 4,
+        SecuritiesDaily = 5
     }
 }

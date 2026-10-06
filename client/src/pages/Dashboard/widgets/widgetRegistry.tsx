@@ -2,9 +2,11 @@ import React from "react";
 import { DashboardWidgetType, WidgetType } from "@/models/dashboard/WidgetEntity";
 import { WidgetDescriptor, WidgetTemplateInfo } from "./types";
 import { oilWidgetDescriptor } from "./Oil";
+import { securitiesDailyWidgetDescriptor } from "./SecuritiesDaily";
 
 const activeDescriptors: Record<WidgetType, WidgetDescriptor<any>> = {
-    [DashboardWidgetType.Oil]: oilWidgetDescriptor
+    [DashboardWidgetType.Oil]: oilWidgetDescriptor,
+    [DashboardWidgetType.SecuritiesDaily]: securitiesDailyWidgetDescriptor
 };
 
 export const getWidgetDescriptor = (type: WidgetType): WidgetDescriptor<any> | undefined => {

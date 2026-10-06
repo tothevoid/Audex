@@ -32,5 +32,9 @@
     "widget_save_settings": "Сохранить",
     "widget_oil_title": "Нефть",
     "widget_oil_desc": "Котировки фьючерсов на нефть",
-    "widget_oil_select_symbols": "Отображаемые сорта нефти"
+    "widget_oil_select_symbols": "Отображаемые сорта нефти",
+
+    "widget_securities_daily_title": "Ценные бумаги за день",
+    "widget_securities_daily_desc": "Суточная динамика ценных бумаг в портфеле",
+    "widget_securities_daily_empty": "В портфеле нет ценных бумаг"
 }
