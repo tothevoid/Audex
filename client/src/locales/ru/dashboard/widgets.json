@@ -36,5 +36,9 @@
 
     "widget_securities_daily_title": "Ценные бумаги за день",
     "widget_securities_daily_desc": "Суточная динамика ценных бумаг в портфеле",
-    "widget_securities_daily_empty": "В портфеле нет ценных бумаг"
+    "widget_securities_daily_empty": "В портфеле нет ценных бумаг",
+
+    "widget_currency_rates_title": "Курсы валют",
+    "widget_currency_rates_desc": "Актуальные курсы валют относительно основной валюты",
+    "widget_currency_rates_empty": "Нет доступных валют для отображения"
 }

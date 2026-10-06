@@ -1,5 +1,6 @@
 export enum DashboardWidgetType {
     Oil = 'Oil',
+    CurrencyRates = 'CurrencyRates',
     SecuritiesDaily = 'SecuritiesDaily'
 }
 

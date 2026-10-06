@@ -36,5 +36,9 @@
 
     "widget_securities_daily_title": "Daily Securities",
     "widget_securities_daily_desc": "Daily performance and dynamics of portfolio securities",
-    "widget_securities_daily_empty": "No securities in portfolio"
+    "widget_securities_daily_empty": "No securities in portfolio",
+
+    "widget_currency_rates_title": "Currency Rates",
+    "widget_currency_rates_desc": "Current exchange rates relative to main currency",
+    "widget_currency_rates_empty": "No available currencies to display"
 }

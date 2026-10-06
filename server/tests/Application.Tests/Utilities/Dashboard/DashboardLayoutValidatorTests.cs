@@ -354,5 +354,28 @@ namespace Audex.Application.Tests.Utilities.Dashboard
             Assert.Equal("securities-daily-1", widgets[0].Id);
             Assert.Equal("SecuritiesDaily", widgets[0].Type);
         }
+
+        [Fact]
+        public void ValidateAndParse_WithCurrencyRatesWidget_ReturnsParsedWidgets()
+        {
+            var layoutJson = """
+            [
+                {
+                    "id": "currency-rates-1",
+                    "type": "CurrencyRates",
+                    "title": "Курсы валют",
+                    "refreshIntervalSeconds": 300,
+                    "grid": { "x": 0, "y": 0, "w": 6, "h": 3 },
+                    "settings": {}
+                }
+            ]
+            """;
+
+            var widgets = DashboardLayoutValidator.ValidateAndParse(layoutJson);
+
+            Assert.Single(widgets);
+            Assert.Equal("currency-rates-1", widgets[0].Id);
+            Assert.Equal("CurrencyRates", widgets[0].Type);
+        }
     }
 }
