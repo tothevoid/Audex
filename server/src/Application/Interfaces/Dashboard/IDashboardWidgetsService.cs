@@ -10,5 +10,9 @@ namespace Audex.Application.Interfaces.Dashboard
         Task<OilWidgetDto> GetOilWidgetAsync(Guid userId, OilWidgetRequestDto request);
 
         Task<IReadOnlyList<string>> GetSupportedOilSymbolsAsync();
+
+        Task<IndicesWidgetDto> GetIndicesWidgetAsync(Guid userId, IndicesWidgetRequestDto request);
+
+        Task<IReadOnlyList<string>> GetSupportedIndicesAsync();
     }
 }

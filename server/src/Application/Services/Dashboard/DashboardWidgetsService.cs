@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Dashboard.Widgets;
 using Audex.Application.Interfaces.Dashboard;
+using Audex.Application.Interfaces.Integrations.Indices;
 using Audex.Application.Interfaces.Integrations.Oil;
 using Audex.Application.Utilities.Dashboard;
 using Audex.Infrastructure.Entities.User;
@@ -16,13 +17,16 @@ namespace Audex.Application.Services.Dashboard
     {
         private readonly IRepository<UserDashboard> _userDashboardRepository;
         private readonly IOilConnector _oilConnector;
+        private readonly IIndicesConnector _indicesConnector;
 
         public DashboardWidgetsService(
             IUnitOfWork unitOfWork,
-            IOilConnector oilConnector)
+            IOilConnector oilConnector,
+            IIndicesConnector indicesConnector)
         {
             _userDashboardRepository = unitOfWork.CreateRepository<UserDashboard>();
             _oilConnector = oilConnector;
+            _indicesConnector = indicesConnector;
         }
 
         public async Task<OilWidgetDto> GetOilWidgetAsync(Guid userId, OilWidgetRequestDto request)
@@ -42,6 +46,25 @@ namespace Audex.Application.Services.Dashboard
         public Task<IReadOnlyList<string>> GetSupportedOilSymbolsAsync()
         {
             return _oilConnector.GetSupportedSymbolsAsync();
+        }
+
+        public async Task<IndicesWidgetDto> GetIndicesWidgetAsync(Guid userId, IndicesWidgetRequestDto request)
+        {
+            var targetCodes = request.Codes.Count > 0
+                ? request.Codes
+                : (await GetWidgetSettingsAsync<IndicesWidgetSettingsDto>(userId, request.DashboardId, request.WidgetId))?.Codes;
+
+            var quotes = (await _indicesConnector.GetIndicesQuotesAsync(targetCodes)).ToList();
+
+            return new IndicesWidgetDto
+            {
+                Indices = quotes
+            };
+        }
+
+        public Task<IReadOnlyList<string>> GetSupportedIndicesAsync()
+        {
+            return _indicesConnector.GetSupportedIndicesAsync();
         }
 
         private async Task<TSettings?> GetWidgetSettingsAsync<TSettings>(Guid userId, Guid dashboardId, string widgetId)

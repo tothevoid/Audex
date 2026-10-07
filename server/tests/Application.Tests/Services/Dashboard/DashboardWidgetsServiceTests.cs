@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Dashboard.Widgets;
 using Audex.Application.Interfaces.Dashboard;
+using Audex.Application.Interfaces.Integrations.Indices;
 using Audex.Application.Interfaces.Integrations.Oil;
 using Audex.Application.Interfaces.User;
 using Audex.Application.Tests.Fixtures;
@@ -198,6 +199,72 @@ namespace Audex.Application.Tests.Services.Dashboard
             Assert.Equal(2, result.Count);
             Assert.Contains("BRENT", result);
             Assert.Contains("WTI", result);
+        }
+
+        [Fact]
+        public async Task TestGetIndicesWidget_WithExplicitCodes_ReturnsRequestedIndices()
+        {
+            var userId = UserProfileConstants.UserProfileId;
+            var dashboardId = Guid.NewGuid();
+            var widgetId = "indices-widget-1";
+
+            var result = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var mockConnector = (MockIndicesConnector)serviceProvider.GetRequiredService<IIndicesConnector>();
+                mockConnector.GetIndicesQuotesHandler = codes =>
+                {
+                    var requestedList = (codes != null && codes.Any()) ? codes.ToList() : new List<string> { "IMOEX", "RTSI" };
+                    return Task.FromResult<IEnumerable<MarketIndexQuoteDto>>(
+                        requestedList.Select(code => new MarketIndexQuoteDto
+                        {
+                            Code = code,
+                            Name = code,
+                            ShortName = code,
+                            Value = 2500.50m,
+                            ChangePoints = 15.20m,
+                            ChangePercent = 0.61m,
+                            Currency = "RUB",
+                            Source = "MOEX",
+                            LastUpdateTime = DateTime.UtcNow
+                        })
+                    );
+                };
+
+                var widgetsService = serviceProvider.GetRequiredService<IDashboardWidgetsService>();
+                var request = new IndicesWidgetRequestDto
+                {
+                    DashboardId = dashboardId,
+                    WidgetId = widgetId,
+                    Codes = new List<string> { "IMOEX" }
+                };
+                return await widgetsService.GetIndicesWidgetAsync(userId, request);
+            });
+
+            Assert.NotNull(result);
+            Assert.Single(result.Indices);
+            Assert.Equal("IMOEX", result.Indices[0].Code);
+            Assert.Equal(2500.50m, result.Indices[0].Value);
+        }
+
+        [Fact]
+        public async Task TestGetSupportedIndicesAsync_ReturnsCodesFromConnector()
+        {
+            var result = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var mockConnector = (MockIndicesConnector)serviceProvider.GetRequiredService<IIndicesConnector>();
+                mockConnector.GetSupportedIndicesHandler = () =>
+                    Task.FromResult<IReadOnlyList<string>>(new List<string> { "IMOEX", "RTSI", "RGBI", "MCFTR" });
+
+                var widgetsService = serviceProvider.GetRequiredService<IDashboardWidgetsService>();
+                return await widgetsService.GetSupportedIndicesAsync();
+            });
+
+            Assert.NotNull(result);
+            Assert.Equal(4, result.Count);
+            Assert.Contains("IMOEX", result);
+            Assert.Contains("RTSI", result);
+            Assert.Contains("RGBI", result);
+            Assert.Contains("MCFTR", result);
         }
     }
 }

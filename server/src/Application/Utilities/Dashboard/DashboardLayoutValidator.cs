@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using Audex.Application.DTO.Dashboard.Widgets;
 using Audex.Application.Enums.Dashboard;
+using Audex.Application.Integrations.Indices.Moex;
 using Audex.Application.Services.Dashboard.Widgets.Oil;
 
 namespace Audex.Application.Utilities.Dashboard
@@ -115,33 +116,61 @@ namespace Audex.Application.Utilities.Dashboard
                 case DashboardWidgetType.Oil:
                     ValidateOilWidgetSettings(widget);
                     break;
+                case DashboardWidgetType.Indices:
+                    ValidateIndicesWidgetSettings(widget);
+                    break;
             }
         }
 
         private static void ValidateOilWidgetSettings(DashboardWidgetDto widget)
         {
+            ValidateSelectionWidgetSettings<OilWidgetSettingsDto>(
+                widget,
+                itemsSelector: settings => settings.Symbols,
+                isSupportedPredicate: symbol => OilQuotationService.BenchmarkDefinitions.ContainsKey(symbol));
+        }
+
+        private static void ValidateIndicesWidgetSettings(DashboardWidgetDto widget)
+        {
+            var supportedIndexCodes = new HashSet<string>(MoexIndicesConnector.SupportedIndexCodes, StringComparer.OrdinalIgnoreCase);
+
+            ValidateSelectionWidgetSettings<IndicesWidgetSettingsDto>(
+                widget,
+                itemsSelector: settings => settings.Codes,
+                isSupportedPredicate: code => supportedIndexCodes.Contains(code));
+        }
+
+        private static void ValidateSelectionWidgetSettings<TSettings>(
+            DashboardWidgetDto widget,
+            Func<TSettings, IEnumerable<string>?> itemsSelector,
+            Func<string, bool> isSupportedPredicate)
+            where TSettings : class
+        {
             try
             {
-                var settings = widget.Settings.Deserialize<OilWidgetSettingsDto>(SerializerOptions);
-                if (settings?.Symbols == null || settings.Symbols.Count == 0)
+                var settings = widget.Settings.Deserialize<TSettings>(SerializerOptions);
+                var items = settings != null ? itemsSelector(settings) : null;
+                if (items == null)
                 {
                     return;
                 }
 
-                var unsupportedSymbols = settings.Symbols
-                    .Where(symbol => !OilQuotationService.BenchmarkDefinitions.ContainsKey(symbol.Trim()))
+                var unsupportedItems = items
+                    .Where(item => !string.IsNullOrWhiteSpace(item))
+                    .Select(item => item.Trim())
+                    .Where(item => !isSupportedPredicate(item))
                     .ToList();
 
-                if (unsupportedSymbols.Count > 0)
+                if (unsupportedItems.Count > 0)
                 {
                     throw new ArgumentException(
-                        $"Widget with id '{widget.Id}' contains unsupported oil symbols: {string.Join(", ", unsupportedSymbols)}.");
+                        $"Widget with id '{widget.Id}' contains unsupported {widget.Type} items: {string.Join(", ", unsupportedItems)}.");
                 }
             }
             catch (JsonException jsonException)
             {
                 throw new ArgumentException(
-                    $"Widget with id '{widget.Id}' has malformed Oil settings.", jsonException);
+                    $"Widget with id '{widget.Id}' has malformed {widget.Type} settings.", jsonException);
             }
         }
     }

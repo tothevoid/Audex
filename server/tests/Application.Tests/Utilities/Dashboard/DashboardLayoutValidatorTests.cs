@@ -229,7 +229,7 @@ namespace Audex.Application.Tests.Utilities.Dashboard
             var exception = Assert.Throws<ArgumentException>(() =>
                 DashboardLayoutValidator.ValidateAndParse(unsupportedSymbolJson));
 
-            Assert.Contains("unsupported oil symbols", exception.Message);
+            Assert.Contains("unsupported Oil items", exception.Message);
         }
 
         [Fact]
@@ -376,6 +376,55 @@ namespace Audex.Application.Tests.Utilities.Dashboard
             Assert.Single(widgets);
             Assert.Equal("currency-rates-1", widgets[0].Id);
             Assert.Equal("CurrencyRates", widgets[0].Type);
+        }
+
+        [Fact]
+        public void ValidateAndParse_WithIndicesWidget_ValidSettings_ReturnsParsedWidgets()
+        {
+            const string layoutJson = """
+            [
+                {
+                    "id": "indices-1",
+                    "type": "Indices",
+                    "title": "Биржевые индексы",
+                    "refreshIntervalSeconds": 60,
+                    "grid": { "x": 0, "y": 0, "w": 6, "h": 3 },
+                    "settings": {
+                        "codes": ["IMOEX", "RTSI", "RGBI"]
+                    }
+                }
+            ]
+            """;
+
+            var widgets = DashboardLayoutValidator.ValidateAndParse(layoutJson);
+
+            Assert.Single(widgets);
+            Assert.Equal("indices-1", widgets[0].Id);
+            Assert.Equal("Indices", widgets[0].Type);
+        }
+
+        [Fact]
+        public void ValidateAndParse_WithIndicesWidget_UnsupportedCodes_ThrowsArgumentException()
+        {
+            const string layoutJson = """
+            [
+                {
+                    "id": "indices-1",
+                    "type": "Indices",
+                    "title": "Биржевые индексы",
+                    "refreshIntervalSeconds": 60,
+                    "grid": { "x": 0, "y": 0, "w": 6, "h": 3 },
+                    "settings": {
+                        "codes": ["SP500_UNKNOWN"]
+                    }
+                }
+            ]
+            """;
+
+            var exception = Assert.Throws<ArgumentException>(() =>
+                DashboardLayoutValidator.ValidateAndParse(layoutJson));
+
+            Assert.Contains("unsupported Indices items", exception.Message);
         }
     }
 }

@@ -16,8 +16,10 @@ using Audex.Application.Interfaces.Deposits;
 using Audex.Application.Interfaces.FileStorage;
 using Audex.Application.Interfaces.Integrations.Crypto;
 using Audex.Application.Interfaces.Integrations.Currency;
+using Audex.Application.Interfaces.Integrations.Indices;
 using Audex.Application.Interfaces.Integrations.Oil;
 using Audex.Application.Interfaces.Integrations.Stock;
+using Audex.Application.Integrations.Indices.Moex;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Notifications;
 using Audex.Application.Interfaces.Reports;
@@ -123,6 +125,8 @@ namespace Audex.Application.Extensions
             services.AddTransient<IMoexOilConnector, MoexOilConnector>();
             services.AddTransient<IYahooOilConnector, YahooOilConnector>();
             services.AddTransient<IOilConnector, OilQuotationService>();
+            services.AddTransient<IMoexIndicesConnector, MoexIndicesConnector>();
+            services.AddTransient<IIndicesConnector, MoexIndicesConnector>();
             services.AddTransient<ICurrencyGrabber, CbrCurrencyGrabber>();
             services.AddTransient<ICryptoConnector, CoinGeckoConnector>();
 

@@ -10,6 +10,7 @@ using Audex.Infrastructure.Interfaces.Database;
 using Audex.Infrastructure.Extensions;
 using Audex.Infrastructure.Interfaces.Messages;
 using Audex.Application.Interfaces.Integrations.Crypto;
+using Audex.Application.Interfaces.Integrations.Indices;
 using Audex.Application.Interfaces.Integrations.Oil;
 using Audex.Application.Interfaces.Integrations.Stock;
 using Audex.Infrastructure.Interfaces.DatabaseBackup;
@@ -66,6 +67,7 @@ namespace Audex.Tests.Shared.Fixtures
             services.AddScoped<ICryptoConnector, TestCryptoConnector>();
             services.AddSingleton<IStockConnector, MockStockConnector>();
             services.AddSingleton<IOilConnector, MockOilConnector>();
+            services.AddSingleton<IIndicesConnector, MockIndicesConnector>();
 
             services.AddMinio(configureClient => configureClient
                 .WithEndpoint(MinioEndpoint)

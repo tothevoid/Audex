@@ -39,6 +39,21 @@ namespace Audex.WebApi.Controllers.Dashboard
             return Ok(symbols);
         }
 
+        [HttpPost("GetIndices")]
+        public async Task<ActionResult<IndicesWidgetDto>> GetIndicesAsync([FromBody] IndicesWidgetRequestDto request)
+        {
+            var userId = GetUserId();
+            var widgetData = await _dashboardWidgetsService.GetIndicesWidgetAsync(userId, request);
+            return Ok(widgetData);
+        }
+
+        [HttpGet("GetSupportedIndices")]
+        public async Task<ActionResult<IReadOnlyList<string>>> GetSupportedIndicesAsync()
+        {
+            var indices = await _dashboardWidgetsService.GetSupportedIndicesAsync();
+            return Ok(indices);
+        }
+
         private Guid GetUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
