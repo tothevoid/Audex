@@ -4,11 +4,13 @@ import { WidgetDescriptor, WidgetTemplateInfo } from "./types";
 import { oilWidgetDescriptor } from "./Oil";
 import { securitiesDailyWidgetDescriptor } from "./SecuritiesDaily";
 import { currencyRatesWidgetDescriptor } from "./CurrencyRates";
+import { indicesWidgetDescriptor } from "./Indices";
 
 const activeDescriptors: Record<WidgetType, WidgetDescriptor<any>> = {
     [DashboardWidgetType.Oil]: oilWidgetDescriptor,
     [DashboardWidgetType.SecuritiesDaily]: securitiesDailyWidgetDescriptor,
-    [DashboardWidgetType.CurrencyRates]: currencyRatesWidgetDescriptor
+    [DashboardWidgetType.CurrencyRates]: currencyRatesWidgetDescriptor,
+    [DashboardWidgetType.Indices]: indicesWidgetDescriptor
 };
 
 export const getWidgetDescriptor = (type: WidgetType): WidgetDescriptor<any> | undefined => {

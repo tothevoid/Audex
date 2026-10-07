@@ -40,5 +40,10 @@
 
     "widget_currency_rates_title": "Курсы валют",
     "widget_currency_rates_desc": "Актуальные курсы валют относительно основной валюты",
-    "widget_currency_rates_empty": "Нет доступных валют для отображения"
+    "widget_currency_rates_empty": "Нет доступных валют для отображения",
+
+    "widget_indices_title": "Биржевые индексы",
+    "widget_indices_desc": "Котировки ключевых биржевых индексов",
+    "widget_indices_select_codes": "Отображаемые индексы",
+    "widget_indices_empty": "Нет доступных индексов для отображения"
 }

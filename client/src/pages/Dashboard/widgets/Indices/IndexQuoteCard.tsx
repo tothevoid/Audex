@@ -1,29 +1,25 @@
 import React from "react";
 import { Box, HStack, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { BsDropletFill } from "react-icons/bs";
+import { LuTrendingUp } from "react-icons/lu";
 import TrendDiff from "@/shared/components/TrendDiff";
 import { getCurrencySymbol } from "@/shared/utilities/currencyUtils";
+import { formatAdaptiveNumber } from "@/shared/utilities/formatters/moneyFormatter";
 import { formatAdaptiveDateTime } from "@/shared/utilities/formatters/dateFormatter";
-import { OilQuoteEntity } from "@/models/dashboard/widgets/oil/OilWidgetEntity";
+import { MarketIndexQuoteEntity } from "@/models/dashboard/widgets/indices/IndicesWidgetEntity";
 
-interface OilQuoteCardProps {
-    quote: OilQuoteEntity;
+interface IndexQuoteCardProps {
+    quote: MarketIndexQuoteEntity;
 }
 
-export const OilQuoteCard: React.FC<OilQuoteCardProps> = ({ quote }) => {
+export const IndexQuoteCard: React.FC<IndexQuoteCardProps> = ({ quote }) => {
     const { i18n } = useTranslation();
 
-    const formattedPrice = quote.price.toLocaleString(i18n.language, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-
-    const titleText = quote.symbol;
+    const formattedValue = formatAdaptiveNumber(quote.value, i18n.language, quote.decimals);
 
     const currencySymbol = getCurrencySymbol(quote.currency, i18n.language);
 
-    const formattedTime = formatAdaptiveDateTime(quote.lastTradeTime, i18n);
+    const formattedTime = formatAdaptiveDateTime(quote.lastUpdateTime, i18n);
 
     return (
         <Box
@@ -45,10 +41,10 @@ export const OilQuoteCard: React.FC<OilQuoteCardProps> = ({ quote }) => {
                 boxShadow: "sm"
             }}
         >
-            {/* Centered Droplet Icon */}
+            {/* Centered Index Icon */}
             <Box
-                w={14}
-                h={14}
+                w={12}
+                h={12}
                 borderRadius="full"
                 backgroundColor="background_primary"
                 borderWidth="1px"
@@ -57,26 +53,43 @@ export const OilQuoteCard: React.FC<OilQuoteCardProps> = ({ quote }) => {
                 alignItems="center"
                 justifyContent="center"
                 color="action_primary"
-                fontSize="1.8rem"
+                fontSize="1.5rem"
                 mb={2}
                 boxShadow="xs"
             >
-                <BsDropletFill />
+                <LuTrendingUp />
             </Box>
 
-            {/* Asset Name in Bold Caps (BRENT / WTI) */}
+
+            {/* Index Code (IMOEX / RTSI / RGBI / MCFTR) */}
             <Text
                 fontWeight="extrabold"
                 fontSize="sm"
                 letterSpacing="widest"
                 color="text_secondary"
                 lineHeight="1.2"
-                mb={1}
+                mb={0.5}
             >
-                {titleText}
+                {quote.code}
             </Text>
 
-            {/* Main Price (e.g. 102,60 $) */}
+            {/* Human-readable Name */}
+            <Text
+                fontSize="2xs"
+                color="text_secondary"
+                opacity={0.8}
+                lineHeight="1.2"
+                mb={1.5}
+                maxW="180px"
+                whiteSpace="nowrap"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                title={quote.shortName || quote.name}
+            >
+                {quote.shortName || quote.name}
+            </Text>
+
+            {/* Main Value */}
             <HStack gap={1.5} align="baseline" justify="center">
                 <Text
                     fontSize="3xl"
@@ -85,15 +98,17 @@ export const OilQuoteCard: React.FC<OilQuoteCardProps> = ({ quote }) => {
                     letterSpacing="tight"
                     lineHeight="1.1"
                 >
-                    {formattedPrice}
+                    {formattedValue}
                 </Text>
-                <Text fontSize="md" color="text_secondary" fontWeight="bold">
-                    {currencySymbol}
-                </Text>
+                {currencySymbol && (
+                    <Text fontSize="md" color="text_secondary" fontWeight="bold">
+                        {currencySymbol}
+                    </Text>
+                )}
             </HStack>
 
             {/* Diff & Trend */}
-            <TrendDiff change={quote.change} changePercent={quote.changePercent} />
+            <TrendDiff change={quote.changePoints} changePercent={quote.changePercent} />
 
             {/* Source & Timestamp Footer */}
             {(quote.source || formattedTime) && (

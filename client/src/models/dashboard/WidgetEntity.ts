@@ -1,7 +1,8 @@
 export enum DashboardWidgetType {
     Oil = 'Oil',
     CurrencyRates = 'CurrencyRates',
-    SecuritiesDaily = 'SecuritiesDaily'
+    SecuritiesDaily = 'SecuritiesDaily',
+    Indices = 'Indices'
 }
 
 export type WidgetType = keyof typeof DashboardWidgetType;

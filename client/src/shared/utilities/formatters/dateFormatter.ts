@@ -89,3 +89,23 @@ export const formatChartTooltipDate = (date: Date, period: ChartPeriod, format: 
 	}
 	return formatDate(date, format);
 };
+
+export const formatAdaptiveDateTime = (date: Date | null | undefined, format: i18n): string => {
+	if (!date || isNaN(date.getTime()) || date.getFullYear() <= 1970) {
+		return "";
+	}
+
+	const now = new Date();
+	const isToday =
+		date.getDate() === now.getDate() &&
+		date.getMonth() === now.getMonth() &&
+		date.getFullYear() === now.getFullYear();
+
+	if (isToday) {
+		return formatTime(date, format);
+	}
+
+	return formatShortDateTime(date, format, false);
+};
+
+export const formatQuoteTime = formatAdaptiveDateTime;

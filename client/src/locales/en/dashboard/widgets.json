@@ -40,5 +40,10 @@
 
     "widget_currency_rates_title": "Currency Rates",
     "widget_currency_rates_desc": "Current exchange rates relative to main currency",
-    "widget_currency_rates_empty": "No available currencies to display"
+    "widget_currency_rates_empty": "No available currencies to display",
+
+    "widget_indices_title": "Market Indices",
+    "widget_indices_desc": "Live quotes for key market indices",
+    "widget_indices_select_codes": "Displayed Indices",
+    "widget_indices_empty": "No available indices to display"
 }

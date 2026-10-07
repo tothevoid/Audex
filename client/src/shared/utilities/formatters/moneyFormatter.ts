@@ -32,3 +32,30 @@ export const formatMoneyByCurrencyCulture = (value: number, currency: Nullable<s
 		minimumFractionDigits: digits,
 	}).format(value);
 };
+
+/**
+ * Форматирует число: если >= 100 — выводит 1-2 знака, если меньше 100 — оставляет как есть.
+ */
+export const formatAdaptiveNumber = (
+	value: number,
+	locale: string,
+	decimals?: number
+): string => {
+	if (!Number.isFinite(value)) {
+		return "0";
+	}
+
+	if (Math.abs(value) >= 100) {
+		return value.toLocaleString(locale, {
+			minimumFractionDigits: 1,
+			maximumFractionDigits: 2
+		});
+	}
+
+	return decimals !== undefined
+		? value.toLocaleString(locale, {
+			minimumFractionDigits: decimals,
+			maximumFractionDigits: decimals
+		})
+		: value.toLocaleString(locale);
+};
