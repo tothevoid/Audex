@@ -52,14 +52,14 @@ export const WidgetHeader: React.FC<WidgetHeaderProps> = ({
             cursor={isEditMode ? "grab" : "default"}
             userSelect="none"
         >
-            <HStack gap={2} align="center" overflow="hidden">
+            <HStack gap={2} align="center" overflow="hidden" flex="1" minW="0">
                 {isEditMode && (
-                    <Icon color="text_secondary" fontSize="1.1rem" cursor="grab">
+                    <Icon color="text_secondary" fontSize="1.1rem" cursor="grab" flexShrink={0}>
                         <MdDragIndicator />
                     </Icon>
                 )}
                 {icon && (
-                    <Box display="flex" alignItems="center" color="action_primary">
+                    <Box display="flex" alignItems="center" color="action_primary" flexShrink={0}>
                         {icon}
                     </Box>
                 )}
@@ -68,14 +68,14 @@ export const WidgetHeader: React.FC<WidgetHeaderProps> = ({
                     fontSize="sm"
                     color="text_primary"
                     truncate
-                    maxW="180px"
+                    minW="0"
                     title={widget.title}
                 >
                     {widget.title}
                 </Text>
             </HStack>
 
-            <HStack gap={1} align="center">
+            <HStack gap={1} align="center" flexShrink={0}>
                 <Badge
                     variant="subtle"
                     size="sm"

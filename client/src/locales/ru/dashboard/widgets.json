@@ -1,5 +1,4 @@
 {
-    "header_widgets_dashboard": "Дашборд",
     "dashboard_edit_mode": "Режим редактирования",
     "dashboard_view_mode": "Готово",
     "dashboard_add_widget": "Добавить виджет",
@@ -30,6 +29,7 @@
     "widget_remove": "Удалить виджет",
     "widget_settings": "Настройки виджета",
     "widget_save_settings": "Сохранить",
+    "widget_total_label": "Всего",
     "widget_oil_title": "Нефть",
     "widget_oil_desc": "Котировки фьючерсов на нефть",
     "widget_oil_select_symbols": "Отображаемые сорта нефти",
@@ -45,5 +45,38 @@
     "widget_indices_title": "Биржевые индексы",
     "widget_indices_desc": "Котировки ключевых биржевых индексов",
     "widget_indices_select_codes": "Отображаемые индексы",
-    "widget_indices_empty": "Нет доступных индексов для отображения"
+    "widget_indices_empty": "Нет доступных индексов для отображения",
+
+    "widget_total_balance_title": "Общий капитал",
+    "widget_total_balance_desc": "Совокупный капитал и распределение по классам активов",
+
+    "widget_cash_title": "Наличные",
+    "widget_cash_desc": "Распределение наличных средств по валютам и кошелькам",
+
+    "widget_bank_accounts_title": "Банковские счета",
+    "widget_bank_accounts_desc": "Распределение средств на банковских счетах и картах",
+
+    "widget_securities_title": "Ценные бумаги",
+    "widget_securities_desc": "Распределение активов по брокерским счетам",
+
+    "widget_deposits_title": "Депозиты",
+    "widget_deposits_desc": "Распределение средств по открытым банковским вкладам",
+
+    "widget_deposit_incomes_title": "Доходы по депозитам",
+    "widget_deposit_incomes_desc": "Начисленный доход по банковским вкладам",
+
+    "widget_debts_title": "Долги",
+    "widget_debts_desc": "Распределение задолженностей по должникам",
+
+    "widget_crypto_title": "Криптовалюты",
+    "widget_crypto_desc": "Распределение средств по криптовалютным счетам",
+
+    "widget_banks_title": "Распределение по банкам",
+    "widget_banks_desc": "Совокупное распределение капитала в разрезе банков",
+
+    "widget_spents_title": "Расходы за месяц",
+    "widget_spents_desc": "Сумма и распределение расходов за текущий месяц по категориям",
+
+    "widget_incomes_title": "Доходы за месяц",
+    "widget_incomes_desc": "Сумма и распределение доходов за текущий месяц по категориям"
 }

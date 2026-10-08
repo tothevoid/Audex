@@ -63,7 +63,8 @@ export const AddWidgetModal = forwardRef<BaseModalRef, AddWidgetModalProps>(({
                         </Text>
                     </Box>
                 ) : (
-                    <SimpleGrid columns={{ base: 1, sm: 2 }} gap={3} mt={2}>
+                    <Box maxH="65vh" overflowY="auto" pr={1}>
+                        <SimpleGrid columns={{ base: 1, sm: 2 }} gap={3} mt={2}>
                         {widgetTemplates.map(template => (
                             <Card.Root
                                 key={template.type}
@@ -98,6 +99,7 @@ export const AddWidgetModal = forwardRef<BaseModalRef, AddWidgetModalProps>(({
                             </Card.Root>
                         ))}
                     </SimpleGrid>
+                </Box>
                 )}
             </Stack>
         </BaseModal>

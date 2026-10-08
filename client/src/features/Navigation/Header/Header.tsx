@@ -123,7 +123,6 @@ const Header = () => {
     };
 
     const navItems: NavItem[] = [
-        { type: 'link', path: "/dashboard", title: t("header_widgets_dashboard") },
         { type: 'link', path: "/accounts", title: t("header_accounts") },
         { type: 'link', path: "/transactions", title: t("header_transactions") },
         { type: 'link', path: "/deposits", title: t("header_deposits") },

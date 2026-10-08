@@ -2,7 +2,18 @@ export enum DashboardWidgetType {
     Oil = 'Oil',
     CurrencyRates = 'CurrencyRates',
     SecuritiesDaily = 'SecuritiesDaily',
-    Indices = 'Indices'
+    Indices = 'Indices',
+    TotalBalance = 'TotalBalance',
+    CashDistribution = 'CashDistribution',
+    BankAccountsDistribution = 'BankAccountsDistribution',
+    SecuritiesDistribution = 'SecuritiesDistribution',
+    DepositsDistribution = 'DepositsDistribution',
+    DepositIncomesDistribution = 'DepositIncomesDistribution',
+    DebtsDistribution = 'DebtsDistribution',
+    CryptoDistribution = 'CryptoDistribution',
+    BanksDistribution = 'BanksDistribution',
+    SpentsDistribution = 'SpentsDistribution',
+    IncomesDistribution = 'IncomesDistribution'
 }
 
 export type WidgetType = keyof typeof DashboardWidgetType;

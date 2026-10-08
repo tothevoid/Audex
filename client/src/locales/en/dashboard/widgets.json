@@ -1,5 +1,4 @@
 {
-    "header_widgets_dashboard": "Dashboard",
     "dashboard_edit_mode": "Edit Mode",
     "dashboard_view_mode": "Done",
     "dashboard_add_widget": "Add Widget",
@@ -30,6 +29,7 @@
     "widget_remove": "Remove widget",
     "widget_settings": "Widget Settings",
     "widget_save_settings": "Save",
+    "widget_total_label": "Total",
     "widget_oil_title": "Oil",
     "widget_oil_desc": "Live quotes for crude oil futures.",
     "widget_oil_select_symbols": "Displayed Benchmarks",
@@ -45,5 +45,38 @@
     "widget_indices_title": "Market Indices",
     "widget_indices_desc": "Live quotes for key market indices",
     "widget_indices_select_codes": "Displayed Indices",
-    "widget_indices_empty": "No available indices to display"
+    "widget_indices_empty": "No available indices to display",
+
+    "widget_total_balance_title": "Total Net Worth",
+    "widget_total_balance_desc": "Total capital and asset class allocation",
+
+    "widget_cash_title": "Cash",
+    "widget_cash_desc": "Cash distribution by currencies and wallets",
+
+    "widget_bank_accounts_title": "Bank Accounts",
+    "widget_bank_accounts_desc": "Bank accounts and debit/credit cards allocation",
+
+    "widget_securities_title": "Securities",
+    "widget_securities_desc": "Brokerage accounts and securities allocation",
+
+    "widget_deposits_title": "Deposits",
+    "widget_deposits_desc": "Allocation across active bank deposits",
+
+    "widget_deposit_incomes_title": "Deposit Incomes",
+    "widget_deposit_incomes_desc": "Earned interest income across bank deposits",
+
+    "widget_debts_title": "Debts",
+    "widget_debts_desc": "Debts allocation across debtors",
+
+    "widget_crypto_title": "Cryptocurrencies",
+    "widget_crypto_desc": "Crypto accounts and assets allocation",
+
+    "widget_banks_title": "Banks Allocation",
+    "widget_banks_desc": "Total capital allocation by financial institutions",
+
+    "widget_spents_title": "Monthly Expenses",
+    "widget_spents_desc": "Monthly expenses total and breakdown by category",
+
+    "widget_incomes_title": "Monthly Incomes",
+    "widget_incomes_desc": "Monthly incomes total and breakdown by category"
 }

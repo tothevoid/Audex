@@ -12,7 +12,6 @@ import SecuritiesPage from '@/pages/SecuritiesPage/SecuritiesPage';
 import BrokerAccountPage from '@/pages/BrokerAccount/BrokerAccountPage';
 import SecurityPage from '@/pages/SecurityPage/SecurityPage';
 import DashboardPage from '@/pages/Dashboard/DashboardPage';
-import WidgetsDashboardPage from '@/pages/Dashboard/WidgetsDashboardPage';
 import DebtsPage from '@/pages/Debts/DebtsPage';
 import CryptocurrenciesPage from '@/pages/CryptocurrenciesPage/CryptocurrenciesPage';
 import CryptoAccountsPage from '@/pages/CryptoAccountsPage/CryptoAccountsPage';
@@ -86,7 +85,7 @@ const App = () => {
 						<Route element={<RequireAuth />}>
 							<Route element={<PageWrapper />}>
 								<Route path="/" element={<DashboardPage />} />
-								<Route path="/dashboard" element={<WidgetsDashboardPage />} />
+								<Route path="/dashboard" element={<Navigate to="/" replace />} />
 								<Route path="/accounts" element={<AccountsPage />} />
 								<Route path="/transactions" element={<TransactionsPage />} />
 								<Route path="/deposits" element={<DepositsPage />} />

@@ -30,21 +30,14 @@
     "header_profile_tokens_desc": "Manage active devices",
     "header_profile_logout": "Log out",
 
-    "dashboard_title": "Summaries",
-    "dashboard_total": "Total",
     "dashboard_empty": "No data",
     "dashboard_cash": "Cash",
     "dashboard_securities": "Securities",
-    "dashboard_total_accounts": "Accounts",
     "dashboard_deposits": "Deposits",
     "dashboard_deposit_incomes": "Deposit locked incomes",
     "dashboard_bank_accounts": "Bank accounts",
     "dashboard_debts": "Debtors",
     "dashboard_crypto_account": "Crypto accounts",
-    "dashboard_banks": "Banks",
-
-    "dashboard_transactions_spents": "Spents",
-    "dashboard_transactions_incomes": "Incomes",
 
     "user_profile_settings_title": "Application configuration",
     "user_profile_settings_currency": "Display in currency",

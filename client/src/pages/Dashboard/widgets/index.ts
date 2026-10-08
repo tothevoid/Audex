@@ -4,4 +4,6 @@ export * from "./Oil";
 export * from "./SecuritiesDaily";
 export * from "./CurrencyRates";
 export * from "./Indices";
+export * from "./TotalBalance";
+export * from "./Distribution";
 
