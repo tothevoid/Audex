@@ -7,5 +7,14 @@
   "total_balance_deposit_incomes": "Накопленные проценты",
   "total_balance_bank_accounts": "Банковские счета",
   "total_balance_debts": "Долги",
-  "total_balance_crypto": "Криптосчета"
+  "total_balance_crypto": "Криптосчета",
+  "widget_total_balance_title": "Общий капитал",
+  "widget_cash_title": "Наличные",
+  "widget_securities_title": "Ценные бумаги",
+  "widget_deposits_title": "Депозиты",
+  "widget_deposit_incomes_title": "Доходы по депозитам",
+  "widget_bank_accounts_title": "Банковские счета",
+  "widget_debts_title": "Долги",
+  "widget_crypto_title": "Криптовалюты",
+  "widget_banks_title": "Распределение по банкам"
 }

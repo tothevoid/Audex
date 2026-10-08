@@ -7,5 +7,14 @@
   "total_balance_deposit_incomes": "Deposit locked incomes",
   "total_balance_bank_accounts": "Bank accounts",
   "total_balance_debts": "Debts",
-  "total_balance_crypto": "Crypto accounts"
+  "total_balance_crypto": "Crypto accounts",
+  "widget_total_balance_title": "Total Net Worth",
+  "widget_cash_title": "Cash",
+  "widget_securities_title": "Securities",
+  "widget_deposits_title": "Deposits",
+  "widget_deposit_incomes_title": "Deposit Incomes",
+  "widget_bank_accounts_title": "Bank Accounts",
+  "widget_debts_title": "Debts",
+  "widget_crypto_title": "Cryptocurrencies",
+  "widget_banks_title": "Banks Allocation"
 }
