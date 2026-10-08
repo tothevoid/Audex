@@ -170,15 +170,19 @@ export const useDashboards = () => {
         let updated: WidgetConfig[];
 
         if (exists) {
-            updated = widgets.map(w => (w.id === savedWidget.id ? savedWidget : w));
+            updated = widgets.map(widget => (widget.id === savedWidget.id ? savedWidget : widget));
         } else {
             const maxY = widgets.reduce(
-                (max, w) => Math.max(max, normalizeWidgetGrid(w.grid).y + normalizeWidgetGrid(w.grid).h),
+                (max, widget) => Math.max(max, normalizeWidgetGrid(widget.grid).y + normalizeWidgetGrid(widget.grid).h),
                 0
             );
             const normalizedWidget: WidgetConfig = {
                 ...savedWidget,
-                grid: normalizeWidgetGrid(savedWidget.grid, maxY)
+                grid: {
+                    ...normalizeWidgetGrid(savedWidget.grid),
+                    x: 0,
+                    y: maxY
+                }
             };
             updated = [...widgets, normalizedWidget];
         }

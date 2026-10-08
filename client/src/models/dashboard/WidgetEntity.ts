@@ -52,6 +52,7 @@ export const normalizeWidgetGrid = (
     maxH: grid?.maxH
 });
 
+
 export interface WidgetConfig<TSettings = Record<string, unknown>> {
     id: string;
     type: WidgetType;
