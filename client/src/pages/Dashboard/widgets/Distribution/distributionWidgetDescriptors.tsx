@@ -1,4 +1,5 @@
 import {
+    MdAccountBalanceWallet,
     MdAttachMoney,
     MdCreditCard,
     MdShowChart,
@@ -12,6 +13,7 @@ import {
 import { DashboardWidgetType } from "@/models/dashboard/WidgetEntity";
 import { WidgetDescriptor } from "../types";
 import {
+    TotalBalanceWidget,
     CashDistributionWidget,
     BankAccountsDistributionWidget,
     SecuritiesDistributionWidget,
@@ -23,6 +25,24 @@ import {
     SpentsDistributionWidget,
     IncomesDistributionWidget
 } from "./distributionWidgets";
+
+export const totalBalanceWidgetDescriptor: WidgetDescriptor = {
+    type: DashboardWidgetType.TotalBalance,
+    template: {
+        type: DashboardWidgetType.TotalBalance,
+        titleKey: "widget_total_balance_title",
+        descKey: "widget_total_balance_desc",
+        icon: <MdAccountBalanceWallet size={20} />,
+        defaultW: 6,
+        defaultH: 4,
+        minW: 4,
+        minH: 3,
+        defaultInterval: 0,
+        isAvailable: true
+    },
+    component: TotalBalanceWidget,
+    getDefaultSettings: () => ({})
+};
 
 export const cashDistributionWidgetDescriptor: WidgetDescriptor = {
     type: DashboardWidgetType.CashDistribution,

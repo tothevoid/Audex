@@ -395,12 +395,12 @@ namespace Audex.Application.Services.Dashboard
 
         public void Add(Guid? bankId, string currencyName, decimal amount, decimal convertedAmount)
         {
-            if (bankId == null || !Banks.ContainsKey((Guid )bankId))
+            if (bankId == null || !Banks.ContainsKey((Guid)bankId))
             {
                 return;
             }
 
-            var bank = Banks[(Guid) bankId];
+            var bank = Banks[(Guid)bankId];
             var key = $"{bank.Name} ({currencyName})";
 
             if (Distributions.ContainsKey(key))
@@ -427,3 +427,4 @@ namespace Audex.Application.Services.Dashboard
         }
     }
 }
+

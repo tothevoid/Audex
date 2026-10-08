@@ -1,4 +1,11 @@
 {
   "default_title": "Main Dashboard",
-  "invalid_layout_title": "Invalid dashboard layout"
+  "invalid_layout_title": "Invalid dashboard layout",
+  "total_balance_cash": "Cash",
+  "total_balance_securities": "Securities",
+  "total_balance_deposits": "Deposits",
+  "total_balance_deposit_incomes": "Deposit locked incomes",
+  "total_balance_bank_accounts": "Bank accounts",
+  "total_balance_debts": "Debts",
+  "total_balance_crypto": "Crypto accounts"
 }

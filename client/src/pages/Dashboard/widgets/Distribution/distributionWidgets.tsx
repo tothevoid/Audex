@@ -3,6 +3,17 @@ import { useTranslation } from "react-i18next";
 import { WidgetComponentProps } from "@/pages/Dashboard/widgets/types";
 import { DistributionWidgetBase } from "./DistributionWidgetBase";
 
+export const TotalBalanceWidget: React.FC<WidgetComponentProps> = (props) => {
+    const { t } = useTranslation();
+    return (
+        <DistributionWidgetBase
+            {...props}
+            endpoint="GetTotalBalanceWidgetData"
+            emptyText={t("dashboard_empty")}
+        />
+    );
+};
+
 export const CashDistributionWidget: React.FC<WidgetComponentProps> = (props) => {
     const { t } = useTranslation();
     return (

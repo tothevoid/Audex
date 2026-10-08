@@ -216,7 +216,12 @@ namespace Audex.Application.Services.User
             }
 
             var defaultTitle = await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.DefaultTitle, userId);
-            return await CreateAsync(userId, defaultTitle);
+            return await CreateAsync(userId, defaultTitle, GetDefaultLayoutJson());
+        }
+
+        private static string GetDefaultLayoutJson()
+        {
+            return "[]";
         }
     }
 }

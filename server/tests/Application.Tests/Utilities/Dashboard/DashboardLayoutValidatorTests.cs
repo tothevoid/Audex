@@ -426,5 +426,39 @@ namespace Audex.Application.Tests.Utilities.Dashboard
 
             Assert.Contains("unsupported Indices items", exception.Message);
         }
+
+        [Theory]
+        [InlineData("TotalBalance")]
+        [InlineData("CashDistribution")]
+        [InlineData("BankAccountsDistribution")]
+        [InlineData("SecuritiesDistribution")]
+        [InlineData("DepositsDistribution")]
+        [InlineData("DepositIncomesDistribution")]
+        [InlineData("DebtsDistribution")]
+        [InlineData("CryptoDistribution")]
+        [InlineData("BanksDistribution")]
+        [InlineData("SpentsDistribution")]
+        [InlineData("IncomesDistribution")]
+        public void ValidateAndParse_WithDistributionWidget_ValidType_ReturnsParsedWidgets(string widgetType)
+        {
+            var layoutJson = $$"""
+            [
+                {
+                    "id": "widget-1",
+                    "type": "{{widgetType}}",
+                    "title": "Widget",
+                    "refreshIntervalSeconds": 0,
+                    "grid": { "x": 0, "y": 0, "w": 4, "h": 3 },
+                    "settings": {}
+                }
+            ]
+            """;
+
+            var widgets = DashboardLayoutValidator.ValidateAndParse(layoutJson);
+
+            Assert.Single(widgets);
+            Assert.Equal("widget-1", widgets[0].Id);
+            Assert.Equal(widgetType, widgets[0].Type);
+        }
     }
 }

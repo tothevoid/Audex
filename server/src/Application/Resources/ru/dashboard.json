@@ -1,4 +1,11 @@
 {
   "default_title": "Главный дашборд",
-  "invalid_layout_title": "Некорректная разметка дашборда"
+  "invalid_layout_title": "Некорректная разметка дашборда",
+  "total_balance_cash": "Наличные",
+  "total_balance_securities": "Ценные бумаги",
+  "total_balance_deposits": "Вклады",
+  "total_balance_deposit_incomes": "Накопленные проценты",
+  "total_balance_bank_accounts": "Банковские счета",
+  "total_balance_debts": "Долги",
+  "total_balance_crypto": "Криптосчета"
 }

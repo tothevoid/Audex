@@ -5,8 +5,8 @@ import { oilWidgetDescriptor } from "./Oil";
 import { securitiesDailyWidgetDescriptor } from "./SecuritiesDaily";
 import { currencyRatesWidgetDescriptor } from "./CurrencyRates";
 import { indicesWidgetDescriptor } from "./Indices";
-import { totalBalanceWidgetDescriptor } from "./TotalBalance";
 import {
+    totalBalanceWidgetDescriptor,
     cashDistributionWidgetDescriptor,
     bankAccountsDistributionWidgetDescriptor,
     securitiesDistributionWidgetDescriptor,

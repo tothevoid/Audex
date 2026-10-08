@@ -156,6 +156,13 @@ namespace Audex.Application.Constants
         {
             public const string DefaultTitle = "dashboard.default_title";
             public const string InvalidLayoutTitle = "dashboard.invalid_layout_title";
+            public const string TotalBalanceCash = "dashboard.total_balance_cash";
+            public const string TotalBalanceSecurities = "dashboard.total_balance_securities";
+            public const string TotalBalanceDeposits = "dashboard.total_balance_deposits";
+            public const string TotalBalanceDepositIncomes = "dashboard.total_balance_deposit_incomes";
+            public const string TotalBalanceBankAccounts = "dashboard.total_balance_bank_accounts";
+            public const string TotalBalanceDebts = "dashboard.total_balance_debts";
+            public const string TotalBalanceCrypto = "dashboard.total_balance_crypto";
         }
 
         public static class Errors
