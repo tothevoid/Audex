@@ -19,6 +19,8 @@
     "dashboard_save_success": "Dashboard layout saved",
     "dashboard_add_modal_title": "Add Widget",
     "dashboard_add_modal_desc": "Select a widget to add to your dashboard",
+    "dashboard_tab_static_widgets": "Static",
+    "dashboard_tab_dynamic_widgets": "Dynamic",
     "dashboard_no_available_widgets": "Widgets are currently under development.",
     "widget_refresh_interval": "Refresh interval",
     "widget_refresh_manual": "Manual",

@@ -15,7 +15,8 @@ export const currencyRatesWidgetDescriptor: WidgetDescriptor<Record<string, unkn
         minW: 3,
         minH: 3,
         defaultInterval: 300,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: false
     },
     component: CurrencyRatesWidget,
     getDefaultSettings: () => ({})

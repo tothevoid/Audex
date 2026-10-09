@@ -12,6 +12,16 @@ import {
     updateUserDashboardLayout
 } from "@/api/dashboard/userDashboardApi";
 
+const parseLayoutWidgets = (layoutJson?: string): WidgetConfig[] => {
+    if (!layoutJson) return [];
+    try {
+        const rawWidgets = JSON.parse(layoutJson);
+        return Array.isArray(rawWidgets) ? (rawWidgets as WidgetConfig[]) : [];
+    } catch {
+        return [];
+    }
+};
+
 export const useDashboards = () => {
     const [dashboards, setDashboards] = useState<UserDashboardEntity[]>([]);
     const [activeDashboardId, setActiveDashboardId] = useState<string | null>(null);
@@ -38,15 +48,7 @@ export const useDashboards = () => {
             if (list.length > 0) {
                 const defaultOrFirst = list.find(d => d.isDefault) || list[0];
                 setActiveDashboardId(defaultOrFirst.id);
-
-                try {
-                    const parsedWidgets = defaultOrFirst.layoutJson
-                        ? JSON.parse(defaultOrFirst.layoutJson)
-                        : [];
-                    setWidgets(parsedWidgets);
-                } catch {
-                    setWidgets([]);
-                }
+                setWidgets(parseLayoutWidgets(defaultOrFirst.layoutJson));
             }
         } finally {
             setIsLoading(false);
@@ -62,12 +64,7 @@ export const useDashboards = () => {
         setActiveDashboardId(dashboardId);
         const target = dashboards.find(d => d.id === dashboardId);
         if (target) {
-            try {
-                const parsedWidgets = target.layoutJson ? JSON.parse(target.layoutJson) : [];
-                setWidgets(parsedWidgets);
-            } catch {
-                setWidgets([]);
-            }
+            setWidgets(parseLayoutWidgets(target.layoutJson));
         }
     };
 
@@ -156,11 +153,7 @@ export const useDashboards = () => {
         if (activeDashboardId === dashboardId && remaining.length > 0) {
             const nextDashboard = remaining[0];
             setActiveDashboardId(nextDashboard.id);
-            try {
-                setWidgets(nextDashboard.layoutJson ? JSON.parse(nextDashboard.layoutJson) : []);
-            } catch {
-                setWidgets([]);
-            }
+            setWidgets(parseLayoutWidgets(nextDashboard.layoutJson));
         }
     };
 

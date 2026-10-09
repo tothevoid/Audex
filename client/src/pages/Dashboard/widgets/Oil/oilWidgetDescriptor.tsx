@@ -17,7 +17,8 @@ export const oilWidgetDescriptor: WidgetDescriptor<OilWidgetSettings> = {
         minW: 3,
         minH: 3,
         defaultInterval: 60,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: false
     },
     component: OilWidget,
     settingsComponent: OilSettings,

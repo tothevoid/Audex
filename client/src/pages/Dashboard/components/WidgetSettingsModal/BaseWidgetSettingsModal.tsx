@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { WidgetConfig } from "@/models/dashboard/WidgetEntity";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { getWidgetDescriptor } from "../../widgets";
 
 export interface BaseWidgetSettingsModalRef<TSettings = Record<string, unknown>> extends BaseModalRef {
     openWithWidget: (widget: WidgetConfig<TSettings>) => void;
@@ -36,33 +37,38 @@ export const BaseWidgetSettingsModal = forwardRef(<TSettings extends Record<stri
 
     const [currentWidget, setCurrentWidget] = useState<WidgetConfig<TSettings> | null>(null);
     const [title, setTitle] = useState("");
-    const [refreshInterval, setRefreshInterval] = useState<number>(60);
+    const [refreshInterval, setRefreshInterval] = useState<number>(0);
     const [customSettings, setCustomSettings] = useState<TSettings>({} as TSettings);
+
+    const descriptor = currentWidget ? getWidgetDescriptor(currentWidget.type) : null;
+    const isStaticWidget = descriptor?.template.isStatic ?? false;
 
     useImperativeHandle(ref, () => ({
         openModal: () => modalRef.current?.openModal(),
         closeModal: () => modalRef.current?.closeModal(),
         openWithWidget: (widget: WidgetConfig<TSettings>) => {
+            const targetDescriptor = getWidgetDescriptor(widget.type);
+            const isTargetStatic = targetDescriptor?.template.isStatic ?? false;
             setCurrentWidget(widget);
             setTitle(widget.title);
-            setRefreshInterval(widget.refreshIntervalSeconds);
+            setRefreshInterval(isTargetStatic ? 0 : widget.refreshIntervalSeconds);
             setCustomSettings(widget.settings ?? ({} as TSettings));
             modalRef.current?.openModal();
         }
     }));
 
     const handleUpdateSettings = (partial: Partial<TSettings>) => {
-        setCustomSettings(prev => ({ ...prev, ...partial }));
+        setCustomSettings(previousSettings => ({ ...previousSettings, ...partial }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = (event: React.FormEvent) => {
+        event.preventDefault();
         if (!currentWidget) return;
 
         const updatedWidget: WidgetConfig<TSettings> = {
             ...currentWidget,
             title: title.trim() || currentWidget.title,
-            refreshIntervalSeconds: Number(refreshInterval),
+            refreshIntervalSeconds: isStaticWidget ? 0 : Number(refreshInterval),
             settings: customSettings
         };
 
@@ -83,7 +89,7 @@ export const BaseWidgetSettingsModal = forwardRef(<TSettings extends Record<stri
                     <Field.Label>{t("dashboard_create_title")}</Field.Label>
                     <Input
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        onChange={(event) => setTitle(event.target.value)}
                         placeholder={t("dashboard_create_title")}
                         backgroundColor="background_secondary"
                         borderColor="border_primary"
@@ -91,25 +97,27 @@ export const BaseWidgetSettingsModal = forwardRef(<TSettings extends Record<stri
                     />
                 </Field.Root>
 
-                <Field.Root>
-                    <Field.Label>{t("widget_refresh_interval")}</Field.Label>
-                    <NativeSelect.Root>
-                        <NativeSelect.Field
-                            value={refreshInterval}
-                            onChange={(e) => setRefreshInterval(Number(e.target.value))}
-                            backgroundColor="background_secondary"
-                            borderColor="border_primary"
-                            color="text_primary"
-                        >
-                            <option value={0}>{t("widget_refresh_manual")}</option>
-                            <option value={30}>{t("widget_refresh_30s")}</option>
-                            <option value={60}>{t("widget_refresh_1m")}</option>
-                            <option value={300}>{t("widget_refresh_5m")}</option>
-                            <option value={900}>{t("widget_refresh_15m")}</option>
-                        </NativeSelect.Field>
-                        <NativeSelect.Indicator />
-                    </NativeSelect.Root>
-                </Field.Root>
+                {!isStaticWidget && (
+                    <Field.Root>
+                        <Field.Label>{t("widget_refresh_interval")}</Field.Label>
+                        <NativeSelect.Root>
+                            <NativeSelect.Field
+                                value={refreshInterval}
+                                onChange={(event) => setRefreshInterval(Number(event.target.value))}
+                                backgroundColor="background_secondary"
+                                borderColor="border_primary"
+                                color="text_primary"
+                            >
+                                <option value={0}>{t("widget_refresh_manual")}</option>
+                                <option value={30}>{t("widget_refresh_30s")}</option>
+                                <option value={60}>{t("widget_refresh_1m")}</option>
+                                <option value={300}>{t("widget_refresh_5m")}</option>
+                                <option value={900}>{t("widget_refresh_15m")}</option>
+                            </NativeSelect.Field>
+                            <NativeSelect.Indicator />
+                        </NativeSelect.Root>
+                    </Field.Root>
+                )}
 
                 {renderCustomSettings && renderCustomSettings(customSettings, handleUpdateSettings, currentWidget)}
             </Stack>

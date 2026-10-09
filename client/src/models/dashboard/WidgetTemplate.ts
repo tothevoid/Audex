@@ -13,6 +13,7 @@ export interface WidgetTemplate {
     minH: number;
     defaultInterval: number;
     isAvailable: boolean;
+    isStatic: boolean;
 }
 
 export const createDefaultWidgetFromTemplate = (

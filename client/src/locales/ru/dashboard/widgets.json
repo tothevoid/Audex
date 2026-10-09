@@ -19,6 +19,8 @@
     "dashboard_save_success": "Расположение виджетов сохранено",
     "dashboard_add_modal_title": "Добавление виджета",
     "dashboard_add_modal_desc": "Выберите виджет для добавления на дашборд",
+    "dashboard_tab_static_widgets": "Статические",
+    "dashboard_tab_dynamic_widgets": "Динамические",
     "dashboard_no_available_widgets": "Виджеты находятся в разработке.",
     "widget_refresh_interval": "Интервал обновления",
     "widget_refresh_manual": "Вручную",

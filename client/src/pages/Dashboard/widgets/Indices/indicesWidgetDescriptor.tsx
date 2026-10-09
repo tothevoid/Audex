@@ -17,7 +17,8 @@ export const indicesWidgetDescriptor: WidgetDescriptor<IndicesWidgetSettings> = 
         minW: 3,
         minH: 3,
         defaultInterval: 60,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: false
     },
     component: IndicesWidget,
     settingsComponent: IndicesSettings,

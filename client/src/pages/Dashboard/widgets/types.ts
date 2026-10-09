@@ -25,6 +25,7 @@ export interface WidgetTemplateInfo {
     minH: number;
     defaultInterval: number;
     isAvailable: boolean;
+    isStatic: boolean;
 }
 
 export interface WidgetDescriptor<TSettings = Record<string, unknown>> {

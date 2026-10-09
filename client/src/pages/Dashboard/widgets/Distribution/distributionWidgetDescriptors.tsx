@@ -38,7 +38,8 @@ export const totalBalanceWidgetDescriptor: WidgetDescriptor = {
         minW: 4,
         minH: 3,
         defaultInterval: 0,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: true
     },
     component: TotalBalanceWidget,
     getDefaultSettings: () => ({})
@@ -56,7 +57,8 @@ export const cashDistributionWidgetDescriptor: WidgetDescriptor = {
         minW: 3,
         minH: 3,
         defaultInterval: 0,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: true
     },
     component: CashDistributionWidget,
     getDefaultSettings: () => ({})
@@ -74,7 +76,8 @@ export const bankAccountsDistributionWidgetDescriptor: WidgetDescriptor = {
         minW: 3,
         minH: 3,
         defaultInterval: 0,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: true
     },
     component: BankAccountsDistributionWidget,
     getDefaultSettings: () => ({})
@@ -92,7 +95,8 @@ export const securitiesDistributionWidgetDescriptor: WidgetDescriptor = {
         minW: 3,
         minH: 3,
         defaultInterval: 0,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: true
     },
     component: SecuritiesDistributionWidget,
     getDefaultSettings: () => ({})
@@ -110,7 +114,8 @@ export const depositsDistributionWidgetDescriptor: WidgetDescriptor = {
         minW: 3,
         minH: 3,
         defaultInterval: 0,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: true
     },
     component: DepositsDistributionWidget,
     getDefaultSettings: () => ({})
@@ -128,7 +133,8 @@ export const depositIncomesDistributionWidgetDescriptor: WidgetDescriptor = {
         minW: 3,
         minH: 3,
         defaultInterval: 0,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: true
     },
     component: DepositIncomesDistributionWidget,
     getDefaultSettings: () => ({})
@@ -146,7 +152,8 @@ export const debtsDistributionWidgetDescriptor: WidgetDescriptor = {
         minW: 3,
         minH: 3,
         defaultInterval: 0,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: true
     },
     component: DebtsDistributionWidget,
     getDefaultSettings: () => ({})
@@ -164,7 +171,8 @@ export const cryptoDistributionWidgetDescriptor: WidgetDescriptor = {
         minW: 3,
         minH: 3,
         defaultInterval: 0,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: true
     },
     component: CryptoDistributionWidget,
     getDefaultSettings: () => ({})
@@ -182,7 +190,8 @@ export const banksDistributionWidgetDescriptor: WidgetDescriptor = {
         minW: 3,
         minH: 3,
         defaultInterval: 0,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: true
     },
     component: BanksDistributionWidget,
     getDefaultSettings: () => ({})
@@ -200,7 +209,8 @@ export const spentsDistributionWidgetDescriptor: WidgetDescriptor = {
         minW: 3,
         minH: 3,
         defaultInterval: 0,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: true
     },
     component: SpentsDistributionWidget,
     getDefaultSettings: () => ({})
@@ -218,7 +228,8 @@ export const incomesDistributionWidgetDescriptor: WidgetDescriptor = {
         minW: 3,
         minH: 3,
         defaultInterval: 0,
-        isAvailable: true
+        isAvailable: true,
+        isStatic: true
     },
     component: IncomesDistributionWidget,
     getDefaultSettings: () => ({})
