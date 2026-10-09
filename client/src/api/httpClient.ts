@@ -5,6 +5,8 @@ import { refreshToken } from "./auth/authApi";
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
+    _requestId?: string;
+    _startTime?: number;
 }
 
 const httpClient = axios.create({
@@ -12,12 +14,24 @@ const httpClient = axios.create({
     withCredentials: true,
 });
 
-httpClient.interceptors.request.use((reqConfig: InternalAxiosRequestConfig) => {
+httpClient.interceptors.request.use((requestConfig: InternalAxiosRequestConfig) => {
+    const customConfig = requestConfig as CustomAxiosRequestConfig;
     const token = getAccessToken();
     if (token) {
-        reqConfig.headers.Authorization = `Bearer ${token}`;
+        requestConfig.headers.Authorization = `Bearer ${token}`;
     }
-    return reqConfig;
+
+    const requestId = crypto.randomUUID();
+    customConfig._requestId = requestId;
+    customConfig._startTime = performance.now();
+    requestConfig.headers["X-Request-Id"] = requestId;
+
+    if (import.meta.env.DEV) {
+        const httpMethod = requestConfig.method?.toUpperCase() ?? "GET";
+        console.debug(`[Req ${requestId.slice(0, 8)}] ${httpMethod} ${requestConfig.url}`);
+    }
+
+    return requestConfig;
 });
 
 let isRefreshing = false;
@@ -27,11 +41,11 @@ let failedQueue: Array<{
 }> = [];
 
 const processQueue = (error: unknown, token: string | null = null) => {
-    failedQueue.forEach(prom => {
+    failedQueue.forEach(promiseItem => {
         if (error) {
-            prom.reject(error);
+            promiseItem.reject(error);
         } else if (token) {
-            prom.resolve(token);
+            promiseItem.resolve(token);
         }
     });
     failedQueue = [];
@@ -71,10 +85,38 @@ const requestNewAccessToken = async (): Promise<string> => {
     return newAccessToken;
 };
 
+interface RequestLogMetadata {
+    duration: number;
+    requestId: string;
+    httpMethod: string;
+    url: string;
+}
+
+const getRequestLogMetadata = (requestConfig?: CustomAxiosRequestConfig): RequestLogMetadata => {
+    const duration = requestConfig?._startTime ? Math.round(performance.now() - requestConfig._startTime) : 0;
+    const requestId = (requestConfig?._requestId ?? "").slice(0, 8);
+    const httpMethod = requestConfig?.method?.toUpperCase() ?? "GET";
+    const url = requestConfig?.url ?? "";
+
+    return { duration, requestId, httpMethod, url };
+};
+
 httpClient.interceptors.response.use(
-    response => response,
+    response => {
+        if (import.meta.env.DEV) {
+            const { duration, requestId, httpMethod, url } = getRequestLogMetadata(response.config as CustomAxiosRequestConfig);
+            console.debug(`[Res ${requestId}] ${response.status} ${httpMethod} ${url} (${duration}ms)`);
+        }
+        return response;
+    },
     async (error: AxiosError) => {
         const originalRequest = error.config as CustomAxiosRequestConfig | undefined;
+
+        if (originalRequest) {
+            const { duration, requestId, httpMethod, url } = getRequestLogMetadata(originalRequest);
+            const statusCode = error.response?.status ?? "ERR";
+            console.error(`[API Error ${requestId}] ${statusCode} ${httpMethod} ${url} (${duration}ms):`, error);
+        }
 
         if (!isRefreshableAuthError(error, originalRequest)) {
             return Promise.reject(error);
@@ -96,9 +138,9 @@ httpClient.interceptors.response.use(
 
             processQueue(null, newAccessToken);
             return httpClient(originalRequest);
-        } catch (refreshErr) {
-            handleAuthFailure(refreshErr);
-            return Promise.reject(refreshErr);
+        } catch (refreshError: unknown) {
+            handleAuthFailure(refreshError);
+            return Promise.reject(refreshError);
         } finally {
             isRefreshing = false;
         }
