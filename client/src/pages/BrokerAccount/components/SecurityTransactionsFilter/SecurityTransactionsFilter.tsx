@@ -2,9 +2,8 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Box, Flex, Grid, Text, Badge, Button, HStack, Icon } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { MdFilterList, MdClose } from "react-icons/md";
-import DatePicker from "react-datepicker";
+import DatePicker from "@/shared/components/DatePicker/DatePicker";
 import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
-import DateInput from "@/shared/components/DateInput/DateInput";
 import { convertToDateOnly, parseIsoDateOnly } from "@/shared/utilities/dateUtils";
 import { getSecurities } from "@/api/securities/securityApi";
 import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
@@ -192,37 +191,33 @@ const SecurityTransactionsFilter: React.FC<Props> = ({
                     </Box>
                 )}
 
-                <Box css={{ "& .react-datepicker-wrapper": { width: "100%" } }}>
+                <Box width="100%">
                     <HStack gap={2} alignItems="flex-end">
-                        <Box width={{ base: "calc(50% - 12px)", sm: "135px" }}>
+                        <Box width={{ base: "calc(50% - 12px)", sm: "145px" }}>
                             <Text fontSize="xs" fontWeight="medium" color="text_secondary" mb={1}>
                                 {t("security_transactions_filter_date_from")}
                             </Text>
                             <DatePicker
-                                autoComplete="off"
-                                selected={selectedStartDate}
+                                value={selectedStartDate}
                                 onChange={handleStartDateChange}
-                                maxDate={selectedEndDate ?? undefined}
-                                dateFormat="dd.MM.yyyy"
+                                maxDate={selectedEndDate}
                                 isClearable={true}
-                                customInput={<DateInput width="100%" placeholder={t("security_transactions_filter_date_from")} />}
+                                placeholder={t("security_transactions_filter_date_from")}
                             />
                         </Box>
                         <Text color="text_secondary" fontSize="sm" pb={1.5} userSelect="none">
                             —
                         </Text>
-                        <Box width={{ base: "calc(50% - 12px)", sm: "135px" }}>
+                        <Box width={{ base: "calc(50% - 12px)", sm: "145px" }}>
                             <Text fontSize="xs" fontWeight="medium" color="text_secondary" mb={1}>
                                 {t("security_transactions_filter_date_to")}
                             </Text>
                             <DatePicker
-                                autoComplete="off"
-                                selected={selectedEndDate}
+                                value={selectedEndDate}
                                 onChange={handleEndDateChange}
-                                minDate={selectedStartDate ?? undefined}
-                                dateFormat="dd.MM.yyyy"
+                                minDate={selectedStartDate}
                                 isClearable={true}
-                                customInput={<DateInput width="100%" placeholder={t("security_transactions_filter_date_to")} />}
+                                placeholder={t("security_transactions_filter_date_to")}
                             />
                         </Box>
                     </HStack>

@@ -4,7 +4,6 @@ import '@/index.css';
 import '@/i18n';
 import App from '@/App.tsx';
 import { ChakraProvider } from '@chakra-ui/react';
-import 'react-datepicker/dist/react-datepicker.css';
 import { appTheme } from '@/theme';
 import { ColorModeProvider } from '@/shared/context/ColorModeContext';
 

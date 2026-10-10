@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
-import { SimpleGrid, Stack, Text, Input, Card, Skeleton, Button } from "@chakra-ui/react";
-import DatePicker from "react-datepicker";
+import { SimpleGrid, Stack, Text, Card, Skeleton } from "@chakra-ui/react";
+import DatePicker from "@/shared/components/DatePicker/DatePicker";
 import { useTranslation } from "react-i18next";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import MoneyCard from "@/shared/components/MoneyCard/MoneyCard";
@@ -61,33 +61,16 @@ const BrokerAccountPortfolioHistory: React.FC<Props> = ({ brokerAccountId }) => 
                     {t("broker_account_portfolio_history_date_select")}:
                 </Text>
                 <DatePicker
-                    autoComplete="off"
-                    selected={selectedDate}
+                    value={selectedDate}
                     onChange={(date: Date | null) => {
                         if (date) {
                             setSelectedDate(date);
                         }
                     }}
                     maxDate={new Date()}
-                    dateFormat="dd.MM.yyyy"
-                    customInput={
-                        <Input
-                            width="200px"
-                            color="text_primary"
-                            backgroundColor="background_primary"
-                            borderColor="border_primary"
-                        />
-                    }
+                    width="200px"
+                    fullWidth={false}
                 />
-                <Button
-                    size="sm"
-                    variant="outline"
-                    borderColor="border_primary"
-                    color="text_primary"
-                    onClick={() => setSelectedDate(new Date())}
-                >
-                    {t("broker_account_portfolio_history_today")}
-                </Button>
             </Stack>
 
             {isLoading ? (

@@ -2,6 +2,7 @@ import { buttonRecipe } from './button.recipe';
 import { inputRecipe } from './input.recipe';
 import { tabsSlotRecipe } from './tabs.recipe';
 import { checkboxSlotRecipe } from './checkbox.recipe';
+import { datePickerSlotRecipe } from './datePicker.recipe';
 
 export const recipes = {
     button: buttonRecipe,
@@ -11,5 +12,6 @@ export const recipes = {
 export const slotRecipes = {
     tabs: tabsSlotRecipe,
     checkbox: checkboxSlotRecipe,
+    datePicker: datePickerSlotRecipe,
 };
 

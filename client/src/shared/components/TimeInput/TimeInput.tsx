@@ -23,7 +23,6 @@ export const TimeInput: React.FC<TimeInputProps> = ({
             borderColor="border_primary"
             maxW={maxW}
             css={{
-                colorScheme: 'dark',
                 '&::-webkit-calendar-picker-indicator': {
                     cursor: 'pointer'
                 }

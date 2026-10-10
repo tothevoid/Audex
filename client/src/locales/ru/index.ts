@@ -1,5 +1,6 @@
 import commonGeneral from './common/general.json';
 import commonModals from './common/modals.json';
+import datePicker from './components/datePicker.json';
 import actions from './actions/actions.json';
 import notifications from './common/notifications.json';
 import accounts from './accounts/accounts.json';
@@ -24,6 +25,7 @@ import widgets from './dashboard/widgets.json';
 const ru = {
     ...commonGeneral,
     ...commonModals,
+    ...datePicker,
     ...actions,
     ...notifications,
     ...accounts,

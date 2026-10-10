@@ -14,7 +14,7 @@ import {
     VStack
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { format } from 'date-fns';
+import { formatShortDateTime } from '@/shared/utilities/formatters/dateFormatter';
 import {
     MdDeleteOutline,
     MdPlayArrow,
@@ -228,7 +228,7 @@ export const SchedulerTaskDetailPane: React.FC<SchedulerTaskDetailPaneProps> = (
                         {task.lastExecutionUtc ? (
                             <>
                                 <Text fontSize="sm" fontWeight="semibold" color="text_primary">
-                                    {format(new Date(task.lastExecutionUtc), 'dd.MM.yyyy HH:mm')}
+                                    {formatShortDateTime(new Date(task.lastExecutionUtc), i18n, true)}
                                 </Text>
                                 <HStack gap={1} mt={0.5}>
                                     <Badge size="xs" colorPalette={getStatusBadgeProps(task.lastExecutionStatus, t).colorPalette}>
@@ -254,7 +254,7 @@ export const SchedulerTaskDetailPane: React.FC<SchedulerTaskDetailPaneProps> = (
                         </Text>
                         {task.isEnabled && task.nextExecutionUtc ? (
                             <Text fontSize="sm" fontWeight="semibold" color="text_primary">
-                                {format(new Date(task.nextExecutionUtc), 'dd.MM.yyyy HH:mm')}
+                                {formatShortDateTime(new Date(task.nextExecutionUtc), i18n, true)}
                             </Text>
                         ) : (
                             <Text fontSize="sm" color="text_secondary">

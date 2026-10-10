@@ -12,7 +12,7 @@ import {
     VStack
 } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { format } from 'date-fns';
+import { formatShortDateTime } from '@/shared/utilities/formatters/dateFormatter';
 import { MdAdd, MdHistory, MdSchedule } from 'react-icons/md';
 import { ScheduledTaskEntity } from '@/models/scheduler/ScheduledTaskEntity';
 import { toggleTaskStatus } from '@/api/scheduler/schedulerTaskApi';
@@ -186,7 +186,7 @@ export const SchedulerTaskMasterList: React.FC<SchedulerTaskMasterListProps> = (
 
                                     {task.isEnabled && task.nextExecutionUtc ? (
                                         <Text fontSize="2xs" color="text_secondary">
-                                            {t('scheduler_next_run')}: {format(task.nextExecutionUtc, 'dd.MM HH:mm')}
+                                            {t('scheduler_next_run')}: {formatShortDateTime(new Date(task.nextExecutionUtc), i18n, false)}
                                         </Text>
                                     ) : null}
                                 </VStack>

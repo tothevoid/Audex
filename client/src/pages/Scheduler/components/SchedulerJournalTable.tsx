@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Badge, Box, Flex, HStack, Icon, SimpleGrid, Spinner, Table, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { format } from 'date-fns';
+import { formatDateTimeWithSeconds } from '@/shared/utilities/formatters/dateFormatter';
 import {
     MdAttachFile,
     MdErrorOutline,
@@ -47,7 +47,7 @@ export const SchedulerJournalTable: React.FC<SchedulerJournalTableProps> = ({
     onStatusFilterChange,
     onRefresh
 }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>({});
 
     const toggleExpand = (id: string) => {
@@ -144,7 +144,7 @@ export const SchedulerJournalTable: React.FC<SchedulerJournalTableProps> = ({
                                             transition="background-color 0.15s ease"
                                         >
                                             <Table.Cell color="text_primary" whiteSpace="nowrap">
-                                                {format(new Date(record.executedAtUtc), 'dd.MM.yyyy HH:mm:ss')}
+                                                {formatDateTimeWithSeconds(new Date(record.executedAtUtc), i18n)}
                                             </Table.Cell>
                                             {!hideTaskColumn && (
                                                 <Table.Cell color="text_primary" fontWeight="medium">

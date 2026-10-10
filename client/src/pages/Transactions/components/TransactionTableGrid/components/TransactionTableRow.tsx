@@ -1,13 +1,12 @@
 import React, { useMemo } from 'react';
 import { Box, Button, Flex, HStack, Input, NativeSelect, Table, Tooltip } from '@chakra-ui/react';
 import { NumericFormat } from 'react-number-format';
-import DatePicker from 'react-datepicker';
+import DatePicker from '@/shared/components/DatePicker/DatePicker';
 import { useTranslation } from 'react-i18next';
 import { TransactionEntity } from '@/models/transactions/TransactionEntity';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
 import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEntity';
 import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
-import DateInput from '@/shared/components/DateInput/DateInput';
 import { computeRowDiff, EMPTY_ROW_DIFF, RowDiff } from '@/pages/Transactions/components/TransactionTableGrid/types';
 
 export interface TransactionTableRowProps {
@@ -75,14 +74,12 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
                 >
                     <Tooltip.Root disabled={!diff.date.isModified}>
                         <Tooltip.Trigger asChild>
-                            <Box maxW="105px">
+                            <Box maxW="115px">
                                 <DatePicker
+                                    size="xs"
                                     disabled={isDeleted}
-                                    autoComplete="off"
-                                    selected={row.date ? new Date(row.date) : new Date()}
-                                    onChange={(d) => d && handleFieldChange({ date: d })}
-                                    dateFormat="dd.MM.yyyy"
-                                    customInput={<DateInput size="xs" backgroundColor="transparent" borderColor="transparent" />}
+                                    value={row.date ? new Date(row.date) : new Date()}
+                                    onChange={(transactionDate) => transactionDate && handleFieldChange({ date: transactionDate })}
                                 />
                             </Box>
                         </Tooltip.Trigger>

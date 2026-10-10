@@ -15,6 +15,16 @@ export const formatTimeWithSeconds = (date: Date, format: i18n) => {
 	}).format(date);
 };
 
+export const formatDateTimeWithSeconds = (date: Date, format: i18n, showYear: boolean = true) => {
+	return new Intl.DateTimeFormat(format.language, {
+		year: showYear ? "numeric" : undefined,
+		month: "2-digit",
+		day: "2-digit",
+		hour: "2-digit",
+		minute: "2-digit",
+		second: "2-digit"
+	}).format(date);
+};
 
 export const formatDate = (date: Date, format: i18n, showYear: boolean = true,) => {
 	return new Intl.DateTimeFormat(format.language, {

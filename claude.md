@@ -151,6 +151,7 @@ This document contains guidelines, coding standards, and architectural patterns 
 ### Localization Rules (i18n)
 - **Modular Directory Structure**: Locales are organized semantically into domain folders under `client/src/locales/en/` and `client/src/locales/ru/`, aggregated via `index.ts`:
   - `common/`: `general.json` (headers, dashboard, settings), `modals.json` (action buttons, confirm dialogs).
+  - `components/`: `datePicker.json` (controls and shared UI components).
   - `accounts/`: `accounts.json` (balances, accounts page, transfer modal).
   - `broker/`: `broker.json` (broker accounts, cards, stats), `transfers.json` (fund transfers), `taxes.json` (tax deductions).
   - `securities/`: `securities.json` (securities, transactions, quotes), `dividends.json` (dividends, payments).
@@ -210,9 +211,7 @@ This document contains guidelines, coding standards, and architectural patterns 
         <Field.ErrorText>{errors.amount?.message}</Field.ErrorText>
     </Field.Root>
     ```
-- **Loading & Empty States**: Pages MUST use Skeleton loaders (`CardSkeleton`, `TableSkeleton`) during data fetches and `<EmptyStatePlaceholder>` when entity collections are empty.
-- **Date Picker**: Use `react-datepicker` (`DatePicker`) with Chakra UI `<Input width="200px" color="text_primary" backgroundColor="background_primary" borderColor="border_primary" />`.
-- **Default Date**: Default to today (`new Date()`). Display as `dd.MM.yyyy` to the user, and format as ISO date `YYYY-MM-DD` for API queries.
+- **Date Picker & DateSelect**: Use the modern Chakra UI v3 `<DatePicker />` (`client/src/shared/components/DatePicker/`) or `<DateSelect />` (`client/src/shared/components/DateSelect/`). Renders popups in `<Portal>` (zero modal layout shifts), fully integrated with Chakra UI v3 semantic theme tokens (`background_primary`, `border_primary`, `action_primary`, `text_primary`), supports `isClearable`, and automatically infers localized date formatting/placeholders (`dd.MM.yyyy` for RU, `yyyy-MM-dd` for EN) from `i18n.language` and `Intl.DateTimeFormat`. Do NOT use legacy `react-datepicker` or hardcoded format strings.
 - **Themes & Scrollbars**: The application supports Dark Theme and Solarized Sand Light Theme via Chakra UI v3 semantic tokens. Root elements (`html`, `body` in `index.css`) support `[data-theme="dark"]` and `[data-theme="light"]`, matching scrollbars and WebKit autofill styles. Always preserve `scrollbar-gutter: stable` on `html` to prevent layout jumping/shifting between scrollable and non-scrollable pages.
 - **Layout & Styling**: Use Chakra UI v3 theme tokens (`background_main`, `background_primary`, `background_secondary`, `text_primary`, `text_secondary`, `border_primary`, `action_primary`) and `<SimpleGrid columns={2} gap={4}>` with `<MoneyCard>` for metric grids. Do NOT use hardcoded hex/rgb/rgba colors in components.
 
