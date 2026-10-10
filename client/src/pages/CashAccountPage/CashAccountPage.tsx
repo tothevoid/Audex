@@ -62,8 +62,7 @@ const CashAccountPage: React.FC = () => {
         refreshPage
     } = usePagedQuery<CurrencyTransactionEntity, CurrencyTransactionsQuery>({
         fetchData: getPagedCurrencyTransactions,
-        filters,
-        keySelector: (transaction) => transaction.id
+        filters
     });
 
     const loadAccountAndSummary = useCallback(async () => {

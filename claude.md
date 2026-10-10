@@ -198,6 +198,18 @@ This document contains guidelines, coding standards, and architectural patterns 
   });
   ```
 
+### React Hooks, Dependencies & Infinite Loop Prevention (No `useRef` / `JSON.stringify` Crutches)
+- **Prohibition of Hook Crutches (`useRef` / Empty Deps / Stringified Deps)**: When encountering infinite re-renders or request loops (e.g. rapid or repeating API queries triggered by `useEffect`), NEVER attempt to suppress or mask the issue inside custom hooks by:
+  - Copying hook parameters, callbacks, or filters into `useRef` containers to bypass dependency arrays.
+  - Artificially emptying `useCallback` / `useMemo` dependency arrays (`[]`) while referencing mutable ref values.
+  - Serializing dependencies (e.g. `JSON.stringify(filters)`) directly in hook `useEffect` dependency arrays to bypass React's reference change detection.
+  These crutches break idiomatic React unidirectional data flow, cause stale closures, violate the Rules of Hooks (`react-hooks/exhaustive-deps`), and mask underlying bugs in consuming components.
+- **Fix Root Cause at the Source (Caller Level)**:
+  - Always identify and eliminate unstable references in the consuming component or page.
+  - **No Inline Lambdas as Hook Props**: Do NOT pass inline arrow functions (e.g. `keySelector: (item) => item.id`) as hook options if they are recreated on every render. If default behavior exists (e.g. built-in `id` selectors in `usePagedQuery`), rely on the default rather than passing redundant inline callbacks. If a custom callback is required, stabilize it with `useCallback` or declare it outside the component.
+  - **Stable Filter Objects**: Ensure filter objects and options passed to hooks are stabilized using `useMemo` or primitives rather than passing inline unmemoized object literals.
+  - **Honest Dependency Arrays**: Custom hooks and components must always declare complete, honest dependency arrays that faithfully reflect all referenced reactive values.
+
 ### UI/UX & Component Guidelines
 - **Money & Numeric Inputs (`MoneyInput`)**: ALL monetary amounts, currency rates, prices, percentages, and quantities in forms and modals MUST use the shared `<MoneyInput />` component (`client/src/shared/components/MoneyInput/MoneyInput.tsx`). Do NOT use native `<Input type="number">` or `{ valueAsNumber: true }`.
   - **Required `currency` Prop**: Always pass `currency: string` (e.g. `currency="RUB"`, `currency={selectedCurrency?.name ?? ''}`, `currency="%"`, or `currency="шт."`).
