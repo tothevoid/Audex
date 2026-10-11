@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Scheduler;
 using Audex.Application.Enums.Scheduler;
 using Audex.Application.Interfaces.Scheduler;
-using Audex.Application.Tests.Fixtures;
 using Xunit;
 
 namespace Audex.Application.Tests.Services.Scheduler

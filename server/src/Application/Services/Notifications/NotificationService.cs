@@ -14,6 +14,7 @@ using Audex.Infrastructure.Interfaces.Database;
 using Audex.Infrastructure.Interfaces.Messages;
 using Audex.Infrastructure.Queries;
 using Audex.Shared.Common;
+using Audex.Shared.Constants;
 
 namespace Audex.Application.Services.Notifications
 {
@@ -74,17 +75,6 @@ namespace Audex.Application.Services.Notifications
             await _db.CommitAsync();
         }
 
-        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
-        private static string BuildNotificationReceivedMessage(NotificationDto dto) =>
-            $"{{\"type\":\"NotificationReceived\",\"payload\":{JsonSerializer.Serialize(dto, JsonOptions)}}}";
-
-        private static string BuildNotificationReadMessage(Guid notificationId) =>
-            $"{{\"type\":\"NotificationRead\",\"notificationId\":\"{notificationId}\"}}";
-
-        private static string BuildAllNotificationsReadMessage() =>
-            "{\"type\":\"AllNotificationsRead\"}";
-
         public async Task<NotificationDto> CreateAsync(
             string title,
             string message,
@@ -109,9 +99,9 @@ namespace Audex.Application.Services.Notifications
             await _notificationRepo.AddAsync(entity);
             await _db.CommitAsync();
 
-            var dto = _mapper.Map(entity);
-            await _serverNotifier.SendToAllAsync(BuildNotificationReceivedMessage(dto));
-            return dto;
+            var notificationDto = _mapper.Map(entity);
+            await _serverNotifier.SendToAllAsync(ServerNotificationEvents.NotificationReceived, notificationDto);
+            return notificationDto;
         }
 
         public async Task MarkAsReadAsync(Guid notificationId)
@@ -124,7 +114,7 @@ namespace Audex.Application.Services.Notifications
                 _notificationRepo.Update(item);
                 await _db.CommitAsync();
 
-                await _serverNotifier.SendToAllAsync(BuildNotificationReadMessage(notificationId));
+                await _serverNotifier.SendToAllAsync(ServerNotificationEvents.NotificationRead, notificationId);
             }
         }
 
@@ -145,7 +135,7 @@ namespace Audex.Application.Services.Notifications
             }
 
             await _db.CommitAsync();
-            await _serverNotifier.SendToAllAsync(BuildAllNotificationsReadMessage());
+            await _serverNotifier.SendToAllAsync(ServerNotificationEvents.AllNotificationsRead);
         }
 
         public async Task DeleteAsync(Guid notificationId)

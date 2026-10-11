@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Transactions;
 using Audex.Application.Interfaces.Transactions;
-using Audex.Application.Tests.Fixtures;
 
 namespace Audex.Application.Tests.Services.Transactions
 {

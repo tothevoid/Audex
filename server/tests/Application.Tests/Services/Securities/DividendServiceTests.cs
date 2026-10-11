@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Securities;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 using Audex.Shared.Common;
 

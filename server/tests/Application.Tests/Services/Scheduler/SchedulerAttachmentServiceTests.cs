@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.Interfaces.Scheduler;
-using Audex.Application.Tests.Fixtures;
 using Xunit;
 
 namespace Audex.Application.Tests.Services.Scheduler

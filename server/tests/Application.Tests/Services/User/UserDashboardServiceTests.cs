@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Audex.Application.Constants;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.User;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;

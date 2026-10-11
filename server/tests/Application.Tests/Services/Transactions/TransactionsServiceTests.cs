@@ -3,7 +3,6 @@ using Audex.Application.DTO.Accounts;
 using Audex.Application.DTO.Transactions;
 using Audex.Application.Interfaces.Accounts;
 using Audex.Application.Interfaces.Transactions;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 
 namespace Audex.Application.Tests.Services.Transactions

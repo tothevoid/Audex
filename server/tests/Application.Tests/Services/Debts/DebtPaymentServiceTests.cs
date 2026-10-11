@@ -5,7 +5,6 @@ using Audex.Application.DTO.Debts;
 using Audex.Application.Interfaces.Accounts;
 using Audex.Application.Interfaces.Banks;
 using Audex.Application.Interfaces.Debts;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 using Audex.Shared.Common;
 

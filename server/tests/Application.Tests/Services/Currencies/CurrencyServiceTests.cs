@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Currencies;
 using Audex.Application.Interfaces.Currencies;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 
 namespace Audex.Application.Tests.Services.Currencies

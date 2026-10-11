@@ -6,7 +6,6 @@ using Audex.Application.Interfaces.Accounts;
 using Audex.Application.Interfaces.Brokers;
 using Audex.Application.Interfaces.Securities;
 using Audex.Application.Services.Brokers;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 
 namespace Audex.Application.Tests.Services.Brokers

@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.User;
 using Audex.Application.Interfaces.User;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Entities.User;
 

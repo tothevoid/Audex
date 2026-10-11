@@ -3,7 +3,6 @@ using Audex.Application.DTO.Accounts;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.Interfaces.Accounts;
 using Audex.Application.Interfaces.Brokers;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 using System.Linq;
 

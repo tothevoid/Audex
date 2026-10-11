@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading;
@@ -9,6 +9,7 @@ using Audex.Application.Enums.Scheduler;
 using Audex.Application.Interfaces.DatabaseBackup;
 using Audex.Application.Interfaces.Scheduler;
 using Audex.Infrastructure.Interfaces.Messages;
+using Audex.Shared.Constants;
 
 namespace Audex.Application.Jobs
 {
@@ -41,12 +42,7 @@ namespace Audex.Application.Jobs
                 return;
             }
 
-            var startNotification = JsonSerializer.Serialize(new
-            {
-                type = "ScheduledTaskStarted",
-                taskName = TaskName
-            });
-            await _serverNotifier.SendToAllAsync(startNotification);
+            await _serverNotifier.SendToAllAsync(ServerNotificationEvents.ScheduledTaskStarted, TaskName);
            
             try
             {

@@ -11,6 +11,7 @@ using Audex.Infrastructure.Entities.Securities;
 using Audex.Infrastructure.Interfaces.Database;
 using Audex.Infrastructure.Interfaces.Messages;
 using Audex.Infrastructure.Queries;
+using Audex.Shared.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -154,7 +155,7 @@ namespace Audex.Application.Services.Brokers
 
             _pullQuotationsService.UpdatePullDate(date);
             await _db.CommitAsync();
-            await _serverNotifier.SendToAllAsync(JsonSerializer.Serialize(new { date }));
+            await _serverNotifier.SendToAllAsync(ServerNotificationEvents.QuotesRecalculated, new QuotesRecalculatedDto { Date = date });
         }
 
         public async Task<Guid> AddAsync(BrokerAccountSecurityDto brokerAccountSecurityDto)

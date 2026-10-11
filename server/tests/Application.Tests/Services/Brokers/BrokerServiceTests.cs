@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.Interfaces.Brokers;
-using Audex.Application.Tests.Fixtures;
 
 namespace Audex.Application.Tests.Services.Brokers
 {

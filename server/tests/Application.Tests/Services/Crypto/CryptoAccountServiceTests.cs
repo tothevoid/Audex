@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.Interfaces.Crypto;
-using Audex.Application.Tests.Fixtures;
 using Audex.Application.DTO.Crypto;
 using Audex.Infrastructure.Entities.Crypto;
 

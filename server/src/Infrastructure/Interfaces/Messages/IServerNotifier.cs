@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+#nullable enable
 using System.Threading.Tasks;
 
 namespace Audex.Infrastructure.Interfaces.Messages
 {
     public interface IServerNotifier
     {
-        public Task SendToAllAsync(string message = null);
+        Task SendToAllAsync(string eventName);
+        Task SendToAllAsync<TPayload>(string eventName, TPayload payload);
     }
 }

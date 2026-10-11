@@ -5,7 +5,6 @@ using Audex.Application.DTO;
 using Audex.Application.DTO.User;
 using Audex.Application.Interfaces.Reports;
 using Audex.Application.Interfaces.User;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 
 namespace Audex.Application.Tests.Services.Reports

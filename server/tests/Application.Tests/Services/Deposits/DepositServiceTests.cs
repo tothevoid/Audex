@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Deposits;
 using Audex.Application.Interfaces.Deposits;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 
 namespace Audex.Application.Tests.Services.Deposits

@@ -7,7 +7,6 @@ using Audex.Application.Interfaces.Dashboard;
 using Audex.Application.Interfaces.Integrations.Indices;
 using Audex.Application.Interfaces.Integrations.Oil;
 using Audex.Application.Interfaces.User;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 using Audex.Tests.Shared.Mock;
 using Microsoft.Extensions.DependencyInjection;

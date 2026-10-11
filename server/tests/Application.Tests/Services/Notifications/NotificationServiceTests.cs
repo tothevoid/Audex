@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Notifications;
 using Audex.Application.Interfaces.Notifications;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Entities.Notifications;
 using Xunit;
 

@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Debts;
 using Audex.Application.Interfaces.Debts;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 using Xunit;
 

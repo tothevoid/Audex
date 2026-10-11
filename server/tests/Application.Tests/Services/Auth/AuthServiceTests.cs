@@ -5,7 +5,6 @@ using Audex.Application.DTO.User;
 using Audex.Application.Interfaces.Auth;
 using Audex.Application.Interfaces.User;
 using Audex.Application.Mappings;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Entities.User;
 using Audex.Infrastructure.Interfaces.Database;

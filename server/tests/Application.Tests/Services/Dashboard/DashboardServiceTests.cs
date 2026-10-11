@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.Interfaces.Dashboard;
-using Audex.Application.Tests.Fixtures;
 
 namespace Audex.Application.Tests.Services.Dashboard
 {

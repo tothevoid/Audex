@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Accounts;
 using Audex.Application.Interfaces.Accounts;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Entities.Transactions;
 using Audex.Infrastructure.Interfaces.Database;

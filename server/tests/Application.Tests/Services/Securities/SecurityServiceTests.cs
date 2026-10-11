@@ -3,7 +3,6 @@ using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Integrations.Stock;
 using Audex.Application.Interfaces.Securities;
 using Audex.Application.Integrations.Stock.Moex.Model;
-using Audex.Application.Tests.Fixtures;
 using Audex.Infrastructure.Constants;
 using Audex.Tests.Shared.Mock;
 

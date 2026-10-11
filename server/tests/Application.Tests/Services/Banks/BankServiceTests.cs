@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Banks;
 using Audex.Application.Interfaces.Banks;
-using Audex.Application.Tests.Fixtures;
 
 namespace Audex.Application.Tests.Services.Banks
 {
