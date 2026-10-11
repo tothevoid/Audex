@@ -25,6 +25,13 @@
     "deposits_stats_no_data": "No payout data for the selected period",
 
     "deposits_list_only_active": "Only active",
-    "deposits_list_add_button": "Add deposit"
+    "deposits_list_add_button": "Add deposit",
+
+    "deposits_toast_created_title": "Deposit created",
+    "deposits_toast_created_desc": "Deposit \"{{name}}\" created successfully",
+    "deposits_toast_updated_title": "Deposit updated",
+    "deposits_toast_updated_desc": "Deposit \"{{name}}\" updated successfully",
+    "deposits_toast_deleted_title": "Deposit deleted",
+    "deposits_toast_deleted_desc": "Deposit \"{{name}}\" deleted"
 }
 

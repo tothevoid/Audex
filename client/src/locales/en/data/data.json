@@ -41,7 +41,48 @@
     "entity_crypto_provider_form_title": "Crypto provider",
     "entity_crypto_provider_name": "Name",
     "entity_crypto_provider_add": "Add provider",
-    "crypto_providers_delete_title": "Delete provider",
     "broker_account_types_delete_title": "Delete account type",
-    "brokers_delete_title": "Delete broker"
+    "brokers_delete_title": "Delete broker",
+
+    "bank_toast_created_title": "Bank added",
+    "bank_toast_created_desc": "Bank \"{{name}}\" added successfully",
+    "bank_toast_updated_title": "Bank updated",
+    "bank_toast_updated_desc": "Bank \"{{name}}\" updated successfully",
+    "bank_toast_deleted_title": "Bank deleted",
+    "bank_toast_deleted_desc": "Bank \"{{name}}\" deleted",
+
+    "crypto_provider_toast_created_title": "Provider added",
+    "crypto_provider_toast_created_desc": "Crypto provider \"{{name}}\" added successfully",
+    "crypto_provider_toast_updated_title": "Provider updated",
+    "crypto_provider_toast_updated_desc": "Crypto provider \"{{name}}\" updated successfully",
+    "crypto_provider_toast_deleted_title": "Provider deleted",
+    "crypto_provider_toast_deleted_desc": "Crypto provider \"{{name}}\" deleted",
+
+    "currency_toast_created_title": "Currency added",
+    "currency_toast_created_desc": "Currency \"{{name}}\" added successfully",
+    "currency_toast_updated_title": "Currency updated",
+    "currency_toast_updated_desc": "Currency \"{{name}}\" updated successfully",
+    "currency_toast_deleted_title": "Currency deleted",
+    "currency_toast_deleted_desc": "Currency \"{{name}}\" deleted",
+
+    "transaction_type_toast_created_title": "Category added",
+    "transaction_type_toast_created_desc": "Category \"{{name}}\" added successfully",
+    "transaction_type_toast_updated_title": "Category updated",
+    "transaction_type_toast_updated_desc": "Category \"{{name}}\" updated successfully",
+    "transaction_type_toast_deleted_title": "Category deleted",
+    "transaction_type_toast_deleted_desc": "Category \"{{name}}\" deleted",
+
+    "broker_account_type_toast_created_title": "Account type added",
+    "broker_account_type_toast_created_desc": "Account type \"{{name}}\" added successfully",
+    "broker_account_type_toast_updated_title": "Account type updated",
+    "broker_account_type_toast_updated_desc": "Account type \"{{name}}\" updated successfully",
+    "broker_account_type_toast_deleted_title": "Account type deleted",
+    "broker_account_type_toast_deleted_desc": "Account type \"{{name}}\" deleted",
+
+    "broker_toast_created_title": "Broker added",
+    "broker_toast_created_desc": "Broker \"{{name}}\" added successfully",
+    "broker_toast_updated_title": "Broker updated",
+    "broker_toast_updated_desc": "Broker \"{{name}}\" updated successfully",
+    "broker_toast_deleted_title": "Broker deleted",
+    "broker_toast_deleted_desc": "Broker \"{{name}}\" deleted"
 }

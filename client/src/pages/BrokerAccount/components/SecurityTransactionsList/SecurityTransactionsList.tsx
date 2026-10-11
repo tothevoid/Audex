@@ -84,11 +84,11 @@ const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransact
 		return { brokerAccountId };
 	}, [brokerAccountId, activeEntity]);
 
-	const onSecurityTransactionSaved = async (securityTransaction: SecurityTransactionEntityRequest) => {
+	const onSecurityTransactionSaved = async (securityTransaction: SecurityTransactionEntityRequest, securityName?: string) => {
 		if (mode === ActiveEntityMode.Add) {
-			await createSecurityTransactionEntity(securityTransaction);
+			await createSecurityTransactionEntity(securityTransaction, securityName);
 		} else if (mode === ActiveEntityMode.Edit) {
-			await updatedSecurityTransactionEntity(securityTransaction);
+			await updatedSecurityTransactionEntity(securityTransaction, securityName);
 		}
 		onActionEnded();
 		onTransactionsChanged();

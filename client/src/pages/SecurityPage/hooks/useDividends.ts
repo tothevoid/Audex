@@ -8,6 +8,8 @@ import {
     updateDividend
 } from "@/api/securities/dividendApi";
 import usePagedQuery from "@/shared/hooks/usePagedQuery";
+import { useTranslation } from "react-i18next";
+import { notify } from "@/shared/components/Toaster";
 
 export interface UseDividendsOptions {
     securityId: string;
@@ -39,11 +41,15 @@ export const useDividends = (options: UseDividendsOptions) => {
         initialPageSize
     });
 
+    const { t } = useTranslation();
+
     const createDividendEntity = async (createdDividend: DividendEntity) => {
         const added = await createDividend(createdDividend);
         if (!added) {
             return;
         }
+        const name = createdDividend.security?.name ?? "";
+        notify.success(t("dividends_toast_created_title"), t("dividends_toast_created_desc", { name }));
         refreshPage();
     };
 
@@ -52,6 +58,8 @@ export const useDividends = (options: UseDividendsOptions) => {
         if (!updated) {
             return;
         }
+        const name = updatedDividend.security?.name ?? "";
+        notify.success(t("dividends_toast_updated_title"), t("dividends_toast_updated_desc", { name }));
         refreshPage();
     };
 
@@ -60,6 +68,8 @@ export const useDividends = (options: UseDividendsOptions) => {
         if (!deleted) {
             return;
         }
+        const name = deletedDividend.security?.name ?? "";
+        notify.success(t("dividends_toast_deleted_title"), t("dividends_toast_deleted_desc", { name }));
         refreshPage();
     };
 

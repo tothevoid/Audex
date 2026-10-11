@@ -25,6 +25,13 @@
     "deposits_stats_no_data": "Нет данных о выплатах за выбранный период",
 
     "deposits_list_only_active": "Только активные",
-    "deposits_list_add_button": "Добавить вклад"
+    "deposits_list_add_button": "Добавить вклад",
+
+    "deposits_toast_created_title": "Вклад создан",
+    "deposits_toast_created_desc": "Вклад «{{name}}» успешно создан",
+    "deposits_toast_updated_title": "Вклад обновлён",
+    "deposits_toast_updated_desc": "Вклад «{{name}}» успешно обновлён",
+    "deposits_toast_deleted_title": "Вклад удалён",
+    "deposits_toast_deleted_desc": "Вклад «{{name}}» успешно удалён"
 }
 

@@ -60,5 +60,12 @@
 
     "stats_total_spent": "Всего расходов",
     "stats_total_income": "Всего доходов",
-    "stats_no_data": "Нет данных по расходам для графика"
+    "stats_no_data": "Нет данных по расходам для графика",
+
+    "transactions_toast_created_title": "Транзакция создана",
+    "transactions_toast_created_desc": "Транзакция «{{name}}» успешно сохранена",
+    "transactions_toast_updated_title": "Транзакция обновлена",
+    "transactions_toast_updated_desc": "Транзакция «{{name}}» успешно обновлена",
+    "transactions_toast_deleted_title": "Транзакция удалена",
+    "transactions_toast_deleted_desc": "Транзакция «{{name}}» удалена"
 }

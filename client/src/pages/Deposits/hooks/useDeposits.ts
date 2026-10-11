@@ -4,6 +4,7 @@ import { DepositEntity } from "@/models/deposits/DepositEntity";
 import { createDeposit, deleteDeposit, getDeposits, getDepositsRange, updateDeposit } from "@/api/deposits/depositApi";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 import { DepositsRange } from "@/models/deposits/depositsRange";
+import { notify } from "@/shared/components/Toaster";
 
 export interface DepositsFilters {
 	selectedMinMonths: number;
@@ -117,18 +118,30 @@ export const useDeposits = (options: UseDepositsOptions = {}) => {
 		const addedDeposit = await createDeposit(createdDeposit);
 		if (!addedDeposit) return;
 		await fetchRangeAndDeposits();
+		notify.success(
+			t("deposits_toast_created_title"),
+			t("deposits_toast_created_desc", { name: createdDeposit.name })
+		);
 	};
 
 	const updateDepositEntity = async (updatedDeposit: DepositEntity) => {
 		const updated = await updateDeposit(updatedDeposit);
 		if (!updated) return;
 		await fetchRangeAndDeposits();
+		notify.success(
+			t("deposits_toast_updated_title"),
+			t("deposits_toast_updated_desc", { name: updatedDeposit.name })
+		);
 	};
 
 	const deleteDepositEntity = async (deletedDeposit: DepositEntity) => {
 		const deleted = await deleteDeposit(deletedDeposit.id);
 		if (!deleted) return;
 		await fetchRangeAndDeposits();
+		notify.success(
+			t("deposits_toast_deleted_title"),
+			t("deposits_toast_deleted_desc", { name: deletedDeposit.name })
+		);
 	};
 
 	return {

@@ -2,11 +2,21 @@ import axios, { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from "ax
 import config from "@/config";
 import { getAccessToken, setAccessToken, clearAccessToken } from "./tokenStorage";
 import { refreshToken } from "./auth/authApi";
+import { notify } from "@/shared/components/Toaster";
+import i18n from "@/i18n";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
+
+declare module "axios" {
+    export interface AxiosRequestConfig {
+        skipErrorToast?: boolean;
+    }
+}
 
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
     _requestId?: string;
     _startTime?: number;
+    skipErrorToast?: boolean;
 }
 
 const httpClient = axios.create({
@@ -64,7 +74,7 @@ const shouldRefreshToken = (request: CustomAxiosRequestConfig): boolean => {
     return !url.includes("/Auth/Login") && !url.includes("/Auth/RefreshToken");
 };
 
-const isRefreshableAuthError = (error: AxiosError, request?: CustomAxiosRequestConfig): request is CustomAxiosRequestConfig => {
+const isRefreshableAuthError = (error: AxiosError, request?: CustomAxiosRequestConfig): boolean => {
     return !!(request && error.response?.status === 401 && !request._retry && shouldRefreshToken(request));
 };
 
@@ -119,6 +129,23 @@ httpClient.interceptors.response.use(
         }
 
         if (!isRefreshableAuthError(error, originalRequest)) {
+            const shouldSkipToast = Boolean(originalRequest?.skipErrorToast) || axios.isCancel(error);
+            const requestUrl = originalRequest?.url ?? "";
+            const isSilentAuthCheck = error.response?.status === 401 && !requestUrl.includes("/Auth/Login");
+
+            if (!shouldSkipToast && !isSilentAuthCheck) {
+                const isNetworkError = error.code === AxiosError.ERR_NETWORK || !error.response;
+                const errorMessage = isNetworkError
+                    ? i18n.t("toast_network_error")
+                    : parseErrorMessage(error, i18n.t("toast_unexpected_error"));
+
+                notify.error(i18n.t("toast_error_title"), errorMessage);
+            }
+
+            return Promise.reject(error);
+        }
+
+        if (!originalRequest) {
             return Promise.reject(error);
         }
 

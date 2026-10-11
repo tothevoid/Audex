@@ -12,15 +12,12 @@ import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/mone
 import RefreshButton from "@/shared/components/RefreshButton/RefreshButton";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
-
-interface State {
-    currencies: CurrencyEntity[],
-    hasChanges: boolean,
-    currentCurrencyId: string | null
-}
+import { notify } from "@/shared/components/Toaster";
 
 const CurrenciesTable: React.FC = () => {
-    const [state, setState] = useState<State>({currencies: [], hasChanges: false, currentCurrencyId: null});
+    const [currencies, setCurrencies] = useState<CurrencyEntity[]>([]);
+    const [hasChanges, setHasChanges] = useState(false);
+    const [currencyToDelete, setCurrencyToDelete] = useState<CurrencyEntity | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const { t } = useTranslation();
     
@@ -38,49 +35,47 @@ const CurrenciesTable: React.FC = () => {
     const fetchCurrencies = async () => { 
         setIsLoading(true);
         try {
-            const currencies = await getCurrencies();
-            setState((currentState) => {
-                return {...currentState, currencies};
-            });
+            const fetchedCurrencies = await getCurrencies();
+            setCurrencies(fetchedCurrencies);
         } finally {
             setIsLoading(false);
         }
     };
 
     const onActiveChanged = useCallback((currencyId: string, newValue: boolean) => {
-        setState((currentState) => {
-            let hasChanges = false;
-            const updatedCurrencies = currentState.currencies.map((currency: CurrencyEntity) => {
-                if (currency.id !== currencyId || currency.active === newValue) {
-                    return currency;
+        setCurrencies((currentCurrencies) => {
+            let hasNewChanges = false;
+            const updatedCurrencies = currentCurrencies.map((currencyItem: CurrencyEntity) => {
+                if (currencyItem.id !== currencyId || currencyItem.active === newValue) {
+                    return currencyItem;
                 }
 
-                hasChanges = true;
-                return {...currency, active: newValue};
+                hasNewChanges = true;
+                return { ...currencyItem, active: newValue };
             });
 
-            if (!hasChanges) {
-                return currentState;
+            if (!hasNewChanges) {
+                return currentCurrencies;
             }
 
-            return {...currentState, currencies: updatedCurrencies, hasChanges: true};
+            setHasChanges(true);
+            return updatedCurrencies;
         });
     }, []);
 
     const onCellBlur = useCallback(async (currencyId: string) => {
-        if (!state.hasChanges){
+        if (!hasChanges) {
             return;
         }
 
-        const currency = state.currencies.find((c: CurrencyEntity) => {
-            return c.id === currencyId;
-        });
+        const currency = currencies.find((currencyItem: CurrencyEntity) => currencyItem.id === currencyId);
         if (!currency) {
             return;
         }
 
-        await updateCurrency({...currency});
-    }, [state.currencies, state.hasChanges]);
+        await updateCurrency({ ...currency });
+        setHasChanges(false);
+    }, [currencies, hasChanges]);
     
     const onAdd = () => {
         modalRef.current?.openModal();
@@ -94,38 +89,31 @@ const CurrenciesTable: React.FC = () => {
 
         currency.id = createdCurrencyId;
 
-        setState((currentState) => {
-            return {...currentState, currencies: [...currentState.currencies, currency]};
-        });
+        notify.success(t("currency_toast_created_title"), t("currency_toast_created_desc", { name: currency.name }));
+
+        setCurrencies((currentCurrencies) => [...currentCurrencies, currency]);
     };
 
     const onDeleteClicked = (currency: CurrencyEntity) => {
-        setState((currentState) => {
-            return {...currentState, currentCurrencyId: currency.id};
-        });
+        setCurrencyToDelete(currency);
         confirmModalRef.current?.openModal();
     };
 
     const onDeleteConfirmed = async () => {
-        const {currentCurrencyId} = state;
-
-        if (!currentCurrencyId){
+        if (!currencyToDelete) {
             return;
         }
 
-        const isDeleted = await deleteCurrency(currentCurrencyId);
+        const isDeleted = await deleteCurrency(currencyToDelete.id);
         
         if (!isDeleted) {
             return;
         }
 
-        const currencies = state.currencies.filter((currency: CurrencyEntity) => {
-            return currency.id !== state.currentCurrencyId;
-        });
+        notify.success(t("currency_toast_deleted_title"), t("currency_toast_deleted_desc", { name: currencyToDelete.name }));
 
-        setState((currentState) => {
-            return {...currentState, currencies, currentCurrencyId: null};
-        });
+        setCurrencies((currentCurrencies) => currentCurrencies.filter((currencyItem: CurrencyEntity) => currencyItem.id !== currencyToDelete.id));
+        setCurrencyToDelete(null);
     };
 
     const onSyncRates = async () => {
@@ -179,7 +167,7 @@ const CurrenciesTable: React.FC = () => {
             }
         />
         <DataTable
-            data={state.currencies}
+            data={currencies}
             columns={columns}
             keyExtractor={(item) => item.id}
             isLoading={isLoading}

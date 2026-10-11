@@ -24,14 +24,19 @@ export const getTransactionsBySecurity = async (securityId: string): Promise<Sec
 };
 
 export const createSecurityTransaction = async (addedSecurityTransaction: SecurityTransactionEntityRequest): Promise<boolean | void> => {
-    const createdSecurityTransaction = await createEntity<SecurityTransactionEntityRequest, SecurityTransactionEntityResponse>(basicUrl, 
-        addedSecurityTransaction);
+    const createdSecurityTransaction = await createEntity<SecurityTransactionEntityRequest, SecurityTransactionEntityResponse>(
+        basicUrl, 
+        addedSecurityTransaction
+    );
 
     return !!createdSecurityTransaction;
 };
 
 export const updateSecurityTransaction = async (modifiedSecurityTransaction: SecurityTransactionEntityRequest): Promise<boolean> => {
-    return await updateEntity<SecurityTransactionEntityRequest>(basicUrl, modifiedSecurityTransaction);
+    return await updateEntity<SecurityTransactionEntityRequest>(
+        basicUrl,
+        modifiedSecurityTransaction
+    );
 };
 
 export const deleteSecurityTransaction = async (securityTransactionId: string): Promise<boolean> => {

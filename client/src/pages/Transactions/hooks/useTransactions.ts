@@ -4,6 +4,7 @@ import { TransactionEntity } from "@/models/transactions/TransactionEntity";
 import { createTransaction, getTransactions, updateTransaction, deleteTransaction } from "@/api/transactions/transactionApi";
 import { insertByPredicate, reorderByPredicate } from "@/shared/utilities/arrayUtilities";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
+import { notify } from "@/shared/components/Toaster";
 
 export interface TransactionsQuery {
 	month: number,
@@ -37,14 +38,20 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 
 	const createTransactionEntity = async (transaction: TransactionEntity) => {
 		const createdTransaction = await createTransaction(transaction);
-		
-		if (!createdTransaction || !isCurrentMonthTransaction(createdTransaction)) {
+		if (!createdTransaction) {
 			return;
 		}
 
-		const newTransactions = insertByPredicate([...transactions], createdTransaction, 
-			(transactionElm: TransactionEntity) => (transactionElm.date <= createdTransaction.date));
-		setTransactions(newTransactions);
+		if (isCurrentMonthTransaction(createdTransaction)) {
+			const newTransactions = insertByPredicate([...transactions], createdTransaction, 
+				(transactionElm: TransactionEntity) => (transactionElm.date <= createdTransaction.date));
+			setTransactions(newTransactions);
+		}
+
+		notify.success(
+			t("transactions_toast_created_title"),
+			t("transactions_toast_created_desc", { name: createdTransaction.name || `${createdTransaction.amount}` })
+		);
 	};
 
 	const updateTransactionEntity = async (updatedTransaction: TransactionEntity) => {
@@ -55,21 +62,25 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 
 		if (!isCurrentMonthTransaction(updatedTransaction)) {
 			deleteTransactionFromCollection(updatedTransaction);
-			return;
+		} else {
+			const newTransactions = transactions.map((transaction: TransactionEntity) => {
+				return transaction.id === updatedTransaction.id ?
+					{...updatedTransaction}:
+					transaction;
+			});
+
+			// TODO: date is not changed => reorder is not required 
+			const updatedTransactions = reorderByPredicate(newTransactions, updatedTransaction, 
+				(currentElement: TransactionEntity) => (currentElement.date <= updatedTransaction.date),
+				(currentElement: TransactionEntity) => (currentElement.id !== updatedTransaction.id));
+
+			setTransactions(updatedTransactions);
 		}
 
-		const newTransactions = transactions.map((transaction: TransactionEntity) => {
-			return transaction.id === updatedTransaction.id ?
-				{...updatedTransaction}:
-				transaction;
-		});
-
-		// TODO: date is not changed => reorder is not required 
-		const updatedTransactions = reorderByPredicate(newTransactions, updatedTransaction, 
-			(currentElement: TransactionEntity) => (currentElement.date <= updatedTransaction.date),
-			(currentElement: TransactionEntity) => (currentElement.id !== updatedTransaction.id));
-
-		setTransactions(updatedTransactions);
+		notify.success(
+			t("transactions_toast_updated_title"),
+			t("transactions_toast_updated_desc", { name: updatedTransaction.name || `${updatedTransaction.amount}` })
+		);
 	};
 
 	const deleteTransactionEntity = async (deletedTransaction: TransactionEntity) => {
@@ -80,6 +91,10 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 		await deleteTransaction(deletedTransaction.id);
 
 		deleteTransactionFromCollection(deletedTransaction);
+		notify.success(
+			t("transactions_toast_deleted_title"),
+			t("transactions_toast_deleted_desc", { name: deletedTransaction.name || `${deletedTransaction.amount}` })
+		);
 	};
 	
 	const deleteTransactionFromCollection = (deletingTransaction: TransactionEntity) => {

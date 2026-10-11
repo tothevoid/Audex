@@ -16,5 +16,19 @@
     "dividend_payment_form_security": "Бумага",
     "dividend_payment_form_payment": "Выплата",
 
-    "dividends_empty": "Дивиденды не найдены"
+    "dividends_empty": "Дивиденды не найдены",
+
+    "dividends_toast_created_title": "Дивиденд добавлен",
+    "dividends_toast_created_desc": "Дивиденд «{{name}}» успешно добавлен",
+    "dividends_toast_updated_title": "Дивиденд обновлён",
+    "dividends_toast_updated_desc": "Дивиденд «{{name}}» успешно обновлён",
+    "dividends_toast_deleted_title": "Дивиденд удалён",
+    "dividends_toast_deleted_desc": "Дивиденд «{{name}}» удалён",
+
+    "dividend_payment_toast_created_title": "Выплата добавлена",
+    "dividend_payment_toast_created_desc": "Выплата дивидендов «{{name}}» успешно добавлена",
+    "dividend_payment_toast_updated_title": "Выплата обновлена",
+    "dividend_payment_toast_updated_desc": "Выплата дивидендов «{{name}}» успешно обновлена",
+    "dividend_payment_toast_deleted_title": "Выплата удалена",
+    "dividend_payment_toast_deleted_desc": "Выплата дивидендов «{{name}}» удалена"
 }

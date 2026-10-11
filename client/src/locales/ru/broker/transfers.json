@@ -19,6 +19,13 @@
     "transfers_history_chart_period_deposited": "Внесено за период",
     "transfers_history_chart_period_withdrawn": "Выведено за период",
     "transfers_history_chart_net_flow": "Чистый приток",
-    "transfers_history_chart_no_transfers": "Нет данных о переводах за выбранный период"
+    "transfers_history_chart_no_transfers": "Нет данных о переводах за выбранный период",
+
+    "transfers_toast_created_title": "Перевод выполнен",
+    "transfers_toast_created_desc": "Перевод средств «{{name}}» успешно добавлен",
+    "transfers_toast_updated_title": "Перевод обновлён",
+    "transfers_toast_updated_desc": "Перевод средств «{{name}}» успешно обновлён",
+    "transfers_toast_deleted_title": "Перевод удалён",
+    "transfers_toast_deleted_desc": "Перевод средств «{{name}}» удалён"
 }
 

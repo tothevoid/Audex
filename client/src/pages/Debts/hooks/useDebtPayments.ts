@@ -9,6 +9,8 @@ import {
 } from "@/api/debts/debtPaymentApi";
 import { Nullable } from "@/shared/utilities/nullable";
 import usePagedQuery from "@/shared/hooks/usePagedQuery";
+import { useTranslation } from "react-i18next";
+import { notify } from "@/shared/components/Toaster";
 
 export interface UseDebtPaymentsOptions {
     debtId?: Nullable<string>;
@@ -45,11 +47,15 @@ export const useDebtPayments = (options: UseDebtPaymentsOptions) => {
         initialPageSize
     });
 
+    const { t } = useTranslation();
+
     const createDebtPaymentEntity = async (createdDebtPayment: DebtPaymentEntity) => {
         const added = await createDebtPayment(createdDebtPayment);
         if (!added) {
             return;
         }
+        const name = createdDebtPayment.debt?.name ?? "";
+        notify.success(t("debt_payment_toast_created_title"), t("debt_payment_toast_created_desc", { name }));
         refreshPage();
         onDataChanged();
     };
@@ -59,6 +65,8 @@ export const useDebtPayments = (options: UseDebtPaymentsOptions) => {
         if (!updated) {
             return;
         }
+        const name = updatedDebtPayment.debt?.name ?? "";
+        notify.success(t("debt_payment_toast_updated_title"), t("debt_payment_toast_updated_desc", { name }));
         refreshPage();
         onDataChanged();
     };
@@ -68,6 +76,8 @@ export const useDebtPayments = (options: UseDebtPaymentsOptions) => {
         if (!deleted) {
             return;
         }
+        const name = deletedDebt.debt?.name ?? "";
+        notify.success(t("debt_payment_toast_deleted_title"), t("debt_payment_toast_deleted_desc", { name }));
         refreshPage();
         onDataChanged();
     };

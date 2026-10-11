@@ -26,5 +26,12 @@
     "entity_currency_transaction_source_account": "From account",
     "entity_currency_transaction_source_account_placeholder": "Select source account",
     "entity_currency_transaction_destination_account": "To account",
-    "entity_currency_transaction_destination_account_placeholder": "Select destination account"
+    "entity_currency_transaction_destination_account_placeholder": "Select destination account",
+
+    "currency_transaction_toast_created_title": "Transaction created",
+    "currency_transaction_toast_created_desc": "Currency transaction \"{{name}}\" created successfully",
+    "currency_transaction_toast_updated_title": "Transaction updated",
+    "currency_transaction_toast_updated_desc": "Currency transaction \"{{name}}\" updated successfully",
+    "currency_transaction_toast_deleted_title": "Transaction deleted",
+    "currency_transaction_toast_deleted_desc": "Currency transaction \"{{name}}\" deleted"
 }

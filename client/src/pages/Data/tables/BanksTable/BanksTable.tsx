@@ -12,6 +12,7 @@ import { BsBank } from "react-icons/bs";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
 import StoredIcon from "@/shared/components/StoredIcon";
+import { notify } from "@/shared/components/Toaster";
 
 interface State {
     banks: BankEntity[]
@@ -22,7 +23,7 @@ const BanksTable: React.FC = () => {
         banks: []});
     const [isLoading, setIsLoading] = useState(true);
 
-    const [bankToDeleteId, setBankToDeleteId] = useState<string | null>(null);
+    const [bankToDelete, setBankToDelete] = useState<BankEntity | null>(null);
     const [updatedBank, setUpdatedBank] = useState<BankEntity | null>(null);
 
     const { t } = useTranslation();
@@ -46,10 +47,10 @@ const BanksTable: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (bankToDeleteId) {
+        if (bankToDelete) {
             confirmModalRef.current?.openModal();
         }
-    }, [bankToDeleteId]);
+    }, [bankToDelete]);
 
     useEffect(() => {
         if (updatedBank) {
@@ -86,6 +87,8 @@ const BanksTable: React.FC = () => {
             return;
         }
 
+        notify.success(t("bank_toast_created_title"), t("bank_toast_created_desc", { name: addedBank.name }));
+
         setState((currentState) => {
             return {...currentState, banks: [...currentState.banks, addedBank]};
         });
@@ -97,6 +100,8 @@ const BanksTable: React.FC = () => {
             return;
         }
 
+        notify.success(t("bank_toast_updated_title"), t("bank_toast_updated_desc", { name: updatedBank.name }));
+
         setState((currentState) => {
             return {...currentState, banks: currentState.banks.map(bank => 
                 bankToUpdate.id !== bank.id ?
@@ -107,28 +112,30 @@ const BanksTable: React.FC = () => {
     };
 
     const onDeleteClicked = (bank: BankEntity) => {
-        setBankToDeleteId(bank.id);
+        setBankToDelete(bank);
     };
 
     const onDeleteConfirmed = async () => {
-        if (!bankToDeleteId){
+        if (!bankToDelete){
             return;
         }
 
-        const isDeleted = await deleteBank(bankToDeleteId);
+        const isDeleted = await deleteBank(bankToDelete.id);
         
         if (!isDeleted) {
             return;
         }
 
+        notify.success(t("bank_toast_deleted_title"), t("bank_toast_deleted_desc", { name: bankToDelete.name }));
+
         const banks = state.banks.filter((bank: BankEntity) => {
-            return bank.id !== bankToDeleteId;
+            return bank.id !== bankToDelete.id;
         });
 
         setState((currentState) => {
             return {...currentState, banks: banks};
         });
-        setBankToDeleteId(null);
+        setBankToDelete(null);
     };
 
     const columns: ColumnDef<BankEntity>[] = useMemo(() => [

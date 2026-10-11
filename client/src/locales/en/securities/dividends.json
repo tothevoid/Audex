@@ -16,5 +16,19 @@
     "dividend_payment_form_security": "Security",
     "dividend_payment_form_payment": "Payment",
 
-    "dividends_empty": "No dividends found"
+    "dividends_empty": "No dividends found",
+
+    "dividends_toast_created_title": "Dividend added",
+    "dividends_toast_created_desc": "Dividend \"{{name}}\" added successfully",
+    "dividends_toast_updated_title": "Dividend updated",
+    "dividends_toast_updated_desc": "Dividend \"{{name}}\" updated successfully",
+    "dividends_toast_deleted_title": "Dividend deleted",
+    "dividends_toast_deleted_desc": "Dividend \"{{name}}\" deleted",
+
+    "dividend_payment_toast_created_title": "Payment added",
+    "dividend_payment_toast_created_desc": "Dividend payment \"{{name}}\" added successfully",
+    "dividend_payment_toast_updated_title": "Payment updated",
+    "dividend_payment_toast_updated_desc": "Dividend payment \"{{name}}\" updated successfully",
+    "dividend_payment_toast_deleted_title": "Payment deleted",
+    "dividend_payment_toast_deleted_desc": "Dividend payment \"{{name}}\" deleted"
 }

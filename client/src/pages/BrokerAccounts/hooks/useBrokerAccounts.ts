@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 import { createBrokerAccount, deleteBrokerAccount, getBrokerAccounts, updateBrokerAccount } from "@/api/brokers/brokerAccountApi";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
+import { notify } from "@/shared/components/Toaster";
 
 export const useBrokerAccounts = () => {
 	const { t } = useTranslation();
@@ -34,6 +35,10 @@ export const useBrokerAccounts = () => {
 		}
 
 		await fetchData();
+		notify.success(
+			t("broker_account_toast_created_title"),
+			t("broker_account_toast_created_desc", { name: createdBrokerAccount.name })
+		);
 	};
 
 	const updateBrokerAccountEntity = async (updatedBrokerAccount: BrokerAccountEntity) => {
@@ -43,6 +48,10 @@ export const useBrokerAccounts = () => {
 		}
 		
 		await fetchData();
+		notify.success(
+			t("broker_account_toast_updated_title"),
+			t("broker_account_toast_updated_desc", { name: updatedBrokerAccount.name })
+		);
 	};
 
 	const deleteBrokerAccountEntity = async (deletedBrokerAccount: BrokerAccountEntity) => {
@@ -55,6 +64,10 @@ export const useBrokerAccounts = () => {
 		const updatedBrokerAccounts = brokerAccounts
 			.filter((brokerAccount: BrokerAccountEntity) => brokerAccount.id !== deletedBrokerAccount.id);
 		setBrokerAccounts(updatedBrokerAccounts);
+		notify.success(
+			t("broker_account_toast_deleted_title"),
+			t("broker_account_toast_deleted_desc", { name: deletedBrokerAccount.name })
+		);
 	};
 
 	return {

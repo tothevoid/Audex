@@ -22,5 +22,12 @@
 
     "account_type_cash": "Наличные",
     "account_type_debit_card": "Дебетовая карта",
-    "account_type_credit_card": "Кредитная карта"
+    "account_type_credit_card": "Кредитная карта",
+
+    "accounts_toast_created_title": "Счёт создан",
+    "accounts_toast_created_desc": "Счёт «{{name}}» успешно создан",
+    "accounts_toast_updated_title": "Счёт обновлён",
+    "accounts_toast_updated_desc": "Счёт «{{name}}» успешно обновлён",
+    "accounts_toast_deleted_title": "Счёт удалён",
+    "accounts_toast_deleted_desc": "Счёт «{{name}}» успешно удалён"
 }

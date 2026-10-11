@@ -59,7 +59,7 @@ const CryptoAccountCryptocurrenciesList: React.FC<Props> = (props: Props) => {
 
 	const onDeleteConfirmed = async () => {
 		if (!activeEntity) return;
-		await deleteCryptoAccountCryptocurrencyEntity(activeEntity.id);
+		await deleteCryptoAccountCryptocurrencyEntity(activeEntity);
 		props.onDataChanged();
 		onActionEnded();
 	};

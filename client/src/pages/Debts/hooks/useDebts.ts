@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { DebtEntity } from "@/models/debts/DebtEntity";
 import { createDebt, deleteDebt, getDebts, updateDebt } from "@/api/debts/debtApi";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
+import { notify } from "@/shared/components/Toaster";
 
 export const useDebts = () => {
 	const { t } = useTranslation();
@@ -34,6 +35,10 @@ export const useDebts = () => {
 		}
 
 		await fetchData();
+		notify.success(
+			t("debts_toast_created_title"),
+			t("debts_toast_created_desc", { name: debt.name })
+		);
 	};
 
 	const updateDebtEntity = async (updatedDebt: DebtEntity) => {
@@ -49,6 +54,10 @@ export const useDebts = () => {
 		);
 
 		setDebts(updatedDebts);
+		notify.success(
+			t("debts_toast_updated_title"),
+			t("debts_toast_updated_desc", { name: updatedDebt.name })
+		);
 	};
 
 	const deleteDebtEntity = async (deletedDebt: DebtEntity) => {
@@ -59,6 +68,10 @@ export const useDebts = () => {
 
 		const updatedDebts = debts.filter(debt => debt.id !== deletedDebt.id);
 		setDebts(updatedDebts);
+		notify.success(
+			t("debts_toast_deleted_title"),
+			t("debts_toast_deleted_desc", { name: deletedDebt.name })
+		);
 	};
 
 	return {

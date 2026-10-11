@@ -9,14 +9,11 @@ import { BrokerAccountTypeEntity } from "@/models/brokers/BrokerAccountTypeEntit
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
-
-interface State {
-    brokerAccountTypes: BrokerAccountTypeEntity[],
-    currentBrokerAccountTypeId: string | null
-}
+import { notify } from "@/shared/components/Toaster";
 
 const BrokerAccountTypesTable: React.FC = () => {
-    const [state, setState] = useState<State>({brokerAccountTypes: [], currentBrokerAccountTypeId: null});
+    const [brokerAccountTypes, setBrokerAccountTypes] = useState<BrokerAccountTypeEntity[]>([]);
+    const [brokerAccountTypeToDelete, setBrokerAccountTypeToDelete] = useState<BrokerAccountTypeEntity | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [updatedBrokerAccountType, setUpdatedBrokerAccountType] = useState<BrokerAccountTypeEntity | null>(null);
     const { t } = useTranslation();
@@ -28,10 +25,8 @@ const BrokerAccountTypesTable: React.FC = () => {
         const initData = async () => { 
             setIsLoading(true);
             try {
-                const brokerAccountTypes = await getBrokerAccountTypes();
-                setState((currentState) => {
-                    return {...currentState, brokerAccountTypes};
-                });
+                const fetchedBrokerAccountTypes = await getBrokerAccountTypes();
+                setBrokerAccountTypes(fetchedBrokerAccountTypes);
             } finally {
                 setIsLoading(false);
             }
@@ -59,53 +54,42 @@ const BrokerAccountTypesTable: React.FC = () => {
     };
 
     const onBrokerAccountTypeSaved = async (savedAccountType: BrokerAccountTypeEntity) => {
-        const isModified = state.brokerAccountTypes.some(b => b.id === savedAccountType.id);
+        const isModified = brokerAccountTypes.some((typeItem: BrokerAccountTypeEntity) => typeItem.id === savedAccountType.id);
 
         if (isModified) {
             await updateBrokerAccountType(savedAccountType);
-            setState((currentState) => ({
-                ...currentState,
-                brokerAccountTypes: currentState.brokerAccountTypes.map(b => b.id === savedAccountType.id ? savedAccountType : b)
-            }));
+            notify.success(t("broker_account_type_toast_updated_title"), t("broker_account_type_toast_updated_desc", { name: savedAccountType.name }));
+            setBrokerAccountTypes((currentTypes) => currentTypes.map((typeItem: BrokerAccountTypeEntity) => typeItem.id === savedAccountType.id ? savedAccountType : typeItem));
         } else {
             const createdBrokerAccountType = await createBrokerAccountType(savedAccountType);
             if (!createdBrokerAccountType) {
                 return;
             }
-            setState((currentState) => ({
-                ...currentState,
-                brokerAccountTypes: [...currentState.brokerAccountTypes, createdBrokerAccountType]
-            }));
+            notify.success(t("broker_account_type_toast_created_title"), t("broker_account_type_toast_created_desc", { name: createdBrokerAccountType.name }));
+            setBrokerAccountTypes((currentTypes) => [...currentTypes, createdBrokerAccountType]);
         }
     };
 
     const onDeleteClicked = (brokerAccountType: BrokerAccountTypeEntity) => {
-        setState((currentState) => {
-            return {...currentState, currentBrokerAccountTypeId: brokerAccountType.id};
-        });
+        setBrokerAccountTypeToDelete(brokerAccountType);
         confirmModalRef.current?.openModal();
     };
 
     const onDeleteConfirmed = async () => {
-        const {currentBrokerAccountTypeId} = state;
-
-        if (!currentBrokerAccountTypeId){
+        if (!brokerAccountTypeToDelete){
             return;
         }
 
-        const isDeleted = await deleteBrokerAccountType(currentBrokerAccountTypeId);
+        const isDeleted = await deleteBrokerAccountType(brokerAccountTypeToDelete.id);
         
         if (!isDeleted) {
             return;
         }
 
-        const brokerAccountTypes = state.brokerAccountTypes.filter((brokerAccountType: BrokerAccountTypeEntity) => {
-            return brokerAccountType.id !== state.currentBrokerAccountTypeId;
-        });
+        notify.success(t("broker_account_type_toast_deleted_title"), t("broker_account_type_toast_deleted_desc", { name: brokerAccountTypeToDelete.name }));
 
-        setState((currentState) => {
-            return {...currentState, brokerAccountTypes, currentBrokerAccountTypeId: null};
-        });
+        setBrokerAccountTypes((currentTypes) => currentTypes.filter((typeItem: BrokerAccountTypeEntity) => typeItem.id !== brokerAccountTypeToDelete.id));
+        setBrokerAccountTypeToDelete(null);
     };
 
     const columns: ColumnDef<BrokerAccountTypeEntity>[] = useMemo(() => [
@@ -152,7 +136,7 @@ const BrokerAccountTypesTable: React.FC = () => {
             addButtonTitle={t("entity_broker_account_type_add")}
         />
         <DataTable
-            data={state.brokerAccountTypes}
+            data={brokerAccountTypes}
             columns={columns}
             keyExtractor={(item) => item.id}
             isLoading={isLoading}

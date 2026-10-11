@@ -25,6 +25,8 @@ import { getAccessToken } from '@/api/tokenStorage';
 import { refreshToken } from '@/api/auth/authApi';
 import { Box, Theme } from '@chakra-ui/react';
 import { useColorMode } from '@/shared/context/useColorMode';
+import { Toaster } from '@/shared/components/Toaster';
+import { useServerToasts } from '@/shared/hooks/useServerToasts';
 
 const RequireAuth = () => {
 	const token = getAccessToken();
@@ -60,18 +62,22 @@ const RequireAuth = () => {
 	return isAuthenticated ? <Outlet /> : <Navigate to="/auth" replace state={{ from: location.pathname }} />;
 };
 
-const PageWrapper = () => (
-	<UserProvider>
-		<div className="app">
-			<div className="header">
-				<Header />
+const PageWrapper = () => {
+	useServerToasts();
+
+	return (
+		<UserProvider>
+			<div className="app">
+				<div className="header">
+					<Header />
+				</div>
+				<main className="app-main">
+					<Outlet />
+				</main>
 			</div>
-			<main className="app-main">
-				<Outlet />
-			</main>
-		</div>
-	</UserProvider>
-);
+		</UserProvider>
+	);
+};
 
 const App = () => {
 	const { resolvedColorMode } = useColorMode();
@@ -106,6 +112,7 @@ const App = () => {
 						</Route>
 					</Routes>
 				</Router>
+				<Toaster />
 			</Box>
 		</Theme>
 	);

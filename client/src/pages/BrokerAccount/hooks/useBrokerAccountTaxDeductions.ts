@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { createBrokerAccountTaxDeduction, deleteBrokerAccountTaxDeduction, getBrokerAccountTaxDeductions, updateBrokerAccountTaxDeduction } from "@/api/brokers/brokerAccountTaxDeductionApi";
 import { BrokerAccountTaxDeductionEntity, TaxDeductionsQuery } from "@/models/brokers/BrokerAccountTaxDeductionEntity";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
+import { notify } from "@/shared/components/Toaster";
 
 export type { TaxDeductionsQuery };
 
@@ -33,11 +34,13 @@ export const useBrokerAccountTaxDeductions = (
 
     const createTaxDeductionEntity = async (createdTaxDeduction: BrokerAccountTaxDeductionEntity) => {
         await createBrokerAccountTaxDeduction(createdTaxDeduction);
+        notify.success(t("taxes_toast_created_title"), t("taxes_toast_created_desc", { name: createdTaxDeduction.name }));
         await fetchData();
     };
 
     const updateTaxDeductionEntity = async (updatedTaxDeduction: BrokerAccountTaxDeductionEntity) => {
         await updateBrokerAccountTaxDeduction(updatedTaxDeduction);
+        notify.success(t("taxes_toast_updated_title"), t("taxes_toast_updated_desc", { name: updatedTaxDeduction.name }));
         await fetchData();
     };
 
@@ -46,6 +49,7 @@ export const useBrokerAccountTaxDeductions = (
         if (!taxDeductionDeleted) {
             return;
         }
+        notify.success(t("taxes_toast_deleted_title"), t("taxes_toast_deleted_desc", { name: deletedTaxDeduction.name }));
         await fetchData();
     };
 

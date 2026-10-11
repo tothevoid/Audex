@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { AccountEntity } from "@/models/accounts/AccountEntity";
 import { createAccount, getAccounts, updateAccount, deleteAccount } from "@/api/accounts/accountApi";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
+import { notify } from "@/shared/components/Toaster";
 
 export interface AccountsQuery {
 	onlyActive: boolean;
@@ -41,6 +42,10 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 		}
 
 		await fetchData();
+		notify.success(
+			t("accounts_toast_created_title"),
+			t("accounts_toast_created_desc", { name: account.name })
+		);
 	};
 
 	const updateAccountEntity = async (updatedAccount: AccountEntity) => {
@@ -54,6 +59,10 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 		}
 
 		await fetchData();
+		notify.success(
+			t("accounts_toast_updated_title"),
+			t("accounts_toast_updated_desc", { name: updatedAccount.name })
+		);
 	};
 
 	const deleteAccountEntity = async (deletedAccount: AccountEntity) => {
@@ -67,6 +76,10 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 		}
 
 		await fetchData();
+		notify.success(
+			t("accounts_toast_deleted_title"),
+			t("accounts_toast_deleted_desc", { name: deletedAccount.name })
+		);
 	};
 
 	return {

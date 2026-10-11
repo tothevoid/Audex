@@ -24,6 +24,7 @@ import CashAccountHeader from "./components/CashAccountHeader";
 import { CurrencyTransactionsTable } from "./components/CurrencyTransactionsTable/CurrencyTransactionsTable";
 import CollectionPagination from "@/shared/components/CollectionPagination/CollectionPagination";
 import usePagedQuery from "@/shared/hooks/usePagedQuery";
+import { notify } from "@/shared/components/Toaster";
 
 const CashAccountPage: React.FC = () => {
     const { cashAccountId } = useParams();
@@ -94,8 +95,16 @@ const CashAccountPage: React.FC = () => {
     const onCurrencyTransactionSaved = async (transaction: CurrencyTransactionEntity) => {
         if (mode === ActiveEntityMode.Add) {
             await createCurrencyTransaction(transaction);
+            notify.success(
+                t("currency_transaction_toast_created_title"),
+                t("currency_transaction_toast_created_desc", { name: transaction.name })
+            );
         } else {
             await updateCurrencyTransaction(transaction);
+            notify.success(
+                t("currency_transaction_toast_updated_title"),
+                t("currency_transaction_toast_updated_desc", { name: transaction.name })
+            );
         }
         onActionEnded();
         refreshPage();
@@ -104,6 +113,10 @@ const CashAccountPage: React.FC = () => {
     const onDeleteConfirmed = async () => {
         if (!activeEntity) return;
         await deleteCurrencyTransaction(activeEntity.id);
+        notify.success(
+            t("currency_transaction_toast_deleted_title"),
+            t("currency_transaction_toast_deleted_desc", { name: activeEntity.name })
+        );
         onActionEnded();
         refreshPage();
     };

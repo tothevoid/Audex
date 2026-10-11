@@ -40,5 +40,19 @@
     "crypto_stats_total_value": "Общая стоимость",
     "crypto_stats_cryptocurrencies_distribution": "Распределение по криптовалютам",
     "crypto_stats_accounts_distribution": "Распределение по счетам",
-    "crypto_stats_no_data": "Нет данных для отображения статистики"
+    "crypto_stats_no_data": "Нет данных для отображения статистики",
+
+    "crypto_toast_created_title": "Криптовалюта добавлена",
+    "crypto_toast_created_desc": "Криптовалюта «{{name}}» успешно добавлена",
+    "crypto_toast_updated_title": "Криптовалюта обновлена",
+    "crypto_toast_updated_desc": "Криптовалюта «{{name}}» успешно обновлена",
+    "crypto_toast_deleted_title": "Криптовалюта удалена",
+    "crypto_toast_deleted_desc": "Криптовалюта «{{name}}» удалена",
+
+    "crypto_position_toast_created_title": "Позиция добавлена",
+    "crypto_position_toast_created_desc": "Криптовалюта «{{name}}» добавлена на счёт",
+    "crypto_position_toast_updated_title": "Позиция обновлена",
+    "crypto_position_toast_updated_desc": "Позиция «{{name}}» успешно обновлена",
+    "crypto_position_toast_deleted_title": "Позиция удалена",
+    "crypto_position_toast_deleted_desc": "Криптовалюта «{{name}}» удалена со счёта"
 }

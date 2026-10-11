@@ -19,6 +19,13 @@
     "transfers_history_chart_period_deposited": "Deposited for period",
     "transfers_history_chart_period_withdrawn": "Withdrawn for period",
     "transfers_history_chart_net_flow": "Net cashflow",
-    "transfers_history_chart_no_transfers": "No transfers data for selected period"
+    "transfers_history_chart_no_transfers": "No transfers data for selected period",
+
+    "transfers_toast_created_title": "Transfer completed",
+    "transfers_toast_created_desc": "Fund transfer \"{{name}}\" added successfully",
+    "transfers_toast_updated_title": "Transfer updated",
+    "transfers_toast_updated_desc": "Fund transfer \"{{name}}\" updated successfully",
+    "transfers_toast_deleted_title": "Transfer deleted",
+    "transfers_toast_deleted_desc": "Fund transfer \"{{name}}\" deleted"
 }
 

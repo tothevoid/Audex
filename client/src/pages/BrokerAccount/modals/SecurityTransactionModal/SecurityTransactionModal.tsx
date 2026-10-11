@@ -33,7 +33,7 @@ export interface EditSecurityTransactionContext {
 
 interface ModalProps {
 	modalRef: RefObject<BaseModalRef | null>,
-	onSaved: (securityTransaction: SecurityTransactionEntityRequest) => void,
+	onSaved: (securityTransaction: SecurityTransactionEntityRequest, securityName?: string) => void,
 	context: CreateSecurityTransactionContext | EditSecurityTransactionContext,
 	isGlobalBrokerAccount: boolean
 }
@@ -129,7 +129,7 @@ const SecurityTransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
 			brokerAccountId: securityTransaction.brokerAccount.id
 		};
 
-		props.onSaved(transaction);
+		props.onSaved(transaction, securityTransaction.security.name);
 		props.modalRef?.current?.closeModal();
 	};
 

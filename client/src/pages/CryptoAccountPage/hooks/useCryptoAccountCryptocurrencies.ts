@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { CryptoAccountCryptocurrencyEntity } from "@/models/crypto/CryptoAccountCryptocurrencyEntity";
 import { createCryptoAccountCryptocurrency, deleteCryptoAccountCryptocurrency, updateCryptoAccountCryptocurrency, getCryptocurrenciesByCryptoAccount, getTotalBalance } from "@/api/crypto/cryptoAccountCryptocurrencyApi";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
+import { notify } from "@/shared/components/Toaster";
 
 export interface CryptoAccountCryptocurrenciesQuery {
     cryptoAccountId: string
@@ -40,16 +41,22 @@ export const useCryptoAccountCryptocurrencies = (queryParameters: CryptoAccountC
 
     const addCryptoAccountCryptocurrencyEntity = async (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => {
         await createCryptoAccountCryptocurrency(cryptoAccountCryptocurrency);
+        const name = cryptoAccountCryptocurrency.cryptocurrency?.name ?? "";
+        notify.success(t("crypto_position_toast_created_title"), t("crypto_position_toast_created_desc", { name }));
         await fetchData();
     };
 
     const updateCryptoAccountCryptocurrencyEntity = async (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => {
         await updateCryptoAccountCryptocurrency(cryptoAccountCryptocurrency);
+        const name = cryptoAccountCryptocurrency.cryptocurrency?.name ?? "";
+        notify.success(t("crypto_position_toast_updated_title"), t("crypto_position_toast_updated_desc", { name }));
         await fetchData();
     };
 
-    const deleteCryptoAccountCryptocurrencyEntity = async (id: string) => {
-        await deleteCryptoAccountCryptocurrency(id);
+    const deleteCryptoAccountCryptocurrencyEntity = async (deletedCryptoPosition: CryptoAccountCryptocurrencyEntity) => {
+        const name = deletedCryptoPosition.cryptocurrency?.name ?? "";
+        await deleteCryptoAccountCryptocurrency(deletedCryptoPosition.id);
+        notify.success(t("crypto_position_toast_deleted_title"), t("crypto_position_toast_deleted_desc", { name }));
         await fetchData();
     };
 

@@ -31,5 +31,19 @@
     "debts_header_title": "Debtors",
     "debts_header_total_amount": "Lent",
     "debts_header_active_count": "Active debtors",
-    "debts_header_total_count": "Total debtors"
+    "debts_header_total_count": "Total debtors",
+
+    "debts_toast_created_title": "Debt created",
+    "debts_toast_created_desc": "Debt \"{{name}}\" created successfully",
+    "debts_toast_updated_title": "Debt updated",
+    "debts_toast_updated_desc": "Debt \"{{name}}\" updated successfully",
+    "debts_toast_deleted_title": "Debt deleted",
+    "debts_toast_deleted_desc": "Debt \"{{name}}\" deleted",
+
+    "debt_payment_toast_created_title": "Payment added",
+    "debt_payment_toast_created_desc": "Payment for debt \"{{name}}\" added successfully",
+    "debt_payment_toast_updated_title": "Payment updated",
+    "debt_payment_toast_updated_desc": "Payment for debt \"{{name}}\" updated successfully",
+    "debt_payment_toast_deleted_title": "Payment deleted",
+    "debt_payment_toast_deleted_desc": "Payment for debt \"{{name}}\" deleted"
 }

@@ -81,5 +81,12 @@
     "broker_account_daily_stats_max_value_column": "Макс. цена",
     "broker_account_daily_stats_diff_column": "Разница",
     "broker_account_daily_stats_percentage_diff_column": "Разница в %",
-    "broker_account_daily_stats_total_diff_column": "Общая разница"
+    "broker_account_daily_stats_total_diff_column": "Общая разница",
+
+    "broker_account_toast_created_title": "Брокерский счёт создан",
+    "broker_account_toast_created_desc": "Счёт «{{name}}» успешно добавлен",
+    "broker_account_toast_updated_title": "Брокерский счёт обновлён",
+    "broker_account_toast_updated_desc": "Счёт «{{name}}» успешно обновлён",
+    "broker_account_toast_deleted_title": "Брокерский счёт удалён",
+    "broker_account_toast_deleted_desc": "Счёт «{{name}}» удалён"
 }

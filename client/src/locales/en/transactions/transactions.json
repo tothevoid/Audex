@@ -60,5 +60,12 @@
 
     "stats_total_spent": "Total Expenses",
     "stats_total_income": "Total Income",
-    "stats_no_data": "No expense data for chart"
+    "stats_no_data": "No expense data for chart",
+
+    "transactions_toast_created_title": "Transaction created",
+    "transactions_toast_created_desc": "Transaction \"{{name}}\" created successfully",
+    "transactions_toast_updated_title": "Transaction updated",
+    "transactions_toast_updated_desc": "Transaction \"{{name}}\" updated successfully",
+    "transactions_toast_deleted_title": "Transaction deleted",
+    "transactions_toast_deleted_desc": "Transaction \"{{name}}\" deleted"
 }

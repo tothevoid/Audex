@@ -9,14 +9,11 @@ import BrokerModal from "@/pages/Data/modals/BrokerModal/BrokerModal";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
-
-interface State {
-    brokers: BrokerEntity[],
-    currentBrokerId: string | null
-}
+import { notify } from "@/shared/components/Toaster";
 
 const BrokersTable: React.FC = () => {
-    const [state, setState] = useState<State>({brokers: [], currentBrokerId: null});
+    const [brokers, setBrokers] = useState<BrokerEntity[]>([]);
+    const [brokerToDelete, setBrokerToDelete] = useState<BrokerEntity | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [updatedBroker, setUpdatedBroker] = useState<BrokerEntity | null>(null);
     const { t } = useTranslation();
@@ -28,10 +25,8 @@ const BrokersTable: React.FC = () => {
         const initData = async () => { 
             setIsLoading(true);
             try {
-                const brokers = await getBrokers();
-                setState((currentState) => {
-                    return {...currentState, brokers};
-                });
+                const fetchedBrokers = await getBrokers();
+                setBrokers(fetchedBrokers);
             } finally {
                 setIsLoading(false);
             }
@@ -59,53 +54,42 @@ const BrokersTable: React.FC = () => {
     };
 
     const onBrokerSaved = async (savedBroker: BrokerEntity) => {
-        const isModified = state.brokers.some(b => b.id === savedBroker.id);
+        const isModified = brokers.some((brokerItem: BrokerEntity) => brokerItem.id === savedBroker.id);
 
         if (isModified) {
             await updateBroker(savedBroker);
-            setState((currentState) => ({
-                ...currentState,
-                brokers: currentState.brokers.map(b => b.id === savedBroker.id ? savedBroker : b)
-            }));
+            notify.success(t("broker_toast_updated_title"), t("broker_toast_updated_desc", { name: savedBroker.name }));
+            setBrokers((currentBrokers) => currentBrokers.map((brokerItem: BrokerEntity) => brokerItem.id === savedBroker.id ? savedBroker : brokerItem));
         } else {
             const createdBroker = await createBroker(savedBroker);
             if (!createdBroker) {
                 return;
             }
-            setState((currentState) => ({
-                ...currentState,
-                brokers: [...currentState.brokers, createdBroker]
-            }));
+            notify.success(t("broker_toast_created_title"), t("broker_toast_created_desc", { name: createdBroker.name }));
+            setBrokers((currentBrokers) => [...currentBrokers, createdBroker]);
         }
     };
 
     const onDeleteClicked = (broker: BrokerEntity) => {
-        setState((currentState) => {
-            return {...currentState, currentBrokerId: broker.id};
-        });
+        setBrokerToDelete(broker);
         confirmModalRef.current?.openModal();
     };
 
     const onDeleteConfirmed = async () => {
-        const {currentBrokerId} = state;
-
-        if (!currentBrokerId){
+        if (!brokerToDelete) {
             return;
         }
 
-        const isDeleted = await deleteBroker(currentBrokerId);
+        const isDeleted = await deleteBroker(brokerToDelete.id);
         
         if (!isDeleted) {
             return;
         }
 
-        const brokers = state.brokers.filter((broker: BrokerEntity) => {
-            return broker.id !== state.currentBrokerId;
-        });
+        notify.success(t("broker_toast_deleted_title"), t("broker_toast_deleted_desc", { name: brokerToDelete.name }));
 
-        setState((currentState) => {
-            return {...currentState, brokers, currentBrokerId: null};
-        });
+        setBrokers((currentBrokers) => currentBrokers.filter((brokerItem: BrokerEntity) => brokerItem.id !== brokerToDelete.id));
+        setBrokerToDelete(null);
     };
 
     const columns: ColumnDef<BrokerEntity>[] = useMemo(() => [
@@ -152,7 +136,7 @@ const BrokersTable: React.FC = () => {
             addButtonTitle={t("entity_broker_add")}
         />
         <DataTable
-            data={state.brokers}
+            data={brokers}
             columns={columns}
             keyExtractor={(item) => item.id}
             isLoading={isLoading}

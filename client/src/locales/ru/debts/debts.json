@@ -31,5 +31,19 @@
     "debts_header_title": "Должники",
     "debts_header_total_amount": "Одолжено",
     "debts_header_active_count": "Активные должники",
-    "debts_header_total_count": "Всего должников"
+    "debts_header_total_count": "Всего должников",
+
+    "debts_toast_created_title": "Долг создан",
+    "debts_toast_created_desc": "Долг «{{name}}» успешно добавлен",
+    "debts_toast_updated_title": "Долг обновлён",
+    "debts_toast_updated_desc": "Долг «{{name}}» успешно обновлён",
+    "debts_toast_deleted_title": "Долг удалён",
+    "debts_toast_deleted_desc": "Долг «{{name}}» удалён",
+
+    "debt_payment_toast_created_title": "Платёж добавлен",
+    "debt_payment_toast_created_desc": "Платёж по долгу «{{name}}» успешно добавлен",
+    "debt_payment_toast_updated_title": "Платёж обновлён",
+    "debt_payment_toast_updated_desc": "Платёж по долгу «{{name}}» успешно обновлён",
+    "debt_payment_toast_deleted_title": "Платёж удалён",
+    "debt_payment_toast_deleted_desc": "Платёж по долгу «{{name}}» удалён"
 }

@@ -1,0 +1,9 @@
+{
+    "toast_success_title": "Success",
+    "toast_error_title": "Error",
+    "toast_warning_title": "Warning",
+    "toast_info_title": "Information",
+    "toast_unexpected_error": "An unexpected server error occurred",
+    "toast_network_error": "Network connection error",
+    "toast_notification_new": "New notification"
+}

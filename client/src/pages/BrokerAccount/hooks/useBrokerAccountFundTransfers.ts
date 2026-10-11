@@ -10,6 +10,8 @@ import {
 import { BrokerAccountFundTransferEntity } from "@/models/brokers/BrokerAccountFundTransfer";
 import { Nullable } from "@/shared/utilities/nullable";
 import usePagedQuery from "@/shared/hooks/usePagedQuery";
+import { useTranslation } from "react-i18next";
+import { notify } from "@/shared/components/Toaster";
 
 export interface UseBrokerAccountFundTransfersOptions {
     brokerAccountId?: Nullable<string>;
@@ -41,13 +43,19 @@ export const useBrokerAccountFundTransfers = (options: UseBrokerAccountFundTrans
         initialPageSize
     });
 
+    const { t } = useTranslation();
+
     const createFundTransferEntity = async (createdFundTransfer: BrokerAccountFundTransferEntity) => {
         await createBrokerAccountFundsTransfer(createdFundTransfer);
+        const name = createdFundTransfer.brokerAccount?.name ?? createdFundTransfer.account?.name ?? "";
+        notify.success(t("transfers_toast_created_title"), t("transfers_toast_created_desc", { name }));
         refreshPage();
     };
 
     const updateFundTransferEntity = async (updatedFundTransfer: BrokerAccountFundTransferEntity) => {
         await updateBrokerAccountFundsTransfer(updatedFundTransfer);
+        const name = updatedFundTransfer.brokerAccount?.name ?? updatedFundTransfer.account?.name ?? "";
+        notify.success(t("transfers_toast_updated_title"), t("transfers_toast_updated_desc", { name }));
         refreshPage();
     };
 
@@ -56,6 +64,8 @@ export const useBrokerAccountFundTransfers = (options: UseBrokerAccountFundTrans
         if (!fundTransferDeleted) {
             return;
         }
+        const name = deletedFundTransfer.brokerAccount?.name ?? deletedFundTransfer.account?.name ?? "";
+        notify.success(t("transfers_toast_deleted_title"), t("transfers_toast_deleted_desc", { name }));
         refreshPage();
     };
 

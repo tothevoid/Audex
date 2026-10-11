@@ -1,0 +1,9 @@
+{
+    "toast_success_title": "Успешно",
+    "toast_error_title": "Ошибка",
+    "toast_warning_title": "Внимание",
+    "toast_info_title": "Информация",
+    "toast_unexpected_error": "Произошла непредвиденная ошибка при запросе к серверу",
+    "toast_network_error": "Ошибка подключения к сети",
+    "toast_notification_new": "Новое уведомление"
+}

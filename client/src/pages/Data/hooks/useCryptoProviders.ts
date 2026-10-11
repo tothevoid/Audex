@@ -4,6 +4,7 @@ import { CryptoProviderEntity } from "@/models/crypto/CryptoProviderEntity";
 import { createCryptoProvider, deleteCryptoProvider, getCryptoProviders, updateCryptoProvider } from "@/api/crypto/cryptoProviderApi";
 import { Nullable } from "@/shared/utilities/nullable";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
+import { notify } from "@/shared/components/Toaster";
 
 export const useCryptoProviders = () => {
     const { t } = useTranslation();
@@ -34,6 +35,7 @@ export const useCryptoProviders = () => {
             return;
         }
 
+        notify.success(t("crypto_provider_toast_created_title"), t("crypto_provider_toast_created_desc", { name: addedCryptoProvider.name }));
         setCryptoProviders([addedCryptoProvider, ...cryptoProviders]);
     };
 
@@ -42,6 +44,8 @@ export const useCryptoProviders = () => {
         if (!cryptoProviderUpdated) {
             return;
         }
+
+        notify.success(t("crypto_provider_toast_updated_title"), t("crypto_provider_toast_updated_desc", { name: updatedCryptoProvider.name }));
 
         const updatedCryptoProviders = cryptoProviders.map((provider: CryptoProviderEntity) => 
             provider.id === updatedCryptoProvider.id ?
@@ -58,6 +62,8 @@ export const useCryptoProviders = () => {
         if (!cryptoProviderDeleted) {
             return;
         }
+
+        notify.success(t("crypto_provider_toast_deleted_title"), t("crypto_provider_toast_deleted_desc", { name: deletedCryptoProvider.name }));
 
         const updatedCryptoProviders = cryptoProviders
             .filter((cryptoProvider: CryptoProviderEntity) => cryptoProvider.id !== deletedCryptoProvider.id);

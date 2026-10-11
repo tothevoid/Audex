@@ -22,5 +22,12 @@
 
     "account_type_cash": "Cash",
     "account_type_debit_card": "Debit card",
-    "account_type_credit_card": "Credit card"
+    "account_type_credit_card": "Credit card",
+
+    "accounts_toast_created_title": "Account created",
+    "accounts_toast_created_desc": "Account \"{{name}}\" created successfully",
+    "accounts_toast_updated_title": "Account updated",
+    "accounts_toast_updated_desc": "Account \"{{name}}\" updated successfully",
+    "accounts_toast_deleted_title": "Account deleted",
+    "accounts_toast_deleted_desc": "Account \"{{name}}\" deleted"
 }

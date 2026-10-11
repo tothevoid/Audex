@@ -85,7 +85,14 @@
     "security_transactions_empty": "No transactions found",
     "security_transaction_broker_commission_short": "broker",
     "security_transaction_exchange_commission_short": "exchange",
-    "security_transaction_tax_short": "tax"
+    "security_transaction_tax_short": "tax",
+
+    "security_transactions_toast_created_title": "Transaction added",
+    "security_transactions_toast_created_desc": "Transaction for security \"{{name}}\" added successfully",
+    "security_transactions_toast_updated_title": "Transaction updated",
+    "security_transactions_toast_updated_desc": "Transaction for security \"{{name}}\" updated successfully",
+    "security_transactions_toast_deleted_title": "Transaction deleted",
+    "security_transactions_toast_deleted_desc": "Transaction for security \"{{name}}\" deleted"
 }
 
 

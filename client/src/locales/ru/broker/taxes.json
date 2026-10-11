@@ -6,5 +6,12 @@
     "broker_account_tax_deduction_modal_broker_account": "Брокерский счёт",
     "broker_account_tax_deduction_modal_name_placeholder": "Введите название",
     "broker_account_tax_deduction_modal_date_applied": "Дата применения",
-    "entity_broker_account_tax_deduction_delete_title": "Удалить налоговый вычет"
+    "entity_broker_account_tax_deduction_delete_title": "Удалить налоговый вычет",
+
+    "taxes_toast_created_title": "Вычет добавлен",
+    "taxes_toast_created_desc": "Налоговый вычет «{{name}}» успешно добавлен",
+    "taxes_toast_updated_title": "Вычет обновлён",
+    "taxes_toast_updated_desc": "Налоговый вычет «{{name}}» успешно обновлён",
+    "taxes_toast_deleted_title": "Вычет удалён",
+    "taxes_toast_deleted_desc": "Налоговый вычет «{{name}}» удалён"
 }

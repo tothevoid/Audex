@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { CryptocurrencyEntity } from "@/models/crypto/CryptocurrencyEntity";
 import { createCryptocurrency, deleteCryptocurrency, getCryptocurrencies, updateCryptocurrency } from "@/api/crypto/cryptocurrencyApi";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
+import { notify } from "@/shared/components/Toaster";
 
 export const useCryptocurrencies = () => {
     const { t } = useTranslation();
@@ -32,6 +33,7 @@ export const useCryptocurrencies = () => {
             return;
         }
 
+        notify.success(t("crypto_toast_created_title"), t("crypto_toast_created_desc", { name: createResult.name }));
         setCryptocurrencies([createResult, ...cryptocurrencies]);
     };
 
@@ -40,7 +42,8 @@ export const useCryptocurrencies = () => {
         if (!updateResult) {
             return;
         }
-    
+
+        notify.success(t("crypto_toast_updated_title"), t("crypto_toast_updated_desc", { name: updatedCryptocurrency.name }));
         await fetchData();
     };
 
@@ -50,6 +53,7 @@ export const useCryptocurrencies = () => {
             return;
         }
 
+        notify.success(t("crypto_toast_deleted_title"), t("crypto_toast_deleted_desc", { name: deletedCryptocurrency.name }));
         await fetchData();
     };
 

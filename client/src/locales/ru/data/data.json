@@ -41,7 +41,48 @@
     "entity_crypto_provider_form_title": "Крипто провайдер",
     "entity_crypto_provider_name": "Название",
     "entity_crypto_provider_add": "Добавить провайдера",
-    "crypto_providers_delete_title": "Удалить провайдера",
     "broker_account_types_delete_title": "Удалить тип счёта",
-    "brokers_delete_title": "Удалить брокера"
+    "brokers_delete_title": "Удалить брокера",
+
+    "bank_toast_created_title": "Банк добавлен",
+    "bank_toast_created_desc": "Банк «{{name}}» успешно добавлен",
+    "bank_toast_updated_title": "Банк обновлён",
+    "bank_toast_updated_desc": "Банк «{{name}}» успешно обновлён",
+    "bank_toast_deleted_title": "Банк удалён",
+    "bank_toast_deleted_desc": "Банк «{{name}}» удалён",
+
+    "crypto_provider_toast_created_title": "Провайдер добавлен",
+    "crypto_provider_toast_created_desc": "Крипто-провайдер «{{name}}» успешно добавлен",
+    "crypto_provider_toast_updated_title": "Провайдер обновлён",
+    "crypto_provider_toast_updated_desc": "Крипто-провайдер «{{name}}» успешно обновлён",
+    "crypto_provider_toast_deleted_title": "Провайдер удалён",
+    "crypto_provider_toast_deleted_desc": "Крипто-провайдер «{{name}}» удалён",
+
+    "currency_toast_created_title": "Валюта добавлена",
+    "currency_toast_created_desc": "Валюта «{{name}}» успешно добавлена",
+    "currency_toast_updated_title": "Валюта обновлена",
+    "currency_toast_updated_desc": "Валюта «{{name}}» успешно обновлена",
+    "currency_toast_deleted_title": "Валюта удалена",
+    "currency_toast_deleted_desc": "Валюта «{{name}}» удалена",
+
+    "transaction_type_toast_created_title": "Категория добавлена",
+    "transaction_type_toast_created_desc": "Категория «{{name}}» успешно добавлена",
+    "transaction_type_toast_updated_title": "Категория обновлена",
+    "transaction_type_toast_updated_desc": "Категория «{{name}}» успешно обновлена",
+    "transaction_type_toast_deleted_title": "Категория удалена",
+    "transaction_type_toast_deleted_desc": "Категория «{{name}}» удалена",
+
+    "broker_account_type_toast_created_title": "Тип счёта добавлен",
+    "broker_account_type_toast_created_desc": "Тип счёта «{{name}}» успешно добавлен",
+    "broker_account_type_toast_updated_title": "Тип счёта обновлён",
+    "broker_account_type_toast_updated_desc": "Тип счёта «{{name}}» успешно обновлён",
+    "broker_account_type_toast_deleted_title": "Тип счёта удалён",
+    "broker_account_type_toast_deleted_desc": "Тип счёта «{{name}}» удалён",
+
+    "broker_toast_created_title": "Брокер добавлен",
+    "broker_toast_created_desc": "Брокер «{{name}}» успешно добавлен",
+    "broker_toast_updated_title": "Брокер обновлён",
+    "broker_toast_updated_desc": "Брокер «{{name}}» успешно обновлён",
+    "broker_toast_deleted_title": "Брокер удалён",
+    "broker_toast_deleted_desc": "Брокер «{{name}}» удалён"
 }

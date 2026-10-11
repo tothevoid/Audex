@@ -8,6 +8,7 @@ import {
 	SecurityTransactionsRequest
 } from "@/models/securities/SecurityTransactionsRequest";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
+import { notify } from "@/shared/components/Toaster";
 
 export const useSecurityTransactions = (brokerAccountId: Nullable<string>) => {
 	const { t } = useTranslation();
@@ -44,21 +45,21 @@ export const useSecurityTransactions = (brokerAccountId: Nullable<string>) => {
 		fetchData();
 	}, [fetchData]);
 
-	const createSecurityTransactionEntity = async (createdSecurityTransaction: SecurityTransactionEntityRequest) => {
+	const createSecurityTransactionEntity = async (createdSecurityTransaction: SecurityTransactionEntityRequest, securityName?: string) => {
 		const securityTransaction = await createSecurityTransaction(createdSecurityTransaction);
 		if (!securityTransaction) {
 			return;
 		}
-
+		notify.success(t("security_transactions_toast_created_title"), t("security_transactions_toast_created_desc", { name: securityName ?? "" }));
 		await fetchData();
 	};
 
-	const updatedSecurityTransactionEntity = async (updatedSecurityTransaction: SecurityTransactionEntityRequest) => {
+	const updatedSecurityTransactionEntity = async (updatedSecurityTransaction: SecurityTransactionEntityRequest, securityName?: string) => {
 		const securityTransactionUpdated = await updateSecurityTransaction(updatedSecurityTransaction);
 		if (!securityTransactionUpdated) {
 			return;
 		}
-
+		notify.success(t("security_transactions_toast_updated_title"), t("security_transactions_toast_updated_desc", { name: securityName ?? "" }));
 		await fetchData();
 	};
 
@@ -67,7 +68,8 @@ export const useSecurityTransactions = (brokerAccountId: Nullable<string>) => {
 		if (!securityTransactionDeleted) {
 			return;
 		}
-
+		const name = deletedSecurityTransaction.security?.name ?? "";
+		notify.success(t("security_transactions_toast_deleted_title"), t("security_transactions_toast_deleted_desc", { name }));
 		await fetchData();
 	};
 

@@ -81,5 +81,12 @@
     "broker_account_daily_stats_max_value_column": "Max value",
     "broker_account_daily_stats_diff_column": "Diff",
     "broker_account_daily_stats_percentage_diff_column": "Percentage diff",
-    "broker_account_daily_stats_total_diff_column": "Total diff"
+    "broker_account_daily_stats_total_diff_column": "Total diff",
+
+    "broker_account_toast_created_title": "Brokerage account created",
+    "broker_account_toast_created_desc": "Account \"{{name}}\" created successfully",
+    "broker_account_toast_updated_title": "Brokerage account updated",
+    "broker_account_toast_updated_desc": "Account \"{{name}}\" updated successfully",
+    "broker_account_toast_deleted_title": "Brokerage account deleted",
+    "broker_account_toast_deleted_desc": "Account \"{{name}}\" deleted"
 }

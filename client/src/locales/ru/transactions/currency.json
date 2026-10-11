@@ -26,5 +26,12 @@
     "entity_currency_transaction_source_account": "Со счёта",
     "entity_currency_transaction_source_account_placeholder": "Выберите счёт списания",
     "entity_currency_transaction_destination_account": "На счёт",
-    "entity_currency_transaction_destination_account_placeholder": "Выберите счёт зачисления"
+    "entity_currency_transaction_destination_account_placeholder": "Выберите счёт зачисления",
+
+    "currency_transaction_toast_created_title": "Операция создана",
+    "currency_transaction_toast_created_desc": "Валютная операция «{{name}}» успешно сохранена",
+    "currency_transaction_toast_updated_title": "Операция обновлена",
+    "currency_transaction_toast_updated_desc": "Валютная операция «{{name}}» успешно обновлена",
+    "currency_transaction_toast_deleted_title": "Операция удалена",
+    "currency_transaction_toast_deleted_desc": "Валютная операция «{{name}}» успешно удалена"
 }
