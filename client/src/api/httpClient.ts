@@ -135,11 +135,18 @@ httpClient.interceptors.response.use(
 
             if (!shouldSkipToast && !isSilentAuthCheck) {
                 const isNetworkError = error.code === AxiosError.ERR_NETWORK || !error.response;
-                const errorMessage = isNetworkError
-                    ? i18n.t("toast_network_error")
-                    : parseErrorMessage(error, i18n.t("toast_unexpected_error"));
-
-                notify.error(i18n.t("toast_error_title"), errorMessage);
+                if (isNetworkError) {
+                    notify.error(i18n.t("toast_error_title"), {
+                        id: "network_error_toast",
+                        description: i18n.t("toast_network_error")
+                    });
+                } else {
+                    const errorMessage = parseErrorMessage(error, i18n.t("toast_unexpected_error"));
+                    notify.error(i18n.t("toast_error_title"), {
+                        id: `api_error_${errorMessage}`,
+                        description: errorMessage
+                    });
+                }
             }
 
             return Promise.reject(error);
