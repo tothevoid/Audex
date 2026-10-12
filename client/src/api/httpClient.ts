@@ -38,7 +38,7 @@ httpClient.interceptors.request.use((requestConfig: InternalAxiosRequestConfig) 
 
     if (import.meta.env.DEV) {
         const httpMethod = requestConfig.method?.toUpperCase() ?? "GET";
-        console.debug(`[Req ${requestId.slice(0, 8)}] ${httpMethod} ${requestConfig.url}`);
+        console.info(`[Req ${requestId.slice(0, 8)}] ${httpMethod} ${requestConfig.url}`);
     }
 
     return requestConfig;
@@ -115,7 +115,7 @@ httpClient.interceptors.response.use(
     response => {
         if (import.meta.env.DEV) {
             const { duration, requestId, httpMethod, url } = getRequestLogMetadata(response.config as CustomAxiosRequestConfig);
-            console.debug(`[Res ${requestId}] ${response.status} ${httpMethod} ${url} (${duration}ms)`);
+            console.info(`[Res ${requestId}] ${response.status} ${httpMethod} ${url} (${duration}ms)`);
         }
         return response;
     },
