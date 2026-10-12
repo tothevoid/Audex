@@ -2,8 +2,6 @@
 
 This document contains guidelines, coding standards, and architectural patterns for developing features in Audex.
 
-> **Important**: This document (`AGENTS.md`) and `claude.md` must ALWAYS be updated synchronously whenever development rules, guidelines, or patterns are modified.
-
 ---
 
 ## 🧹 Clean Code & Engineering Standards
@@ -27,6 +25,30 @@ This document contains guidelines, coding standards, and architectural patterns 
 ### 5. Strict Typing & No Type Crutches
 - **No `any` or Cast-Through-`unknown` Crutches**: NEVER use `any` or cast types through `unknown` as a workaround when concrete domain interfaces, component props, chart tooltips, or form models exist or can be defined.
 - **Valid TypeScript `catch` Syntax**: TypeScript catch blocks must use `catch (error: unknown)` or `catch (error)`. Do not use `catch (error: Error)` (which is invalid TypeScript TS1196). Error properties must be extracted using `parseErrorMessage` and `parseErrorCode`.
+- **Clean Naming & No Ghost/`Any*` Aliases**: When replacing or eliminating legacy untyped constructs, completely delete obsolete types and aliases. Do NOT leave dummy bridge aliases (especially with prefixes like `Any*`, e.g. `type AnyWidgetDescriptor = WidgetDescriptor`), which perpetuate naming ambiguity and look like type crutches.
+- **Explicit Domain Base Types Instead of Raw Utility Maps**: For extensible polymorphic abstractions (e.g. widget settings, plugin configs, entity payloads), always define a semantic domain base type (e.g. `BaseWidgetSettings`, `BasePluginConfig`) rather than scattering technical utility types like `Record<string, unknown>` across component props, modal interfaces, and function signatures.
+
+### 6. Strict Domain Integrity & No Weakening for Compiler
+- **No Weakening Domain Models for Compiler Convenience**: NEVER make mandatory properties of domain entities, interfaces, or forms optional (`?:`) or nullable just to satisfy compiler variance, assignability to generic collections, or quick error suppression. Domain models MUST strictly reflect domain invariants.
+- **Adapters at Integration Boundaries**: If a polymorphic or generic container operates on a base type, bridge the type difference at the integration boundary (via adapter patterns or descriptor implementations), NEVER by degrading the integrity of the underlying domain model.
+
+### 7. Dependency Inversion in Types & Contracts
+- **Abstract Contracts Must Not Depend on Concrete Implementations**: Base type definition files, abstract contracts, and generic registries (e.g. `types.ts`, base descriptors) MUST NEVER import concrete feature implementations, domain settings, or plugin entities to build closed unions.
+- **Open for Extension**: Base contracts must remain decoupled and open for extension. Concrete feature modules depend on base contracts, never the reverse.
+
+### 8. Zero Dead Code & Immediate Cleanup
+- **No Lingering Temporary Code**: When completing refactorings, changing method/prop signatures, or removing temporary bridge logic, immediately and thoroughly remove all obsolete constructs, temporary adapter functions, and dead code.
+- **Unused Imports Hygiene**: NEVER leave unused imports (`unused imports`) in files after refactoring. Clean up imports immediately upon changing file contents.
+- **No Commented-Out Code or Debug Artifacts**: Never leave commented-out code blocks, temporary `console.log` statements, mock flags, or obsolete `TODO`/`FIXME` notes. Every step must result in clean, production-ready code.
+- **Signature Cleanup**: If a function parameter, component prop, or interface field becomes unused as a result of a change, cleanly remove it from the signature and all call sites rather than leaving orphaned parameters.
+
+### 9. Transparent Linter & Tooling Diagnostics
+- **No Silent Rule Disabling**: When a major dependency update (e.g. ESLint plugins, compiler rules) introduces a new batch of diagnostics or stricter rules (e.g. React Compiler rules), NEVER silently disable, replace, or suppress the rules in config files without first analyzing the diagnostics and presenting the architectural trade-offs to the user.
+
+### 10. Git & Version Control Policy: No Commits in Main Repository
+- **Commit Prohibition in Main Repo**: The agent MUST NEVER create git commits (`git commit`), amend commits, or push (`git push`) in the main codebase repository (`Audex`).
+- **User Commits Code**: All commits and pushes in the main repository are handled exclusively by the user.
+- **Allowed Documentation Repo**: The agent is ONLY permitted to create commits in the documentation repository (`*.Docs`).
 
 ---
 
