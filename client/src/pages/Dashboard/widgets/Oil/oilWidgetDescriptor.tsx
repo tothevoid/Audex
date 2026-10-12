@@ -1,11 +1,11 @@
+import React from "react";
 import { BsDropletHalf } from "react-icons/bs";
 import { DashboardWidgetType } from "@/models/dashboard/WidgetEntity";
-import { WidgetDescriptor } from "../types";
+import { WidgetComponentProps, WidgetDescriptor, WidgetSettingsProps } from "../types";
 import { OilWidget } from "./OilWidget";
 import { OilSettings } from "./OilSettings";
-import { OilWidgetSettings } from "@/models/dashboard/widgets/oil/OilWidgetEntity";
 
-export const oilWidgetDescriptor: WidgetDescriptor<OilWidgetSettings> = {
+export const oilWidgetDescriptor: WidgetDescriptor = {
     type: DashboardWidgetType.Oil,
     template: {
         type: DashboardWidgetType.Oil,
@@ -20,7 +20,7 @@ export const oilWidgetDescriptor: WidgetDescriptor<OilWidgetSettings> = {
         isAvailable: true,
         isStatic: false
     },
-    component: OilWidget,
-    settingsComponent: OilSettings,
+    component: OilWidget as React.ComponentType<WidgetComponentProps>,
+    settingsComponent: OilSettings as React.ComponentType<WidgetSettingsProps>,
     getDefaultSettings: () => ({ symbols: [] })
 };

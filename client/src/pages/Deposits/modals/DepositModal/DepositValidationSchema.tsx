@@ -19,8 +19,8 @@ export const getDepositValidationSchema = (t: TFunction) => z.object({
     id: z.string().min(1, t("validation_currency_required")),
     name: z.string().optional()
   }, { message: t("validation_currency_required") }),
-  from: z.coerce.date({ message: t("validation_date_required") }),
-  to: z.coerce.date({ message: t("validation_date_required") }),
+  from: z.date({ message: t("validation_date_required") }),
+  to: z.date({ message: t("validation_date_required") }),
 })
 .refine(({ from, to }) => to > from, {
   message: t("validation_end_date_after_start"),

@@ -12,10 +12,10 @@ interface DashboardSelectorProps {
     dashboards: UserDashboardEntity[];
     activeDashboardId: string | null;
     onSelectDashboard: (dashboardId: string) => void;
-    onCreateDashboard: (title: string) => void;
-    onRenameDashboard: (dashboardId: string, newTitle: string) => void;
-    onSetDefaultDashboard: (dashboardId: string) => void;
-    onDeleteDashboard: (dashboardId: string) => void;
+    onCreateDashboard: (title: string) => Promise<void>;
+    onRenameDashboard: (dashboardId: string, newTitle: string) => Promise<void>;
+    onSetDefaultDashboard: (dashboardId: string) => Promise<void>;
+    onDeleteDashboard: (dashboardId: string) => Promise<void>;
 }
 
 export const DashboardSelector: React.FC<DashboardSelectorProps> = ({
@@ -49,7 +49,7 @@ export const DashboardSelector: React.FC<DashboardSelectorProps> = ({
 
     const handleDeleteConfirmed = async () => {
         if (!targetDashboardId) return;
-        onDeleteDashboard(targetDashboardId);
+        await onDeleteDashboard(targetDashboardId);
         setTargetDashboardId(null);
     };
 

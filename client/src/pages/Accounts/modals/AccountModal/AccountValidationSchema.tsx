@@ -9,8 +9,8 @@ export const getAccountValidationSchema = (t: TFunction) => z.object({
 		name: z.string().optional()
 	}).nullable().optional(),
 	balance: z.number(),
-	active: z.boolean().default(true),
-	createdOn: z.coerce.date({ message: t("validation_date_required") }),
+	active: z.boolean(),
+	createdOn: z.date({ message: t("validation_date_required") }),
 	accountType: z.object({
 		id: z.string().min(1, t("validation_account_type_required")),
 		name: z.string().optional()

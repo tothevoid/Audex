@@ -88,7 +88,7 @@ const TransactionStats: React.FC<TransactionStatsProps> = ({
     };
 
     useEffect(() => {
-        let data: PieChartData[] = [];
+        let data: PieChartData[];
 
         if (selectedGrouping === DataGrouping.ByType) {
             data = getGraphData(

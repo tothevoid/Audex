@@ -1,11 +1,11 @@
+import React from "react";
 import { LuTrendingUp } from "react-icons/lu";
 import { DashboardWidgetType } from "@/models/dashboard/WidgetEntity";
-import { WidgetDescriptor } from "../types";
+import { WidgetComponentProps, WidgetDescriptor, WidgetSettingsProps } from "../types";
 import { IndicesWidget } from "./IndicesWidget";
 import { IndicesSettings } from "./IndicesSettings";
-import { IndicesWidgetSettings } from "@/models/dashboard/widgets/indices/IndicesWidgetEntity";
 
-export const indicesWidgetDescriptor: WidgetDescriptor<IndicesWidgetSettings> = {
+export const indicesWidgetDescriptor: WidgetDescriptor = {
     type: DashboardWidgetType.Indices,
     template: {
         type: DashboardWidgetType.Indices,
@@ -20,7 +20,7 @@ export const indicesWidgetDescriptor: WidgetDescriptor<IndicesWidgetSettings> = 
         isAvailable: true,
         isStatic: false
     },
-    component: IndicesWidget,
-    settingsComponent: IndicesSettings,
+    component: IndicesWidget as React.ComponentType<WidgetComponentProps>,
+    settingsComponent: IndicesSettings as React.ComponentType<WidgetSettingsProps>,
     getDefaultSettings: () => ({ codes: [] })
 };

@@ -4,10 +4,11 @@ import { useTranslation } from "react-i18next";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 
 interface Props {
-    onConfirmed: () => Promise<void>
-    title: string,
-    message: string,
-    confirmActionName: string
+    onConfirmed: () => Promise<void>;
+    title: string;
+    message?: string;
+    confirmActionName?: string;
+    description?: string;
 }
 
 export const ConfirmModal = forwardRef<BaseModalRef, Props>((props: Props, ref) => {

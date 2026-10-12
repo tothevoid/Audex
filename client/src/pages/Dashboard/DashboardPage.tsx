@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { Stack, Box, Spinner, Center } from "@chakra-ui/react";
 import PageContainer from "@/shared/components/PageContainer/PageContainer";
-import { WidgetConfig } from "@/models/dashboard/WidgetEntity";
+import { BaseWidgetSettings, WidgetConfig } from "@/models/dashboard/WidgetEntity";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import { DashboardToolbar } from "./components/DashboardToolbar/DashboardToolbar";
 import { DashboardGrid } from "./components/DashboardGrid/DashboardGrid";
@@ -39,8 +39,8 @@ export const DashboardPage: React.FC = () => {
     };
 
     const renderCustomSettings = (
-        settings: Record<string, unknown>,
-        updateSettings: (newSettings: Partial<Record<string, unknown>>) => void,
+        settings: BaseWidgetSettings,
+        updateSettings: (newSettings: Partial<BaseWidgetSettings>) => void,
         currentWidget: WidgetConfig | null
     ) => {
         if (!currentWidget) return null;

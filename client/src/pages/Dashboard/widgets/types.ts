@@ -1,14 +1,14 @@
 import React from "react";
-import { WidgetConfig, WidgetType } from "@/models/dashboard/WidgetEntity";
+import { BaseWidgetSettings, WidgetConfig, WidgetType } from "@/models/dashboard/WidgetEntity";
 
-export interface WidgetComponentProps<TSettings = Record<string, unknown>> {
+export interface WidgetComponentProps<TSettings extends BaseWidgetSettings = BaseWidgetSettings> {
     widget: WidgetConfig<TSettings>;
     dashboardId: string;
     refreshSignal?: number;
     onFetched?: (date: Date) => void;
 }
 
-export interface WidgetSettingsProps<TSettings = Record<string, unknown>> {
+export interface WidgetSettingsProps<TSettings extends BaseWidgetSettings = BaseWidgetSettings> {
     settings: TSettings;
     updateSettings: (newSettings: Partial<TSettings>) => void;
     currentWidget: WidgetConfig<TSettings> | null;
@@ -28,7 +28,7 @@ export interface WidgetTemplateInfo {
     isStatic: boolean;
 }
 
-export interface WidgetDescriptor<TSettings = Record<string, unknown>> {
+export interface WidgetDescriptor<TSettings extends BaseWidgetSettings = BaseWidgetSettings> {
     type: WidgetType;
     template: WidgetTemplateInfo;
     component: React.ComponentType<WidgetComponentProps<TSettings>>;

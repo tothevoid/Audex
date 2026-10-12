@@ -3,7 +3,7 @@ import { DashboardWidgetType } from "@/models/dashboard/WidgetEntity";
 import { WidgetDescriptor } from "../types";
 import { SecuritiesDailyWidget } from "./SecuritiesDailyWidget";
 
-export const securitiesDailyWidgetDescriptor: WidgetDescriptor<Record<string, unknown>> = {
+export const securitiesDailyWidgetDescriptor: WidgetDescriptor = {
     type: DashboardWidgetType.SecuritiesDaily,
     template: {
         type: DashboardWidgetType.SecuritiesDaily,

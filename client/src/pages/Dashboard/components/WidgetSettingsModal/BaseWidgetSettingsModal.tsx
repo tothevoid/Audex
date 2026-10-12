@@ -1,16 +1,16 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { Field, Input, NativeSelect, Stack } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { WidgetConfig } from "@/models/dashboard/WidgetEntity";
+import { BaseWidgetSettings, WidgetConfig } from "@/models/dashboard/WidgetEntity";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { getWidgetDescriptor } from "../../widgets";
 
-export interface BaseWidgetSettingsModalRef<TSettings = Record<string, unknown>> extends BaseModalRef {
+export interface BaseWidgetSettingsModalRef<TSettings extends BaseWidgetSettings = BaseWidgetSettings> extends BaseModalRef {
     openWithWidget: (widget: WidgetConfig<TSettings>) => void;
 }
 
-export interface BaseWidgetSettingsModalProps<TSettings = Record<string, unknown>> {
+export interface BaseWidgetSettingsModalProps<TSettings extends BaseWidgetSettings = BaseWidgetSettings> {
     title?: string;
     saveButtonTitle?: string;
     onSaveWidget: (updatedWidget: WidgetConfig<TSettings>) => void;
@@ -21,7 +21,7 @@ export interface BaseWidgetSettingsModalProps<TSettings = Record<string, unknown
     ) => React.ReactNode;
 }
 
-export const BaseWidgetSettingsModal = forwardRef(<TSettings extends Record<string, unknown> = Record<string, unknown>>(
+export const BaseWidgetSettingsModal = forwardRef(<TSettings extends BaseWidgetSettings = BaseWidgetSettings>(
     props: BaseWidgetSettingsModalProps<TSettings>,
     ref: React.Ref<BaseWidgetSettingsModalRef<TSettings>>
 ) => {
@@ -123,6 +123,6 @@ export const BaseWidgetSettingsModal = forwardRef(<TSettings extends Record<stri
             </Stack>
         </BaseFormModal>
     );
-}) as <TSettings extends Record<string, unknown> = Record<string, unknown>>(
+}) as <TSettings extends BaseWidgetSettings = BaseWidgetSettings>(
     props: BaseWidgetSettingsModalProps<TSettings> & { ref?: React.Ref<BaseWidgetSettingsModalRef<TSettings>> }
 ) => React.ReactElement;

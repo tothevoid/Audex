@@ -15,10 +15,10 @@ interface DashboardToolbarProps {
     isRefreshingAll: boolean;
     lastGlobalRefreshAt: Date | null;
     onSelectDashboard: (dashboardId: string) => void;
-    onCreateDashboard: (title: string) => void;
-    onRenameDashboard: (dashboardId: string, newTitle: string) => void;
-    onSetDefaultDashboard: (dashboardId: string) => void;
-    onDeleteDashboard: (dashboardId: string) => void;
+    onCreateDashboard: (title: string) => Promise<void>;
+    onRenameDashboard: (dashboardId: string, newTitle: string) => Promise<void>;
+    onSetDefaultDashboard: (dashboardId: string) => Promise<void>;
+    onDeleteDashboard: (dashboardId: string) => Promise<void>;
     onToggleEditMode: () => void;
     onOpenAddWidget: () => void;
     onRefreshAll: () => void;

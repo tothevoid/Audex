@@ -19,7 +19,7 @@ import {
     incomesDistributionWidgetDescriptor
 } from "./Distribution";
 
-const activeDescriptors: Record<WidgetType, WidgetDescriptor<any>> = {
+const activeDescriptors: Record<WidgetType, WidgetDescriptor> = {
     [DashboardWidgetType.TotalBalance]: totalBalanceWidgetDescriptor,
     [DashboardWidgetType.CashDistribution]: cashDistributionWidgetDescriptor,
     [DashboardWidgetType.BankAccountsDistribution]: bankAccountsDistributionWidgetDescriptor,
@@ -37,7 +37,7 @@ const activeDescriptors: Record<WidgetType, WidgetDescriptor<any>> = {
     [DashboardWidgetType.Oil]: oilWidgetDescriptor
 };
 
-export const getWidgetDescriptor = (type: WidgetType): WidgetDescriptor<any> | undefined => {
+export const getWidgetDescriptor = (type: WidgetType): WidgetDescriptor | undefined => {
     return activeDescriptors[type];
 };
 

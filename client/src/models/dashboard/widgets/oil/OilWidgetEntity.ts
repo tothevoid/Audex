@@ -1,3 +1,5 @@
+import { BaseWidgetSettings } from "@/models/dashboard/WidgetEntity";
+
 export interface OilQuoteResponse {
     symbol: string;
     price: number;
@@ -26,7 +28,7 @@ export interface OilWidgetEntity {
     quotes: OilQuoteEntity[];
 }
 
-export interface OilWidgetSettings {
+export interface OilWidgetSettings extends BaseWidgetSettings {
     symbols: string[];
 }
 

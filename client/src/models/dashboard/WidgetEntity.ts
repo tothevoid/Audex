@@ -53,7 +53,9 @@ export const normalizeWidgetGrid = (
 });
 
 
-export interface WidgetConfig<TSettings = Record<string, unknown>> {
+export type BaseWidgetSettings = Record<string, unknown>;
+
+export interface WidgetConfig<TSettings extends BaseWidgetSettings = BaseWidgetSettings> {
     id: string;
     type: WidgetType;
     title: string;
