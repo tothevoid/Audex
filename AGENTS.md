@@ -106,8 +106,9 @@ This document contains guidelines, coding standards, and architectural patterns 
 - **Build**: `cd server && dotnet build`
 - **Run WebApi**: `dotnet run --project server/src/WebApi` (или `dotnet watch --project server/src/WebApi`)
 - **Run All Tests**: `cd server && dotnet test`
-- **Run S3 Tests**: `cd server && dotnet test --filter "Category=S3"`
-- **Run Auth Tests**: `cd server && dotnet test --filter "Category=Auth"`
+- **Run S3 Tests**: `cd server && dotnet test --filter-trait "Category=S3"`
+- **Run Auth Tests**: `cd server && dotnet test --filter-trait "Category=Auth"`
+- **Run Project Tests directly via MTP runner**: `dotnet run --project tests/Application.Tests -- -trait "Category=Auth"` (или `dotnet test --project tests/Application.Tests/Application.Tests.csproj --filter-trait "Category=Auth"`)
 
 ---
 
