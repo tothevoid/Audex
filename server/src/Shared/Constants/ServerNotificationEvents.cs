@@ -8,5 +8,6 @@ namespace Audex.Shared.Constants
         public const string QuotesRecalculated = "QuotesRecalculated";
         public const string ScheduledTaskStarted = "ScheduledTaskStarted";
         public const string ScheduledTaskExecutionRecorded = "ScheduledTaskExecutionRecorded";
+        public const string ToastReceived = "ToastReceived";
     }
 }

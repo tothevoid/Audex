@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useSignalR } from "./useSignalR";
 import { ScheduledTaskExecutionStatus } from "@/models/scheduler/ScheduledTaskEntity";
+import { ServerNotificationEvents } from "@/shared/constants/serverNotificationEvents";
 
 export interface TaskExecutionRecordedPayload {
     taskName: string;
@@ -17,24 +18,23 @@ export interface SchedulerEventsHandlers {
 export const useSchedulerEvents = ({
     onTaskStarted,
     onTaskExecutionRecorded,
-}: SchedulerEventsHandlers) => {
-    const handleSignalRMessage = useCallback((rawMessage: string) => {
-        try {
-            const data = typeof rawMessage === "string" ? JSON.parse(rawMessage) : rawMessage;
-            if (data?.type === "ScheduledTaskStarted" && data.taskName) {
-                onTaskStarted?.(data.taskName);
-            } else if (data?.type === "ScheduledTaskExecutionRecorded" && data.taskName) {
-                onTaskExecutionRecorded?.({
-                    taskName: data.taskName,
-                    status: data.status as ScheduledTaskExecutionStatus,
-                    durationMs: data.durationMs,
-                    errorMessage: data.errorMessage
-                });
-            }
-        } catch {
-            // Ignore non-JSON or irrelevant messages
+}: SchedulerEventsHandlers): void => {
+    const handleTaskStarted = useCallback((taskName: string) => {
+        if (!taskName) {
+            return;
         }
-    }, [onTaskStarted, onTaskExecutionRecorded]);
 
-    useSignalR(handleSignalRMessage);
+        onTaskStarted?.(taskName);
+    }, [onTaskStarted]);
+
+    const handleTaskExecutionRecorded = useCallback((payload: TaskExecutionRecordedPayload) => {
+        if (!payload) {
+            return;
+        }
+
+        onTaskExecutionRecorded?.(payload);
+    }, [onTaskExecutionRecorded]);
+
+    useSignalR<string>(ServerNotificationEvents.ScheduledTaskStarted, handleTaskStarted);
+    useSignalR<TaskExecutionRecordedPayload>(ServerNotificationEvents.ScheduledTaskExecutionRecorded, handleTaskExecutionRecorded);
 };

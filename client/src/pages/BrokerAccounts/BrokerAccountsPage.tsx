@@ -12,6 +12,8 @@ import { getPortfolioValues } from "@/api/brokers/brokerAccountSummaryApi";
 import { BrokerAccountPortfolioEntity } from "@/models/brokers/BrokerAccountPortfolioEntity";
 import { BrokerStatementImportModal } from "@/pages/BrokerAccount/modals/BrokerStatementImportModal/BrokerStatementImportModal";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { QuotesRecalculatedEventPayload } from "@/models/securities/QuotesRecalculatedEventPayload";
+import { ServerNotificationEvents } from "@/shared/constants/serverNotificationEvents";
 
 interface State {
     isReloading: boolean
@@ -47,16 +49,14 @@ const BrokerAccountsPage: React.FC = () => {
         await securitiesRef.current?.reloadData();
     }, [fetchBrokerAccountsSummary]);
 
-    const onQuotesRecalculated = async (message: string) => {
-        const data = JSON.parse(message);
-        
-        if (data && data.date) {
-            const newDate = new Date(data.date);
+    const onQuotesRecalculated = useCallback(async (eventPayload?: QuotesRecalculatedEventPayload) => {
+        if (eventPayload?.date) {
+            const newDate = new Date(eventPayload.date);
             setLastPullDate(newDate);
         }
 
         await onTransactionsChanged();
-    };
+    }, [onTransactionsChanged]);
 
     const fetchLastPullDate = async () => {
         const lastPullDate = await getLastPullDate();
@@ -80,7 +80,7 @@ const BrokerAccountsPage: React.FC = () => {
         await pullBrokerAccountQuotations();
     };
     
-    useSignalR(onQuotesRecalculated);
+    useSignalR<QuotesRecalculatedEventPayload>(ServerNotificationEvents.QuotesRecalculated, onQuotesRecalculated);
 
     const onActionTriggered = async (action: ChangeAction) => {
         switch (action) {

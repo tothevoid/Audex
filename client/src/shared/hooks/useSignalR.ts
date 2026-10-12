@@ -1,48 +1,27 @@
 import { useEffect, useRef } from "react";
-import * as signalR from "@microsoft/signalr";
-import config from "@/config";
+import { signalRService } from "@/shared/services/signalRService";
+import { ServerNotificationEventName } from "@/shared/constants/serverNotificationEvents";
 
-const HANDLER_NAME = "ReceiveServerMessage";
+export const useSignalR = <TPayload = unknown>(
+    eventName: ServerNotificationEventName | string,
+    handler: (payload: TPayload) => Promise<void> | void
+): void => {
+    const handlerRef = useRef(handler);
+    handlerRef.current = handler;
 
-export const useSignalR = (onMessage: (message: string) => Promise<void> | void) => {
-	const connectionRef = useRef<signalR.HubConnection | null>(null);
-	const onMessageRef = useRef(onMessage);
-	onMessageRef.current = onMessage;
+    useEffect(() => {
+        const handleEvent = (payload: TPayload) => {
+            if (handlerRef.current) {
+                handlerRef.current(payload);
+            }
+        };
 
-	useEffect(() => {
-		return () => {
-			if (connectionRef?.current?.state !== signalR.HubConnectionState.Connected) {
-				return;
-			}
-			
-			const connection = connectionRef?.current;
-			connection.off(HANDLER_NAME);
-			connection.stop();
-			connectionRef.current = null;
-		};
-	}, []);
+        signalRService.on<TPayload>(eventName, handleEvent);
 
-	useEffect(() => {
-		if (connectionRef.current) {
-			return;
-		}
-
-		const connection = new signalR.HubConnectionBuilder()
-			.withUrl(`${config.api.URL}/messages`)
-			.withAutomaticReconnect()
-			.build();
-
-		connection
-			.start()
-			.then(() => {
-				connection.on(HANDLER_NAME, (msg: string) => {
-					if (onMessageRef.current) {
-						onMessageRef.current(msg);
-					}
-				});
-			})
-			.catch(console.error);
-
-		connectionRef.current = connection;
-	}, []);
+        return () => {
+            signalRService.off<TPayload>(eventName, handleEvent);
+        };
+    }, [eventName]);
 };
+
+export default useSignalR;

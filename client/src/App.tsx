@@ -27,6 +27,7 @@ import { Box, Theme } from '@chakra-ui/react';
 import { useColorMode } from '@/shared/context/useColorMode';
 import { Toaster } from '@/shared/components/Toaster';
 import { useServerToasts } from '@/shared/hooks/useServerToasts';
+import { signalRService } from '@/shared/services/signalRService';
 
 const RequireAuth = () => {
 	const token = getAccessToken();
@@ -64,6 +65,22 @@ const RequireAuth = () => {
 
 const PageWrapper = () => {
 	useServerToasts();
+
+	useEffect(() => {
+		const initializeConnection = async () => {
+			await signalRService.startAsync();
+		};
+
+		initializeConnection();
+
+		return () => {
+			const closeConnection = async () => {
+				await signalRService.stopAsync();
+			};
+
+			closeConnection();
+		};
+	}, []);
 
 	return (
 		<UserProvider>

@@ -12,6 +12,8 @@ import { getPortfolioValues } from "@/api/brokers/brokerAccountSummaryApi";
 import { BrokerAccountPortfolioEntity } from "@/models/brokers/BrokerAccountPortfolioEntity";
 import { BrokerStatementImportModal } from "./modals/BrokerStatementImportModal/BrokerStatementImportModal";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { QuotesRecalculatedEventPayload } from "@/models/securities/QuotesRecalculatedEventPayload";
+import { ServerNotificationEvents } from "@/shared/constants/serverNotificationEvents";
 
 interface State {
     brokerAccount: BrokerAccountEntity | null,
@@ -30,16 +32,6 @@ const BrokerAccountPage: React.FC = () => {
 
     const [portfolio, setPortfolio] = useState<BrokerAccountPortfolioEntity | null>(null);
 
-    const onQuotesRecalculated = async (message: string) => {
-        const data = JSON.parse(message);
-        
-        if (data && data.date) {
-            const newDate = new Date(data.date);
-            setLastPullDate(newDate);
-        }
-
-        await onTransactionsChanged();
-    };
 
     const fetchBrokerAccount = useCallback(async () => {
         if (!brokerAccountId) {
@@ -63,7 +55,6 @@ const BrokerAccountPage: React.FC = () => {
         }
     };
 
-    useSignalR(onQuotesRecalculated);
 
     useEffect(() => {
         const getData = async () => {
@@ -95,6 +86,17 @@ const BrokerAccountPage: React.FC = () => {
         await fetchBrokerAccount();
         await securitiesRef.current?.reloadData();
     }, [fetchBrokerAccount]);
+
+    const onQuotesRecalculated = useCallback(async (eventPayload?: QuotesRecalculatedEventPayload) => {
+        if (eventPayload?.date) {
+            const newDate = new Date(eventPayload.date);
+            setLastPullDate(newDate);
+        }
+
+        await onTransactionsChanged();
+    }, [onTransactionsChanged]);
+
+    useSignalR<QuotesRecalculatedEventPayload>(ServerNotificationEvents.QuotesRecalculated, onQuotesRecalculated);
 
     const onActionTriggered = useCallback(async (action: ChangeAction) => {
         switch (action) {

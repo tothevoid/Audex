@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { NotificationEntity, NotificationEntityResponse } from "@/models/notifications/NotificationEntity";
 import { prepareNotification } from "@/api/notifications/notificationApiMapping";
+import { ServerNotificationEvents } from "@/shared/constants/serverNotificationEvents";
 import { useSignalR } from "./useSignalR";
 
 export interface NotificationEventsHandlers {
@@ -13,22 +14,29 @@ export const useNotificationEvents = ({
     onNotificationReceived,
     onNotificationRead,
     onAllNotificationsRead,
-}: NotificationEventsHandlers) => {
-    const handleSignalRMessage = useCallback((rawMessage: string) => {
-        try {
-            const data = typeof rawMessage === "string" ? JSON.parse(rawMessage) : rawMessage;
-            if (data?.type === "NotificationReceived" && data.payload) {
-                const notification = prepareNotification(data.payload as NotificationEntityResponse);
-                onNotificationReceived?.(notification);
-            } else if (data?.type === "NotificationRead" && data.notificationId) {
-                onNotificationRead?.(data.notificationId);
-            } else if (data?.type === "AllNotificationsRead") {
-                onAllNotificationsRead?.();
-            }
-        } catch {
-            // Ignore non-JSON or irrelevant messages
+}: NotificationEventsHandlers): void => {
+    const handleNotificationReceived = useCallback((notificationPayload: NotificationEntityResponse) => {
+        if (!notificationPayload) {
+            return;
         }
-    }, [onNotificationReceived, onNotificationRead, onAllNotificationsRead]);
 
-    useSignalR(handleSignalRMessage);
+        const notification = prepareNotification(notificationPayload);
+        onNotificationReceived?.(notification);
+    }, [onNotificationReceived]);
+
+    const handleNotificationRead = useCallback((notificationId: string) => {
+        if (!notificationId) {
+            return;
+        }
+
+        onNotificationRead?.(notificationId);
+    }, [onNotificationRead]);
+
+    const handleAllNotificationsRead = useCallback(() => {
+        onAllNotificationsRead?.();
+    }, [onAllNotificationsRead]);
+
+    useSignalR<NotificationEntityResponse>(ServerNotificationEvents.NotificationReceived, handleNotificationReceived);
+    useSignalR<string>(ServerNotificationEvents.NotificationRead, handleNotificationRead);
+    useSignalR<void>(ServerNotificationEvents.AllNotificationsRead, handleAllNotificationsRead);
 };
