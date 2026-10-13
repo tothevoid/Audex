@@ -22,36 +22,39 @@ interface State {
     cryptoProviders: CryptoProviderEntity[]
 }
 
-const CryptoAccountModal: React.FC<ModalProps> = (props: ModalProps) => {
-    const [state, setState] = useState<State>({cryptoProviders: []});
+const CryptoAccountModal: React.FC<ModalProps> = ({
+    modalRef,
+    cryptoAccount,
+    onSaved,
+}: ModalProps) => {
+    const [state, setState] = useState<State>({ cryptoProviders: [] });
 
     useEffect(() => {
+        let isMounted = true;
         const initData = async () => {
-            await requestData();
+            const cryptoProviders = await getCryptoProviders();
+            if (isMounted) {
+                setState((currentState) => ({ ...currentState, cryptoProviders }));
+            }
         };
         initData();
+        return () => {
+            isMounted = false;
+        };
     }, []);
-
-    const requestData = async () => {
-        const cryptoProviders = await getCryptoProviders();
-
-        setState((currentState) => {
-            return {...currentState, cryptoProviders };
-        });
-    };
 
     const getFormDefaultValues = useCallback(() => {
         return {
-            id: props.cryptoAccount?.id ?? generateGuid(),
-            name: props.cryptoAccount?.name ?? "",
-            cryptoProvider: props.cryptoAccount?.cryptoProvider
+            id: cryptoAccount?.id ?? generateGuid(),
+            name: cryptoAccount?.name ?? "",
+            cryptoProvider: cryptoAccount?.cryptoProvider
         };
-    }, [props.cryptoAccount]);
+    }, [cryptoAccount]);
 
     const { t } = useTranslation();
     const validationSchema = useMemo(() => getCryptoAccountValidationSchema(t), [t]);
 
-    const { register, handleSubmit, control, formState: { errors }, reset} = useForm<CryptoAccountFormInput>({
+    const { register, handleSubmit, control, formState: { errors }, reset } = useForm<CryptoAccountFormInput>({
         resolver: zodResolver(validationSchema),
         mode: "onBlur",
         defaultValues: getFormDefaultValues()
@@ -59,14 +62,18 @@ const CryptoAccountModal: React.FC<ModalProps> = (props: ModalProps) => {
 
     useEffect(() => {
         reset(getFormDefaultValues());
-    }, [reset, props.cryptoAccount, getFormDefaultValues]);
+    }, [reset, cryptoAccount, getFormDefaultValues]);
 
-    const onSubmit = (cryptoAccount: CryptoAccountFormInput) => {
-        props.onSaved(cryptoAccount as CryptoAccountEntity);
-        props.modalRef?.current?.closeModal();
+    const onSubmit = (formData: CryptoAccountFormInput) => {
+        onSaved(formData as CryptoAccountEntity);
+        modalRef?.current?.closeModal();
     };
 
-    return <BaseFormModal ref={props.modalRef} title={t("entity_crypto_account_form_title")} submitHandler={handleSubmit(onSubmit)}>
+    const handleFormSubmit: React.FormEventHandler = (event) => {
+        handleSubmit(onSubmit)(event);
+    };
+
+    return <BaseFormModal ref={modalRef} title={t("entity_crypto_account_form_title")} submitHandler={handleFormSubmit}>
         <Field.Root invalid={!!errors.name}>
             <Field.Label>{t("entity_crypto_account_crypto_name")}</Field.Label>
             <Input {...register("name")} autoComplete="off" placeholder='Debit card' />

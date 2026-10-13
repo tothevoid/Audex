@@ -16,13 +16,18 @@ interface ModalProps {
     onModalClosed: () => void;
 }
 
-const BrokerModal: React.FC<ModalProps> = (props: ModalProps) => {
+const BrokerModal: React.FC<ModalProps> = ({
+    modalRef,
+    broker,
+    onSaved,
+    onModalClosed,
+}: ModalProps) => {
     const setDefaultValues = useCallback(() => {
         return {
-            id: props.broker?.id ?? generateGuid(),
-            name: props.broker?.name ?? ""
+            id: broker?.id ?? generateGuid(),
+            name: broker?.name ?? ""
         };
-    }, [props.broker]);
+    }, [broker]);
 
     const { t } = useTranslation();
     const validationSchema = useMemo(() => getBrokerValidationSchema(t), [t]);
@@ -37,21 +42,25 @@ const BrokerModal: React.FC<ModalProps> = (props: ModalProps) => {
         if (open) {
             reset(setDefaultValues());
         } else {
-            props.onModalClosed();
+            onModalClosed();
         }
     };
 
-    const onSubmit = (broker: BrokerFormInput) => {
-        props.onSaved(broker as BrokerEntity);
-        props.modalRef?.current?.closeModal();
+    const onSubmit = (formData: BrokerFormInput) => {
+        onSaved(formData as BrokerEntity);
+        modalRef?.current?.closeModal();
+    };
+
+    const handleFormSubmit: React.FormEventHandler = (event) => {
+        handleSubmit(onSubmit)(event);
     };
 
     return (
         <BaseFormModal
             visibilityChanged={onModalVisibilityChanged}
-            ref={props.modalRef}
+            ref={modalRef}
             title={t("entity_broker_form_title")}
-            submitHandler={handleSubmit(onSubmit)}
+            submitHandler={handleFormSubmit}
         >
             <Field.Root invalid={!!errors.name}>
                 <Field.Label>{t("entity_broker_name")}</Field.Label>

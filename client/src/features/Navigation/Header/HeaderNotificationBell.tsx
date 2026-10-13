@@ -22,8 +22,22 @@ import {
 } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { TFunction } from "i18next";
 import { useNotifications } from "@/shared/hooks/useNotifications";
 import { NotificationEntity, NotificationSeverity } from "@/models/notifications/NotificationEntity";
+
+const formatTimeAgo = (date: Date | string, t: TFunction) => {
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) return t("notifications_just_now");
+    const diffMs = Date.now() - parsedDate.getTime();
+    const diffMinutes = Math.floor(diffMs / 60000);
+    if (diffMinutes < 1) return t("notifications_just_now");
+    if (diffMinutes < 60) return t("notifications_minutes_ago", { count: diffMinutes });
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return t("notifications_hours_ago", { count: diffHours });
+    const diffDays = Math.floor(diffHours / 24);
+    return t("notifications_days_ago", { count: diffDays });
+};
 
 export const HeaderNotificationBell: React.FC = () => {
     const { t } = useTranslation();
@@ -59,19 +73,6 @@ export const HeaderNotificationBell: React.FC = () => {
             default:
                 return "blue.500";
         }
-    };
-
-    const formatTimeAgo = (date: Date | string) => {
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return t("notifications_just_now");
-        const diffMs = Date.now() - d.getTime();
-        const diffMinutes = Math.floor(diffMs / 60000);
-        if (diffMinutes < 1) return t("notifications_just_now");
-        if (diffMinutes < 60) return t("notifications_minutes_ago", { count: diffMinutes });
-        const diffHours = Math.floor(diffMinutes / 60);
-        if (diffHours < 24) return t("notifications_hours_ago", { count: diffHours });
-        const diffDays = Math.floor(diffHours / 24);
-        return t("notifications_days_ago", { count: diffDays });
     };
 
     const handleItemClick = (item: NotificationEntity) => {
@@ -221,7 +222,7 @@ export const HeaderNotificationBell: React.FC = () => {
                                                             {item.title}
                                                         </Text>
                                                         <Text fontSize="11px" color="text_secondary">
-                                                            {formatTimeAgo(item.createdAt)}
+                                                            {formatTimeAgo(item.createdAt, t)}
                                                         </Text>
                                                     </Flex>
                                                     <Text fontSize="xs" color="text_secondary" lineHeight="short">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, SimpleGrid, Skeleton, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { WidgetComponentProps } from "../types";
@@ -17,40 +17,40 @@ export const OilWidget: React.FC<WidgetComponentProps<OilWidgetSettings>> = ({
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchData = useCallback(async (isSilent: boolean = false) => {
-        if (!dashboardId || !widget.id) return;
-
-        if (!isSilent) {
-            setIsLoading(true);
-        }
-
-        try {
-            const result = await getOilWidget({
-                dashboardId,
-                widgetId: widget.id,
-                symbols: widget.settings?.symbols ?? []
-            });
-            if (result) {
-                setData(result);
-                setError(null);
-                onFetched?.(new Date());
+    useEffect(() => {
+        let isMounted = true;
+        const load = async () => {
+            if (!dashboardId || !widget.id) return;
+            const isSilent = Boolean(refreshSignal && refreshSignal > 0);
+            if (!isSilent) {
+                setIsLoading(true);
             }
-        } catch {
-            setError(t("error_data_load"));
-        } finally {
-            setIsLoading(false);
-        }
-    }, [dashboardId, widget.id, widget.settings?.symbols, onFetched, t]);
-
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
-
-    useEffect(() => {
-        if (refreshSignal && refreshSignal > 0) {
-            fetchData(true);
-        }
-    }, [refreshSignal, fetchData]);
+            try {
+                const result = await getOilWidget({
+                    dashboardId,
+                    widgetId: widget.id,
+                    symbols: widget.settings?.symbols ?? []
+                });
+                if (result && isMounted) {
+                    setData(result);
+                    setError(null);
+                    onFetched?.(new Date());
+                }
+            } catch {
+                if (isMounted) {
+                    setError(t("error_data_load"));
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+        load();
+        return () => {
+            isMounted = false;
+        };
+    }, [dashboardId, widget.id, widget.settings, refreshSignal, onFetched, t]);
 
     if (isLoading && !data) {
         return (

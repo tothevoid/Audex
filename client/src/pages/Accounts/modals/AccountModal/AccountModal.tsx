@@ -1,6 +1,6 @@
 import { Field, Input} from "@chakra-ui/react";
 import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountFormInput, getAccountValidationSchema } from "./AccountValidationSchema";
 import { useTranslation } from "react-i18next";
@@ -33,89 +33,79 @@ interface State {
 	banks: BankEntity[]
 }
 
-const AccountModal: React.FC<ModalProps> = (props: ModalProps) => {
+const AccountModal: React.FC<ModalProps> = ({
+	modalRef,
+	account,
+	onSaved
+}: ModalProps) => {
   	const [state, setState] = useState<State>({currencies: [], accountTypes: [], banks: []});
 
-	const [bankFieldVisible, setBankFieldVisible] = useState<boolean>(false);
-
 	useEffect(() => {
+		let isMounted = true;
 		const initData = async () => {
-			await initCurrencies();
-			await initAccountTypes();
-			await initBanks();
+			const [currencies, accountTypes, banks] = await Promise.all([
+				getCurrencies(),
+				getAccountTypes(),
+				getBanks()
+			]);
+			if (isMounted) {
+				setState({ currencies, accountTypes, banks });
+			}
 		};
 		initData();
+		return () => {
+			isMounted = false;
+		};
 	}, []);
-
-	const initCurrencies = async () => {
-		const currencies = await getCurrencies();
-		setState((currentState) => {
-			return {...currentState, currencies};
-		});
-	};
-
-	const initAccountTypes = async () => {
-		const accountTypes = await getAccountTypes();
-		setState((currentState) => {
-			return {...currentState, accountTypes};
-		});
-	};
-
-	const initBanks = async () => {
-		const banks = await getBanks();
-		setState((currentState) => {
-			return {...currentState, banks};
-		});
-	};
 
 	const getFormDefaultValues = useCallback(() => {
 		return {
-			id: props.account?.id ?? generateGuid(),
-			name: props.account?.name ?? "",
-			balance: props.account?.balance ?? 0,
-			currency: props.account?.currency,
-			accountType: props.account?.accountType,
-			active: props.account?.active ?? true,
-			createdOn: props.account?.createdOn ?? new Date(),
-			bank: props.account?.bank
+			id: account?.id ?? generateGuid(),
+			name: account?.name ?? "",
+			balance: account?.balance ?? 0,
+			currency: account?.currency,
+			accountType: account?.accountType,
+			active: account?.active ?? true,
+			createdOn: account?.createdOn ?? new Date(),
+			bank: account?.bank
 		};
-	}, [props.account]);
+	}, [account]);
 
 	const { t } = useTranslation();
 	const validationSchema = useMemo(() => getAccountValidationSchema(t), [t]);
 
-	const { register, handleSubmit, control, formState: { errors }, reset, watch} = useForm<AccountFormInput>({
+	const { register, handleSubmit, control, formState: { errors }, reset } = useForm<AccountFormInput>({
 		resolver: zodResolver(validationSchema),
 		mode: "onBlur",
 		defaultValues: getFormDefaultValues()
 	});
 
-	const accountType = watch("accountType");
-	const selectedCurrency = watch("currency");
-	const currentCurrency = state.currencies.find(c => c.id === selectedCurrency?.id)?.name ?? '';
-
-	useEffect(() => {
-		const visible = accountType?.id === ACCOUNT_TYPE.DEBIT_CARD || 
-			accountType?.id === ACCOUNT_TYPE.CREDIT_CARD;
-		setBankFieldVisible(visible);
-	}, [accountType]);
+	const accountType = useWatch({ control, name: "accountType" });
+	const selectedCurrency = useWatch({ control, name: "currency" });
+	const currentCurrency = selectedCurrency?.name ?? '';
+	const bankFieldVisible = accountType?.id === ACCOUNT_TYPE.DEBIT_CARD || 
+		accountType?.id === ACCOUNT_TYPE.CREDIT_CARD;
 
 	useEffect(() => {
 		reset(getFormDefaultValues());
-	}, [reset, getFormDefaultValues, props.account]);
+	}, [reset, getFormDefaultValues, account]);
 
-	const onSubmit = async (account: AccountFormInput) => {
-		const accountEntity = account as AccountEntity;
+	const onSubmit = async (savedAccount: AccountFormInput) => {
+		const accountEntity = savedAccount as AccountEntity;
 
-		if (account.bank?.id) {
-			accountEntity.bank = state.banks.find(bank => bank.id === account.bank?.id);
+		if (savedAccount.bank?.id) {
+			accountEntity.bank = state.banks.find(bank => bank.id === savedAccount.bank?.id);
 		}
 
-		await props.onSaved(accountEntity);
-		props.modalRef?.current?.closeModal();
+		await onSaved(accountEntity);
+		modalRef?.current?.closeModal();
 	};
 
-	return <BaseFormModal ref={props.modalRef} title={t("entity_account_name_form_title")} submitHandler={handleSubmit(onSubmit)}>
+	const handleFormSubmit: React.FormEventHandler = (event) => {
+		handleSubmit(onSubmit)(event);
+	};
+
+	return <BaseFormModal ref={modalRef} title={t("entity_account_name_form_title")} submitHandler={handleFormSubmit}>
 		<Field.Root invalid={!!errors.name}>
 			<Field.Label>{t("entity_account_name")}</Field.Label>
 			<Input {...register("name")} autoComplete="off" placeholder='Debit card' />

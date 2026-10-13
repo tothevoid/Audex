@@ -5,43 +5,35 @@ import { getSecuritiesByBrokerAccount } from "@/api/brokers/brokerAccountSecurit
 import { Nullable } from "@/shared/utilities/nullable";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
-export interface BrokerAccountSecuritiesQuery {
-	brokerAccountId: Nullable<string>
-}
-
-export const useBrokerAccountsSecurities = (queryParameters: BrokerAccountSecuritiesQuery) => {
+export const useBrokerAccountsSecurities = (
+	brokerAccountId?: Nullable<string>,
+	externalRefreshTrigger?: number
+) => {
 	const { t } = useTranslation();
 	const [brokerAccountSecurities, setBrokerAccountSecurities] = useState<BrokerAccountSecurityEntity[]>([]);
 	const [isBrokerAccountSecuritiesLoading, setLoading] = useState(false);
 
 	const [error, setError] = useState<string | null>(null);
-	const [brokerAccountSecurityQueryParameters, setBrokerAccountSecurityQueryParameters] = useState<BrokerAccountSecuritiesQuery>(queryParameters);
 
-	const fetchData = useCallback(async () => {
-		setLoading(true);
-		try {
-			const securities = await getSecuritiesByBrokerAccount(brokerAccountSecurityQueryParameters.brokerAccountId);
-			setBrokerAccountSecurities(securities);
-		} catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-		} finally {
-			setLoading(false);
-		}
-	}, [brokerAccountSecurityQueryParameters, t]);
+	const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+	const reloadBrokerAccountSecurities = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+	}, []);
 
 	useEffect(() => {
 		let isMounted = true;
 		const load = async () => {
 			setLoading(true);
 			try {
-				const securities = await getSecuritiesByBrokerAccount(brokerAccountSecurityQueryParameters.brokerAccountId);
+				const securities = await getSecuritiesByBrokerAccount(brokerAccountId);
 				if (isMounted) {
 					setBrokerAccountSecurities(securities);
 					setError(null);
 				}
-			} catch (err: unknown) {
+			} catch (error: unknown) {
 				if (isMounted) {
-					setError(parseErrorMessage(err, t("error_data_load")));
+					setError(parseErrorMessage(error, t("error_data_load")));
 				}
 			} finally {
 				if (isMounted) {
@@ -55,14 +47,12 @@ export const useBrokerAccountsSecurities = (queryParameters: BrokerAccountSecuri
 		return () => {
 			isMounted = false;
 		};
-	}, [brokerAccountSecurityQueryParameters.brokerAccountId, t]);
+	}, [brokerAccountId, refreshTrigger, externalRefreshTrigger, t]);
 	
 	return {
 		brokerAccountSecurities,
 		isBrokerAccountSecuritiesLoading,
 		error,
-		setBrokerAccountSecurityQueryParameters,
-		brokerAccountSecurityQueryParameters,
-		reloadBrokerAccountSecurities: fetchData
+		reloadBrokerAccountSecurities
 	};
 };

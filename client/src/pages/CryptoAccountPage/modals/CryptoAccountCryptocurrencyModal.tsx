@@ -1,6 +1,6 @@
 import { Field, Stack } from "@chakra-ui/react";
 import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
@@ -26,34 +26,45 @@ interface State {
     cryptocurrencies: CryptocurrencyEntity[]
 }
 
-const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = (props: ModalProps) => {
+const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = ({
+    modalRef,
+    cryptoAccountCryptocurrency,
+    cryptoAccount,
+    existingCryptocurrencyIds,
+    onSaved
+}: ModalProps) => {
     const { t } = useTranslation();
    
     const getDefaultValues = useCallback(() => {
         return {
-            id: props.cryptoAccountCryptocurrency?.id ?? generateGuid(),
-            cryptocurrency: props.cryptoAccountCryptocurrency?.cryptocurrency,
-            cryptoAccount: props.cryptoAccountCryptocurrency?.cryptoAccount ?? props.cryptoAccount,
-            quantity: props.cryptoAccountCryptocurrency?.quantity ?? 0
+            id: cryptoAccountCryptocurrency?.id ?? generateGuid(),
+            cryptocurrency: cryptoAccountCryptocurrency?.cryptocurrency,
+            cryptoAccount: cryptoAccountCryptocurrency?.cryptoAccount ?? cryptoAccount,
+            quantity: cryptoAccountCryptocurrency?.quantity ?? 0
         };
-    }, [props.cryptoAccountCryptocurrency, props.cryptoAccount]);
+    }, [cryptoAccountCryptocurrency, cryptoAccount]);
 
     const [state, setState] = useState<State>({ cryptocurrencies: []});
    
-    const initCryptocurrencies = async () => {
-        const cryptocurrencies = await getCryptocurrencies();
-        setState((currentState: State) => {
-            return {...currentState, cryptocurrencies};
-        });
-    };
-
     useEffect(() => {
-        initCryptocurrencies();
+        let isMounted = true;
+        const loadCryptocurrencies = async () => {
+            const cryptocurrencies = await getCryptocurrencies();
+            if (isMounted) {
+                setState((currentState: State) => {
+                    return { ...currentState, cryptocurrencies };
+                });
+            }
+        };
+        loadCryptocurrencies();
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     const validationSchema = useMemo(() => getCryptoAccountCryptocurrencyValidationSchema(t), [t]);
 
-    const { handleSubmit, formState: { errors }, reset, control, watch } = useForm<CryptoAccountCryptocurrencyFormInput>({
+    const { handleSubmit, formState: { errors }, reset, control } = useForm<CryptoAccountCryptocurrencyFormInput>({
         resolver: zodResolver(validationSchema),
         mode: "onBlur",
         defaultValues: getDefaultValues()
@@ -61,24 +72,28 @@ const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = (props: ModalProp
 
     useEffect(() => {
         reset(getDefaultValues());
-    }, [props.cryptoAccountCryptocurrency, reset, getDefaultValues]);
+    }, [cryptoAccountCryptocurrency, reset, getDefaultValues]);
 
     const availableCryptocurrencies = useMemo(() => {
-        const currentId = props.cryptoAccountCryptocurrency?.cryptocurrency?.id;
-        const existingIds = props.existingCryptocurrencyIds ?? [];
-        return state.cryptocurrencies.filter(c => c.id === currentId || !existingIds.includes(c.id));
-    }, [state.cryptocurrencies, props.cryptoAccountCryptocurrency, props.existingCryptocurrencyIds]);
+        const currentId = cryptoAccountCryptocurrency?.cryptocurrency?.id;
+        const existingIds = existingCryptocurrencyIds ?? [];
+        return state.cryptocurrencies.filter(item => item.id === currentId || !existingIds.includes(item.id));
+    }, [state.cryptocurrencies, cryptoAccountCryptocurrency, existingCryptocurrencyIds]);
 
-    const selectedCrypto = watch("cryptocurrency");
-    const cryptoSymbol = state.cryptocurrencies.find(c => c.id === selectedCrypto?.id)?.symbol ?? '';
+    const selectedCrypto = useWatch({ control, name: "cryptocurrency" });
+    const cryptoSymbol = state.cryptocurrencies.find(item => item.id === selectedCrypto?.id)?.symbol ?? '';
 
-    const onSubmit = (data: CryptoAccountCryptocurrencyFormInput) => {
-        props.onSaved(data as CryptoAccountCryptocurrencyEntity);
-        props.modalRef?.current?.closeModal();
+    const onSubmit = (formData: CryptoAccountCryptocurrencyFormInput) => {
+        onSaved(formData as CryptoAccountCryptocurrencyEntity);
+        modalRef.current?.closeModal();
+    };
+
+    const handleFormSubmit: React.FormEventHandler = (event) => {
+        handleSubmit(onSubmit)(event);
     };
 
     return (
-        <BaseFormModal ref={props.modalRef} title={t("crypto_account_cryptocurrency_modal_title")} submitHandler={handleSubmit(onSubmit)}>
+        <BaseFormModal ref={modalRef} title={t("crypto_account_cryptocurrency_modal_title")} submitHandler={handleFormSubmit}>
             <Stack>
                 <Field.Root mt={4} invalid={!!errors.cryptocurrency}>
                     <Field.Label>{t("crypto_account_cryptocurrency_cryptocurrency")}</Field.Label>

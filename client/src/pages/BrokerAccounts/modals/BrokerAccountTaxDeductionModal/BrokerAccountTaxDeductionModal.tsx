@@ -1,6 +1,6 @@
 import { Field, Input } from "@chakra-ui/react";
 import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
@@ -28,16 +28,22 @@ interface ModalProps {
     isGlobalBrokerAccount: boolean
     onSaved: (taxDeduction: BrokerAccountTaxDeductionEntity) => void
     context: CreateBrokerAccountTaxDeductionContext | EditBrokerAccountTaxDeductionContext
-    modalRef: RefObject<BaseModalRef | null>}
+    modalRef: RefObject<BaseModalRef | null>
+}
 
-const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = (props: ModalProps) => {
+const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = ({
+    modalRef,
+    isGlobalBrokerAccount,
+    onSaved,
+    context
+}: ModalProps) => {
     const { t } = useTranslation();
     
     const [brokerAccounts, setBrokerAccounts] = useState<BrokerAccountEntity[]>([]);
 
     const getDefaultValues = useCallback(() => {
-        if ("taxDeduction" in props.context) {
-            const deduction = props.context.taxDeduction;
+        if ("taxDeduction" in context) {
+            const deduction = context.taxDeduction;
             return {
                 id: deduction.id,
                 name: deduction.name,
@@ -50,29 +56,33 @@ const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = (props: ModalProps)
         return {
             id: generateGuid(),
             name: "",
-            brokerAccount: { id: props.context.brokerAccountId ?? undefined },
+            brokerAccount: { id: context.brokerAccountId ?? undefined },
             dateApplied: new Date(),
             amount: 0
         };
-    }, [props.context]);
+    }, [context]);
 
     const validationSchema = useMemo(() => getBrokerAccountTaxDeductionValidationSchema(t), [t]);
 
-    const { register, handleSubmit, control, watch, formState: { errors }, reset } = useForm<BrokerAccountTaxDeductionFormInput>({
+    const { register, handleSubmit, control, formState: { errors }, reset } = useForm<BrokerAccountTaxDeductionFormInput>({
         resolver: zodResolver(validationSchema),
         defaultValues: getDefaultValues()
     });
 
     useEffect(() => {
         reset(getDefaultValues());
-    }, [reset, getDefaultValues, props.context]);
+    }, [reset, getDefaultValues, context]);
 
-    const selectedBrokerAccount = watch("brokerAccount");
-    const brokerAccountCurrency = brokerAccounts.find(ba => ba.id === selectedBrokerAccount?.id)?.currency?.name ?? '';
+    const selectedBrokerAccount = useWatch({ control, name: "brokerAccount" });
+    const brokerAccountCurrency = brokerAccounts.find(account => account.id === selectedBrokerAccount?.id)?.currency?.name ?? '';
 
     const onSubmit = async (formData: BrokerAccountTaxDeductionFormInput) => {
-        await props.onSaved(formData as BrokerAccountTaxDeductionEntity);
-        props.modalRef.current?.closeModal();
+        await onSaved(formData as BrokerAccountTaxDeductionEntity);
+        modalRef.current?.closeModal();
+    };
+
+    const handleFormSubmit: React.FormEventHandler = (event) => {
+        handleSubmit(onSubmit)(event);
     };
 
     const onModalVisibilityChanged = (open: boolean) => {
@@ -85,23 +95,23 @@ const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = (props: ModalProps)
 
     useEffect(() => {
         const runAsync = async () => {
-            if (!props.isGlobalBrokerAccount) {
+            if (!isGlobalBrokerAccount) {
                 return;
             }
-            const brokerAccounts = await getBrokerAccounts();
-            setBrokerAccounts(brokerAccounts);
+            const accounts = await getBrokerAccounts();
+            setBrokerAccounts(accounts);
         };
 
         runAsync();
-    }, [props.isGlobalBrokerAccount]);
+    }, [isGlobalBrokerAccount]);
 
     return (
-        <BaseFormModal ref={props.modalRef} title={t("broker_account_tax_deduction_modal_title")}
+        <BaseFormModal ref={modalRef} title={t("broker_account_tax_deduction_modal_title")}
             visibilityChanged={onModalVisibilityChanged}
-            submitHandler={handleSubmit(onSubmit)} 
+            submitHandler={handleFormSubmit} 
             saveButtonTitle={t("broker_account_tax_deduction_modal_deduction_button")}>
             {
-                props.isGlobalBrokerAccount &&
+                isGlobalBrokerAccount &&
                 <Field.Root mt={4} invalid={!!errors.brokerAccount}>
                     <Field.Label>{t("broker_account_tax_deduction_modal_broker_account")}</Field.Label>
                     <CollectionSelect name="brokerAccount" control={control} placeholder="Select broker account"

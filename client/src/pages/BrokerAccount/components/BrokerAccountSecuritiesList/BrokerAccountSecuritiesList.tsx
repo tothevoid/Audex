@@ -1,4 +1,4 @@
-import { forwardRef, Fragment, useImperativeHandle } from 'react';
+import React, { Fragment } from 'react';
 import { SimpleGrid } from '@chakra-ui/react';
 import BrokerAccountSecurity from '@/pages/BrokerAccount/components/BrokerAccountSecurity/BrokerAccountSecurity';
 import { BrokerAccountSecurityEntity } from '@/models/brokers/BrokerAccountSecurityEntity';
@@ -6,24 +6,14 @@ import { useBrokerAccountsSecurities } from '@/pages/BrokerAccount/hooks/useBrok
 import { Nullable } from '@/shared/utilities/nullable';
 
 interface Props {
-	mainCurrencyAmount?: number,
-	mainCurrencyName?: string,
-	brokerAccountId?: Nullable<string>
+	mainCurrencyAmount?: number;
+	mainCurrencyName?: string;
+	brokerAccountId?: Nullable<string>;
+	refreshTrigger?: number;
 }
 
-export interface BrokerAccountSecuritiesListRef {
-	reloadData: () => Promise<void>
-}
-
-const BrokerAccountSecuritiesList = forwardRef<BrokerAccountSecuritiesListRef, Props>(({ brokerAccountId }, ref)=> {
-	const { 
-		brokerAccountSecurities,
-		reloadBrokerAccountSecurities
-	} = useBrokerAccountsSecurities({brokerAccountId: brokerAccountId});
-
-	useImperativeHandle(ref, () => ({
-		reloadData: reloadBrokerAccountSecurities,
-	}));
+const BrokerAccountSecuritiesList: React.FC<Props> = ({ brokerAccountId, refreshTrigger }) => {
+	const { brokerAccountSecurities } = useBrokerAccountsSecurities(brokerAccountId, refreshTrigger);
 
 	if (!brokerAccountSecurities || brokerAccountSecurities.length === 0) {
 		return <Fragment />;
@@ -42,6 +32,6 @@ const BrokerAccountSecuritiesList = forwardRef<BrokerAccountSecuritiesListRef, P
 			</SimpleGrid>
 		</Fragment>
 	);
-});
+};
 
 export default BrokerAccountSecuritiesList;

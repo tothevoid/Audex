@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Box } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { useDividendPayments } from '@/pages/BrokerAccount/hooks/useDividendPayments';
@@ -46,16 +46,13 @@ const DividendPaymentsList: React.FC<Props> = (props) => {
 		onDataChanged: props.onDividendsChanged
 	});
 
-	const [context, setContext] = useState<Nullable<CreateDividendPaymentContext | EditDividendPaymentContext>>(null);
-
-	useEffect(() => {
+	const context: Nullable<CreateDividendPaymentContext | EditDividendPaymentContext> = useMemo(() => {
 		if (!props.brokerAccountId && !activeEntity) {
-			setContext(null);
+			return null;
 		}
-		const context: CreateDividendPaymentContext | EditDividendPaymentContext = activeEntity ?
-			{ dividendPayment: activeEntity } as EditDividendPaymentContext:
-			{ brokerAccountId: props.brokerAccountId } as CreateDividendPaymentContext;
-		setContext(context);
+		return activeEntity
+			? ({ dividendPayment: activeEntity } as EditDividendPaymentContext)
+			: ({ brokerAccountId: props.brokerAccountId } as CreateDividendPaymentContext);
 	}, [props.brokerAccountId, activeEntity]);
 
 	const dividendPaymentSaved = (dividendPayment: DividendPaymentEntity) => {

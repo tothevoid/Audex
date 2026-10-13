@@ -85,12 +85,37 @@ const CashAccountPage: React.FC = () => {
     }, [cashAccountId]);
 
     useEffect(() => {
-        if (mode !== ActiveEntityMode.None) {
+        if (mode !== ActiveEntityMode.None || !cashAccountId) {
             return;
         }
-        if (!cashAccountId) return;
-        loadAccountAndSummary();
-    }, [mode, cashAccountId, loadAccountAndSummary]);
+        let isMounted = true;
+        const load = async () => {
+            setIsHeaderLoading(true);
+            try {
+                const [accountData, map, summary] = await Promise.all([
+                    getAccountById(cashAccountId),
+                    getCurrenciesMap(),
+                    getCurrencyAccountSummary(cashAccountId)
+                ]);
+                if (isMounted) {
+                    setAccount(accountData);
+                    setCurrenciesMap(map);
+                    setTotalPnl(summary?.totalPnl ?? 0);
+                    setTransactionsCount(summary?.transactionsCount ?? 0);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsHeaderLoading(false);
+                }
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [mode, cashAccountId]);
 
     const onCurrencyTransactionSaved = async (transaction: CurrencyTransactionEntity) => {
         if (mode === ActiveEntityMode.Add) {
@@ -108,6 +133,7 @@ const CashAccountPage: React.FC = () => {
         }
         onActionEnded();
         refreshPage();
+        loadAccountAndSummary();
     };
 
     const onDeleteConfirmed = async () => {
@@ -119,6 +145,7 @@ const CashAccountPage: React.FC = () => {
         );
         onActionEnded();
         refreshPage();
+        loadAccountAndSummary();
     };
 
     const isLoading = isHeaderLoading || isTransactionsLoading;

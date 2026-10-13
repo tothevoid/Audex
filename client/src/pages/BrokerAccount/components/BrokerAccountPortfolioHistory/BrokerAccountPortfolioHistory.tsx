@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { SimpleGrid, Stack, Text, Card, Skeleton } from "@chakra-ui/react";
 import DatePicker from "@/shared/components/DatePicker/DatePicker";
 import { useTranslation } from "react-i18next";
@@ -29,24 +29,31 @@ const BrokerAccountPortfolioHistory: React.FC<Props> = ({ brokerAccountId }) => 
     const [history, setHistory] = useState<BrokerAccountPortfolioHistoryEntity | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const fetchHistory = useCallback(async (date: Date) => {
-        setIsLoading(true);
-        try {
-            const isoDate = formatDateToIso(date);
-            const result = await getBrokerAccountPortfolioHistory(brokerAccountId, isoDate);
-            if (result) {
-                setHistory(result);
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    }, [brokerAccountId]);
-
     useEffect(() => {
-        if (selectedDate) {
-            fetchHistory(selectedDate);
-        }
-    }, [selectedDate, fetchHistory]);
+        if (!selectedDate) return;
+
+        let isMounted = true;
+        const load = async () => {
+            setIsLoading(true);
+            try {
+                const isoDate = formatDateToIso(selectedDate);
+                const result = await getBrokerAccountPortfolioHistory(brokerAccountId, isoDate);
+                if (result && isMounted) {
+                    setHistory(result);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [brokerAccountId, selectedDate]);
 
     if (!user) return <Fragment />;
 

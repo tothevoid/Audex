@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Center, Flex, Spinner, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { Nullable } from "@/shared/utilities/nullable";
@@ -33,22 +33,29 @@ export const DistributionWidgetBase: React.FC<DistributionWidgetBaseProps> = ({
 
     const currency = user?.currency.name ?? "";
 
-    const fetchData = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            const result = await getDistributionWidgetData(endpoint);
-            setData(result ?? null);
-            if (onFetched) {
-                onFetched(new Date());
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    }, [endpoint, onFetched]);
-
     useEffect(() => {
-        fetchData();
-    }, [fetchData, refreshSignal, user?.currency?.id]);
+        let isMounted = true;
+        const load = async () => {
+            setIsLoading(true);
+            try {
+                const result = await getDistributionWidgetData(endpoint);
+                if (isMounted) {
+                    setData(result ?? null);
+                    onFetched?.(new Date());
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [endpoint, onFetched, refreshSignal, user?.currency?.id]);
 
     if (isLoading) {
         return (

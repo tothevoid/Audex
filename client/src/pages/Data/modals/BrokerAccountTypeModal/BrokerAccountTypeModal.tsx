@@ -16,13 +16,18 @@ interface ModalProps {
 	onModalClosed: () => void;
 }
 
-const BrokerAccountTypeModal: React.FC<ModalProps> = (props: ModalProps) => {
+const BrokerAccountTypeModal: React.FC<ModalProps> = ({
+	modalRef,
+	brokerAccountType,
+	onSaved,
+	onModalClosed,
+}: ModalProps) => {
 	const setDefaultValues = useCallback(() => {
 		return {
-			id: props.brokerAccountType?.id ?? generateGuid(),
-			name: props.brokerAccountType?.name ?? ""
+			id: brokerAccountType?.id ?? generateGuid(),
+			name: brokerAccountType?.name ?? ""
 		};
-	}, [props.brokerAccountType]);
+	}, [brokerAccountType]);
 
 	const { t } = useTranslation();
 	const validationSchema = useMemo(() => getBrokerAccountTypeValidationSchema(t), [t]);
@@ -37,21 +42,25 @@ const BrokerAccountTypeModal: React.FC<ModalProps> = (props: ModalProps) => {
 		if (open) {
 			reset(setDefaultValues());
 		} else {
-			props.onModalClosed();
+			onModalClosed();
 		}
 	};
 
-	const onSubmit = (brokerAccountType: BrokerAccountTypeFormInput) => {
-		props.onSaved(brokerAccountType as BrokerAccountTypeEntity);
-		props.modalRef?.current?.closeModal();
+	const onSubmit = (formData: BrokerAccountTypeFormInput) => {
+		onSaved(formData as BrokerAccountTypeEntity);
+		modalRef?.current?.closeModal();
+	};
+
+	const handleFormSubmit: React.FormEventHandler = (event) => {
+		handleSubmit(onSubmit)(event);
 	};
 
 	return (
 		<BaseFormModal
 			visibilityChanged={onModalVisibilityChanged}
-			ref={props.modalRef}
+			ref={modalRef}
 			title={t("entity_broker_account_type_form_title")}
-			submitHandler={handleSubmit(onSubmit)}
+			submitHandler={handleFormSubmit}
 		>
 			<Field.Root invalid={!!errors.name}>
 				<Field.Label>{t("entity_broker_account_type_name")}</Field.Label>

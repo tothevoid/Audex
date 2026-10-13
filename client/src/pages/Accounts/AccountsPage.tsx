@@ -6,19 +6,25 @@ import AccountsList from "./components/AccountsList/AccountsList";
 
 const AccountsPage: React.FC = () => {
 	const [accountCurrencySummaries, setAccountCurrencySummaries] = useState<AccountCurrencySummary[]>([]);
+	const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-	const requestAccountsData = useCallback(async () => {
-		const summaries = await getSummary();
-		setAccountCurrencySummaries(summaries);
+	const onAccountsChanged = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
 	}, []);
 
-	const onAccountsChanged = useCallback(async () => {
-		await requestAccountsData();
-	}, [requestAccountsData]);
-
 	useEffect(() => {
-		requestAccountsData();
-	}, [requestAccountsData]);
+		let isMounted = true;
+		const load = async () => {
+			const summaries = await getSummary();
+			if (isMounted) {
+				setAccountCurrencySummaries(summaries);
+			}
+		};
+		load();
+		return () => {
+			isMounted = false;
+		};
+	}, [refreshTrigger]);
 
 	return (
 		<PageContainer>

@@ -1,7 +1,7 @@
 import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
 import { Field, Input, Flex} from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { getDepositValidationSchema, DepositFormInput } from "./DepositValidationSchema";
 import { useTranslation } from "react-i18next";
 import { getCurrencies } from '@/api/currencies/currencyApi';
@@ -27,7 +27,11 @@ interface State {
 	banks: BankEntity[]
 }
 
-const DepositModal: React.FC<ModalProps> = (props: ModalProps) => {
+const DepositModal: React.FC<ModalProps> = ({
+	modalRef,
+	deposit,
+	onSaved
+}: ModalProps) => {
 	const [state, setState] = useState<State>({ currencies: [], banks: [] });
 
 	const initCurrencies = async () => {
@@ -54,22 +58,22 @@ const DepositModal: React.FC<ModalProps> = (props: ModalProps) => {
 
 	const getDefaultFormState = useCallback(() => {
 		return {
-			id: props.deposit?.id ?? generateGuid(),
-			name: props.deposit?.name ?? "",
-			bank: props.deposit?.bank,
-			from: props.deposit?.from ?? new Date(),
-			to: props.deposit?.to ?? new Date(),
-			percentage: props.deposit?.percentage ?? 0,
-			initialAmount: props.deposit?.initialAmount ?? 0,
-			estimatedEarn: props.deposit?.estimatedEarn ?? 0,
-			currency: props.deposit?.currency,
+			id: deposit?.id ?? generateGuid(),
+			name: deposit?.name ?? "",
+			bank: deposit?.bank,
+			from: deposit?.from ?? new Date(),
+			to: deposit?.to ?? new Date(),
+			percentage: deposit?.percentage ?? 0,
+			initialAmount: deposit?.initialAmount ?? 0,
+			estimatedEarn: deposit?.estimatedEarn ?? 0,
+			currency: deposit?.currency,
 		};
-	}, [props.deposit]);
+	}, [deposit]);
 
 	const { t } = useTranslation();
 	const validationSchema = useMemo(() => getDepositValidationSchema(t), [t]);
 
-	const { register, control, handleSubmit, watch, formState: { errors }, reset} = useForm<DepositFormInput>({
+	const { register, control, handleSubmit, formState: { errors }, reset } = useForm<DepositFormInput>({
 		resolver: zodResolver(validationSchema),
 		mode: "onBlur",
 		defaultValues: getDefaultFormState()
@@ -77,17 +81,21 @@ const DepositModal: React.FC<ModalProps> = (props: ModalProps) => {
 
 	useEffect(() => {
 		reset(getDefaultFormState());
-	}, [reset, getDefaultFormState, props.deposit]);
+	}, [reset, getDefaultFormState, deposit]);
 
-	const selectedCurrencyForm = watch("currency");
-	const depositCurrency = state.currencies.find(c => c.id === selectedCurrencyForm?.id)?.name ?? '';
+	const selectedCurrency = useWatch({ control, name: "currency" });
+	const depositCurrency = selectedCurrency?.name ?? '';
 
-	const onSubmit = async (deposit: DepositFormInput) => {
-		await props.onSaved(deposit as DepositEntity);
-		props.modalRef?.current?.closeModal();
+	const onSubmit = async (savedDeposit: DepositFormInput) => {
+		await onSaved(savedDeposit as DepositEntity);
+		modalRef?.current?.closeModal();
 	};
 
-	return <BaseFormModal ref={props.modalRef} title={t("entity_deposit_name_form_title")} submitHandler={handleSubmit(onSubmit)}>
+	const handleFormSubmit: React.FormEventHandler = (event) => {
+		handleSubmit(onSubmit)(event);
+	};
+
+	return <BaseFormModal ref={modalRef} title={t("entity_deposit_name_form_title")} submitHandler={handleFormSubmit}>
 		<Field.Root invalid={!!errors.name}>
 			<Field.Label>{t("entity_deposit_name")}</Field.Label>
 			<Input {...register("name")} autoComplete="off" placeholder='Deposit name' />

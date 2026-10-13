@@ -50,14 +50,14 @@ const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransact
 		createSecurityTransactionEntity,
 		updatedSecurityTransactionEntity,
 		deleteSecurityTransactionEntity,
-		securityTransactionsQueryParameters,
-		setSecurityTransactionsQueryParameters
+		queryParameters,
+		setQueryParameters
 	} = useSecurityTransactions(brokerAccountId);
 
 	const showSkeleton = useDelayedLoading(isSecurityTransactionsLoading);
 
 	const onFilterChange = (newFilters: SecurityTransactionsFilterValues) => {
-		setSecurityTransactionsQueryParameters(previousQueryParameters => ({
+		setQueryParameters(previousQueryParameters => ({
 			...previousQueryParameters,
 			pageIndex: 1,
 			...newFilters,
@@ -70,7 +70,7 @@ const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransact
 	};
 
 	const onPageChanged = (pageNumber: number, pageSize: number) => {
-		setSecurityTransactionsQueryParameters(previousQueryParameters => ({
+		setQueryParameters(previousQueryParameters => ({
 			...previousQueryParameters,
 			recordsQuantity: pageSize,
 			pageIndex: pageNumber <= 0 ? 1 : pageNumber
@@ -116,7 +116,7 @@ const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransact
 
 			<SecurityTransactionsFilter
 				isGlobalBrokerAccount={isGlobalBrokerAccount}
-				filters={securityTransactionsQueryParameters}
+				filters={queryParameters}
 				onFilterChange={onFilterChange}
 				onReset={onResetFilters}
 			/>
@@ -146,8 +146,8 @@ const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransact
 
 			<CollectionPagination
 				count={totalCount}
-				page={securityTransactionsQueryParameters.pageIndex}
-				pageSize={securityTransactionsQueryParameters.recordsQuantity}
+				page={queryParameters.pageIndex}
+				pageSize={queryParameters.recordsQuantity}
 				onPageChange={onPageChanged}
 			/>
 

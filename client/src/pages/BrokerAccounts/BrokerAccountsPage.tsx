@@ -2,7 +2,7 @@ import { Fragment } from "react/jsx-runtime";
 import BrokerAccountHeader from "@/pages/BrokerAccount/components/BrokerAccountHeader/BrokerAccountHeader";
 import BrokerAccountTabs from "@/pages/BrokerAccount/components/BrokerAccountTabs/BrokerAccountTabs";
 import { ChangeAction } from "@/pages/BrokerAccount/components/BrokerAccountTabs/types";
-import BrokerAccountSecuritiesList, { BrokerAccountSecuritiesListRef } from "@/pages/BrokerAccount/components/BrokerAccountSecuritiesList/BrokerAccountSecuritiesList";
+import BrokerAccountSecuritiesList from "@/pages/BrokerAccount/components/BrokerAccountSecuritiesList/BrokerAccountSecuritiesList";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { getLastPullDate, pullBrokerAccountQuotations } from "@/api/brokers/brokerAccountSecurityApi";
 import { useSignalR } from "@/shared/hooks/useSignalR";
@@ -21,13 +21,13 @@ interface State {
 
 const BrokerAccountsPage: React.FC = () => {
     const { t } = useTranslation();
-    const securitiesRef = useRef<BrokerAccountSecuritiesListRef>(null);
     const importModalRef = useRef<BaseModalRef>(null);
     const { user } = useUserProfile();
     // TODO: Currency can be different for each account
     const currencyName = user?.currency.name ?? "USD";
 
     const [state, setState] = useState<State>({ isReloading: false });
+    const [securitiesRefreshTrigger, setSecuritiesRefreshTrigger] = useState<number>(0);
 
     const [portfolio, setPortfolio] = useState<BrokerAccountPortfolioEntity | null>(null);
 
@@ -46,7 +46,7 @@ const BrokerAccountsPage: React.FC = () => {
     
     const onTransactionsChanged = useCallback(async () => {
         await fetchBrokerAccountsSummary();
-        await securitiesRef.current?.reloadData();
+        setSecuritiesRefreshTrigger((previousTrigger) => previousTrigger + 1);
     }, [fetchBrokerAccountsSummary]);
 
     const onQuotesRecalculated = useCallback(async (eventPayload?: QuotesRecalculatedEventPayload) => {
@@ -107,7 +107,7 @@ const BrokerAccountsPage: React.FC = () => {
                 onImportStatement={() => importModalRef.current?.openModal()}
             />
         }
-        <BrokerAccountSecuritiesList ref={securitiesRef} />
+        <BrokerAccountSecuritiesList refreshTrigger={securitiesRefreshTrigger} />
         <BrokerAccountTabs 
             currencyName={currencyName} 
             onActionTriggered={onActionTriggered}/>

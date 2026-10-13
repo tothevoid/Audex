@@ -4,7 +4,7 @@ import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 import { getBrokerAccountById } from "@/api/brokers/brokerAccountApi";
 import { getLastPullDate, pullBrokerAccountQuotations } from "@/api/brokers/brokerAccountSecurityApi";
 import { useSignalR } from "@/shared/hooks/useSignalR";
-import BrokerAccountSecuritiesList, { BrokerAccountSecuritiesListRef } from "./components/BrokerAccountSecuritiesList/BrokerAccountSecuritiesList";
+import BrokerAccountSecuritiesList from "./components/BrokerAccountSecuritiesList/BrokerAccountSecuritiesList";
 import BrokerAccountTabs from "./components/BrokerAccountTabs/BrokerAccountTabs";
 import { ChangeAction } from "./components/BrokerAccountTabs/types";
 import BrokerAccountHeader from "./components/BrokerAccountHeader/BrokerAccountHeader";
@@ -21,12 +21,12 @@ interface State {
 }
 
 const BrokerAccountPage: React.FC = () => {
-    const securitiesRef = useRef<BrokerAccountSecuritiesListRef>(null);
     const importModalRef = useRef<BaseModalRef>(null);
 
     const { brokerAccountId } = useParams();
 
     const [state, setState] = useState<State>({ brokerAccount: null, isReloading: false });
+    const [securitiesRefreshTrigger, setSecuritiesRefreshTrigger] = useState<number>(0);
     
     const [lastPullDate, setLastPullDate] = useState<Date | null>(null);
 
@@ -84,7 +84,7 @@ const BrokerAccountPage: React.FC = () => {
 
     const onTransactionsChanged = useCallback(async () => {
         await fetchBrokerAccount();
-        await securitiesRef.current?.reloadData();
+        setSecuritiesRefreshTrigger((previousTrigger) => previousTrigger + 1);
     }, [fetchBrokerAccount]);
 
     const onQuotesRecalculated = useCallback(async (eventPayload?: QuotesRecalculatedEventPayload) => {
@@ -137,7 +137,7 @@ const BrokerAccountPage: React.FC = () => {
                 onImportStatement={() => importModalRef.current?.openModal()}
             />
         )}
-        <BrokerAccountSecuritiesList ref={securitiesRef} brokerAccountId={state.brokerAccount.id}/>
+        <BrokerAccountSecuritiesList brokerAccountId={state.brokerAccount.id} refreshTrigger={securitiesRefreshTrigger}/>
         <BrokerAccountTabs currencyName={state?.brokerAccount?.currency?.name} brokerAccountId={brokerAccountId} onActionTriggered={onActionTriggered}/>
         <BrokerStatementImportModal
             ref={importModalRef}

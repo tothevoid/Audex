@@ -30,20 +30,28 @@ const BanksTable: React.FC = () => {
     const modalRef = useRef<BaseModalRef>(null);
     const confirmModalRef = useRef<BaseModalRef>(null);
 
-    const fetchBanks = async () => { 
-        setIsLoading(true);
-        try {
-            const banks = await getBanks();
-            setState((currentState) => {
-                return {...currentState, banks};
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     useEffect(() => {
-        fetchBanks();
+        let isMounted = true;
+        const load = async () => {
+            setIsLoading(true);
+            try {
+                const banks = await getBanks();
+                if (isMounted) {
+                    setState((currentState) => ({ ...currentState, banks }));
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     useEffect(() => {

@@ -1,6 +1,6 @@
 import { Field } from "@chakra-ui/react";
 import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
@@ -27,20 +27,25 @@ export interface EditBrokerAccountFundTransferContext {
 }
 
 interface ModalProps {
-    isGlobalBrokerAccount: boolean
-    onSaved: (transfer: BrokerAccountFundTransferEntity) => void
-    context: CreateBrokerAccountFundTransferContext | EditBrokerAccountFundTransferContext
-    modalRef: RefObject<BaseModalRef | null>}
+    isGlobalBrokerAccount: boolean;
+    onSaved: (transfer: BrokerAccountFundTransferEntity) => void;
+    context: CreateBrokerAccountFundTransferContext | EditBrokerAccountFundTransferContext;
+    modalRef: RefObject<BaseModalRef | null>;
+}
 
 interface TransferType {
     label: string;
     value: boolean;
 }
 
-const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps) => {
+const BrokerAccountFundTransferModal: React.FC<ModalProps> = ({
+    isGlobalBrokerAccount,
+    onSaved,
+    context,
+    modalRef
+}: ModalProps) => {
     const [accounts, setAccounts] = useState<AccountEntity[]>([]);
     const [brokerAccounts, setBrokerAccounts] = useState<BrokerAccountEntity[]>([]);
-
 
     const { t } = useTranslation();
 
@@ -53,9 +58,9 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
     );
     
     const getDefaultValues = useCallback(() => {
-        if ("brokerAccountFundTransfer" in props.context) {
-            const transfer = props.context.brokerAccountFundTransfer;
-            const transferType = transferTypes.find(tt => tt.value === transfer.income) ?? transferTypes[0];
+        if ("brokerAccountFundTransfer" in context) {
+            const transfer = context.brokerAccountFundTransfer;
+            const transferType = transferTypes.find(transferTypeItem => transferTypeItem.value === transfer.income) ?? transferTypes[0];
             return {
                 id: transfer.id,
                 account: transfer.account,
@@ -69,53 +74,62 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
         return {
             id: generateGuid(),
             account: undefined,
-            brokerAccount: { id: props.context.brokerAccountId ?? undefined },
+            brokerAccount: { id: context.brokerAccountId ?? undefined },
             income: transferTypes[0],
             date: new Date(),
             amount: 0
         };
-    }, [props.context, transferTypes]);
+    }, [context, transferTypes]);
 
     useEffect(() => {
+        let isMounted = true;
         const fetchData = async () => {
-            // TODO: Filter by account type and currency
-            const accounts = await getAccounts({ onlyActive: true });
-            setAccounts(accounts);
+            if (isGlobalBrokerAccount) {
+                const [fetchedAccounts, fetchedBrokerAccounts] = await Promise.all([
+                    getAccounts({ onlyActive: true }),
+                    getBrokerAccounts()
+                ]);
 
-            if (props.isGlobalBrokerAccount) {
-                const brokerAccounts = await getBrokerAccounts();
-                setBrokerAccounts(brokerAccounts);
+                if (isMounted) {
+                    setAccounts(fetchedAccounts);
+                    setBrokerAccounts(fetchedBrokerAccounts);
+                }
+            } else {
+                const fetchedAccounts = await getAccounts({ onlyActive: true });
+
+                if (isMounted) {
+                    setAccounts(fetchedAccounts);
+                }
             }
         };
         fetchData();
-    }, [props.isGlobalBrokerAccount]);
+        return () => {
+            isMounted = false;
+        };
+    }, [isGlobalBrokerAccount]);
 
     const validationSchema = useMemo(() => getBrokerAccountFundTransferValidationSchema(t), [t]);
 
-    const { handleSubmit, control, formState: { errors }, reset, watch } = useForm<BrokerAccountFundTransferFormInput>({
+    const { handleSubmit, control, formState: { errors }, reset } = useForm<BrokerAccountFundTransferFormInput>({
         resolver: zodResolver(validationSchema),
         mode: "onBlur",
         defaultValues: getDefaultValues()
     });
 
-    const incomeValue = watch("income"); 
-    const selectedBrokerAccount = watch("brokerAccount");
-    const selectedAccount = watch("account");
-    const transferCurrency = brokerAccounts.find(ba => ba.id === selectedBrokerAccount?.id)?.currency?.name ?? accounts.find(a => a.id === selectedAccount?.id)?.currency?.name ?? '';
-
-    const [accountLabel, setAccountLabel] = useState<string>("");
-    useEffect(() => {
-        setAccountLabel(incomeValue.value ? t("broker_account_transfer_modal_account_from") : t("broker_account_transfer_modal_account_to"));
-    }, [t, incomeValue]);
+    const incomeValue = useWatch({ control, name: "income" }); 
+    const selectedBrokerAccount = useWatch({ control, name: "brokerAccount" });
+    const selectedAccount = useWatch({ control, name: "account" });
+    const transferCurrency = brokerAccounts.find(brokerAccount => brokerAccount.id === selectedBrokerAccount?.id)?.currency?.name ?? accounts.find(account => account.id === selectedAccount?.id)?.currency?.name ?? '';
+    const accountLabel = incomeValue?.value ? t("broker_account_transfer_modal_account_from") : t("broker_account_transfer_modal_account_to");
 
     useEffect(() => {
         reset(getDefaultValues());
-    }, [reset, getDefaultValues, props.context]);
+    }, [reset, getDefaultValues, context]);
 
     const onSubmit = async (formData: BrokerAccountFundTransferFormInput) => {
         const transfer = {...formData, income: formData.income.value} as BrokerAccountFundTransferEntity;
-        await props.onSaved(transfer);
-        props.modalRef.current?.closeModal();
+        await onSaved(transfer);
+        modalRef.current?.closeModal();
     };
 
     const onModalVisibilityChanged = (open: boolean) => {
@@ -126,13 +140,17 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = (props: ModalProps)
         reset(getDefaultValues());
     };
 
+    const handleFormSubmit: React.FormEventHandler = (event) => {
+        handleSubmit(onSubmit)(event);
+    };
+
     return (
-        <BaseFormModal ref={props.modalRef} title={t("broker_account_transfer_modal_title")}
+        <BaseFormModal ref={modalRef} title={t("broker_account_transfer_modal_title")}
             visibilityChanged={onModalVisibilityChanged}
-            submitHandler={handleSubmit(onSubmit)} 
+            submitHandler={handleFormSubmit} 
             saveButtonTitle={t("broker_account_transfer_modal_transfer_button")}>
             {
-                props.isGlobalBrokerAccount &&
+                isGlobalBrokerAccount &&
                 <Field.Root mt={4} invalid={!!errors.brokerAccount}>
                     <Field.Label>{t("broker_account_transfer_modal_broker_account")}</Field.Label>
                     <CollectionSelect name="brokerAccount" control={control} placeholder="Select broker account"

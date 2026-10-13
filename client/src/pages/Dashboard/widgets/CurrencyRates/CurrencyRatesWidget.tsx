@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, SimpleGrid, Skeleton, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { WidgetComponentProps } from "../types";
@@ -18,32 +18,37 @@ export const CurrencyRatesWidget: React.FC<WidgetComponentProps<Record<string, u
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchData = useCallback(async (isSilent: boolean = false) => {
-        if (!isSilent) {
-            setIsLoading(true);
-        }
-
-        try {
-            const result = await getCurrencies();
-            setCurrencies(result || []);
-            setError(null);
-            onFetched?.(new Date());
-        } catch {
-            setError(t("error_data_load"));
-        } finally {
-            setIsLoading(false);
-        }
-    }, [onFetched, t]);
-
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        let isMounted = true;
+        const load = async () => {
+            const isSilent = Boolean(refreshSignal && refreshSignal > 0);
+            if (!isSilent) {
+                setIsLoading(true);
+            }
+            try {
+                const result = await getCurrencies();
+                if (result && isMounted) {
+                    setCurrencies(result);
+                    setError(null);
+                    onFetched?.(new Date());
+                }
+            } catch {
+                if (isMounted) {
+                    setError(t("error_data_load"));
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
 
-    useEffect(() => {
-        if (refreshSignal && refreshSignal > 0) {
-            fetchData(true);
-        }
-    }, [refreshSignal, fetchData]);
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [refreshSignal, onFetched, t]);
 
     if (isLoading && currencies.length === 0) {
         return (

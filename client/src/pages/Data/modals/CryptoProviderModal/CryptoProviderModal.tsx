@@ -1,5 +1,5 @@
 import { Field, Input} from "@chakra-ui/react";
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
+import React, { RefObject, useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -19,13 +19,18 @@ interface ModalProps {
     onModalClosed: () => void;
 }
 
-const CryptoProviderModal: React.FC<ModalProps> = (props: ModalProps) => {
+const CryptoProviderModal: React.FC<ModalProps> = ({
+    modalRef,
+    cryptoProvider,
+    onSaved,
+    onModalClosed,
+}: ModalProps) => {
     const setDefaultValues = useCallback(() => {
         return {
-            id: props.cryptoProvider?.id ?? generateGuid(),
-            name: props.cryptoProvider?.name ?? ""
+            id: cryptoProvider?.id ?? generateGuid(),
+            name: cryptoProvider?.name ?? ""
         };
-    }, [props.cryptoProvider]);
+    }, [cryptoProvider]);
 
     const { t } = useTranslation();
     const validationSchema = useMemo(() => getCryptoProviderValidationSchema(t), [t]);
@@ -37,39 +42,40 @@ const CryptoProviderModal: React.FC<ModalProps> = (props: ModalProps) => {
     });
 
     const [icon, setIcon] = useState<File | null>(null);
-    const [iconUrl, setIconUrl] = useState<string | null>(null);
+    const [customIconUrl, setCustomIconUrl] = useState<string | null>(null);
 
-    useEffect(() => {
-        const url = getCryptoProviderIconUrl(props.cryptoProvider?.iconKey);
-        setIconUrl(url);
-    }, [props.cryptoProvider]);
+    const iconUrl = customIconUrl ?? (cryptoProvider?.iconKey ? getCryptoProviderIconUrl(cryptoProvider.iconKey) : null);
 
     const onModalVisibilityChanged = (open: boolean) => {
         if (open) {
             reset(setDefaultValues());
         } else {
             setIcon(null);
-            setIconUrl(null);
-            props.onModalClosed();
+            setCustomIconUrl(null);
+            onModalClosed();
         }
     };
 
-    const onSubmit = (cryptoProvider: CryptoProviderFormInput) => {
-        props.onSaved({ ...cryptoProvider, iconKey: props.cryptoProvider?.iconKey } as CryptoProviderEntity, icon);
-        props.modalRef?.current?.closeModal();
+    const onSubmit = (formData: CryptoProviderFormInput) => {
+        onSaved({ ...formData, iconKey: cryptoProvider?.iconKey } as CryptoProviderEntity, icon);
+        modalRef?.current?.closeModal();
+    };
+
+    const handleFormSubmit: React.FormEventHandler = (event) => {
+        handleSubmit(onSubmit)(event);
     };
 
     const onImageSelected = (url: string, image: File) => {
         setIcon(image);
-        setIconUrl(url);
+        setCustomIconUrl(url);
     };
 
     return (
         <BaseFormModal
             visibilityChanged={onModalVisibilityChanged}
-            ref={props.modalRef}
+            ref={modalRef}
             title={t("entity_crypto_provider_form_title")}
-            submitHandler={handleSubmit(onSubmit)}
+            submitHandler={handleFormSubmit}
         >
             <ImageInput imageUrl={iconUrl} onImageSelected={onImageSelected} />
             <Field.Root invalid={!!errors.name}>
