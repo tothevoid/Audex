@@ -1,6 +1,6 @@
 import { Card, Flex, HStack, Link, Stack, Text } from '@chakra-ui/react';
 import { NavLink } from 'react-router-dom';
-import { Fragment, useCallback, useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { SiBinance } from 'react-icons/si';
 import { CryptoAccountEntity } from '@/models/crypto/CryptoAccountEntity';
 import { getTotalBalance } from '@/api/crypto/cryptoAccountCryptocurrencyApi';
@@ -23,14 +23,21 @@ const CryptoAccount = (props: Props) => {
 
     const [totalAmount, setTotalAmount] = useState<number>(0);
 
-    const fetchBalance = useCallback(async () => {
-        const balance = await getTotalBalance(id);
-        setTotalAmount(balance);
-    }, [id]);
-
     useEffect(() => {
-        fetchBalance();
-    }, [fetchBalance]);
+        let isMounted = true;
+        const load = async () => {
+            const balance = await getTotalBalance(id);
+            if (isMounted) {
+                setTotalAmount(balance);
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [id]);
 
     return (
         <Fragment>

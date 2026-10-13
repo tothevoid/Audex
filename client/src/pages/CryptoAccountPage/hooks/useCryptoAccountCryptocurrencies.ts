@@ -5,71 +5,80 @@ import { createCryptoAccountCryptocurrency, deleteCryptoAccountCryptocurrency, u
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 import { notify } from "@/shared/components/Toaster";
 
-export interface CryptoAccountCryptocurrenciesQuery {
-    cryptoAccountId: string
-}
+export const useCryptoAccountCryptocurrencies = (cryptoAccountId: string) => {
+	const { t } = useTranslation();
+	const [cryptoAccountCryptocurrencies, setCryptoAccountCryptocurrencies] = useState<CryptoAccountCryptocurrencyEntity[]>([]);
+	const [totalBalanceUsd, setTotalBalanceUsd] = useState<number>(0);
+	const [isCryptoAccountCryptocurrenciesLoading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
-export const useCryptoAccountCryptocurrencies = (queryParameters: CryptoAccountCryptocurrenciesQuery) => {
-    const { t } = useTranslation();
-    const [cryptoAccountCryptocurrencies, setCryptoAccountCryptocurrencies] = useState<CryptoAccountCryptocurrencyEntity[]>([]);
-    const [totalBalanceUsd, setTotalBalanceUsd] = useState<number>(0);
-    const [isBrokerAccountSecuritiesLoading, setLoading] = useState(false);
+	const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-    const [error, setError] = useState<string | null>(null);
-    const [cryptoAccountCryptocurrenciesQueryParameters, setCryptoAccountCryptocurrenciesQueryParameters] = 
-        useState<CryptoAccountCryptocurrenciesQuery>(queryParameters);
+	const reloadCryptoAccountCryptocurrencies = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+	}, []);
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        try {
-            const [cryptocurrencies, balance] = await Promise.all([
-                getCryptocurrenciesByCryptoAccount(cryptoAccountCryptocurrenciesQueryParameters.cryptoAccountId),
-                getTotalBalance(cryptoAccountCryptocurrenciesQueryParameters.cryptoAccountId)
-            ]);
-            setCryptoAccountCryptocurrencies(cryptocurrencies);
-            setTotalBalanceUsd(balance);
-        } catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-        } finally {
-            setLoading(false);
-        }
-    }, [cryptoAccountCryptocurrenciesQueryParameters, t]);
+	useEffect(() => {
+		let isMounted = true;
+		const load = async () => {
+			setLoading(true);
+			try {
+				const [cryptocurrencies, balance] = await Promise.all([
+					getCryptocurrenciesByCryptoAccount(cryptoAccountId),
+					getTotalBalance(cryptoAccountId)
+				]);
+				if (isMounted) {
+					setCryptoAccountCryptocurrencies(cryptocurrencies);
+					setTotalBalanceUsd(balance);
+					setError(null);
+				}
+			} catch (error: unknown) {
+				if (isMounted) {
+					setError(parseErrorMessage(error, t("error_data_load")));
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+		load();
 
-    const addCryptoAccountCryptocurrencyEntity = async (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => {
-        await createCryptoAccountCryptocurrency(cryptoAccountCryptocurrency);
-        const name = cryptoAccountCryptocurrency.cryptocurrency?.name ?? "";
-        notify.success(t("crypto_position_toast_created_title"), t("crypto_position_toast_created_desc", { name }));
-        await fetchData();
-    };
+		return () => {
+			isMounted = false;
+		};
+	}, [cryptoAccountId, refreshTrigger, t]);
 
-    const updateCryptoAccountCryptocurrencyEntity = async (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => {
-        await updateCryptoAccountCryptocurrency(cryptoAccountCryptocurrency);
-        const name = cryptoAccountCryptocurrency.cryptocurrency?.name ?? "";
-        notify.success(t("crypto_position_toast_updated_title"), t("crypto_position_toast_updated_desc", { name }));
-        await fetchData();
-    };
+	const addCryptoAccountCryptocurrencyEntity = async (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => {
+		await createCryptoAccountCryptocurrency(cryptoAccountCryptocurrency);
+		const name = cryptoAccountCryptocurrency.cryptocurrency?.name ?? "";
+		reloadCryptoAccountCryptocurrencies();
+		notify.success(t("crypto_position_toast_created_title"), t("crypto_position_toast_created_desc", { name }));
+	};
 
-    const deleteCryptoAccountCryptocurrencyEntity = async (deletedCryptoPosition: CryptoAccountCryptocurrencyEntity) => {
-        const name = deletedCryptoPosition.cryptocurrency?.name ?? "";
-        await deleteCryptoAccountCryptocurrency(deletedCryptoPosition.id);
-        notify.success(t("crypto_position_toast_deleted_title"), t("crypto_position_toast_deleted_desc", { name }));
-        await fetchData();
-    };
+	const updateCryptoAccountCryptocurrencyEntity = async (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => {
+		await updateCryptoAccountCryptocurrency(cryptoAccountCryptocurrency);
+		const name = cryptoAccountCryptocurrency.cryptocurrency?.name ?? "";
+		reloadCryptoAccountCryptocurrencies();
+		notify.success(t("crypto_position_toast_updated_title"), t("crypto_position_toast_updated_desc", { name }));
+	};
 
-    return {
-        cryptoAccountCryptocurrencies,
-        totalBalanceUsd,
-        addCryptoAccountCryptocurrencyEntity,
-        updateCryptoAccountCryptocurrencyEntity,
-        deleteCryptoAccountCryptocurrencyEntity,
-        isBrokerAccountSecuritiesLoading,
-        error,
-        setCryptoAccountCryptocurrenciesQueryParameters,
-        cryptoAccountCryptocurrenciesQueryParameters,
-        reloadCryptoAccountCryptocurrencies: fetchData
-    };
+	const deleteCryptoAccountCryptocurrencyEntity = async (deletedCryptoPosition: CryptoAccountCryptocurrencyEntity) => {
+		const name = deletedCryptoPosition.cryptocurrency?.name ?? "";
+		await deleteCryptoAccountCryptocurrency(deletedCryptoPosition.id);
+		reloadCryptoAccountCryptocurrencies();
+		notify.success(t("crypto_position_toast_deleted_title"), t("crypto_position_toast_deleted_desc", { name }));
+	};
+
+	return {
+		cryptoAccountCryptocurrencies,
+		totalBalanceUsd,
+		addCryptoAccountCryptocurrencyEntity,
+		updateCryptoAccountCryptocurrencyEntity,
+		deleteCryptoAccountCryptocurrencyEntity,
+		isCryptoAccountCryptocurrenciesLoading,
+		error,
+		reloadCryptoAccountCryptocurrencies
+	};
 };

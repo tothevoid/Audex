@@ -12,21 +12,39 @@ export const useDebts = () => {
 
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchData = useCallback(async () => {
-		setLoading(true);
-		try {
-			const debts = await getDebts(false);
-			setDebts(debts);
-		} catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-		} finally {
-			setLoading(false);
-		}
-	}, [t]);
+	const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+	const reloadDebts = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+	}, []);
 
 	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
+		let isMounted = true;
+		const load = async () => {
+			setLoading(true);
+			try {
+				const debts = await getDebts(false);
+				if (isMounted) {
+					setDebts(debts);
+					setError(null);
+				}
+			} catch (error: unknown) {
+				if (isMounted) {
+					setError(parseErrorMessage(error, t("error_data_load")));
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
+
+		load();
+
+		return () => {
+			isMounted = false;
+		};
+	}, [refreshTrigger, t]);
 
 	const createDebtEntity = async (debt: DebtEntity) => {
 		const added = await createDebt(debt);
@@ -34,7 +52,7 @@ export const useDebts = () => {
 			return;
 		}
 
-		await fetchData();
+		reloadDebts();
 		notify.success(
 			t("debts_toast_created_title"),
 			t("debts_toast_created_desc", { name: debt.name })
@@ -47,13 +65,8 @@ export const useDebts = () => {
 			return;
 		}
 
-		const updatedDebts = debts.map(existingDebt => 
-			updatedDebt.id === existingDebt.id ?
-				{...updatedDebt}:
-				existingDebt
-		);
+		reloadDebts();
 
-		setDebts(updatedDebts);
 		notify.success(
 			t("debts_toast_updated_title"),
 			t("debts_toast_updated_desc", { name: updatedDebt.name })
@@ -81,6 +94,6 @@ export const useDebts = () => {
 		createDebtEntity,
 		updateDebtEntity,
 		deleteDebtEntity,
-		reloadDebts: fetchData
+		reloadDebts
 	};
 };

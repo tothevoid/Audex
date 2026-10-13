@@ -33,8 +33,24 @@ const DebtsPage: React.FC = () => {
 	}, []);
 
 	useEffect(() => {
-		loadTagData();
-	}, [loadTagData]);
+		let isMounted = true;
+		const load = async () => {
+			const [tagsData, statsData] = await Promise.all([
+				getDebtTags(),
+				getDebtTagStats()
+			]);
+			if (isMounted) {
+				setTags(tagsData);
+				setTagStats(statsData);
+			}
+		};
+
+		load();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
 
 	const handleTagCreatedOrUpdated = useCallback(async () => {
 		await loadTagData();

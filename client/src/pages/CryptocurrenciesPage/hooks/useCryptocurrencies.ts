@@ -12,58 +12,77 @@ export const useCryptocurrencies = () => {
 
     const [error, setError] = useState<string | null>(null);
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        try {
-            setCryptocurrencies(await getCryptocurrencies());
-        } catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-        } finally {
-            setLoading(false);
-        }
-    }, [t]);
+	const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+	const reloadCryptocurrencies = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+	}, []);
 
-    const createCryptocurrencyEntity = async (createdCryptocurrency: CryptocurrencyEntity, icon: File | null) => {
-        const createResult = await createCryptocurrency(createdCryptocurrency, icon);
-        if (!createResult) {
-            return;
-        }
+	useEffect(() => {
+		let isMounted = true;
+		const load = async () => {
+			setLoading(true);
+			try {
+				const currencies = await getCryptocurrencies();
+				if (isMounted) {
+					setCryptocurrencies(currencies);
+					setError(null);
+				}
+			} catch (error: unknown) {
+				if (isMounted) {
+					setError(parseErrorMessage(error, t("error_data_load")));
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
 
-        notify.success(t("crypto_toast_created_title"), t("crypto_toast_created_desc", { name: createResult.name }));
-        setCryptocurrencies([createResult, ...cryptocurrencies]);
-    };
+		load();
 
-    const updateCryptocurrencyEntity = async (updatedCryptocurrency: CryptocurrencyEntity, icon: File | null) => {
-        const updateResult = await updateCryptocurrency(updatedCryptocurrency, icon);
-        if (!updateResult) {
-            return;
-        }
+		return () => {
+			isMounted = false;
+		};
+	}, [refreshTrigger, t]);
 
-        notify.success(t("crypto_toast_updated_title"), t("crypto_toast_updated_desc", { name: updatedCryptocurrency.name }));
-        await fetchData();
-    };
+	const createCryptocurrencyEntity = async (createdCryptocurrency: CryptocurrencyEntity, icon: File | null) => {
+		const createResult = await createCryptocurrency(createdCryptocurrency, icon);
+		if (!createResult) {
+			return;
+		}
 
-    const deleteCryptocurrencyEntity = async (deletedCryptocurrency: CryptocurrencyEntity) => {
-        const isCryptocurrencyDeleted = await deleteCryptocurrency(deletedCryptocurrency.id);
-        if (!isCryptocurrencyDeleted) {
-            return;
-        }
+		reloadCryptocurrencies();
+		notify.success(t("crypto_toast_created_title"), t("crypto_toast_created_desc", { name: createResult.name }));
+	};
 
-        notify.success(t("crypto_toast_deleted_title"), t("crypto_toast_deleted_desc", { name: deletedCryptocurrency.name }));
-        await fetchData();
-    };
+	const updateCryptocurrencyEntity = async (updatedCryptocurrency: CryptocurrencyEntity, icon: File | null) => {
+		const updateResult = await updateCryptocurrency(updatedCryptocurrency, icon);
+		if (!updateResult) {
+			return;
+		}
 
-    return {
-        cryptocurrencies,
-        isCryptocurrenciesLoading,
-        error,
-        createCryptocurrencyEntity,
-        updateCryptocurrencyEntity,
-        deleteCryptocurrencyEntity,
-        reloadCryptocurrencies: fetchData
-    };
+		reloadCryptocurrencies();
+		notify.success(t("crypto_toast_updated_title"), t("crypto_toast_updated_desc", { name: updatedCryptocurrency.name }));
+	};
+
+	const deleteCryptocurrencyEntity = async (deletedCryptocurrency: CryptocurrencyEntity) => {
+		const isCryptocurrencyDeleted = await deleteCryptocurrency(deletedCryptocurrency.id);
+		if (!isCryptocurrencyDeleted) {
+			return;
+		}
+
+		reloadCryptocurrencies();
+		notify.success(t("crypto_toast_deleted_title"), t("crypto_toast_deleted_desc", { name: deletedCryptocurrency.name }));
+	};
+
+	return {
+		cryptocurrencies,
+		isCryptocurrenciesLoading,
+		error,
+		createCryptocurrencyEntity,
+		updateCryptocurrencyEntity,
+		deleteCryptocurrencyEntity,
+		reloadCryptocurrencies
+	};
 };

@@ -28,11 +28,7 @@ const CurrenciesTable: React.FC = () => {
     const modalRef = useRef<BaseModalRef>(null);
     const confirmModalRef = useRef<BaseModalRef>(null);
 
-    useEffect(() => {
-        fetchCurrencies();
-    }, []);
-
-    const fetchCurrencies = async () => { 
+    const fetchCurrencies = useCallback(async () => { 
         setIsLoading(true);
         try {
             const fetchedCurrencies = await getCurrencies();
@@ -40,7 +36,28 @@ const CurrenciesTable: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        let isMounted = true;
+        const load = async () => {
+            setIsLoading(true);
+            try {
+                const fetchedCurrencies = await getCurrencies();
+                if (isMounted) {
+                    setCurrencies(fetchedCurrencies);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+        load();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const onActiveChanged = useCallback((currencyId: string, newValue: boolean) => {
         setCurrencies((currentCurrencies) => {

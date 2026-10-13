@@ -12,21 +12,39 @@ export const useBrokerAccounts = () => {
 
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchData = useCallback(async () => {
-		setLoading(true);
-		try {
-			const brokerAccounts = await getBrokerAccounts();
-			setBrokerAccounts(brokerAccounts);
-		} catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-		} finally {
-			setLoading(false);
-		}
-	}, [t]);
+	const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+	const reloadBrokerAccounts = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+	}, []);
 
 	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
+		let isMounted = true;
+		const load = async () => {
+			setLoading(true);
+			try {
+				const accounts = await getBrokerAccounts();
+				if (isMounted) {
+					setBrokerAccounts(accounts);
+					setError(null);
+				}
+			} catch (error: unknown) {
+				if (isMounted) {
+					setError(parseErrorMessage(error, t("error_data_load")));
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
+
+		load();
+
+		return () => {
+			isMounted = false;
+		};
+	}, [refreshTrigger, t]);
 
 	const createBrokerAccountEntity = async (createdBrokerAccount: BrokerAccountEntity) => {
 		const addedBrokerAccount = await createBrokerAccount(createdBrokerAccount);
@@ -34,7 +52,7 @@ export const useBrokerAccounts = () => {
 			return;
 		}
 
-		await fetchData();
+		reloadBrokerAccounts();
 		notify.success(
 			t("broker_account_toast_created_title"),
 			t("broker_account_toast_created_desc", { name: createdBrokerAccount.name })
@@ -47,7 +65,7 @@ export const useBrokerAccounts = () => {
 			return;
 		}
 		
-		await fetchData();
+		reloadBrokerAccounts();
 		notify.success(
 			t("broker_account_toast_updated_title"),
 			t("broker_account_toast_updated_desc", { name: updatedBrokerAccount.name })
@@ -61,9 +79,7 @@ export const useBrokerAccounts = () => {
 			return;
 		}
 
-		const updatedBrokerAccounts = brokerAccounts
-			.filter((brokerAccount: BrokerAccountEntity) => brokerAccount.id !== deletedBrokerAccount.id);
-		setBrokerAccounts(updatedBrokerAccounts);
+		reloadBrokerAccounts();
 		notify.success(
 			t("broker_account_toast_deleted_title"),
 			t("broker_account_toast_deleted_desc", { name: deletedBrokerAccount.name })
@@ -77,6 +93,6 @@ export const useBrokerAccounts = () => {
 		createBrokerAccountEntity,
 		updateBrokerAccountEntity,
 		deleteBrokerAccountEntity,
-		reloadBrokerAccounts: fetchData
+		reloadBrokerAccounts
 	};
 };

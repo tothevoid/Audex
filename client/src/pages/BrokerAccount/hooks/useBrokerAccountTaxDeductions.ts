@@ -16,53 +16,71 @@ export const useBrokerAccountTaxDeductions = (
     const [error, setError] = useState<string | null>(null);
     const [taxDeductionsQueryParameters, setTaxDeductionsQueryParameters] = useState<TaxDeductionsQuery>(queryParameters);
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        try {
-            const deductions = await getBrokerAccountTaxDeductions(taxDeductionsQueryParameters);
-            setTaxDeductions(deductions);
-        } catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-        } finally {
-            setLoading(false);
-        }
-    }, [taxDeductionsQueryParameters, t]);
+    const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+	const reloadTaxDeductions = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+	}, []);
 
-    const createTaxDeductionEntity = async (createdTaxDeduction: BrokerAccountTaxDeductionEntity) => {
-        await createBrokerAccountTaxDeduction(createdTaxDeduction);
-        notify.success(t("taxes_toast_created_title"), t("taxes_toast_created_desc", { name: createdTaxDeduction.name }));
-        await fetchData();
-    };
+	useEffect(() => {
+		let isMounted = true;
+		const load = async () => {
+			setLoading(true);
+			try {
+				const deductions = await getBrokerAccountTaxDeductions(taxDeductionsQueryParameters);
+				if (isMounted) {
+					setTaxDeductions(deductions);
+					setError(null);
+				}
+			} catch (error: unknown) {
+				if (isMounted) {
+					setError(parseErrorMessage(error, t("error_data_load")));
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
 
-    const updateTaxDeductionEntity = async (updatedTaxDeduction: BrokerAccountTaxDeductionEntity) => {
-        await updateBrokerAccountTaxDeduction(updatedTaxDeduction);
-        notify.success(t("taxes_toast_updated_title"), t("taxes_toast_updated_desc", { name: updatedTaxDeduction.name }));
-        await fetchData();
-    };
+		load();
 
-    const deleteTaxDeductionEntity = async (deletedTaxDeduction: BrokerAccountTaxDeductionEntity) => {
-        const taxDeductionDeleted = await deleteBrokerAccountTaxDeduction(deletedTaxDeduction.id);
-        if (!taxDeductionDeleted) {
-            return;
-        }
-        notify.success(t("taxes_toast_deleted_title"), t("taxes_toast_deleted_desc", { name: deletedTaxDeduction.name }));
-        await fetchData();
-    };
+		return () => {
+			isMounted = false;
+		};
+	}, [taxDeductionsQueryParameters, refreshTrigger, t]);
 
-    return {
-        taxDeductions,
-        isTaxDeductionsLoading,
-        error,
-        createTaxDeductionEntity,
-        updateTaxDeductionEntity,
-        deleteTaxDeductionEntity,
-        refetch: fetchData,
-        reloadTaxDeductions: fetchData,
-        taxDeductionsQueryParameters,
-        setTaxDeductionsQueryParameters
-    };
+	const createTaxDeductionEntity = async (createdTaxDeduction: BrokerAccountTaxDeductionEntity) => {
+		await createBrokerAccountTaxDeduction(createdTaxDeduction);
+		reloadTaxDeductions();
+		notify.success(t("taxes_toast_created_title"), t("taxes_toast_created_desc", { name: createdTaxDeduction.name }));
+	};
+
+	const updateTaxDeductionEntity = async (updatedTaxDeduction: BrokerAccountTaxDeductionEntity) => {
+		await updateBrokerAccountTaxDeduction(updatedTaxDeduction);
+		reloadTaxDeductions();
+		notify.success(t("taxes_toast_updated_title"), t("taxes_toast_updated_desc", { name: updatedTaxDeduction.name }));
+	};
+
+	const deleteTaxDeductionEntity = async (deletedTaxDeduction: BrokerAccountTaxDeductionEntity) => {
+		const taxDeductionDeleted = await deleteBrokerAccountTaxDeduction(deletedTaxDeduction.id);
+		if (!taxDeductionDeleted) {
+			return;
+		}
+		reloadTaxDeductions();
+		notify.success(t("taxes_toast_deleted_title"), t("taxes_toast_deleted_desc", { name: deletedTaxDeduction.name }));
+	};
+
+	return {
+		taxDeductions,
+		isTaxDeductionsLoading,
+		error,
+		createTaxDeductionEntity,
+		updateTaxDeductionEntity,
+		deleteTaxDeductionEntity,
+		refetch: reloadTaxDeductions,
+		reloadTaxDeductions,
+		taxDeductionsQueryParameters,
+		setTaxDeductionsQueryParameters
+	};
 };

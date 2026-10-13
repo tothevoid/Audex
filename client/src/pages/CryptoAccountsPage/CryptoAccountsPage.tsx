@@ -16,8 +16,20 @@ const CryptoAccountsPage: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        let isMounted = true;
+        const load = async () => {
+            const balance = await getTotalBalance();
+            if (isMounted) {
+                setTotalBalanceUsd(balance);
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     return (
         <Fragment>

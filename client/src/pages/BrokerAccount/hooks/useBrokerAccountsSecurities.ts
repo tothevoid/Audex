@@ -30,8 +30,32 @@ export const useBrokerAccountsSecurities = (queryParameters: BrokerAccountSecuri
 	}, [brokerAccountSecurityQueryParameters, t]);
 
 	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
+		let isMounted = true;
+		const load = async () => {
+			setLoading(true);
+			try {
+				const securities = await getSecuritiesByBrokerAccount(brokerAccountSecurityQueryParameters.brokerAccountId);
+				if (isMounted) {
+					setBrokerAccountSecurities(securities);
+					setError(null);
+				}
+			} catch (err: unknown) {
+				if (isMounted) {
+					setError(parseErrorMessage(err, t("error_data_load")));
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
+
+		load();
+
+		return () => {
+			isMounted = false;
+		};
+	}, [brokerAccountSecurityQueryParameters.brokerAccountId, t]);
 	
 	return {
 		brokerAccountSecurities,

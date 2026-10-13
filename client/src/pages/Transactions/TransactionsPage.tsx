@@ -68,21 +68,23 @@ const TransactionsPage: React.FC = () => {
     } = useTransactions({ month: new Date().getMonth() + 1, year: new Date().getFullYear(), showSystem: false });
 
     useEffect(() => {
+        let isMounted = true;
         const initData = async () => {
-            await initAccountsAndTypes();
+            const accounts = await getAccountsByTypes([
+                ACCOUNT_TYPE.CASH,
+                ACCOUNT_TYPE.DEBIT_CARD,
+                ACCOUNT_TYPE.CREDIT_CARD
+            ], true);
+            const transactionTypes = await getTransactionTypes(true);
+            if (isMounted) {
+                setState({ accounts, transactionTypes });
+            }
         };
         initData();
+        return () => {
+            isMounted = false;
+        };
     }, []);
-
-    const initAccountsAndTypes = async () => {
-        const accounts = await getAccountsByTypes([
-            ACCOUNT_TYPE.CASH,
-            ACCOUNT_TYPE.DEBIT_CARD,
-            ACCOUNT_TYPE.CREDIT_CARD
-        ], true);
-        const transactionTypes = await getTransactionTypes(true);
-        setState({ accounts, transactionTypes });
-    };
 
     const handleViewDisplayModeChange = useCallback((mode: ViewDisplayMode) => {
         setViewDisplayMode(mode);

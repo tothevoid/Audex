@@ -19,21 +19,39 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 	const [error, setError] = useState<string | null>(null);
 	const [accountQueryParameters, setAccountQueryParameters] = useState<AccountsQuery>(queryParameters);
 
-	const fetchData = useCallback(async () => {
-		setLoading(true);
-		try {
-			const accounts = await getAccounts(accountQueryParameters);
-			setAccounts(accounts);
-		} catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-		} finally {
-			setLoading(false);
-		}
-	}, [accountQueryParameters, t]);
+	const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+	const reloadAccounts = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+	}, []);
 
 	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
+		let isMounted = true;
+		const load = async () => {
+			setLoading(true);
+			try {
+				const fetchedAccounts = await getAccounts(accountQueryParameters);
+				if (isMounted) {
+					setAccounts(fetchedAccounts);
+					setError(null);
+				}
+			} catch (error: unknown) {
+				if (isMounted) {
+					setError(parseErrorMessage(error, t("error_data_load")));
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
+
+		load();
+
+		return () => {
+			isMounted = false;
+		};
+	}, [accountQueryParameters, refreshTrigger, t]);
 
 	const createAccountEntity = async (account: AccountEntity) => {
 		const createdAccountId = await createAccount(account);
@@ -41,7 +59,7 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 			return;
 		}
 
-		await fetchData();
+		reloadAccounts();
 		notify.success(
 			t("accounts_toast_created_title"),
 			t("accounts_toast_created_desc", { name: account.name })
@@ -58,7 +76,7 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 			return;
 		}
 
-		await fetchData();
+		reloadAccounts();
 		notify.success(
 			t("accounts_toast_updated_title"),
 			t("accounts_toast_updated_desc", { name: updatedAccount.name })
@@ -75,7 +93,7 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 			return;
 		}
 
-		await fetchData();
+		reloadAccounts();
 		notify.success(
 			t("accounts_toast_deleted_title"),
 			t("accounts_toast_deleted_desc", { name: deletedAccount.name })
@@ -89,8 +107,8 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 		createAccountEntity,
 		updateAccountEntity,
 		deleteAccountEntity,
-		setAccountQueryParameters: setAccountQueryParameters,
-		accountQueryParameters: accountQueryParameters,
-		reloadAccounts: fetchData
+		setAccountQueryParameters,
+		accountQueryParameters,
+		reloadAccounts
 	};
 };

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Layout } from "react-grid-layout";
 import { UserDashboardEntity } from "@/models/dashboard/UserDashboardEntity";
 import { normalizeWidgetGrid, WidgetConfig } from "@/models/dashboard/WidgetEntity";
@@ -31,33 +31,42 @@ export const useDashboards = () => {
     const [isRefreshingAll, setIsRefreshingAll] = useState<boolean>(false);
     const [lastGlobalRefreshAt, setLastGlobalRefreshAt] = useState<Date | null>(new Date());
 
-    // Load user dashboards
-    const loadDashboards = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            let list = await getAllUserDashboards();
-            if (list.length === 0) {
-                const defaultDashboard = await getDefaultUserDashboard();
-                if (defaultDashboard) {
-                    list = [defaultDashboard];
-                }
-            }
-
-            setDashboards(list);
-
-            if (list.length > 0) {
-                const defaultOrFirst = list.find(d => d.isDefault) || list[0];
-                setActiveDashboardId(defaultOrFirst.id);
-                setWidgets(parseLayoutWidgets(defaultOrFirst.layoutJson));
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
 
     useEffect(() => {
-        loadDashboards();
-    }, [loadDashboards]);
+        let isMounted = true;
+        const load = async () => {
+            setIsLoading(true);
+            try {
+                let list = await getAllUserDashboards();
+                if (list.length === 0) {
+                    const defaultDashboard = await getDefaultUserDashboard();
+                    if (defaultDashboard) {
+                        list = [defaultDashboard];
+                    }
+                }
+
+                if (isMounted) {
+                    setDashboards(list);
+
+                    if (list.length > 0) {
+                        const defaultOrFirst = list.find(d => d.isDefault) || list[0];
+                        setActiveDashboardId(defaultOrFirst.id);
+                        setWidgets(parseLayoutWidgets(defaultOrFirst.layoutJson));
+                    }
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     // Handle switching dashboards
     const handleSelectDashboard = (dashboardId: string) => {

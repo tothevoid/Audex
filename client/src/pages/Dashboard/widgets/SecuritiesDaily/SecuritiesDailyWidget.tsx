@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, SimpleGrid, Skeleton, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { WidgetComponentProps } from "../types";
@@ -16,34 +16,37 @@ export const SecuritiesDailyWidget: React.FC<WidgetComponentProps<Record<string,
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchData = useCallback(async (isSilent: boolean = false) => {
-        if (!isSilent) {
-            setIsLoading(true);
-        }
-
-        try {
-            const result = await getDailyStats(null);
-            if (result) {
-                setData(result);
-                setError(null);
-                onFetched?.(new Date(result.fetchDate));
+    useEffect(() => {
+        let isMounted = true;
+        const load = async () => {
+            const isSilent = Boolean(refreshSignal && refreshSignal > 0);
+            if (!isSilent) {
+                setIsLoading(true);
             }
-        } catch {
-            setError(t("error_data_load"));
-        } finally {
-            setIsLoading(false);
-        }
-    }, [onFetched, t]);
+            try {
+                const result = await getDailyStats(null);
+                if (result && isMounted) {
+                    setData(result);
+                    setError(null);
+                    onFetched?.(new Date(result.fetchDate));
+                }
+            } catch {
+                if (isMounted) {
+                    setError(t("error_data_load"));
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        load();
 
-    useEffect(() => {
-        if (refreshSignal && refreshSignal > 0) {
-            fetchData(true);
-        }
-    }, [refreshSignal, fetchData]);
+        return () => {
+            isMounted = false;
+        };
+    }, [refreshSignal, onFetched, t]);
 
     if (isLoading && !data) {
         return (

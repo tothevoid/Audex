@@ -13,21 +13,39 @@ export const useCryptoProviders = () => {
 
     const [error, setError] = useState<string | null>(null);
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        try {
-            const providers = await getCryptoProviders();
-            setCryptoProviders(providers);
-        } catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-        } finally {
-            setLoading(false);
-        }
-    }, [t]);
+    const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+    const reloadCryptoProviders = useCallback(() => {
+        setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+    }, []);
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        let isMounted = true;
+        const load = async () => {
+            setLoading(true);
+            try {
+                const providers = await getCryptoProviders();
+                if (isMounted) {
+                    setCryptoProviders(providers);
+                    setError(null);
+                }
+            } catch (error: unknown) {
+                if (isMounted) {
+                    setError(parseErrorMessage(error, t("error_data_load")));
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [refreshTrigger, t]);
 
     const createCryptoProviderEntity = async (createdCryptoProvider: CryptoProviderEntity, icon: Nullable<File>) => {
         const addedCryptoProvider = await createCryptoProvider(createdCryptoProvider, icon);
@@ -36,7 +54,7 @@ export const useCryptoProviders = () => {
         }
 
         notify.success(t("crypto_provider_toast_created_title"), t("crypto_provider_toast_created_desc", { name: addedCryptoProvider.name }));
-        setCryptoProviders([addedCryptoProvider, ...cryptoProviders]);
+        reloadCryptoProviders();
     };
 
     const updateCryptoProviderEntity = async (updatedCryptoProvider: CryptoProviderEntity, icon: Nullable<File>) => {
@@ -47,18 +65,12 @@ export const useCryptoProviders = () => {
 
         notify.success(t("crypto_provider_toast_updated_title"), t("crypto_provider_toast_updated_desc", { name: updatedCryptoProvider.name }));
 
-        const updatedCryptoProviders = cryptoProviders.map((provider: CryptoProviderEntity) => 
-            provider.id === updatedCryptoProvider.id ?
-                cryptoProviderUpdated :
-                provider
-        );
-
-        setCryptoProviders(updatedCryptoProviders);
+        reloadCryptoProviders();
     };
 
     const deleteCryptoProviderEntity = async (deletedCryptoProvider: CryptoProviderEntity) => {
         const cryptoProviderDeleted = await deleteCryptoProvider(deletedCryptoProvider.id);
-    
+
         if (!cryptoProviderDeleted) {
             return;
         }
@@ -77,6 +89,7 @@ export const useCryptoProviders = () => {
         createCryptoProviderEntity,
         updateCryptoProviderEntity,
         deleteCryptoProviderEntity,
-        refetch: fetchData
+        reloadCryptoProviders,
+        refetch: reloadCryptoProviders
     };
 };

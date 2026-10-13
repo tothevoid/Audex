@@ -11,55 +11,74 @@ export const useCryptoAccounts = () => {
 
     const [error, setError] = useState<string | null>(null);
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        try {
-            setCryptoAccounts(await getCryptoAccounts());
-        } catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-        } finally {
-            setLoading(false);
-        }
-    }, [t]);
+	const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-    useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+	const reloadCryptoAccounts = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+	}, []);
 
-    const createCryptoAccountEntity = async (createdCryptoAccount: CryptoAccountEntity) => {
-        const addedCryptoAccount = await createCryptoAccount(createdCryptoAccount);
-        if (!addedCryptoAccount) {
-            return;
-        }
+	useEffect(() => {
+		let isMounted = true;
+		const load = async () => {
+			setLoading(true);
+			try {
+				const accounts = await getCryptoAccounts();
+				if (isMounted) {
+					setCryptoAccounts(accounts);
+					setError(null);
+				}
+			} catch (error: unknown) {
+				if (isMounted) {
+					setError(parseErrorMessage(error, t("error_data_load")));
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
 
-        await fetchData();
-    };
+		load();
 
-    const updateCryptoAccountEntity = async (updatedCryptoAccount: CryptoAccountEntity) => {
-        const cryptoAccountUpdated = await updateCryptoAccount(updatedCryptoAccount);
-        if (!cryptoAccountUpdated) {
-            return;
-        }
+		return () => {
+			isMounted = false;
+		};
+	}, [refreshTrigger, t]);
 
-        await fetchData();
-    };
+	const createCryptoAccountEntity = async (createdCryptoAccount: CryptoAccountEntity) => {
+		const addedCryptoAccount = await createCryptoAccount(createdCryptoAccount);
+		if (!addedCryptoAccount) {
+			return;
+		}
 
-    const deleteCryptoAccountEntity = async (deletedCryptoAccount: CryptoAccountEntity) => {
-        const cryptoAccountDeleted = await deleteCryptoAccount(deletedCryptoAccount.id);
-        if (!cryptoAccountDeleted) {
-            return;
-        }
+		reloadCryptoAccounts();
+	};
 
-        await fetchData();
-    };
+	const updateCryptoAccountEntity = async (updatedCryptoAccount: CryptoAccountEntity) => {
+		const cryptoAccountUpdated = await updateCryptoAccount(updatedCryptoAccount);
+		if (!cryptoAccountUpdated) {
+			return;
+		}
 
-    return {
-        cryptoAccounts,
-        isCryptoAccountsLoading,
-        error,
-        createCryptoAccountEntity,
-        updateCryptoAccountEntity,
-        deleteCryptoAccountEntity,
-        reloadCryptoAccounts: fetchData
-    };
+		reloadCryptoAccounts();
+	};
+
+	const deleteCryptoAccountEntity = async (deletedCryptoAccount: CryptoAccountEntity) => {
+		const cryptoAccountDeleted = await deleteCryptoAccount(deletedCryptoAccount.id);
+		if (!cryptoAccountDeleted) {
+			return;
+		}
+
+		reloadCryptoAccounts();
+	};
+
+	return {
+		cryptoAccounts,
+		isCryptoAccountsLoading,
+		error,
+		createCryptoAccountEntity,
+		updateCryptoAccountEntity,
+		deleteCryptoAccountEntity,
+		reloadCryptoAccounts
+	};
 };

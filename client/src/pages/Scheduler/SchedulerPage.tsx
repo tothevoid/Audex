@@ -63,8 +63,27 @@ const SchedulerPage: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        loadTasks(true);
-    }, [loadTasks]);
+        let isMounted = true;
+        const load = async () => {
+            setIsTasksLoading(true);
+            try {
+                const data = await getScheduledTasks();
+                if (isMounted) {
+                    setTasks(data);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsTasksLoading(false);
+                }
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const handleTaskUpdated = useCallback((refreshJournal: boolean = false) => {
         loadTasks(false);

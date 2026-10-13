@@ -38,7 +38,7 @@ const CryptoAccountCryptocurrenciesList: React.FC<Props> = (props: Props) => {
 		updateCryptoAccountCryptocurrencyEntity,
 		deleteCryptoAccountCryptocurrencyEntity,
 		reloadCryptoAccountCryptocurrencies
-	} = useCryptoAccountCryptocurrencies({cryptoAccountId: props.cryptoAccount.id});
+	} = useCryptoAccountCryptocurrencies(props.cryptoAccount.id);
 
 	const existingCryptocurrencyIds = useMemo(
 		() => cryptoAccountCryptocurrencies.map(c => c.cryptocurrency?.id).filter(Boolean),

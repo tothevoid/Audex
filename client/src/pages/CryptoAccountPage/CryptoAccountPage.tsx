@@ -37,8 +37,28 @@ const CryptoAccountPage: React.FC = () => {
     }, [fetchCryptoAccount]);
 
     useEffect(() => {
-        fetchCryptoAccount();
-    }, [fetchCryptoAccount]);
+        if (!cryptoAccountId) {
+            return;
+        }
+
+        let isMounted = true;
+        const load = async () => {
+            const cryptoAccount = await getCryptoAccountById(cryptoAccountId);
+            if (cryptoAccount && isMounted) {
+                setState((currentState) => ({
+                    ...currentState,
+                    cryptoAccount,
+                    isReloading: false
+                }));
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [cryptoAccountId]);
 
     if (!cryptoAccountId || !state.cryptoAccount) {
         return <Fragment />;

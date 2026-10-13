@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
 import { Box, Flex, Stack, Text, Progress } from '@chakra-ui/react';
 import ButtonGroup from '@/shared/components/ButtonGroup/ButtonGroup';
@@ -71,7 +71,6 @@ const TransactionStats: React.FC<TransactionStatsProps> = ({
 }) => {
     const accountsMap = React.useMemo(() => new Map(accounts.map((acc) => [acc.id, acc.name])), [accounts]);
     const [selectedGrouping, setSelectedGrouping] = useState(DataGrouping.ByType);
-    const [chartData, setChartData] = useState<PieChartData[]>([]);
     const { t } = useTranslation();
     const { user } = useUserProfile();
     const colors = CHARTS_COLORS;
@@ -87,7 +86,7 @@ const TransactionStats: React.FC<TransactionStatsProps> = ({
         }
     };
 
-    useEffect(() => {
+    const chartData: PieChartData[] = useMemo(() => {
         let data: PieChartData[];
 
         if (selectedGrouping === DataGrouping.ByType) {
@@ -108,13 +107,11 @@ const TransactionStats: React.FC<TransactionStatsProps> = ({
             );
         }
 
-        const styledData = data.map((item, index) => ({
+        return data.map((item, index) => ({
             ...item,
             color: colors[index % colors.length],
         }));
-
-        setChartData(styledData);
-    }, [transactions, selectedGrouping, typeFilter, accountsMap, t, colors]);
+    }, [transactions, selectedGrouping, accountsMap, t, colors]);
 
     const totalSum = chartData.reduce((acc, curr) => acc + curr.value, 0);
 

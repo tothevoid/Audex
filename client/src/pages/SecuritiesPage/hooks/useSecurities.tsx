@@ -12,26 +12,44 @@ export const useSecurities = () => {
 
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchData = useCallback(async () => {
-		setLoading(true);
-		try {
-			const accounts = await getSecurities();
-			setSecurities(accounts);
-		} catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-		} finally {
-			setLoading(false);
-		}
-	}, [t]);
+	const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+	const reloadSecurities = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+	}, []);
 
 	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
+		let isMounted = true;
+		const load = async () => {
+			setLoading(true);
+			try {
+				const accounts = await getSecurities();
+				if (isMounted) {
+					setSecurities(accounts);
+					setError(null);
+				}
+			} catch (error: unknown) {
+				if (isMounted) {
+					setError(parseErrorMessage(error, t("error_data_load")));
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
+
+		load();
+
+		return () => {
+			isMounted = false;
+		};
+	}, [refreshTrigger, t]);
 
 	const createSecurityEntity = async (createdSecurity: SecurityEntity, icon: File | null): Promise<OperationResult<SecurityEntity>> => {
 		const result = await createSecurity(createdSecurity, icon);
 		if (result.isSuccess) {
-			await fetchData();
+			reloadSecurities();
 		}
 		return result;
 	};
@@ -39,7 +57,7 @@ export const useSecurities = () => {
 	const updateSecurityEntity = async (updatedSecurity: SecurityEntity, icon: File | null): Promise<OperationResult<SecurityEntity>> => {
 		const result = await updateSecurity(updatedSecurity, icon);
 		if (result.isSuccess) {
-			await fetchData();
+			reloadSecurities();
 		}
 		return result;
 	};
@@ -50,7 +68,7 @@ export const useSecurities = () => {
 			return;
 		}
 
-		await fetchData();
+		reloadSecurities();
 	};
 
 	return {
@@ -60,6 +78,6 @@ export const useSecurities = () => {
 		createSecurityEntity,
 		updateSecurityEntity,
 		deleteSecurityEntity,
-		reloadSecurities: fetchData
+		reloadSecurities
 	};
 };

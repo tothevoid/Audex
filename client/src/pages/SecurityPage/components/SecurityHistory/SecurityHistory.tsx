@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Card, Flex, Icon, Skeleton, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BsClockHistory } from "react-icons/bs";
@@ -32,20 +32,29 @@ const SecurityHistory: React.FC<Props> = ({ ticker, currencyName }) => {
     const [selectedPeriod, setSelectedPeriod] = useState<ChartPeriod>("1D");
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
-    const fetchHistoryData = useCallback(async (period: ChartPeriod) => {
-        setIsLoading(true);
-        try {
-            const periodOption = PERIOD_OPTIONS.find((p) => p.id === period) ?? PERIOD_OPTIONS[0];
-            const data = await getTickerHistory(ticker, periodOption.period);
-            setHistory(data || null);
-        } finally {
-            setIsLoading(false);
-        }
-    }, [ticker]);
-
     useEffect(() => {
-        fetchHistoryData(selectedPeriod);
-    }, [selectedPeriod, fetchHistoryData]);
+        let isMounted = true;
+        const load = async () => {
+            setIsLoading(true);
+            try {
+                const periodOption = PERIOD_OPTIONS.find((p) => p.id === selectedPeriod) ?? PERIOD_OPTIONS[0];
+                const data = await getTickerHistory(ticker, periodOption.period);
+                if (isMounted) {
+                    setHistory(data || null);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [ticker, selectedPeriod]);
 
     const processedHistory: ProcessedHistoryItem[] = useMemo(() => {
         if (!history?.values) return [];

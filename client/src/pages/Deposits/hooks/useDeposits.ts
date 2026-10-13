@@ -49,37 +49,11 @@ export const useDeposits = (options: UseDepositsOptions = {}) => {
 	const [isDepositsLoading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchRangeAndDeposits = useCallback(async () => {
-		setLoading(true);
-		try {
-			const range = await getDepositsRange();
-			if (!range) {
-				setDeposits([]);
-				setBoundaries(null);
-				return;
-			}
+	const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-			const serverBoundaries = convertRange(range);
-			setBoundaries(serverBoundaries);
-
-			const effectiveMinMonths = initialFilters?.selectedMinMonths || serverBoundaries.minMonths;
-			const effectiveMaxMonths = initialFilters?.selectedMaxMonths || serverBoundaries.maxMonths;
-			const effectiveActive = initialFilters?.onlyActive ?? true;
-
-			setFilters({
-				selectedMinMonths: effectiveMinMonths,
-				selectedMaxMonths: effectiveMaxMonths,
-				onlyActive: effectiveActive
-			});
-
-			const fetchedDeposits = await getDeposits(effectiveMinMonths, effectiveMaxMonths, effectiveActive);
-			setDeposits(fetchedDeposits);
-		} catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-		} finally {
-			setLoading(false);
-		}
-	}, [initialFilters?.onlyActive, initialFilters?.selectedMaxMonths, initialFilters?.selectedMinMonths, t]);
+	const reloadDeposits = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+	}, []);
 
 	const fetchDepositsOnly = useCallback(async (currentFilters: DepositsFilters) => {
 		if (!currentFilters.selectedMinMonths || !currentFilters.selectedMaxMonths) {
@@ -95,20 +69,64 @@ export const useDeposits = (options: UseDepositsOptions = {}) => {
 				currentFilters.onlyActive
 			);
 			setDeposits(fetchedDeposits);
-		} catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
+		} catch (error: unknown) {
+			setError(parseErrorMessage(error, t("error_data_load")));
 		} finally {
 			setLoading(false);
 		}
 	}, [t]);
 
 	useEffect(() => {
-		fetchRangeAndDeposits();
-	}, [fetchRangeAndDeposits]);
+		let isMounted = true;
+		const load = async () => {
+			setLoading(true);
+			try {
+				const range = await getDepositsRange();
+				if (!range) {
+					if (isMounted) {
+						setDeposits([]);
+						setBoundaries(null);
+					}
+					return;
+				}
+
+				const serverBoundaries = convertRange(range);
+				const effectiveMinMonths = initialFilters?.selectedMinMonths || serverBoundaries.minMonths;
+				const effectiveMaxMonths = initialFilters?.selectedMaxMonths || serverBoundaries.maxMonths;
+				const effectiveActive = initialFilters?.onlyActive ?? true;
+
+				if (isMounted) {
+					setBoundaries(serverBoundaries);
+					setFilters({
+						selectedMinMonths: effectiveMinMonths,
+						selectedMaxMonths: effectiveMaxMonths,
+						onlyActive: effectiveActive
+					});
+				}
+
+				const fetchedDeposits = await getDeposits(effectiveMinMonths, effectiveMaxMonths, effectiveActive);
+				if (isMounted) {
+					setDeposits(fetchedDeposits);
+				}
+			} catch (error: unknown) {
+				if (isMounted) {
+					setError(parseErrorMessage(error, t("error_data_load")));
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
+		load();
+		return () => {
+			isMounted = false;
+		};
+	}, [initialFilters, refreshTrigger, t]);
 
 	const updateFilters = useCallback((updates: Partial<DepositsFilters>) => {
-		setFilters((prev) => {
-			const nextFilters = { ...prev, ...updates };
+		setFilters((previousFilters) => {
+			const nextFilters = { ...previousFilters, ...updates };
 			fetchDepositsOnly(nextFilters);
 			return nextFilters;
 		});
@@ -117,7 +135,7 @@ export const useDeposits = (options: UseDepositsOptions = {}) => {
 	const createDepositEntity = async (createdDeposit: DepositEntity) => {
 		const addedDeposit = await createDeposit(createdDeposit);
 		if (!addedDeposit) return;
-		await fetchRangeAndDeposits();
+		reloadDeposits();
 		notify.success(
 			t("deposits_toast_created_title"),
 			t("deposits_toast_created_desc", { name: createdDeposit.name })
@@ -127,7 +145,7 @@ export const useDeposits = (options: UseDepositsOptions = {}) => {
 	const updateDepositEntity = async (updatedDeposit: DepositEntity) => {
 		const updated = await updateDeposit(updatedDeposit);
 		if (!updated) return;
-		await fetchRangeAndDeposits();
+		reloadDeposits();
 		notify.success(
 			t("deposits_toast_updated_title"),
 			t("deposits_toast_updated_desc", { name: updatedDeposit.name })
@@ -137,7 +155,7 @@ export const useDeposits = (options: UseDepositsOptions = {}) => {
 	const deleteDepositEntity = async (deletedDeposit: DepositEntity) => {
 		const deleted = await deleteDeposit(deletedDeposit.id);
 		if (!deleted) return;
-		await fetchRangeAndDeposits();
+		reloadDeposits();
 		notify.success(
 			t("deposits_toast_deleted_title"),
 			t("deposits_toast_deleted_desc", { name: deletedDeposit.name })
@@ -154,6 +172,7 @@ export const useDeposits = (options: UseDepositsOptions = {}) => {
 		createDepositEntity,
 		updateDepositEntity,
 		deleteDepositEntity,
-		refetch: fetchRangeAndDeposits
+		reloadDeposits,
+		refetch: reloadDeposits
 	};
 };

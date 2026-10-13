@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, Flex, SimpleGrid, Text } from "@chakra-ui/react";
 import { Nullable } from "@/shared/utilities/nullable";
@@ -21,21 +21,28 @@ const CryptoAccountStats: React.FC<Props> = ({ cryptoAccountId, dataVersion }) =
 
     const mainCurrency = user?.currency?.name ?? "USD";
 
-    const fetchData = useCallback(async () => {
-        setIsLoading(true);
-        try {
-            const result = await getCryptoAccountStats(cryptoAccountId);
-            if (result) {
-                setStats(result);
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    }, [cryptoAccountId]);
-
     useEffect(() => {
-        fetchData();
-    }, [fetchData, dataVersion]);
+        let isMounted = true;
+        const load = async () => {
+            setIsLoading(true);
+            try {
+                const result = await getCryptoAccountStats(cryptoAccountId);
+                if (result && isMounted) {
+                    setStats(result);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        load();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [cryptoAccountId, dataVersion]);
 
     if (isLoading) {
         return <Fragment />;
