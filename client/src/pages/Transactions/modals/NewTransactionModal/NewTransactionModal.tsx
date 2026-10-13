@@ -26,35 +26,39 @@ interface State {
     activeFormHandler?: React.FormEventHandler
 }
 
-const NewTransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
+const NewTransactionModal: React.FC<ModalProps> = ({
+    modalRef,
+    onTransactionSaved,
+    onCurrencyTransactionSaved,
+}: ModalProps) => {
     const { t } = useTranslation();
 
     const [state, setState] = useState<State>({ accounts: [] });
 
-    const initAccounts = async () => {
-        const accounts = await getAccounts({ onlyActive: true });
-        setState((currentState) => {
-            return { ...currentState, accounts };
-        });
-    };
+    useEffect(() => {
+        let isMounted = true;
+        const initAccounts = async () => {
+            const accounts = await getAccounts({ onlyActive: true });
+            if (isMounted) {
+                setState((currentState) => ({ ...currentState, accounts }));
+            }
+        };
+        initAccounts();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const setSubmitHandler: SetSubmitHandler = <T extends FieldValues>(submit: UseFormHandleSubmit<T>, handler: (data: T) => Promise<void>) => {
         const wrappedHandler = async (data: T) => {
             await handler(data);
-            props.modalRef?.current?.closeModal();
+            modalRef?.current?.closeModal();
         };
 
         setState((currentState) => {
             return { ...currentState, activeFormHandler: submit(wrappedHandler) };
         });
     };
-
-    useEffect(() => {
-        const initData = async () => {
-            await initAccounts();
-        };
-        initData();
-    }, []);
 
     const onSubmit = async (event: React.FormEvent) => {
         if (!state.activeFormHandler) {
@@ -65,7 +69,7 @@ const NewTransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
     };
 
     return (
-        <BaseFormModal ref={props.modalRef} size="xl" title={t("new_transaction_form_title")} submitHandler={onSubmit}>
+        <BaseFormModal ref={modalRef} size="xl" title={t("new_transaction_form_title")} submitHandler={onSubmit}>
             <Tabs.Root lazyMount={true} unmountOnExit={true} defaultValue="base" variant="enclosed">
                 <Tabs.List>
                     <Tabs.Trigger value="base">
@@ -78,10 +82,10 @@ const NewTransactionModal: React.FC<ModalProps> = (props: ModalProps) => {
                     </Tabs.Trigger>
                 </Tabs.List>
                 <Tabs.Content value="base">
-                    <TransactionForm setSubmitHandler={setSubmitHandler} onTransactionSaved={props.onTransactionSaved} />
+                    <TransactionForm setSubmitHandler={setSubmitHandler} onTransactionSaved={onTransactionSaved} />
                 </Tabs.Content>
                 <Tabs.Content value="currency">
-                    <CurrencyTransactionForm setSubmitHandler={setSubmitHandler} onCurrencyTransactionSaved={props.onCurrencyTransactionSaved} />
+                    <CurrencyTransactionForm setSubmitHandler={setSubmitHandler} onCurrencyTransactionSaved={onCurrencyTransactionSaved} />
                 </Tabs.Content>
             </Tabs.Root>
         </BaseFormModal>

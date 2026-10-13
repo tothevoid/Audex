@@ -26,12 +26,17 @@ interface ModalProps {
 	currencyName?: string
 }
 
-const DividendModal: React.FC<ModalProps> = (props: ModalProps) => {
-	const {t} = useTranslation();
+const DividendModal: React.FC<ModalProps> = ({
+	modalRef,
+	onSaved,
+	context,
+	currencyName,
+}: ModalProps) => {
+	const { t } = useTranslation();
 
 	const getDefaultFormValues = useCallback(() => {
-		const dividend = "dividend" in props.context ? props.context.dividend : null;
-		const security = "securityId" in props.context ? { id: props.context.securityId }: { id: undefined};
+		const dividend = "dividend" in context ? context.dividend : null;
+		const security = "securityId" in context ? { id: context.securityId } : { id: undefined };
 
 		return {
 			id: dividend?.id ?? generateGuid(),
@@ -40,11 +45,11 @@ const DividendModal: React.FC<ModalProps> = (props: ModalProps) => {
 			declarationDate: dividend?.declarationDate ?? new Date(),
 			snapshotDate: dividend?.snapshotDate ?? new Date()
 		};
-	}, [props.context]);
+	}, [context]);
 
 	const validationSchema = useMemo(() => getDividendValidationSchema(t), [t]);
 
-	const { control, handleSubmit, formState: { errors }, reset} = useForm<DividendFormInput>({
+	const { control, handleSubmit, formState: { errors }, reset } = useForm<DividendFormInput>({
 		resolver: zodResolver(validationSchema),
 		mode: "onBlur",
 		defaultValues: getDefaultFormValues()
@@ -52,35 +57,41 @@ const DividendModal: React.FC<ModalProps> = (props: ModalProps) => {
 
 	useEffect(() => {
 		reset(getDefaultFormValues());
-	}, [reset, getDefaultFormValues, props.context]);
+	}, [reset, getDefaultFormValues, context]);
 
-	const onSubmit = (dividend: DividendFormInput) => {
-		props.onSaved(dividend as DividendEntity);
-		props.modalRef?.current?.closeModal();
+	const onSubmit = (formData: DividendFormInput) => {
+		onSaved(formData as DividendEntity);
+		modalRef?.current?.closeModal();
 	};
 
-	return <BaseFormModal ref={props.modalRef} title={t("entity_dividend_form_title")} submitHandler={handleSubmit(onSubmit)}>
-		<Field.Root invalid={!!errors.amount} mt={4}>
-			<Field.Label>{t("entity_dividend_security_amount")}</Field.Label>
-			<MoneyInput
-				name="amount"
-				control={control}
-				placeholder="10"
-				currency={props.currencyName ?? ''}
-			/>
-			<Field.ErrorText>{errors.amount?.message}</Field.ErrorText>
-		</Field.Root>
-		<Field.Root invalid={!!errors.declarationDate} mt={4}>
-			<Field.Label>{t("entity_dividend_declaration_date")}</Field.Label>
-			<DateSelect name="declarationDate" control={control}/>
-			<Field.ErrorText>{errors.declarationDate?.message}</Field.ErrorText>
-		</Field.Root>
-		<Field.Root invalid={!!errors.snapshotDate} mt={4}>
-			<Field.Label>{t("entity_dividend_snapshot_date")}</Field.Label>
-			<DateSelect name="snapshotDate" control={control}/>
-			<Field.ErrorText>{errors.snapshotDate?.message}</Field.ErrorText>
-		</Field.Root>
-	</BaseFormModal>;
+	const handleFormSubmit: React.FormEventHandler = (event) => {
+		handleSubmit(onSubmit)(event);
+	};
+
+	return (
+		<BaseFormModal ref={modalRef} title={t("entity_dividend_form_title")} submitHandler={handleFormSubmit}>
+			<Field.Root invalid={!!errors.amount} mt={4}>
+				<Field.Label>{t("entity_dividend_security_amount")}</Field.Label>
+				<MoneyInput
+					name="amount"
+					control={control}
+					placeholder="10"
+					currency={currencyName ?? ''}
+				/>
+				<Field.ErrorText>{errors.amount?.message}</Field.ErrorText>
+			</Field.Root>
+			<Field.Root invalid={!!errors.declarationDate} mt={4}>
+				<Field.Label>{t("entity_dividend_declaration_date")}</Field.Label>
+				<DateSelect name="declarationDate" control={control} />
+				<Field.ErrorText>{errors.declarationDate?.message}</Field.ErrorText>
+			</Field.Root>
+			<Field.Root invalid={!!errors.snapshotDate} mt={4}>
+				<Field.Label>{t("entity_dividend_snapshot_date")}</Field.Label>
+				<DateSelect name="snapshotDate" control={control} />
+				<Field.ErrorText>{errors.snapshotDate?.message}</Field.ErrorText>
+			</Field.Root>
+		</BaseFormModal>
+	);
 };
 
 export default DividendModal;

@@ -68,7 +68,7 @@ const AccountBalanceTransferModal: React.FC<ModalProps> = ({
 	});
 
 	const fromAccount = useWatch({ control, name: "from" });
-	const fromCurrency = state.accounts.find(a => a.id === fromAccount?.id)?.currency?.name ?? from?.currency?.name ?? '';
+	const fromCurrency = state.accounts.find(account => account.id === fromAccount?.id)?.currency?.name ?? from?.currency?.name ?? '';
 
 	useEffect(() => {
 		reset(getFormDefaultValues());

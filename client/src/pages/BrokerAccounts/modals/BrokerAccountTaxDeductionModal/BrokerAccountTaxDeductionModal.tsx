@@ -13,6 +13,7 @@ import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
 import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 
 import { Nullable } from "@/shared/utilities/nullable";
 
@@ -74,7 +75,8 @@ const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = ({
     }, [reset, getDefaultValues, context]);
 
     const selectedBrokerAccount = useWatch({ control, name: "brokerAccount" });
-    const brokerAccountCurrency = brokerAccounts.find(account => account.id === selectedBrokerAccount?.id)?.currency?.name ?? '';
+    const selectedBrokerAccountEntity = findEntityById(brokerAccounts, selectedBrokerAccount?.id);
+    const brokerAccountCurrency = selectedBrokerAccountEntity?.currency?.name ?? '';
 
     const onSubmit = async (formData: BrokerAccountTaxDeductionFormInput) => {
         await onSaved(formData as BrokerAccountTaxDeductionEntity);
@@ -94,15 +96,21 @@ const BrokerAccountTaxDeductionModal: React.FC<ModalProps> = ({
     };
 
     useEffect(() => {
+        let isMounted = true;
         const runAsync = async () => {
             if (!isGlobalBrokerAccount) {
                 return;
             }
             const accounts = await getBrokerAccounts();
-            setBrokerAccounts(accounts);
+            if (isMounted) {
+                setBrokerAccounts(accounts);
+            }
         };
 
         runAsync();
+        return () => {
+            isMounted = false;
+        };
     }, [isGlobalBrokerAccount]);
 
     return (

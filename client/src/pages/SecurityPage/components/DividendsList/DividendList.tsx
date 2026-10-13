@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useMemo } from 'react';
 import Dividend from '@/pages/SecurityPage/components/Dividend/Dividend';
 import { useTranslation } from 'react-i18next';
 import { DividendEntity } from '@/models/securities/DividendEntity';
@@ -41,14 +41,10 @@ const DividendList: React.FC<Props> = (props) => {
 	} = useDividends({ securityId: props.securityId, initialPageSize: 10 });
 
 	const { t } = useTranslation();
-	const [context, setContext] = useState<Nullable<CreateDividendContext | EditDividendContext>>(null);
-
-	useEffect(() => {
-		const nextContext = activeEntity ?
-			{ dividend: activeEntity } as EditDividendContext :
-			{ securityId: props.securityId } as CreateDividendContext;
-
-		setContext(nextContext);
+	const context: Nullable<CreateDividendContext | EditDividendContext> = useMemo(() => {
+		return activeEntity
+			? ({ dividend: activeEntity } as EditDividendContext)
+			: ({ securityId: props.securityId } as CreateDividendContext);
 	}, [activeEntity, props.securityId]);
 
 	const onDividendSaved = async (dividend: DividendEntity) => {

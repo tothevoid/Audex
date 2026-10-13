@@ -13,6 +13,7 @@ import { getCryptocurrencies } from "@/api/crypto/cryptocurrencyApi";
 import { CryptocurrencyEntity } from "@/models/crypto/CryptocurrencyEntity";
 import { CryptoAccountEntity } from "@/models/crypto/CryptoAccountEntity";
 import { generateGuid } from "@/shared/utilities/idUtilities";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>;
@@ -81,7 +82,8 @@ const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = ({
     }, [state.cryptocurrencies, cryptoAccountCryptocurrency, existingCryptocurrencyIds]);
 
     const selectedCrypto = useWatch({ control, name: "cryptocurrency" });
-    const cryptoSymbol = state.cryptocurrencies.find(item => item.id === selectedCrypto?.id)?.symbol ?? '';
+    const selectedCryptoEntity = findEntityById(state.cryptocurrencies, selectedCrypto?.id);
+    const cryptoSymbol = selectedCryptoEntity?.symbol ?? '';
 
     const onSubmit = (formData: CryptoAccountCryptocurrencyFormInput) => {
         onSaved(formData as CryptoAccountCryptocurrencyEntity);

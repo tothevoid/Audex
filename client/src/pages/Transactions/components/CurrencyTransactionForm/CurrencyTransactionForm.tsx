@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box, Button, Field, Flex, Icon, Input, SimpleGrid, Stack, Text } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { MdSwapHoriz } from 'react-icons/md';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
@@ -24,51 +24,69 @@ interface Props {
     onCurrencyTransactionSaved: (currencyTransaction: CurrencyTransactionEntity) => Promise<void>;
 }
 
-const CurrencyTransactionForm: React.FC<Props> = (props: Props) => {
+const CurrencyTransactionForm: React.FC<Props> = ({
+    currencyTransaction,
+    currentAccount,
+    setSubmitHandler,
+    onCurrencyTransactionSaved
+}: Props) => {
     const { t } = useTranslation();
 
     const getDefaultTransactionFormState = useCallback(() => {
-        const initialAmount = props.currencyTransaction?.amount ?? 0;
-        const initialRate = props.currencyTransaction?.rate ?? 0;
+        const initialAmount = currencyTransaction?.amount ?? 0;
+        const initialRate = currencyTransaction?.rate ?? 0;
 
-        const defaultSource = props.currencyTransaction?.sourceAccount;
-        let defaultDest = props.currencyTransaction?.destinationAccount;
+        const defaultSource = currencyTransaction?.sourceAccount;
+        let defaultDest = currencyTransaction?.destinationAccount;
 
-        if (props.currentAccount && !props.currencyTransaction) {
-            defaultDest = props.currentAccount;
+        if (currentAccount && !currencyTransaction) {
+            defaultDest = currentAccount;
         }
 
         return {
-            id: props.currencyTransaction?.id ?? generateGuid(),
-            name: props.currencyTransaction?.name ?? "",
-            date: props.currencyTransaction?.date ?? new Date(),
+            id: currencyTransaction?.id ?? generateGuid(),
+            name: currencyTransaction?.name ?? "",
+            date: currencyTransaction?.date ?? new Date(),
             amount: initialAmount,
             rate: initialRate,
             sourceAccount: defaultSource,
             destinationAccount: defaultDest,
         };
-    }, [props.currencyTransaction, props.currentAccount]);
+    }, [currencyTransaction, currentAccount]);
 
     const validationSchema = useMemo(() => getCurrencyTransactionValidationSchema(t), [t]);
 
-    const { register, handleSubmit, control, watch, setValue, formState: { errors }, reset } = useForm<CurrencyTransactionFormInput>({
+    const { register, handleSubmit, control, setValue, getValues, formState: { errors }, reset } = useForm<CurrencyTransactionFormInput>({
         resolver: zodResolver(validationSchema),
         mode: "onBlur",
         defaultValues: getDefaultTransactionFormState()
     });
 
-    const { currentAccount, currencyTransaction, onCurrencyTransactionSaved, setSubmitHandler } = props;
-
-    const [isCustomName, setIsCustomName] = useState<boolean>(!!currencyTransaction?.name);
+    const [previousTransactionId, setPreviousTransactionId] = useState(currencyTransaction?.id);
+    const [isCustomName, setIsCustomName] = useState<boolean>(Boolean(currencyTransaction?.name));
     const [accounts, setAccounts] = useState<AccountEntity[]>([]);
+
+    if (currencyTransaction?.id !== previousTransactionId) {
+        setPreviousTransactionId(currencyTransaction?.id);
+        setIsCustomName(Boolean(currencyTransaction?.name));
+    }
 
     useEffect(() => {
         reset(getDefaultTransactionFormState());
-        setIsCustomName(!!currencyTransaction?.name);
     }, [currencyTransaction, reset, getDefaultTransactionFormState]);
 
     useEffect(() => {
-        getAccounts({ onlyActive: true }).then(setAccounts);
+        let isMounted = true;
+        const fetchAccounts = async () => {
+            const activeAccounts = await getAccounts({ onlyActive: true });
+            if (isMounted) {
+                setAccounts(activeAccounts);
+            }
+        };
+        fetchAccounts();
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     const onCurrencyTransactionSaveClick = useCallback(async (formInput: CurrencyTransactionFormInput) => {
@@ -88,16 +106,16 @@ const CurrencyTransactionForm: React.FC<Props> = (props: Props) => {
         setSubmitHandler(handleSubmit, onCurrencyTransactionSaveClick);
     }, [handleSubmit, onCurrencyTransactionSaveClick, setSubmitHandler]);
 
-    const selectedSourceAccount = watch("sourceAccount");
-    const selectedDestAccount = watch("destinationAccount");
+    const selectedSourceAccount = useWatch({ control, name: "sourceAccount" });
+    const selectedDestAccount = useWatch({ control, name: "destinationAccount" });
 
     const isCurrentAccountSource = Boolean(currentAccount && selectedSourceAccount?.id === currentAccount.id);
     const isCurrentAccountDest = Boolean(currentAccount && selectedDestAccount?.id === currentAccount.id);
 
     const findAccount = useCallback((account?: { id?: string } | null) => {
         if (!account?.id) return null;
-        return accounts.find(a => a.id === account.id) ?? (props.currentAccount?.id === account.id ? props.currentAccount : null);
-    }, [accounts, props.currentAccount]);
+        return accounts.find(existingAccount => existingAccount.id === account.id) ?? (currentAccount?.id === account.id ? currentAccount : null);
+    }, [accounts, currentAccount]);
 
     const sourceAcc = useMemo(() => findAccount(selectedSourceAccount), [findAccount, selectedSourceAccount]);
     const destAcc = useMemo(() => findAccount(selectedDestAccount), [findAccount, selectedDestAccount]);
@@ -127,8 +145,10 @@ const CurrencyTransactionForm: React.FC<Props> = (props: Props) => {
         return Math.round(crossRate * 10000) / 10000;
     }, [sourceAcc, destAcc]);
 
-    const amount = watch("amount") || 0;
-    const rate = watch("rate") || 0;
+    const watchedAmount = useWatch({ control, name: "amount" });
+    const amount = watchedAmount || 0;
+    const watchedRate = useWatch({ control, name: "rate" });
+    const rate = watchedRate || 0;
 
     const applyMarketRate = () => {
         if (marketRate) {
@@ -137,25 +157,25 @@ const CurrencyTransactionForm: React.FC<Props> = (props: Props) => {
     };
 
     const handleSwapAccounts = () => {
-        const currentSource = watch("sourceAccount");
-        const currentDest = watch("destinationAccount");
+        const currentSource = getValues("sourceAccount");
+        const currentDest = getValues("destinationAccount");
 
         setValue("sourceAccount", currentDest as AccountEntity, { shouldValidate: true });
         setValue("destinationAccount", currentSource as AccountEntity, { shouldValidate: true });
     };
 
     const availableLinkedAccounts = useMemo(() => {
-        if (!props.currentAccount) return accounts;
-        return accounts.filter(a =>
-            a.id !== props.currentAccount!.id &&
-            a.currency?.id !== props.currentAccount!.currency?.id
+        if (!currentAccount) return accounts;
+        return accounts.filter(accountItem =>
+            accountItem.id !== currentAccount.id &&
+            accountItem.currency?.id !== currentAccount.currency?.id
         );
-    }, [accounts, props.currentAccount]);
+    }, [accounts, currentAccount]);
 
     const getFilteredAccounts = useCallback((targetAccountObj?: { id?: string } | null) => {
         const found = findAccount(targetAccountObj);
         if (!found?.currency?.id) return accounts;
-        return accounts.filter(a => a.currency?.id !== found.currency.id);
+        return accounts.filter(accountItem => accountItem.currency?.id !== found.currency.id);
     }, [findAccount, accounts]);
 
     const availableSourceAccounts = useMemo(() => getFilteredAccounts(selectedDestAccount), [getFilteredAccounts, selectedDestAccount]);
@@ -186,7 +206,7 @@ const CurrencyTransactionForm: React.FC<Props> = (props: Props) => {
                                 name="sourceAccount"
                                 control={control}
                                 placeholder={t("entity_currency_transaction_source_account_placeholder")}
-                                collection={isCurrentAccountSource ? accounts : (props.currentAccount ? availableLinkedAccounts : availableSourceAccounts)}
+                                collection={isCurrentAccountSource ? accounts : (currentAccount ? availableLinkedAccounts : availableSourceAccounts)}
                                 labelSelector={(account => account.name)}
                                 valueSelector={(account => account.id)}
                                 isDisabled={isCurrentAccountSource}
@@ -227,7 +247,7 @@ const CurrencyTransactionForm: React.FC<Props> = (props: Props) => {
                                 name="destinationAccount"
                                 control={control}
                                 placeholder={t("entity_currency_transaction_destination_account_placeholder")}
-                                collection={isCurrentAccountDest ? accounts : (props.currentAccount ? availableLinkedAccounts : availableDestAccounts)}
+                                collection={isCurrentAccountDest ? accounts : (currentAccount ? availableLinkedAccounts : availableDestAccounts)}
                                 labelSelector={(account => account.name)}
                                 valueSelector={(account => account.id)}
                                 isDisabled={isCurrentAccountDest}

@@ -13,6 +13,7 @@ import DateSelect from "@/shared/components/DateSelect/DateSelect";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { generateGuid } from "@/shared/utilities/idUtilities";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 
 interface Props {
@@ -26,35 +27,46 @@ interface State {
 	profileCurrency?: CurrencyEntity
 }
 
-const DebtModal: React.FC<Props> = (props: Props) => {
+const DebtModal: React.FC<Props> = ({
+	debt,
+	modalRef,
+	onSaved,
+}: Props) => {
 	const [state, setState] = useState<State>({ currencies: [] });
 
-	const loadData = useCallback(async () => {
-		const [currencies, userProfile] = await Promise.all([
-			getCurrencies(),
-			getUserProfile()
-		]);
-		const profileCurrency = userProfile ? userProfile.currency : currencies[0];
-		setState({ currencies, profileCurrency });
+	useEffect(() => {
+		let isMounted = true;
+		const loadData = async () => {
+			const [currencies, userProfile] = await Promise.all([
+				getCurrencies(),
+				getUserProfile()
+			]);
+			if (isMounted) {
+				const profileCurrency = userProfile ? userProfile.currency : currencies[0];
+				setState({ currencies, profileCurrency });
+			}
+		};
+		loadData();
+		return () => {
+			isMounted = false;
+		};
 	}, []);
 
-	useEffect(() => {
-		loadData();
-	}, [loadData]);
-
 	const getDefaultFormState = useCallback(() => {
-		const matchedCurrency = props.debt?.currency
-			? (state.currencies.find(c => c.id === props.debt?.currency?.id) || props.debt.currency)
-			: (state.profileCurrency ?? state.currencies[0]);
+		const matchedCurrency = findEntityById(
+			state.currencies,
+			debt?.currency?.id,
+			debt?.currency
+		) ?? state.profileCurrency ?? state.currencies[0];
 
 		return {
-			id: props.debt?.id ?? generateGuid(),
-			name: props.debt?.name ?? "",
-			amount: props.debt?.amount ?? 0,
+			id: debt?.id ?? generateGuid(),
+			name: debt?.name ?? "",
+			amount: debt?.amount ?? 0,
 			currency: matchedCurrency,
-			date: props.debt?.date ?? new Date()
+			date: debt?.date ?? new Date()
 		};
-	}, [props.debt, state.profileCurrency, state.currencies]);
+	}, [debt, state.profileCurrency, state.currencies]);
 
 	const { t } = useTranslation();
 	const validationSchema = useMemo(() => getDebtValidationSchema(t), [t]);
@@ -71,13 +83,17 @@ const DebtModal: React.FC<Props> = (props: Props) => {
 		reset(getDefaultFormState());
 	}, [reset, getDefaultFormState]);
 
-	const onSubmit = (debt: DebtFormInput) => {
-		props.onSaved(debt as DebtEntity);
-		props.modalRef.current?.closeModal();
+	const onSubmit = (formData: DebtFormInput) => {
+		onSaved(formData as DebtEntity);
+		modalRef.current?.closeModal();
+	};
+
+	const handleFormSubmit: React.FormEventHandler = (event) => {
+		handleSubmit(onSubmit)(event);
 	};
 
 	return (
-		<BaseFormModal ref={props.modalRef} title={t("entity_debt_form_title")} submitHandler={handleSubmit(onSubmit)}>
+		<BaseFormModal ref={modalRef} title={t("entity_debt_form_title")} submitHandler={handleFormSubmit}>
 			<Stack gap={4}>
 				<Field.Root invalid={!!errors.name}>
 					<Field.Label>{t("entity_debt_name")}</Field.Label>

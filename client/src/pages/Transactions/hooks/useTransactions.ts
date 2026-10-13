@@ -12,29 +12,51 @@ export interface TransactionsQuery {
 	showSystem: boolean
 }
 
-export const useTransactions = (initialParams: TransactionsQuery) => {
+export const useTransactions = (initialQueryParameters: TransactionsQuery) => {
 	const { t } = useTranslation();
 	const [transactions, setTransactions] = useState<TransactionEntity[]>([]);
 	const [isTransactionsLoading, setLoading] = useState(false);
 
 	const [error, setError] = useState<string | null>(null);
-	const [params, setParams] = useState<TransactionsQuery>(initialParams);
+	const [queryParameters, setQueryParameters] = useState<TransactionsQuery>(initialQueryParameters);
 
-	const fetchData = useCallback(async () => {
-		setLoading(true);
-		try {
-			const transactions = await getTransactions(params.month, params.year, params.showSystem);
-			setTransactions(transactions);
-		} catch (err: unknown) {
-			setError(parseErrorMessage(err, t("error_data_load")));
-		} finally {
-			setLoading(false);
-		}
-	}, [params, t]);
+	const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+
+	const reloadTransactions = useCallback(() => {
+		setRefreshTrigger((previousTrigger) => previousTrigger + 1);
+	}, []);
 
 	useEffect(() => {
-		fetchData();
-	}, [fetchData]);
+		let isMounted = true;
+		const load = async () => {
+			setLoading(true);
+			try {
+				const fetchedTransactions = await getTransactions(
+					queryParameters.month,
+					queryParameters.year,
+					queryParameters.showSystem
+				);
+				if (isMounted) {
+					setTransactions(fetchedTransactions);
+					setError(null);
+				}
+			} catch (error: unknown) {
+				if (isMounted) {
+					setError(parseErrorMessage(error, t("error_data_load")));
+				}
+			} finally {
+				if (isMounted) {
+					setLoading(false);
+				}
+			}
+		};
+
+		load();
+
+		return () => {
+			isMounted = false;
+		};
+	}, [queryParameters, refreshTrigger, t]);
 
 	const createTransactionEntity = async (transaction: TransactionEntity) => {
 		const createdTransaction = await createTransaction(transaction);
@@ -44,7 +66,7 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 
 		if (isCurrentMonthTransaction(createdTransaction)) {
 			const newTransactions = insertByPredicate([...transactions], createdTransaction, 
-				(transactionElm: TransactionEntity) => (transactionElm.date <= createdTransaction.date));
+				(transactionElement: TransactionEntity) => (transactionElement.date <= createdTransaction.date));
 			setTransactions(newTransactions);
 		}
 
@@ -104,8 +126,8 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 	};
 
 	const isCurrentMonthTransaction = (transaction: TransactionEntity): boolean => {
-		return transaction.date.getMonth() === params.month - 1 &&
-			   transaction.date.getFullYear() === params.year;
+		return transaction.date.getMonth() === queryParameters.month - 1 &&
+			   transaction.date.getFullYear() === queryParameters.year;
 	};
 
 	return {
@@ -115,8 +137,11 @@ export const useTransactions = (initialParams: TransactionsQuery) => {
 		createTransactionEntity,
 		updateTransactionEntity,
 		deleteTransactionEntity,
-		refetch: fetchData,
-		setParams,
-		params
+		reloadTransactions,
+		refetch: reloadTransactions,
+		queryParameters,
+		setQueryParameters,
+		params: queryParameters,
+		setParams: setQueryParameters
 	};
 };

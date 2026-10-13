@@ -14,6 +14,7 @@ import { getAccounts } from "@/api/accounts/accountApi";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import { generateGuid } from "@/shared/utilities/idUtilities";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
 import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 
@@ -29,53 +30,59 @@ interface State {
 	debts: DebtEntity[]
 }
 
-const DebtPaymentModal: React.FC<Props> = (props: Props) => {
+const DebtPaymentModal: React.FC<Props> = ({
+	debtPayment,
+	selectedDebtId,
+	onSaved,
+	modalRef,
+}: Props) => {
 	const [state, setState] = useState<State>({ accounts: [], debts: [] });
 
 	useEffect(() => {
+		let isMounted = true;
 		const initData = async () => {
-			await requestData();
+			const [debts, accounts] = await Promise.all([
+				getDebts(true),
+				getAccounts({ onlyActive: false })
+			]);
+			if (isMounted) {
+				setState((currentState) => ({ ...currentState, debts, accounts }));
+			}
 		};
 		initData();
+		return () => {
+			isMounted = false;
+		};
 	}, []);
 
-	const requestData = async () => {
-		const [debts, accounts] = await Promise.all([
-			getDebts(true),
-			getAccounts({ onlyActive: false })
-		]);
-
-		setState((currentState) => {
-			return { ...currentState, debts, accounts };
-		});
-	};
-
 	const availableDebts = useMemo(() => {
-		if (props.debtPayment?.debt && !state.debts.some((d) => d.id === props.debtPayment?.debt?.id)) {
-			return [props.debtPayment.debt, ...state.debts];
+		if (debtPayment?.debt && !state.debts.some((debt) => debt.id === debtPayment.debt?.id)) {
+			return [debtPayment.debt, ...state.debts];
 		}
 		return state.debts;
-	}, [props.debtPayment, state.debts]);
+	}, [debtPayment, state.debts]);
 
 	const getDefaultFormState = useCallback(() => {
-		const initialDebt = props.debtPayment?.debt
-			? (availableDebts.find((d) => d.id === props.debtPayment?.debt?.id) || props.debtPayment.debt)
-			: props.selectedDebtId
-				? (availableDebts.find((d) => d.id === props.selectedDebtId) || undefined)
-				: undefined;
-		const initialAccount = props.debtPayment?.targetAccount
-			? (state.accounts.find((a) => a.id === props.debtPayment?.targetAccount?.id) || props.debtPayment.targetAccount)
-			: undefined;
+		const initialDebt = findEntityById(
+			availableDebts,
+			debtPayment?.debt?.id ?? selectedDebtId,
+			debtPayment?.debt
+		);
+		const initialAccount = findEntityById(
+			state.accounts,
+			debtPayment?.targetAccount?.id,
+			debtPayment?.targetAccount
+		);
 
 		return {
-			id: props.debtPayment?.id ?? generateGuid(),
-			amount: props.debtPayment?.amount ?? 0,
-			date: props.debtPayment?.date ?? new Date(),
+			id: debtPayment?.id ?? generateGuid(),
+			amount: debtPayment?.amount ?? 0,
+			date: debtPayment?.date ?? new Date(),
 			debt: initialDebt,
 			targetAccount: initialAccount,
-			isPercentagePayment: props.debtPayment?.isPercentagePayment ?? false
+			isPercentagePayment: debtPayment?.isPercentagePayment ?? false
 		};
-	}, [props.debtPayment, props.selectedDebtId, availableDebts, state.accounts]);
+	}, [debtPayment, selectedDebtId, availableDebts, state.accounts]);
 
 	const { t } = useTranslation();
 	const validationSchema = useMemo(() => getDebtPaymentValidationSchema(t), [t]);
@@ -95,7 +102,7 @@ const DebtPaymentModal: React.FC<Props> = (props: Props) => {
 
 	const selectedDebtEntity = useMemo(() => {
 		if (!selectedDebtFormValue?.id) return null;
-		return availableDebts.find((d) => d.id === selectedDebtFormValue.id) || null;
+		return findEntityById(availableDebts, selectedDebtFormValue.id) ?? null;
 	}, [selectedDebtFormValue, availableDebts]);
 
 	const availableAccounts = useMemo(() => {
@@ -109,30 +116,27 @@ const DebtPaymentModal: React.FC<Props> = (props: Props) => {
 
 	useEffect(() => {
 		if (selectedDebtEntity && selectedDebtEntity.currency && selectedAccountFormValue?.id) {
-			const selectedAccountEntity = state.accounts.find((a) => a.id === selectedAccountFormValue.id);
+			const selectedAccountEntity = findEntityById(state.accounts, selectedAccountFormValue.id);
 			if (selectedAccountEntity && selectedAccountEntity.currency?.id !== selectedDebtEntity.currency.id) {
 				resetField("targetAccount");
 			}
 		}
 	}, [selectedDebtEntity, selectedAccountFormValue, state.accounts, resetField]);
 
-	const onModalVisibilityChanged = async (open: boolean) => {
-		if (open) {
-			await requestData();
-		}
+	const onSubmit = (formData: DebtPaymentFormInput) => {
+		onSaved(formData as DebtPaymentEntity);
+		modalRef?.current?.closeModal();
 	};
 
-	const onSubmit = (debt: DebtPaymentFormInput) => {
-		props.onSaved(debt as DebtPaymentEntity);
-		props.modalRef?.current?.closeModal();
+	const handleFormSubmit: React.FormEventHandler = (event) => {
+		handleSubmit(onSubmit)(event);
 	};
 
 	return (
 		<BaseFormModal
-			ref={props.modalRef}
+			ref={modalRef}
 			title={t("entity_debt_payment_form_title")}
-			submitHandler={handleSubmit(onSubmit)}
-			visibilityChanged={onModalVisibilityChanged}
+			submitHandler={handleFormSubmit}
 		>
 			<Stack gap={4}>
 				<Field.Root invalid={!!errors.debt}>
@@ -141,7 +145,7 @@ const DebtPaymentModal: React.FC<Props> = (props: Props) => {
 						collection={availableDebts}
 						labelSelector={(debt => debt.name)}
 						valueSelector={(debt => debt.id)}
-						isDisabled={Boolean(props.selectedDebtId)} />
+						isDisabled={Boolean(selectedDebtId)} />
 					<Field.ErrorText>{errors.debt?.message}</Field.ErrorText>
 				</Field.Root>
 				<Field.Root invalid={!!errors.amount}>

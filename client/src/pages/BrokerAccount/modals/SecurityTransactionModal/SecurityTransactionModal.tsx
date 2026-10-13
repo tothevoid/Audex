@@ -15,6 +15,7 @@ import { SecurityTransactionEntity, SecurityTransactionEntityRequest } from "@/m
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { generateGuid } from "@/shared/utilities/idUtilities";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 
 import { Nullable } from "@/shared/utilities/nullable";
 
@@ -102,16 +103,25 @@ const SecurityTransactionModal: React.FC<ModalProps> = ({
 	}, [reset, getFormDefaultValues, context]);
 
 	const selectedSecurity = useWatch({ control, name: "security" });
-	const securityCurrency = state.securities.find(securityItem => securityItem.id === selectedSecurity?.id)?.currency?.name ?? '';
+	const selectedSecurityEntity = findEntityById(state.securities, selectedSecurity?.id);
+	const securityCurrency = selectedSecurityEntity?.currency?.name ?? '';
 
 	useEffect(() => {
+		let isMounted = true;
 		const loadData = async () => {
-			const securities = await getSecurities();
-			const brokerAccounts = await getBrokerAccounts();
+			const [securities, brokerAccounts] = await Promise.all([
+				getSecurities(),
+				getBrokerAccounts()
+			]);
 
-			setState({ securities, brokerAccounts });
+			if (isMounted) {
+				setState({ securities, brokerAccounts });
+			}
 		};
 		loadData();
+		return () => {
+			isMounted = false;
+		};
 	}, []);
 
 	const onSubmit = (securityTransaction: SecurityTransactionFormInput) => {

@@ -49,3 +49,17 @@ export const resolveDefaultEntityId = <T extends { id: string }>(
     }
     return items.length > 0 ? items[0].id : fallback;
 };
+
+export const findEntityById = <T extends { id: string }>(
+    items: readonly T[] | T[],
+    targetId?: string | null,
+    fallback?: T | null
+): T | undefined => {
+    if (targetId) {
+        const foundItem = items.find((item) => item.id === targetId);
+        if (foundItem) {
+            return foundItem;
+        }
+    }
+    return fallback ?? undefined;
+};
