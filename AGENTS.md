@@ -18,9 +18,9 @@ This document contains guidelines, coding standards, and architectural patterns 
 - **Avoid Fully-Qualified Type Paths**: Do NOT use fully-qualified namespace paths in code (e.g. `services.AddSingleton<Audex.Application.Interfaces.Common.ITimeZoneService, Audex.Application.Services.Common.TimeZoneService>()`).
 - **Use `using` Directives**: Always place corresponding `using` directives at the top of the C# file and use clean, unqualified type names in declarations and registrations.
 
-### 4. Leverage & Reuse Existing Codebase
-- **Explore Before Creating**: Always inspect the existing codebase before writing new functionality. Check whether helper functions, utilities, or models already exist (e.g. in `shared/utilities`, `dateUtils`, formatters, base repositories, or common services).
-- **No Redundant Boilerplate**: Reuse established patterns, shared components, and utilities rather than duplicating logic across modules.
+### 4. Leverage & Reuse Existing Codebase & Shared Utilities
+- **Explore Before Creating**: Always inspect the existing codebase before writing new functionality. Check whether helper functions, utilities, or models already exist (e.g. in `client/src/shared/utilities/`, `dateUtils`, formatters, `arrayUtilities`, `webApiUtilities`, base repositories, or common services).
+- **No Redundant Boilerplate**: NEVER reimplement inline loops, searches, custom date/money formatting, GUID generation, or error parsing if a shared utility already exists in `client/src/shared/utilities/`. Always reuse established patterns, shared components, and utilities rather than duplicating logic across modules.
 
 ### 5. Strict Typing & No Type Crutches
 - **No `any` or Cast-Through-`unknown` Crutches**: NEVER use `any` or cast types through `unknown` as a workaround when concrete domain interfaces, component props, chart tooltips, or form models exist or can be defined.
@@ -272,6 +272,65 @@ This document contains guidelines, coding standards, and architectural patterns 
       : `${basicUrl}/GetAll?date=${date}`;
   ```
 - **Centralized Error Parsing (`webApiUtilities.ts`)**: In React components and custom hooks, never swallow errors silently. Catch blocks must use `parseErrorMessage(err, t("error_data_load"))` and `parseErrorCode(err)` from `shared/utilities/webApiUtilities.ts`.
+
+### Shared Utilities Catalog & Usage Guidelines (`client/src/shared/utilities/`)
+Whenever implementing features, forms, tables, formatters, or API integrations, the agent and developers MUST use these centralized utilities rather than writing redundant inline logic:
+
+1. **Collections & Entity Lookups (`shared/utilities/arrayUtilities.ts`)**:
+   - `findEntityById<T>(items, targetId, fallback)`: Safely finds an entity by its `id: string` in a collection with an optional fallback (e.g. `items[0]`). ALWAYS use this instead of manual `selectedId ? items.find(i => i.id === selectedId) : items[0]`.
+   - `resolveDefaultEntityId<T>(items, preferredId, previousId, fallback)`: Resolves active ID by priority (`preferredId` $\to$ `previousId` $\to$ `items[0].id` $\to$ `fallback`). Use in tab bars, selectors, and dropdown filter initializations.
+   - `groupByKey<K, V>(records, keySelector)`: Groups an array into `Map<K, V[]>`. Use instead of writing custom `.reduce(...)` with `Map`.
+   - `sumEntities<T>(records, sumSelector)`: Computes sum of numeric values across a collection. Use instead of writing raw `.reduce((acc, curr) => acc + curr.amount, 0)`.
+   - `insertByPredicate<T>`, `reorderByPredicate<T>`: Reordering and inserting elements into arrays by predicate.
+
+2. **Dates & API Conversions (`shared/utilities/dateUtils.ts`)**:
+   - `convertToDateOnly(date: Date | string)`: Converts a `Date` or date string to `YYYY-MM-DD` without timezone distortion. ALWAYS use when preparing outgoing API request payloads (`DateOnly` parameters/DTOs). NEVER use `.toISOString().slice(0, 10)` (which can shift dates across UTC borders).
+   - `parseIsoDateOnly(dateString)`: Safely parses a `YYYY-MM-DD` string into a local `Date` object without UTC timezone shifts.
+   - `getDateParts(date)`: Extracts two-digit padded strings (`year`, `month`, `day`, `hours`, `minutes`, `seconds`).
+   - `getMonthByIndex(index, i18n)` / `getMonthsNames(i18n)`: Resolves localized month names via `Intl.DateTimeFormat`.
+   - `formatTimestampForReport`, `formatTimestampForBackup`: Generates standardized filesystem/export timestamp strings.
+
+3. **Formatters (`shared/utilities/formatters/`)**:
+   - **Dates (`dateFormatter.ts`)**:
+     - `formatDate(date, i18n, showYear?)`: Localized date string (e.g. `14 октября 2026 г.` / `October 14, 2026`).
+     - `formatDateTime(date, i18n, showYear?)` / `formatShortDateTime(date, i18n)`: Date with time (`dd.MM.yy, HH:mm`).
+     - `formatMonth(month, i18n)` / `formatShortMonth(month, i18n, year?)`: Full or short localized month name.
+     - `formatMonthYear(month, year)` / `formatMonthYearByDate(date)`: Returns `MM-YYYY` string.
+     - `formatChartAxisDate(date, period, i18n)` / `formatChartTooltipDate(date, period, i18n)`: Standardized Recharts axis/tooltip date formatters for periods (`1D`, `1W`, `1M`, `3M`, `6M`, `1Y`, `ALL`).
+   - **Money & Numbers (`moneyFormatter.ts` & `numberWordsFormatter.ts`)**:
+     - `formatMoneyByCurrencyCulture(value, currency, digits = 2)`: Standard currency formatting (e.g. `1 250,50 ₽`). Use everywhere across metric cards, tables, and tooltips.
+     - `formatAdaptiveNumber(value, locale, decimals?)`: Adaptive number formatting (1-2 decimal places if $|value| \ge 100$, full precision otherwise).
+     - `formatNumberToWords(value, locale)`: Human-readable amount preview for amounts $\ge 1\,000$ (e.g. `10 млн ₽`). Used in `<MoneyInput />`.
+   - **Domain Formats (`accountTypeFormatter.ts`, `securityTypeFormatter.ts`, `fileFormatter.ts`)**: Localized human-readable descriptions of account types, security categories, and byte sizes.
+
+4. **Currencies & Typography Badges (`shared/utilities/currencyUtils.tsx`)**:
+   - `getCurrencySymbol(currencyCode, locale)`: Resolves official narrow symbol (`₽`, `$`, `€`, `¥`) via Intl standard.
+   - `getCurrencyColor(currencyName, theme)`: Deterministically generates a harmonious HSL color palette for currency badges across light and dark themes.
+   - `getCurrencyIcon(currencyName, locale, ...)`: Stylized typography currency symbol node.
+
+5. **Entity Identifiers (`shared/utilities/idUtilities.ts`)**:
+   - `generateGuid()`: Universally generates RFC 4122 v4 UUIDs. ALWAYS use when creating new client-side draft entities, join entities, or unique keys. Do NOT use raw `crypto.randomUUID()` or ad-hoc math random strings.
+
+6. **Error Handling & RFC 7807 (`shared/utilities/webApiUtilities.ts`)**:
+   - `parseErrorMessage(error: unknown, defaultMessage?)`: Safely extracts human-readable error messages from Axios ProblemDetails (`detail`, `errorMessage`, `message`, `title`), `Error`, or strings.
+   - `parseErrorCode(error: unknown)`: Extracts domain error code from ProblemDetails response.
+   - `ApiException`: Strongly-typed API exception carrying status code, error code, and request ID.
+
+7. **Financial Diffs & P&L (`shared/utilities/numericDiffsUtilities.ts`)**:
+   - `calculateDiff(currentValue, initialValue, currency)`: Computes absolute and percentage profit/loss with semantic theme color (`green.600`, `red.600`, `text_primary`).
+   - `getDiffColor(profitAndLoss)`: Profit/loss color resolver.
+
+8. **Device & Browser Detection (`shared/utilities/deviceUtilities.ts`)**:
+   - `parseDeviceAndBrowser(userAgent)`: Identifies browser (Chrome, Safari, Firefox, Edge) and operating system (iOS, Android, Windows, macOS, Linux) with corresponding Material Design icon.
+
+9. **Color & Theme Accessibility (`shared/utilities/colorUtilities.ts`)**:
+   - `parseHexToRgb`, `rgbToHsl`, `hslToRgb`, `getAccessibleColor`: Color space conversions and contrast calculations for user-selected tag/category colors in light and dark themes.
+
+10. **Modal Window Reference (`shared/utilities/modalUtilities.ts`)**:
+    - `BaseModalRef`: Unified imperative handle `{ openModal: () => void; closeModal: () => void }` for all modal components.
+
+11. **Editable Grid State Machine (`shared/hooks/useEditableGrid.ts`)**:
+    - `useEditableGrid<TEntity>`: Universal hook for inline-editable spreadsheet tables with isolated drafts, change tracking, and diff commits.
 
 ### Client Commands
 - **Build**: `cd client && npm run build`
