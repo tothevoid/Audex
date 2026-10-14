@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Audex.Application.DTO.Banks;
@@ -65,7 +65,7 @@ namespace Audex.WebApi.Controllers.Banks
         public async Task Delete(Guid id) =>
             await _bankService.DeleteAsync(id);
 
-        [HttpGet("icon")]
+        [HttpGet("Icon")]
         [AllowAnonymous]
         public async Task<IActionResult> GetBankIcon(string iconKey)
         {

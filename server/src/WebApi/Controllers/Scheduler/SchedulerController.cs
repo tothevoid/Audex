@@ -39,21 +39,21 @@ namespace Audex.WebApi.Controllers.Scheduler
             _mapper = mapper;
         }
 
-        [HttpGet("not-scheduled-tasks")]
+        [HttpGet("NotScheduledTasks")]
         public async Task<IEnumerable<ScheduledTaskDefinitionModel>> GetNotScheduledTasks()
         {
             var definitions = await _schedulerTaskService.GetNotScheduledTasksAsync();
             return _mapper.Map(definitions);
         }
 
-        [HttpGet("tasks")]
+        [HttpGet("Tasks")]
         public async Task<IEnumerable<ScheduledTaskModel>> GetTasks()
         {
             var tasks = await _schedulerTaskService.GetAllTasksAsync();
             return _mapper.Map(tasks);
         }
 
-        [HttpGet("tasks/{taskName}")]
+        [HttpGet("Tasks/{taskName}")]
         public async Task<ActionResult<ScheduledTaskModel>> GetTask(string taskName)
         {
             var task = await _schedulerTaskService.GetTaskByNameAsync(taskName);
@@ -64,7 +64,7 @@ namespace Audex.WebApi.Controllers.Scheduler
             return Ok(_mapper.Map(task));
         }
 
-        [HttpPost("tasks")]
+        [HttpPost("Tasks")]
         public async Task<ActionResult<ScheduledTaskModel>> CreateTask([FromBody] CreateScheduledTaskModel model)
         {
             try
@@ -83,7 +83,7 @@ namespace Audex.WebApi.Controllers.Scheduler
             }
         }
 
-        [HttpDelete("tasks/{taskName}")]
+        [HttpDelete("Tasks/{taskName}")]
         public async Task<IActionResult> DeleteTask(string taskName)
         {
             var result = await _schedulerTaskService.DeleteTaskAsync(taskName);
@@ -94,7 +94,7 @@ namespace Audex.WebApi.Controllers.Scheduler
             return Ok();
         }
 
-        [HttpPut("tasks/{taskName}/schedule")]
+        [HttpPut("Tasks/{taskName}/Schedule")]
         public async Task<IActionResult> UpdateSchedule(string taskName, [FromBody] UpdateScheduleModel model)
         {
             try
@@ -113,7 +113,7 @@ namespace Audex.WebApi.Controllers.Scheduler
             }
         }
 
-        [HttpPut("tasks/{taskName}/toggle")]
+        [HttpPut("Tasks/{taskName}/Toggle")]
         public async Task<IActionResult> ToggleTask(string taskName, [FromQuery] bool isEnabled)
         {
             var updated = await _schedulerTaskService.ToggleTaskStatusAsync(taskName, isEnabled);
@@ -124,7 +124,7 @@ namespace Audex.WebApi.Controllers.Scheduler
             return Ok();
         }
 
-        [HttpPost("tasks/{taskName}/run-now")]
+        [HttpPost("Tasks/{taskName}/RunNow")]
         public async Task<IActionResult> RunNow(string taskName)
         {
             try
@@ -145,7 +145,7 @@ namespace Audex.WebApi.Controllers.Scheduler
             }
         }
 
-        [HttpPost("journal")]
+        [HttpPost("Journal")]
         public async Task<PagedResult<ScheduledTaskJournalModel>> GetJournal([FromBody] GetJournalQuery query)
         {
             var filter = _mapper.Map(query);
@@ -153,7 +153,7 @@ namespace Audex.WebApi.Controllers.Scheduler
             return _mapper.Map(records);
         }
 
-        [HttpGet("journal/attachments/{attachmentId}/download")]
+        [HttpGet("Journal/Attachments/{attachmentId}/Download")]
         public async Task<IActionResult> DownloadAttachment(Guid attachmentId)
         {
             var fileStream = await _attachmentService.GetAttachmentFileStreamAsync(attachmentId);

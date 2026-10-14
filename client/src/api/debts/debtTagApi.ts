@@ -8,7 +8,7 @@ export const getDebtTags = async (): Promise<DebtTagEntity[]> => {
 };
 
 export const getDebtTagStats = async (): Promise<DebtTagStatsEntity[]> => {
-    return await getAllEntities<DebtTagStatsEntity>(`${basicUrl}/stats`);
+    return await getAllEntities<DebtTagStatsEntity>(`${basicUrl}/Stats`);
 };
 
 export const createDebtTag = async (tag: Omit<DebtTagEntity, "id">): Promise<DebtTagEntity | null> => {
@@ -28,5 +28,5 @@ export const deleteDebtTag = async (tagId: string): Promise<boolean> => {
 };
 
 export const assignTagsToDebt = async (debtId: string, tagIds: string[]): Promise<boolean | void> => {
-    return await createEntity<string[], void>(`${basicUrl}/debt/${debtId}`, tagIds);
+    return await createEntity<string[], void>(`${basicUrl}/Debt/${debtId}`, tagIds);
 };

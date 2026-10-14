@@ -11,7 +11,7 @@ import {
 const basicUrl = "/BrokerStatementImport";
 
 export const getStatementImporters = async (): Promise<BrokerStatementImporterEntity[]> => {
-    return await getAllEntities<BrokerStatementImporterEntity>(`${basicUrl}/importers`);
+    return await getAllEntities<BrokerStatementImporterEntity>(`${basicUrl}/Importers`);
 };
 
 export const analyzeBrokerStatement = async (
@@ -26,7 +26,7 @@ export const analyzeBrokerStatement = async (
     formData.append("importerId", importerId);
     formData.append("timeZoneId", timeZoneId);
 
-    const result = await getEntityByConfig<BrokerStatementAnalysisResultEntity>(`${basicUrl}/analyze`, formData);
+    const result = await getEntityByConfig<BrokerStatementAnalysisResultEntity>(`${basicUrl}/Analyze`, formData);
     return result ?? null;
 };
 
@@ -34,7 +34,7 @@ export const applyStatementDiffs = async (
     request: ApplyStatementDiffsRequestEntity
 ): Promise<OperationResult<ApplyStatementDiffsSummaryEntity>> => {
     return await postEntityResult<ApplyStatementDiffsRequestEntity, ApplyStatementDiffsSummaryEntity>(
-        `${basicUrl}/apply`,
+        `${basicUrl}/Apply`,
         request
     );
 };

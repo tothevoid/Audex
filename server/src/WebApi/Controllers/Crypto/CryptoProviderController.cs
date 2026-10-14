@@ -57,7 +57,7 @@ namespace Audex.WebApi.Controllers.Crypto
         public async Task Delete(Guid id) =>
             await _cryptoProviderService.DeleteAsync(id);
 
-        [HttpGet("icon")]
+        [HttpGet("Icon")]
         [AllowAnonymous]
         public async Task<IActionResult> GetCryptoProviderIcon(string iconKey)
         {

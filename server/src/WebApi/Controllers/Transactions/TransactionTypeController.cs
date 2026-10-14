@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Mvc;
 using Audex.Application.Interfaces.Transactions;
 using System.Collections.Generic;
@@ -57,7 +57,7 @@ namespace Audex.WebApi.Controllers.Transactions
         public async Task Delete(Guid id) =>
             await _transactionTypeService.DeleteAsync(id);
 
-        [HttpGet("icon")]
+        [HttpGet("Icon")]
         [AllowAnonymous]
         public async Task<IActionResult> GetTransactionTypeIcon(string iconKey)
         {

@@ -29,14 +29,14 @@ namespace Audex.WebApi.Controllers.Brokers
             _localizer = localizer;
         }
 
-        [HttpGet("importers")]
+        [HttpGet("Importers")]
         public ActionResult<IReadOnlyList<BrokerStatementImporterDto>> GetImporters()
         {
             var importers = _importService.GetImporters();
             return Ok(importers);
         }
 
-        [HttpPost("analyze")]
+        [HttpPost("Analyze")]
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<BrokerStatementAnalysisResultDto>> AnalyzeAsync(
             [FromForm] AnalyzeBrokerStatementRequestDto request)
@@ -64,7 +64,7 @@ namespace Audex.WebApi.Controllers.Brokers
             return Ok(result);
         }
 
-        [HttpPost("apply")]
+        [HttpPost("Apply")]
         public async Task<ActionResult<OperationResultDto<ApplyStatementDiffsSummaryDto>>> ApplyDiffsAsync(
             [FromBody] ApplyStatementDiffsRequestDto request)
         {

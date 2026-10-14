@@ -20,16 +20,16 @@ export const getPagedNotifications = async (query: NotificationsQuery): Promise<
 };
 
 export const getUnreadNotificationCount = async (): Promise<number> => {
-    const result = await getEntity<number>(`${basicUrl}/unread-count`);
+    const result = await getEntity<number>(`${basicUrl}/UnreadCount`);
     return typeof result === "number" ? result : 0;
 };
 
 export const markNotificationAsRead = async (id: string): Promise<boolean> => {
-    return await postAction(`${basicUrl}/${id}/read`, {});
+    return await postAction(`${basicUrl}/Read/${id}`, {});
 };
 
 export const markAllNotificationsAsRead = async (): Promise<boolean> => {
-    return await postAction(`${basicUrl}/read-all`, {});
+    return await postAction(`${basicUrl}/ReadAll`, {});
 };
 
 export const deleteNotification = async (id: string): Promise<boolean> => {

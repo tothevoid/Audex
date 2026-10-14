@@ -34,19 +34,19 @@ namespace Audex.WebApi.Controllers.Notifications
             return _mapper.Map(pagedResult);
         }
 
-        [HttpGet("unread-count")]
+        [HttpGet("UnreadCount")]
         public async Task<int> GetUnreadCount()
         {
             return await _notificationService.GetUnreadCountAsync();
         }
 
-        [HttpPost("{id}/read")]
+        [HttpPost("Read/{id}")]
         public async Task MarkAsRead(Guid id)
         {
             await _notificationService.MarkAsReadAsync(id);
         }
 
-        [HttpPost("read-all")]
+        [HttpPost("ReadAll")]
         public async Task MarkAllAsRead()
         {
             await _notificationService.MarkAllAsReadAsync();

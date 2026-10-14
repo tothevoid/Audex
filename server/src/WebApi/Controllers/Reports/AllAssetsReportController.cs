@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Audex.Application.Interfaces.Reports;
@@ -17,7 +17,7 @@ namespace Audex.WebApi.Controllers.Reports
             _reportService = reportService;
         }
 
-        [HttpGet("xlsx")]
+        [HttpGet("Xlsx")]
         public async Task<IActionResult> GetAllAssetsReportXlsx()
         {
             var report = await _reportService.CreateReportAsync();

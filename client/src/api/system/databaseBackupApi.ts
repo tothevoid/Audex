@@ -8,7 +8,7 @@ const basicUrl = '/DatabaseBackup';
 export type ExportBackupResponse = FileDownloadResult;
 
 export const exportDatabaseBackup = async (password?: string): Promise<Nullable<ExportBackupResponse>> => {
-    return await downloadFileByConfig(`${basicUrl}/export`, { password: password || null });
+    return await downloadFileByConfig(`${basicUrl}/Export`, { password: password || null });
 };
 
 export const validateDatabaseBackup = async (file: File, password?: string): Promise<BackupValidationResult> => {
@@ -19,7 +19,7 @@ export const validateDatabaseBackup = async (file: File, password?: string): Pro
     }
 
     try {
-        const response = await getEntityByConfig<BackupValidationResult>(`${basicUrl}/validate`, formData);
+        const response = await getEntityByConfig<BackupValidationResult>(`${basicUrl}/Validate`, formData);
         return response ?? {
             isValid: false,
             isEncrypted: false,
@@ -43,7 +43,7 @@ export const restoreDatabaseBackup = async (file: File, password?: string): Prom
     }
 
     try {
-        const response = await getEntityByConfig<RestoreBackupResult>(`${basicUrl}/restore`, formData);
+        const response = await getEntityByConfig<RestoreBackupResult>(`${basicUrl}/Restore`, formData);
         return response ?? {
             success: false,
             message: 'Failed to restore database from backup'

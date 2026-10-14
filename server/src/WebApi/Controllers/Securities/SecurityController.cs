@@ -51,7 +51,7 @@ namespace Audex.WebApi.Controllers.Securities
             return _mapper.Map(stats);
         }
 
-        [HttpGet("icon")]
+        [HttpGet("Icon")]
         [AllowAnonymous]
         public async Task<IActionResult> GetSecurityIcon(string iconKey)
         {

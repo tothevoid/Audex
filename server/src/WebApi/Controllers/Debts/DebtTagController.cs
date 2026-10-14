@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Audex.Application.DTO.Debts;
 using Audex.Application.Interfaces.Debts;
@@ -32,7 +32,7 @@ namespace Audex.WebApi.Controllers.Debts
             return _mapper.Map(tags);
         }
 
-        [HttpGet("stats")]
+        [HttpGet("Stats")]
         public async Task<IEnumerable<DebtTagStatsModel>> GetStats()
         {
             var stats = await _debtTagService.GetStatsAsync();
@@ -59,7 +59,7 @@ namespace Audex.WebApi.Controllers.Debts
             await _debtTagService.DeleteAsync(id);
         }
 
-        [HttpPut("debt/{debtId}")]
+        [HttpPut("Debt/{debtId}")]
         public async Task AssignTagsToDebt([FromRoute] Guid debtId, [FromBody] IEnumerable<Guid> tagIds)
         {
             await _debtTagService.AssignTagsToDebtAsync(debtId, tagIds);

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -22,7 +22,7 @@ namespace Audex.WebApi.Controllers.DatabaseBackup
             _backupService = backupService;
         }
 
-        [HttpPost("export")]
+        [HttpPost("Export")]
         public async Task<IActionResult> ExportBackup([FromBody] ExportBackupRequestDto? request)
         {
             var backup = await _backupService.CreateBackupAsync(request?.Password);
@@ -31,7 +31,7 @@ namespace Audex.WebApi.Controllers.DatabaseBackup
             return File(backup.Data, backup.ContentType, backup.FileName);
         }
 
-        [HttpPost("validate")]
+        [HttpPost("Validate")]
         public async Task<ActionResult<BackupValidationResultDto>> ValidateBackup(
             [FromForm] IFormFile file,
             [FromForm] string? password = null)
@@ -53,7 +53,7 @@ namespace Audex.WebApi.Controllers.DatabaseBackup
             return Ok(result);
         }
 
-        [HttpPost("restore")]
+        [HttpPost("Restore")]
         public async Task<ActionResult<RestoreBackupResultDto>> RestoreBackup(
             [FromForm] IFormFile file,
             [FromForm] string? password = null)

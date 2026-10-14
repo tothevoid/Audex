@@ -26,7 +26,6 @@ namespace Audex.WebApi.Controllers.Crypto
         }
 
         [HttpGet("GetByCryptoAccount")]
-        [HttpGet(nameof(GetByCryptoAccountAsync))]
         public async Task<IEnumerable<CryptoAssetModel>> GetByCryptoAccountAsync(Guid cryptoAccountId)
         {
             var cryptoAssets = await _cryptoAssetService.GetByCryptoAccountAsync(cryptoAccountId);
@@ -41,14 +40,12 @@ namespace Audex.WebApi.Controllers.Crypto
         }
 
         [HttpGet("GetTotalBalanceByCryptoAccount")]
-        [HttpGet(nameof(GetTotalBalanceByCryptoAccountAsync))]
         public async Task<decimal> GetTotalBalanceByCryptoAccountAsync([FromQuery] Guid cryptoAccountId)
         {
             return await _cryptoAssetService.GetTotalBalanceByCryptoAccountAsync(cryptoAccountId);
         }
 
         [HttpGet("GetTotalBalance")]
-        [HttpGet(nameof(GetTotalBalanceAsync))]
         public async Task<decimal> GetTotalBalanceAsync()
         {
             return await _cryptoAssetService.GetTotalBalanceAsync();

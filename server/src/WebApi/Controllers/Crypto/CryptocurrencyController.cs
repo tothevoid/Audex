@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Audex.Application.DTO.Crypto;
@@ -57,7 +57,7 @@ namespace Audex.WebApi.Controllers.Crypto
             await _cryptocurrencyService.DeleteAsync(id);
 
 
-        [HttpGet("icon")]
+        [HttpGet("Icon")]
         [AllowAnonymous]
         public async Task<IActionResult> GetCryptocurrencyIcon(string iconKey)
         {
