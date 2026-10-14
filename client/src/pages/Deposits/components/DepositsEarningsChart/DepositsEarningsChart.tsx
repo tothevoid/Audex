@@ -53,6 +53,8 @@ const DepositsEarningsChart: React.FC<Props> = ({ data, currencyName }) => {
                         axisLine={{ stroke: CHART_THEME_COLORS.axisLine }}
                         tick={{ fill: CHART_THEME_COLORS.axisText, fontSize: 11 }}
                         tickFormatter={(period: string) => formatPeriodLabel(period, i18n, "short")}
+                        interval="equidistantPreserveStart"
+                        minTickGap={10}
                         dy={6}
                     />
                     <YAxis
