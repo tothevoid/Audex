@@ -5,7 +5,8 @@ import i18n from "@/i18n";
 import { ChartTooltipContainer, ChartTooltipHeader, ChartTooltipItem } from "@/shared/components/ChartTooltip/ChartTooltip";
 import { CHART_THEME_COLORS } from "@/shared/constants/chartColors";
 import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
-import { AccountItem, MONTH_RANGE, TransfersChartRow } from "./types";
+import { formatShortMonth } from "@/shared/utilities/formatters/dateFormatter";
+import { AccountItem, MONTH_RANGE, TransfersChartRow, TransfersRangeType } from "./types";
 
 interface TransfersHistoryTooltipPayloadItem {
     payload?: TransfersChartRow;
@@ -16,7 +17,7 @@ interface Props {
     active?: boolean;
     payload?: TransfersHistoryTooltipPayloadItem[];
     label?: string;
-    selectedRangeTypeValue: string;
+    selectedRangeTypeValue: TransfersRangeType;
     selectedYearValue: number;
     selectedMonthValue: number;
     accountList: AccountItem[];
@@ -41,7 +42,7 @@ const TransfersHistoryTooltip: React.FC<Props> = ({
     if (!chartRow) return null;
 
     const periodTitle = selectedRangeTypeValue === MONTH_RANGE
-        ? `${label} ${new Date(selectedYearValue, selectedMonthValue - 1, 1).toLocaleString(i18n.language, { month: "short" })} ${selectedYearValue}`
+        ? `${label} ${formatShortMonth(selectedMonthValue, i18n, selectedYearValue)} ${selectedYearValue}`
         : `${label} ${selectedYearValue}`;
 
     const deposits: Array<{ id: string; name: string; amount: number; color: string }> = [];

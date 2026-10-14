@@ -4,9 +4,11 @@ import { BrokerAccountTransferAccountValueEntity } from "@/models/brokers/Broker
 export const YEAR_RANGE = "YEAR_RANGE";
 export const MONTH_RANGE = "MONTH_RANGE";
 
+export type TransfersRangeType = typeof YEAR_RANGE | typeof MONTH_RANGE;
+
 export interface RangeType {
     label: string;
-    value: string;
+    value: TransfersRangeType;
 }
 
 export interface NumericOption {
@@ -28,7 +30,7 @@ export interface AccountSelectOption {
 }
 
 export interface TransfersHistoryFilterState {
-    rangeType: RangeType;
+    rangeType: TransfersRangeType;
     year: number;
     month: number;
     accountId: Nullable<string>;

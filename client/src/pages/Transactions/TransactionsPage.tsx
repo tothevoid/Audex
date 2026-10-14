@@ -27,6 +27,9 @@ import { ACCOUNT_TYPE } from "@/shared/constants/accountType";
 import PageContainer from "@/shared/components/PageContainer/PageContainer";
 import { createCurrencyTransaction } from "@/api/transactions/currencyTransactionApi";
 import { createTransaction, updateTransaction, deleteTransaction } from "@/api/transactions/transactionApi";
+import { EditableGridDiff } from "@/shared/hooks/useEditableGrid";
+import { OutOfMonthWarningModal } from "./components/TransactionTableGrid/components/OutOfMonthWarningModal";
+import { hasOutOfPeriodTransactions } from "./components/TransactionTableGrid/types";
 
 interface State {
     accounts: AccountEntity[];
@@ -45,6 +48,9 @@ const TransactionsPage: React.FC = () => {
     const [typeFilter, setTypeFilter] = useState<TypeFilterMode>('all');
     const [selectedAccountId, setSelectedAccountId] = useState('');
     const [selectedCategoryId, setSelectedCategoryId] = useState('');
+    const [pendingTableDiff, setPendingTableDiff] = useState<EditableGridDiff<TransactionEntity> | null>(null);
+    const [isTableSaving, setIsTableSaving] = useState(false);
+    const tableWarningModalRef = useRef<BaseModalRef>(null);
 
     const {
         activeEntity,
@@ -173,19 +179,31 @@ const TransactionsPage: React.FC = () => {
         onActionEnded();
     }, [activeEntity, deleteTransactionEntity, onActionEnded]);
 
-    // Batch Commit handler for Table Grid Mode
-    const handleCommitTableDiff = useCallback(async (diff: {
-        added: TransactionEntity[];
-        updated: TransactionEntity[];
-        deletedIds: string[];
-    }) => {
-        await Promise.all([
-            ...diff.added.map((addedItem) => createTransaction(addedItem)),
-            ...diff.updated.map((updatedItem) => updateTransaction(updatedItem)),
-            ...diff.deletedIds.map((deletedId) => deleteTransaction(deletedId)),
-        ]);
-        await refetch();
+    const executeTableCommit = useCallback(async (diff: EditableGridDiff<TransactionEntity>) => {
+        setIsTableSaving(true);
+        try {
+            await Promise.all([
+                ...diff.added.map((addedItem) => createTransaction(addedItem)),
+                ...diff.updated.map((updatedItem) => updateTransaction(updatedItem)),
+                ...diff.deletedIds.map((deletedId) => deleteTransaction(deletedId)),
+            ]);
+            await refetch();
+            tableWarningModalRef.current?.closeModal();
+            setPendingTableDiff(null);
+        } finally {
+            setIsTableSaving(false);
+        }
     }, [refetch]);
+
+    const handleCommitTableDiff = useCallback(async (diff: EditableGridDiff<TransactionEntity>) => {
+        if (hasOutOfPeriodTransactions(diff, params.month, params.year)) {
+            setPendingTableDiff(diff);
+            tableWarningModalRef.current?.openModal();
+            return;
+        }
+
+        await executeTableCommit(diff);
+    }, [params.month, params.year, executeTableCommit]);
 
     const daysInMonth = new Date(params.year, params.month, 0).getDate();
 
@@ -267,8 +285,6 @@ const TransactionsPage: React.FC = () => {
                     transactions={filteredTransactions}
                     accounts={state.accounts}
                     transactionTypes={state.transactionTypes}
-                    selectedMonth={params.month}
-                    selectedYear={params.year}
                     selectedAccountId={selectedAccountId}
                     onCommitDiff={handleCommitTableDiff}
                     onRefresh={refetch}
@@ -290,6 +306,16 @@ const TransactionsPage: React.FC = () => {
                 modalRef={addTransactionModalRef}
                 onTransactionSaved={createTransactionEntity}
                 onCurrencyTransactionSaved={onCreateCurrencyTransaction}
+            />
+
+            {/* Out of Month Warning Modal for Table Grid Mode */}
+            <OutOfMonthWarningModal
+                ref={tableWarningModalRef}
+                diff={pendingTableDiff}
+                selectedMonth={params.month}
+                selectedYear={params.year}
+                isSaving={isTableSaving}
+                onConfirm={() => pendingTableDiff && executeTableCommit(pendingTableDiff)}
             />
         </PageContainer>
     );

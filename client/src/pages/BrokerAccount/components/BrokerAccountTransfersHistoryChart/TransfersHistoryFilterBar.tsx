@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, { useMemo, useCallback } from "react";
 import { Box, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
@@ -6,12 +6,14 @@ import ButtonGroup from "@/shared/components/ButtonGroup/ButtonGroup";
 import { Nullable } from "@/shared/utilities/nullable";
 import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
 import { BrokerAccountTransfersAvailableDatesEntity } from "@/models/brokers/BrokerAccountTransfersAvailableDatesEntity";
+import { formatShortMonth } from "@/shared/utilities/formatters/dateFormatter";
 import {
     AccountSelectOption,
     MONTH_RANGE,
     NumericOption,
     RangeType,
     TransfersHistoryFilterState,
+    TransfersRangeType,
     YEAR_RANGE
 } from "./types";
 
@@ -19,6 +21,7 @@ interface Props {
     brokerAccountId?: Nullable<string>;
     brokerAccounts?: BrokerAccountEntity[];
     availableDates: BrokerAccountTransfersAvailableDatesEntity | null;
+    currentFilter: TransfersHistoryFilterState;
     onFilterChange: (filter: TransfersHistoryFilterState) => void;
 }
 
@@ -26,6 +29,7 @@ const TransfersHistoryFilterBar: React.FC<Props> = ({
     brokerAccountId,
     brokerAccounts = [],
     availableDates,
+    currentFilter,
     onFilterChange
 }) => {
     const { t, i18n } = useTranslation();
@@ -38,22 +42,15 @@ const TransfersHistoryFilterBar: React.FC<Props> = ({
         [t]
     );
 
-    const [selectedAccountId, setSelectedAccountId] = useState<Nullable<string>>(null);
-    const [selectedRangeType, setSelectedRangeType] = useState<RangeType>(rangeTypes[0]);
-    const [selectedYear, setSelectedYear] = useState<NumericOption>({
-        label: new Date().getFullYear().toString(),
-        value: new Date().getFullYear()
-    });
-    const [selectedMonth, setSelectedMonth] = useState<NumericOption>({
-        label: new Date().toLocaleString(i18n.language, { month: "short" }),
-        value: new Date().getMonth() + 1
-    });
+    const selectedRangeType = useMemo(
+        () => rangeTypes.find((range) => range.value === currentFilter.rangeType) ?? rangeTypes[0],
+        [rangeTypes, currentFilter.rangeType]
+    );
 
     // Available years from database
     const yearsOptions: NumericOption[] = useMemo(() => {
         if (!availableDates?.availableYears?.length) {
-            const currentYear = new Date().getFullYear();
-            return [{ label: currentYear.toString(), value: currentYear }];
+            return [];
         }
         return availableDates.availableYears.map((year) => ({
             label: year.toString(),
@@ -63,108 +60,62 @@ const TransfersHistoryFilterBar: React.FC<Props> = ({
 
     // Available months for selected year from database
     const monthsOptions: NumericOption[] = useMemo(() => {
-        const availableMonths = availableDates?.availableMonthsByYear?.[selectedYear.value];
-        if (!availableMonths?.length) {
-            return Array.from({ length: 12 }, (_, monthIndex) => ({
-                label: new Date(0, monthIndex).toLocaleString(i18n.language, { month: "short" }),
-                value: monthIndex + 1
-            }));
-        }
+        const availableMonths = availableDates?.availableMonthsByYear?.[currentFilter.year] ?? [];
         return availableMonths.map((monthIndex) => ({
-            label: new Date(0, monthIndex - 1).toLocaleString(i18n.language, { month: "short" }),
+            label: formatShortMonth(monthIndex, i18n, currentFilter.year),
             value: monthIndex
         }));
-    }, [availableDates, selectedYear.value, i18n.language]);
+    }, [availableDates, currentFilter.year, i18n]);
 
-    // Initialize/sync default selections when available dates are loaded
-    useEffect(() => {
-        if (!availableDates?.availableYears?.length) {
-            return;
-        }
+    const selectedYear = useMemo(
+        () => yearsOptions.find((option) => option.value === currentFilter.year) ?? yearsOptions[0],
+        [yearsOptions, currentFilter.year]
+    );
 
-        const defaultYear = availableDates.availableYears[0];
-        const monthsForYear = availableDates.availableMonthsByYear[defaultYear] ?? [1];
-        const defaultMonth = monthsForYear[monthsForYear.length - 1] ?? 1;
-
-        const newYearOption: NumericOption = { label: defaultYear.toString(), value: defaultYear };
-        const newMonthOption: NumericOption = {
-            label: new Date(0, defaultMonth - 1).toLocaleString(i18n.language, { month: "short" }),
-            value: defaultMonth
-        };
-
-        setSelectedYear(newYearOption);
-        setSelectedMonth(newMonthOption);
-
-        onFilterChange({
-            rangeType: selectedRangeType,
-            year: defaultYear,
-            month: defaultMonth,
-            accountId: brokerAccountId ?? selectedAccountId
-        });
-    }, [availableDates, brokerAccountId, selectedAccountId, selectedRangeType, i18n.language, onFilterChange]);
+    const selectedMonth = useMemo(
+        () => monthsOptions.find((option) => option.value === currentFilter.month) ?? monthsOptions[0],
+        [monthsOptions, currentFilter.month]
+    );
 
     const handleAccountChange = useCallback(
         (option: Nullable<AccountSelectOption>) => {
             const newAccountId = option?.id ?? null;
-            setSelectedAccountId(newAccountId);
             onFilterChange({
-                rangeType: selectedRangeType,
-                year: selectedYear.value,
-                month: selectedMonth.value,
+                ...currentFilter,
                 accountId: newAccountId
             });
         },
-        [selectedRangeType, selectedYear.value, selectedMonth.value, onFilterChange]
+        [currentFilter, onFilterChange]
     );
 
     const handleRangeTypeChange = useCallback(
-        (rangeType: RangeType) => {
-            setSelectedRangeType(rangeType);
+        (rangeType: TransfersRangeType) => {
             onFilterChange({
-                rangeType,
-                year: selectedYear.value,
-                month: selectedMonth.value,
-                accountId: brokerAccountId ?? selectedAccountId
+                ...currentFilter,
+                rangeType
             });
         },
-        [brokerAccountId, selectedAccountId, selectedYear.value, selectedMonth.value, onFilterChange]
+        [currentFilter, onFilterChange]
     );
 
     const handleYearChange = useCallback(
         (yearOption: NumericOption) => {
-            setSelectedYear(yearOption);
-            const availableMonths = availableDates?.availableMonthsByYear?.[yearOption.value] ?? [];
-            let newMonthValue = selectedMonth.value;
-
-            if (availableMonths.length > 0) {
-                newMonthValue = availableMonths[availableMonths.length - 1];
-                setSelectedMonth({
-                    label: new Date(0, newMonthValue - 1).toLocaleString(i18n.language, { month: "short" }),
-                    value: newMonthValue
-                });
-            }
-
             onFilterChange({
-                rangeType: selectedRangeType,
-                year: yearOption.value,
-                month: newMonthValue,
-                accountId: brokerAccountId ?? selectedAccountId
+                ...currentFilter,
+                year: yearOption.value
             });
         },
-        [availableDates, selectedMonth.value, selectedRangeType, brokerAccountId, selectedAccountId, i18n.language, onFilterChange]
+        [currentFilter, onFilterChange]
     );
 
     const handleMonthChange = useCallback(
         (monthOption: NumericOption) => {
-            setSelectedMonth(monthOption);
             onFilterChange({
-                rangeType: selectedRangeType,
-                year: selectedYear.value,
-                month: monthOption.value,
-                accountId: brokerAccountId ?? selectedAccountId
+                ...currentFilter,
+                month: monthOption.value
             });
         },
-        [selectedRangeType, selectedYear.value, brokerAccountId, selectedAccountId, onFilterChange]
+        [currentFilter, onFilterChange]
     );
 
     // Broker account options for dropdown
@@ -176,8 +127,8 @@ const TransfersHistoryFilterBar: React.FC<Props> = ({
     }, [brokerAccounts, t]);
 
     const selectedAccountOption = useMemo(() => {
-        return brokerAccountOptions.find((option) => option.id === selectedAccountId) ?? brokerAccountOptions[0];
-    }, [brokerAccountOptions, selectedAccountId]);
+        return brokerAccountOptions.find((option) => option.id === currentFilter.accountId) ?? brokerAccountOptions[0];
+    }, [brokerAccountOptions, currentFilter.accountId]);
 
     return (
         <Flex
@@ -204,30 +155,29 @@ const TransfersHistoryFilterBar: React.FC<Props> = ({
                 </Box>
             )}
 
-            <ButtonGroup<string>
+            <ButtonGroup<TransfersRangeType>
                 options={rangeTypes.map((range) => ({ value: range.value, label: range.label }))}
                 value={selectedRangeType.value}
                 onChange={(selectedValue) => {
-                    const foundRange = rangeTypes.find((range) => range.value === selectedValue);
-                    if (foundRange) {
-                        handleRangeTypeChange(foundRange);
-                    }
+                    handleRangeTypeChange(selectedValue);
                 }}
                 size="sm"
             />
 
-            <Box minW="105px">
-                <BaseSelect
-                    placeholder={t("transfers_history_chart_range_year")}
-                    selectedValue={selectedYear}
-                    collection={yearsOptions}
-                    onSelected={(yearOption) => yearOption && handleYearChange(yearOption)}
-                    labelSelector={(yearOption) => yearOption.label}
-                    valueSelector={(yearOption) => yearOption.value}
-                />
-            </Box>
+            {yearsOptions.length > 0 && (
+                <Box minW="105px">
+                    <BaseSelect
+                        placeholder={t("transfers_history_chart_range_year")}
+                        selectedValue={selectedYear}
+                        collection={yearsOptions}
+                        onSelected={(yearOption) => yearOption && handleYearChange(yearOption)}
+                        labelSelector={(yearOption) => yearOption.label}
+                        valueSelector={(yearOption) => yearOption.value}
+                    />
+                </Box>
+            )}
 
-            {selectedRangeType.value === MONTH_RANGE && (
+            {currentFilter.rangeType === MONTH_RANGE && monthsOptions.length > 0 && (
                 <Box minW="115px">
                     <BaseSelect
                         placeholder={t("transfers_history_chart_range_month")}

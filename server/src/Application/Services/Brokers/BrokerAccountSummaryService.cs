@@ -404,15 +404,10 @@ namespace Audex.Application.Services.Brokers
 
             if (transfers.Count == 0)
             {
-                var currentYear = DateTime.UtcNow.Year;
-                var currentMonth = DateTime.UtcNow.Month;
                 return new BrokerAccountTransfersAvailableDatesDto
                 {
-                    AvailableYears = new List<int> { currentYear },
-                    AvailableMonthsByYear = new Dictionary<int, List<int>>
-                    {
-                        { currentYear, new List<int> { currentMonth } }
-                    }
+                    AvailableYears = new List<int>(),
+                    AvailableMonthsByYear = new Dictionary<int, List<int>>()
                 };
             }
 

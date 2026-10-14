@@ -7,7 +7,9 @@ export const useSignalR = <TPayload = unknown>(
     handler: (payload: TPayload) => Promise<void> | void
 ): void => {
     const handlerRef = useRef(handler);
-    handlerRef.current = handler;
+    useEffect(() => {
+        handlerRef.current = handler;
+    });
 
     useEffect(() => {
         const handleEvent = (payload: TPayload) => {

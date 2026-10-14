@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Box, Flex, Image } from '@chakra-ui/react';
 import { LuImage } from 'react-icons/lu';
 import { Nullable } from '@/shared/utilities/nullable';
@@ -39,11 +39,8 @@ export const StoredIcon: React.FC<StoredIconProps> = ({
     color = 'text_primary',
     border
 }) => {
-    const [hasError, setHasError] = useState(false);
-
-    useEffect(() => {
-        setHasError(false);
-    }, [src]);
+    const [failedSrc, setFailedSrc] = useState<string | null>(null);
+    const hasError = Boolean(src && failedSrc === src);
 
     const { dimensionStyle, iconPixelSize, roundedStyle } = useMemo(() => {
         if (typeof size === 'number') {
@@ -109,7 +106,11 @@ export const StoredIcon: React.FC<StoredIconProps> = ({
                 w="100%"
                 h="100%"
                 borderRadius={roundedStyle}
-                onError={() => setHasError(true)}
+                onError={() => {
+                    if (src) {
+                        setFailedSrc(src);
+                    }
+                }}
             />
         </Box>
     );

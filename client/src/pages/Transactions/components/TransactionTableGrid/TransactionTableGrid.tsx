@@ -1,29 +1,20 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback } from 'react';
 import { Box, Table } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { TransactionEntity } from '@/models/transactions/TransactionEntity';
-import { AccountEntity } from '@/models/accounts/AccountEntity';
-import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEntity';
 import { generateGuid } from '@/shared/utilities/idUtilities';
-import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import { findEntityById } from '@/shared/utilities/arrayUtilities';
+import { useEditableGrid } from '@/shared/hooks/useEditableGrid';
+import { TransactionTableGridProps } from './types';
 import {
-    CommitDiffPayload,
-    hasOutOfPeriodTransactions,
-    RowDiff,
-    TransactionsListHeaderProps,
-} from './types';
-import {
-    OutOfMonthWarningModal,
     TransactionTableActionBar,
     TransactionTableRow,
 } from './components';
 
-export const TransactionTableGrid: React.FC<TransactionsListHeaderProps> = ({
+export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
     transactions,
     accounts,
     transactionTypes,
-    selectedMonth,
-    selectedYear,
     selectedAccountId,
     onCommitDiff,
     onRefresh,
@@ -32,169 +23,63 @@ export const TransactionTableGrid: React.FC<TransactionsListHeaderProps> = ({
 }) => {
     const { t } = useTranslation();
 
-    // Working copies for table editing
-    const [rows, setRows] = useState<TransactionEntity[]>([]);
-    const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
-    const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
-    const [isSaving, setIsSaving] = useState(false);
+    const createTransactionRow = useCallback((): TransactionEntity | null => {
+        const defaultAccount = findEntityById(accounts, selectedAccountId, accounts[0]);
+        const defaultType = transactionTypes[0];
 
-    const [modifiedMap, setModifiedMap] = useState<Map<string, { row: TransactionEntity; diff: RowDiff }>>(new Map());
-
-    const warningModalRef = useRef<BaseModalRef>(null);
-    const [pendingDiff, setPendingDiff] = useState<CommitDiffPayload | null>(null);
-
-    const originalMap = useMemo(() => {
-        const map = new Map<string, TransactionEntity>();
-        transactions.forEach((t) => map.set(t.id, { ...t, date: new Date(t.date) }));
-        return map;
-    }, [transactions]);
-
-    // Reset all changes back to original
-    const handleResetAll = useCallback(() => {
-        setRows(transactions.map((t) => ({ ...t, date: new Date(t.date) })));
-        setAddedIds(new Set());
-        setDeletedIds(new Set());
-        setModifiedMap(new Map());
-    }, [transactions]);
-
-    useEffect(() => {
-        handleResetAll();
-    }, [handleResetAll]);
-
-    // Triggered when row values change and differ from original
-    const handleRowChange = useCallback((id: string, updatedRow: TransactionEntity, diff: RowDiff) => {
-        setRows((prev) => prev.map((r) => (r.id === id ? updatedRow : r)));
-        if (!addedIds.has(id)) {
-            setModifiedMap((prev) => new Map(prev).set(id, { row: updatedRow, diff }));
-        }
-    }, [addedIds]);
-
-    // Triggered when row values are reverted back to match original
-    const handleRowRevert = useCallback((id: string) => {
-        if (addedIds.has(id)) {
-            setRows((prevRows) => prevRows.filter((r) => r.id !== id));
-            setAddedIds((prev) => {
-                const next = new Set(prev);
-                next.delete(id);
-                return next;
-            });
-            return;
+        if (!defaultAccount || !defaultType) {
+            return null;
         }
 
-        const orig = originalMap.get(id);
-        if (orig) {
-            setRows((prevRows) =>
-                prevRows.map((r) => (r.id === id ? { ...orig, date: new Date(orig.date) } : r))
-            );
-        }
-
-        setModifiedMap((prev) => {
-            if (!prev.has(id)) return prev;
-            const next = new Map(prev);
-            next.delete(id);
-            return next;
-        });
-
-        setDeletedIds((prev) => {
-            if (!prev.has(id)) return prev;
-            const next = new Set(prev);
-            next.delete(id);
-            return next;
-        });
-    }, [addedIds, originalMap]);
-
-    // Add clean empty row
-    const handleAddRow = useCallback(() => {
-        const newId = generateGuid();
-        const foundAcc = selectedAccountId ? accounts.find((a) => a.id === selectedAccountId) : null;
-        const defaultAcc = foundAcc ?? accounts[0] ?? ({ id: '', name: '' } as AccountEntity);
-        const defaultType = transactionTypes[0] ?? ({ id: '', name: '' } as TransactionTypeEntity);
-
-        const newRow: TransactionEntity = {
-            id: newId,
+        return {
+            id: generateGuid(),
             name: '',
             amount: -100,
             cashback: 0,
             date: new Date(),
-            account: defaultAcc,
+            account: defaultAccount,
             transactionType: defaultType,
             isSystem: false,
         };
-
-        setRows((prev) => [newRow, ...prev]);
-        setAddedIds((prev) => new Set(prev).add(newId));
     }, [accounts, selectedAccountId, transactionTypes]);
 
-    // Duplicate row
-    const handleDuplicateRow = useCallback((sourceRow: TransactionEntity) => {
-        const newId = generateGuid();
-        const copyRow: TransactionEntity = {
+    const cloneTransactionRow = useCallback(
+        (sourceRow: TransactionEntity): TransactionEntity => ({
             ...sourceRow,
-            id: newId,
+            id: generateGuid(),
             date: new Date(sourceRow.date),
-        };
+        }),
+        []
+    );
 
-        setRows((prev) => [copyRow, ...prev]);
-        setAddedIds((prev) => new Set(prev).add(newId));
-    }, []);
+    const {
+        rows,
+        isSaving,
+        hasChanges,
+        modifiedCount,
+        addedCount,
+        deletedCount,
+        commit,
+        handleRowChange,
+        handleRowRevert,
+        handleAddRow,
+        handleDuplicateRow,
+        handleDeleteRow,
+        handleResetAll,
+    } = useEditableGrid<TransactionEntity>({
+        items: transactions,
+        createRow: createTransactionRow,
+        cloneRow: cloneTransactionRow,
+        onCommit: onCommitDiff,
+    });
 
-    // Delete row (mark existing for deletion or remove added row)
-    const handleDeleteRow = useCallback((id: string) => {
-        if (addedIds.has(id)) {
-            setRows((prevRows) => prevRows.filter((r) => r.id !== id));
-            setAddedIds((prev) => {
-                const next = new Set(prev);
-                next.delete(id);
-                return next;
-            });
+    const handleCommit = useCallback(async () => {
+        if (!hasChanges) {
             return;
         }
 
-        setDeletedIds((prev) => new Set(prev).add(id));
-    }, [addedIds]);
-
-
-    const modifiedCount = modifiedMap.size;
-    const addedCount = addedIds.size;
-    const deletedCount = deletedIds.size;
-    const hasChanges = modifiedCount > 0 || addedCount > 0 || deletedCount > 0;
-
-    const executeCommit = async (diffToCommit: CommitDiffPayload) => {
-        setIsSaving(true);
-        try {
-            await onCommitDiff(diffToCommit);
-            warningModalRef.current?.closeModal();
-            setPendingDiff(null);
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    // Commit diff
-    const handleCommit = async () => {
-        if (!hasChanges) return;
-
-        const addedList = rows.filter((r) => addedIds.has(r.id));
-
-        const updatedList = Array.from(modifiedMap.values())
-            .filter((v) => !deletedIds.has(v.row.id))
-            .map((v) => v.row);
-
-        const diff: CommitDiffPayload = {
-            added: addedList,
-            updated: updatedList,
-            deletedIds: Array.from(deletedIds),
-        };
-
-        // Check if any added/updated transaction has a date outside selectedMonth/selectedYear
-        if (hasOutOfPeriodTransactions(diff, selectedMonth, selectedYear)) {
-            setPendingDiff(diff);
-            warningModalRef.current?.openModal();
-            return;
-        }
-
-        await executeCommit(diff);
-    };
+        await commit();
+    }, [hasChanges, commit]);
 
     return (
         <Box>
@@ -250,13 +135,13 @@ export const TransactionTableGrid: React.FC<TransactionsListHeaderProps> = ({
                     </Table.Header>
 
                     <Table.Body>
-                        {rows.map((row) => (
+                        {rows.map(({ row, original, isAdded, isDeleted }) => (
                             <TransactionTableRow
                                 key={row.id}
                                 row={row}
-                                original={originalMap.get(row.id)}
-                                isAdded={addedIds.has(row.id)}
-                                isDeleted={deletedIds.has(row.id)}
+                                original={original}
+                                isAdded={isAdded}
+                                isDeleted={isDeleted}
                                 accounts={accounts}
                                 transactionTypes={transactionTypes}
                                 onRowChange={handleRowChange}
@@ -268,16 +153,6 @@ export const TransactionTableGrid: React.FC<TransactionsListHeaderProps> = ({
                     </Table.Body>
                 </Table.Root>
             </Box>
-
-            {/* Out of Month Warning Modal */}
-            <OutOfMonthWarningModal
-                ref={warningModalRef}
-                diff={pendingDiff}
-                selectedMonth={selectedMonth}
-                selectedYear={selectedYear}
-                isSaving={isSaving}
-                onConfirm={() => pendingDiff && executeCommit(pendingDiff)}
-            />
         </Box>
     );
 };

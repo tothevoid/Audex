@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import {
     Box,
     Button,
@@ -46,14 +46,7 @@ export const StatementAnalysisResultStep: React.FC<Props> = ({
     const [applyFeedback, setApplyFeedback] = useState<string | null>(null);
     const [applyError, setApplyError] = useState<string | null>(null);
 
-    // Reset state when a new analysis result arrives (new session)
-    useEffect(() => {
-        setSelectedDiffIds(new Set());
-        setActiveFilter("all");
-        setApplyFeedback(null);
-        setApplyError(null);
-        setIsSessionExpired(false);
-    }, [analysisResult.sessionId]);
+
 
     const handleApplyClicked = async () => {
         if (selectedDiffIds.size === 0) return;

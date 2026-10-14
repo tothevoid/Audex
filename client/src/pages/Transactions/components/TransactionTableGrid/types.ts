@@ -5,6 +5,7 @@ import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
 import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
 import { i18n as I18nType } from 'i18next';
 import { ViewDisplayMode } from '@/pages/Transactions/components/TransactionFilterBar/TransactionFilterBar';
+import { EditableGridDiff } from '@/shared/hooks/useEditableGrid';
 
 export interface FieldDiff {
     isModified: boolean;
@@ -60,32 +61,24 @@ export const computeRowDiff = (
     };
 };
 
-export interface CommitDiffPayload {
-    added: TransactionEntity[];
-    updated: TransactionEntity[];
-    deletedIds: string[];
-}
-
 export interface OutOfMonthItem {
     name: string;
     dateStr: string;
 }
 
-export interface TransactionsListHeaderProps {
+export interface TransactionTableGridProps {
     transactions: TransactionEntity[];
     accounts: AccountEntity[];
     transactionTypes: TransactionTypeEntity[];
-    selectedMonth?: number;
-    selectedYear?: number;
     selectedAccountId?: string;
-    onCommitDiff: (diff: CommitDiffPayload) => Promise<void>;
+    onCommitDiff: (diff: EditableGridDiff<TransactionEntity>) => Promise<void>;
     onRefresh: () => void;
     viewDisplayMode: ViewDisplayMode;
     onViewDisplayModeChange: (mode: ViewDisplayMode) => void;
 }
 
 export const hasOutOfPeriodTransactions = (
-    diff: CommitDiffPayload,
+    diff: EditableGridDiff<TransactionEntity>,
     month?: number,
     year?: number
 ): boolean => {
@@ -95,6 +88,4 @@ export const hasOutOfPeriodTransactions = (
         return d.getMonth() + 1 !== month || d.getFullYear() !== year;
     });
 };
-
-export type TransactionTableGridProps = TransactionsListHeaderProps;
 

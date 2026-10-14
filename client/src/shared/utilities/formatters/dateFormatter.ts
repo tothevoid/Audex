@@ -76,6 +76,11 @@ export const formatMonth = (month: number, format: i18n): string => {
 	return date.toLocaleString(format.language, { month: 'long' });
 };
 
+export const formatShortMonth = (month: number, format: i18n, year?: number): string => {
+	const targetYear = year ?? new Date().getFullYear();
+	return new Date(targetYear, month - 1, 1).toLocaleString(format.language, { month: 'short' });
+};
+
 export type ChartPeriod = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "5Y" | "10Y";
 
 export const formatChartAxisDate = (date: Date, period: ChartPeriod, format: i18n): string => {

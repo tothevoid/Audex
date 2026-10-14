@@ -4,10 +4,12 @@ import { useTranslation } from 'react-i18next';
 import BaseModal from '@/shared/modals/BaseModal/BaseModal';
 import { BaseModalRef } from '@/shared/utilities/modalUtilities';
 import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
-import { CommitDiffPayload, OutOfMonthItem } from '@/pages/Transactions/components/TransactionTableGrid/types';
+import { EditableGridDiff } from '@/shared/hooks/useEditableGrid';
+import { TransactionEntity } from '@/models/transactions/TransactionEntity';
+import { OutOfMonthItem } from '@/pages/Transactions/components/TransactionTableGrid/types';
 
 interface OutOfMonthWarningModalProps {
-    diff: CommitDiffPayload | null;
+    diff: EditableGridDiff<TransactionEntity> | null;
     selectedMonth?: number;
     selectedYear?: number;
     isSaving: boolean;

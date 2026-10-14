@@ -106,6 +106,7 @@ export const BrokerStatementImportModal = forwardRef<BaseModalRef, Props>(
                             )}
                             {step === 2 && analysisResult && (
                                 <StatementAnalysisResultStep
+                                    key={analysisResult.sessionId}
                                     analysisResult={analysisResult}
                                     onImportSuccess={onImportSuccess}
                                     onReanalyzeRequested={handleReanalyzeRequested}
