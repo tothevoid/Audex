@@ -36,7 +36,7 @@ namespace Audex.Application.Services.Dashboard
         private readonly IUserProfileService _userProfile;
         private readonly ICryptoAccountService _cryptoAccountService;
         private readonly ICurrencyService _currencyService;
-        private readonly ICryptoAccountCryptocurrencyService _cryptoAccountCryptocurrencyService;
+        private readonly ICryptoAssetService _cryptoAssetService;
         private readonly IBankService _bankService;
         private readonly IBrokerAccountSummaryService _brokerAccountSummaryService;
 
@@ -44,7 +44,7 @@ namespace Audex.Application.Services.Dashboard
             IDepositService depositService, ITransactionsService transactionsService,
             IBrokerAccountService brokerAccountService, IDebtService debtService, 
             IUserProfileService userProfile, ICryptoAccountService cryptoAccountService, 
-            ICurrencyService currencyService, ICryptoAccountCryptocurrencyService cryptoAccountCryptocurrencyService,
+            ICurrencyService currencyService, ICryptoAssetService cryptoAssetService,
             IBankService bankService, IBrokerAccountSummaryService brokerAccountSummaryService)
         {
             _db = uow;
@@ -56,7 +56,7 @@ namespace Audex.Application.Services.Dashboard
             _userProfile = userProfile;
             _cryptoAccountService = cryptoAccountService;
             _currencyService = currencyService;
-            _cryptoAccountCryptocurrencyService = cryptoAccountCryptocurrencyService;
+            _cryptoAssetService = cryptoAssetService;
             _bankService = bankService;
             _brokerAccountSummaryService = brokerAccountSummaryService;
         }
@@ -353,7 +353,7 @@ namespace Audex.Application.Services.Dashboard
 
             foreach (var cryptoAccount in cryptoAccounts)
             {
-                var amount = await _cryptoAccountCryptocurrencyService
+                var amount = await _cryptoAssetService
                     .GetTotalBalanceByCryptoAccountAsync(cryptoAccount.Id);
 
                 if (amount <= 0)

@@ -118,9 +118,9 @@ namespace Audex.Application.Mappings
         public partial DividendPaymentDto Map(DividendPayment entity);
         public partial IEnumerable<DividendPaymentDto> Map(IEnumerable<DividendPayment> entities);
 
-        public partial CryptoAccountCryptocurrency Map(CryptoAccountCryptocurrencyDto dto);
-        public partial CryptoAccountCryptocurrencyDto Map(CryptoAccountCryptocurrency entity);
-        public partial IEnumerable<CryptoAccountCryptocurrencyDto> Map(IEnumerable<CryptoAccountCryptocurrency> entities);
+        public partial CryptoAsset Map(CryptoAssetDto dto);
+        public partial CryptoAssetDto Map(CryptoAsset entity);
+        public partial IEnumerable<CryptoAssetDto> Map(IEnumerable<CryptoAsset> entities);
 
         public partial CryptoAccount Map(CryptoAccountDto dto);
         public partial CryptoAccountDto Map(CryptoAccount entity);

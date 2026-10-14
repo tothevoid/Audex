@@ -17,7 +17,7 @@ namespace Audex.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.10")
+                .HasAnnotation("ProductVersion", "10.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -316,7 +316,7 @@ namespace Audex.Infrastructure.Migrations
                     b.ToTable("CryptoAccount");
                 });
 
-            modelBuilder.Entity("Audex.Infrastructure.Entities.Crypto.CryptoAccountCryptocurrency", b =>
+            modelBuilder.Entity("Audex.Infrastructure.Entities.Crypto.CryptoAsset", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -337,7 +337,7 @@ namespace Audex.Infrastructure.Migrations
 
                     b.HasIndex("CryptocurrencyId");
 
-                    b.ToTable("CryptoAccountCryptocurrency");
+                    b.ToTable("CryptoAsset");
                 });
 
             modelBuilder.Entity("Audex.Infrastructure.Entities.Crypto.CryptoProvider", b =>
@@ -1348,16 +1348,16 @@ namespace Audex.Infrastructure.Migrations
                     b.Navigation("CryptoProvider");
                 });
 
-            modelBuilder.Entity("Audex.Infrastructure.Entities.Crypto.CryptoAccountCryptocurrency", b =>
+            modelBuilder.Entity("Audex.Infrastructure.Entities.Crypto.CryptoAsset", b =>
                 {
                     b.HasOne("Audex.Infrastructure.Entities.Crypto.CryptoAccount", "CryptoAccount")
-                        .WithMany("CryptoAccountCryptocurrencies")
+                        .WithMany("CryptoAssets")
                         .HasForeignKey("CryptoAccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Audex.Infrastructure.Entities.Crypto.Cryptocurrency", "Cryptocurrency")
-                        .WithMany("CryptoAccountCryptocurrencies")
+                        .WithMany("CryptoAssets")
                         .HasForeignKey("CryptocurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1645,7 +1645,7 @@ namespace Audex.Infrastructure.Migrations
 
             modelBuilder.Entity("Audex.Infrastructure.Entities.Crypto.CryptoAccount", b =>
                 {
-                    b.Navigation("CryptoAccountCryptocurrencies");
+                    b.Navigation("CryptoAssets");
                 });
 
             modelBuilder.Entity("Audex.Infrastructure.Entities.Crypto.CryptoProvider", b =>
@@ -1655,7 +1655,7 @@ namespace Audex.Infrastructure.Migrations
 
             modelBuilder.Entity("Audex.Infrastructure.Entities.Crypto.Cryptocurrency", b =>
                 {
-                    b.Navigation("CryptoAccountCryptocurrencies");
+                    b.Navigation("CryptoAssets");
                 });
 
             modelBuilder.Entity("Audex.Infrastructure.Entities.Currencies.Currency", b =>

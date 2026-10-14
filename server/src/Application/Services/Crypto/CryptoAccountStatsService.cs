@@ -10,14 +10,14 @@ namespace Audex.Application.Services.Crypto
 {
     public class CryptoAccountStatsService : ICryptoAccountStatsService
     {
-        private readonly ICryptoAccountCryptocurrencyService _cryptoAccountCryptocurrencyService;
+        private readonly ICryptoAssetService _cryptoAssetService;
         private readonly ICryptocurrencyService _cryptocurrencyService;
 
         public CryptoAccountStatsService(
-            ICryptoAccountCryptocurrencyService cryptoAccountCryptocurrencyService,
+            ICryptoAssetService cryptoAssetService,
             ICryptocurrencyService cryptocurrencyService)
         {
-            _cryptoAccountCryptocurrencyService = cryptoAccountCryptocurrencyService;
+            _cryptoAssetService = cryptoAssetService;
             _cryptocurrencyService = cryptocurrencyService;
         }
 
@@ -30,8 +30,8 @@ namespace Audex.Application.Services.Crypto
         private async Task<CryptoAccountStatsDto> BuildStatsAsync(Guid? cryptoAccountId)
         {
             var items = (cryptoAccountId.HasValue
-                ? await _cryptoAccountCryptocurrencyService.GetByCryptoAccountAsync(cryptoAccountId.Value)
-                : await _cryptoAccountCryptocurrencyService.GetAllAsync()).ToList();
+                ? await _cryptoAssetService.GetByCryptoAccountAsync(cryptoAccountId.Value)
+                : await _cryptoAssetService.GetAllAsync()).ToList();
 
             if (items.Count == 0)
             {
@@ -48,8 +48,8 @@ namespace Audex.Application.Services.Crypto
 
             var cryptoDistribution = CalculateDistribution(
                 items,
-                c => c.Cryptocurrency,
-                c => $"{c.Name} ({c.Symbol})",
+                asset => asset.Cryptocurrency,
+                cryptocurrency => $"{cryptocurrency.Name} ({cryptocurrency.Symbol})",
                 baseRate,
                 baseCurrencyCode);
 
@@ -59,8 +59,8 @@ namespace Audex.Application.Services.Crypto
             {
                 accountsDistribution = CalculateDistribution(
                     items,
-                    c => c.CryptoAccount,
-                    a => a.Name,
+                    asset => asset.CryptoAccount,
+                    account => account.Name,
                     baseRate,
                     baseCurrencyCode);
             }
@@ -73,26 +73,26 @@ namespace Audex.Application.Services.Crypto
         }
 
         private static List<DistributionDto> CalculateDistribution<TKey>(
-            IEnumerable<CryptoAccountCryptocurrencyDto> items,
-            Func<CryptoAccountCryptocurrencyDto, TKey> keySelector,
+            IEnumerable<CryptoAssetDto> items,
+            Func<CryptoAssetDto, TKey> keySelector,
             Func<TKey, string> nameSelector,
             decimal baseRate,
             string baseCurrencyCode)
         {
             return items
                 .GroupBy(keySelector)
-                .Select(g =>
+                .Select(group =>
                 {
-                    var amount = g.Sum(c => c.Quantity * c.Cryptocurrency.Price);
+                    var amount = group.Sum(asset => asset.Quantity * asset.Cryptocurrency.Price);
                     return new DistributionDto
                     {
-                        Name = nameSelector(g.Key),
+                        Name = nameSelector(group.Key),
                         Currency = baseCurrencyCode,
                         Amount = amount,
                         ConvertedAmount = amount * baseRate
                     };
                 })
-                .OrderByDescending(d => d.Amount)
+                .OrderByDescending(distribution => distribution.Amount)
                 .ToList();
         }
     }

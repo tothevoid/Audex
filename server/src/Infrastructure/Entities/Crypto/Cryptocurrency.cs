@@ -1,22 +1,18 @@
-﻿using Audex.Shared.Entities;
-using System;
+using Audex.Shared.Entities;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Audex.Infrastructure.Entities.Crypto
 {
-    public class Cryptocurrency: BaseEntity
+    public class Cryptocurrency : BaseEntity
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
-        public string Symbol { get; set; }
+        public string Symbol { get; set; } = string.Empty;
 
-        public decimal Price { get; set; } 
+        public decimal Price { get; set; }
 
-        public string IconKey { get; set; }
+        public string IconKey { get; set; } = string.Empty;
 
-        public ICollection<CryptoAccountCryptocurrency> CryptoAccountCryptocurrencies { get; set; }
+        public ICollection<CryptoAsset> CryptoAssets { get; set; } = [];
     }
 }

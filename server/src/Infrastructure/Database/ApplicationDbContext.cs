@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Audex.Infrastructure.Configurations.Accounts;
 using Audex.Infrastructure.Configurations.Banks;
 using Audex.Infrastructure.Configurations.Brokers;
+using Audex.Infrastructure.Configurations.Crypto;
 using Audex.Infrastructure.Configurations.Currencies;
 using Audex.Infrastructure.Configurations.Debts;
 using Audex.Infrastructure.Configurations.Deposits;
@@ -60,7 +61,7 @@ namespace Audex.Infrastructure.Database
             modelBuilder.ApplyConfiguration(new DividendPaymentConfiguration());
 
             modelBuilder.ApplyConfiguration(new CryptoAccountConfiguration());
-            modelBuilder.ApplyConfiguration(new CryptoAccountCryptocurrencyConfiguration());
+            modelBuilder.ApplyConfiguration(new CryptoAssetConfiguration());
             modelBuilder.ApplyConfiguration(new CryptocurrencyConfiguration());
             modelBuilder.ApplyConfiguration(new CryptoProviderConfiguration());
             

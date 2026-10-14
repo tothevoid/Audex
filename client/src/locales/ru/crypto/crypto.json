@@ -49,10 +49,10 @@
     "crypto_toast_deleted_title": "Криптовалюта удалена",
     "crypto_toast_deleted_desc": "Криптовалюта «{{name}}» удалена",
 
-    "crypto_position_toast_created_title": "Позиция добавлена",
-    "crypto_position_toast_created_desc": "Криптовалюта «{{name}}» добавлена на счёт",
-    "crypto_position_toast_updated_title": "Позиция обновлена",
-    "crypto_position_toast_updated_desc": "Позиция «{{name}}» успешно обновлена",
-    "crypto_position_toast_deleted_title": "Позиция удалена",
-    "crypto_position_toast_deleted_desc": "Криптовалюта «{{name}}» удалена со счёта"
+    "crypto_asset_toast_created_title": "Криптоактив добавлен",
+    "crypto_asset_toast_created_desc": "Криптоактив «{{name}}» добавлен на счёт",
+    "crypto_asset_toast_updated_title": "Криптоактив обновлен",
+    "crypto_asset_toast_updated_desc": "Криптоактив «{{name}}» успешно обновлен",
+    "crypto_asset_toast_deleted_title": "Криптоактив удален",
+    "crypto_asset_toast_deleted_desc": "Криптоактив «{{name}}» удален со счёта"
 }

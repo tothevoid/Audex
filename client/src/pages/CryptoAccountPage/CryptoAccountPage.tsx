@@ -2,12 +2,12 @@ import { Fragment, useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { CryptoAccountEntity } from "@/models/crypto/CryptoAccountEntity";
 import { getCryptoAccountById } from "@/api/crypto/cryptoAccountApi";
-import CryptoAccountCryptocurrenciesList from "./components/CryptoAccountCryptocurrenciesList/CryptoAccountCryptocurrenciesList";
+import CryptoAssetsList from "./components/CryptoAssetsList/CryptoAssetsList";
 import CryptoAccountTabs from "./components/CryptoAccountTabs/CryptoAccountTabs";
 
 interface State {
-    cryptoAccount: CryptoAccountEntity | null,
-    isReloading: boolean
+    cryptoAccount: CryptoAccountEntity | null;
+    isReloading: boolean;
 }
 
 const CryptoAccountPage: React.FC = () => {
@@ -33,7 +33,7 @@ const CryptoAccountPage: React.FC = () => {
 
     const handleDataChanged = useCallback(async () => {
         await fetchCryptoAccount();
-        setDataVersion((v) => v + 1);
+        setDataVersion((previousVersion) => previousVersion + 1);
     }, [fetchCryptoAccount]);
 
     useEffect(() => {
@@ -66,7 +66,7 @@ const CryptoAccountPage: React.FC = () => {
 
     return (
         <Fragment>
-            <CryptoAccountCryptocurrenciesList
+            <CryptoAssetsList
                 cryptoAccount={state.cryptoAccount}
                 onDataChanged={handleDataChanged}
             />

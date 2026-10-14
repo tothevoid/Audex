@@ -7,8 +7,8 @@ import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSel
 import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
-import { CryptoAccountCryptocurrencyEntity } from "@/models/crypto/CryptoAccountCryptocurrencyEntity";
-import { CryptoAccountCryptocurrencyFormInput, getCryptoAccountCryptocurrencyValidationSchema } from "./CryptoAccountCryptocurrencyValidationSchema";
+import { CryptoAssetEntity } from "@/models/crypto/CryptoAssetEntity";
+import { CryptoAssetFormInput, getCryptoAssetValidationSchema } from "./CryptoAssetValidationSchema";
 import { getCryptocurrencies } from "@/api/crypto/cryptocurrencyApi";
 import { CryptocurrencyEntity } from "@/models/crypto/CryptocurrencyEntity";
 import { CryptoAccountEntity } from "@/models/crypto/CryptoAccountEntity";
@@ -17,19 +17,19 @@ import { findEntityById } from "@/shared/utilities/arrayUtilities";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>;
-    cryptoAccountCryptocurrency?: CryptoAccountCryptocurrencyEntity | null;
+    cryptoAsset?: CryptoAssetEntity | null;
     cryptoAccount: CryptoAccountEntity;
     existingCryptocurrencyIds?: string[];
-    onSaved: (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => void;
+    onSaved: (cryptoAsset: CryptoAssetEntity) => void;
 }
 
 interface State {
-    cryptocurrencies: CryptocurrencyEntity[]
+    cryptocurrencies: CryptocurrencyEntity[];
 }
 
-const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = ({
+const CryptoAssetModal: React.FC<ModalProps> = ({
     modalRef,
-    cryptoAccountCryptocurrency,
+    cryptoAsset,
     cryptoAccount,
     existingCryptocurrencyIds,
     onSaved
@@ -38,14 +38,14 @@ const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = ({
    
     const getDefaultValues = useCallback(() => {
         return {
-            id: cryptoAccountCryptocurrency?.id ?? generateGuid(),
-            cryptocurrency: cryptoAccountCryptocurrency?.cryptocurrency,
-            cryptoAccount: cryptoAccountCryptocurrency?.cryptoAccount ?? cryptoAccount,
-            quantity: cryptoAccountCryptocurrency?.quantity ?? 0
+            id: cryptoAsset?.id ?? generateGuid(),
+            cryptocurrency: cryptoAsset?.cryptocurrency,
+            cryptoAccount: cryptoAsset?.cryptoAccount ?? cryptoAccount,
+            quantity: cryptoAsset?.quantity ?? 0
         };
-    }, [cryptoAccountCryptocurrency, cryptoAccount]);
+    }, [cryptoAsset, cryptoAccount]);
 
-    const [state, setState] = useState<State>({ cryptocurrencies: []});
+    const [state, setState] = useState<State>({ cryptocurrencies: [] });
    
     useEffect(() => {
         let isMounted = true;
@@ -63,9 +63,9 @@ const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = ({
         };
     }, []);
 
-    const validationSchema = useMemo(() => getCryptoAccountCryptocurrencyValidationSchema(t), [t]);
+    const validationSchema = useMemo(() => getCryptoAssetValidationSchema(t), [t]);
 
-    const { handleSubmit, formState: { errors }, reset, control } = useForm<CryptoAccountCryptocurrencyFormInput>({
+    const { handleSubmit, formState: { errors }, reset, control } = useForm<CryptoAssetFormInput>({
         resolver: zodResolver(validationSchema),
         mode: "onBlur",
         defaultValues: getDefaultValues()
@@ -73,20 +73,20 @@ const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = ({
 
     useEffect(() => {
         reset(getDefaultValues());
-    }, [cryptoAccountCryptocurrency, reset, getDefaultValues]);
+    }, [cryptoAsset, reset, getDefaultValues]);
 
     const availableCryptocurrencies = useMemo(() => {
-        const currentId = cryptoAccountCryptocurrency?.cryptocurrency?.id;
+        const currentId = cryptoAsset?.cryptocurrency?.id;
         const existingIds = existingCryptocurrencyIds ?? [];
         return state.cryptocurrencies.filter(item => item.id === currentId || !existingIds.includes(item.id));
-    }, [state.cryptocurrencies, cryptoAccountCryptocurrency, existingCryptocurrencyIds]);
+    }, [state.cryptocurrencies, cryptoAsset, existingCryptocurrencyIds]);
 
     const selectedCrypto = useWatch({ control, name: "cryptocurrency" });
     const selectedCryptoEntity = findEntityById(state.cryptocurrencies, selectedCrypto?.id);
     const cryptoSymbol = selectedCryptoEntity?.symbol ?? '';
 
-    const onSubmit = (formData: CryptoAccountCryptocurrencyFormInput) => {
-        onSaved(formData as CryptoAccountCryptocurrencyEntity);
+    const onSubmit = (formData: CryptoAssetFormInput) => {
+        onSaved(formData as CryptoAssetEntity);
         modalRef.current?.closeModal();
     };
 
@@ -95,10 +95,10 @@ const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = ({
     };
 
     return (
-        <BaseFormModal ref={modalRef} title={t("crypto_account_cryptocurrency_modal_title")} submitHandler={handleFormSubmit}>
+        <BaseFormModal ref={modalRef} title={t("crypto_asset_modal_title", t("crypto_account_cryptocurrency_modal_title"))} submitHandler={handleFormSubmit}>
             <Stack>
                 <Field.Root mt={4} invalid={!!errors.cryptocurrency}>
-                    <Field.Label>{t("crypto_account_cryptocurrency_cryptocurrency")}</Field.Label>
+                    <Field.Label>{t("crypto_asset_cryptocurrency", t("crypto_account_cryptocurrency_cryptocurrency"))}</Field.Label>
                     <CollectionSelect name="cryptocurrency" control={control} placeholder="Select cryptocurrency"
                         collection={availableCryptocurrencies} 
                         labelSelector={(cryptocurrency: CryptocurrencyEntity) => `${cryptocurrency.name} (${cryptocurrency.symbol})`} 
@@ -106,7 +106,7 @@ const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = ({
                     <Field.ErrorText>{errors.cryptocurrency?.message}</Field.ErrorText>
                 </Field.Root>
                 <Field.Root invalid={!!errors.quantity} mt={4}>
-                    <Field.Label>{t("crypto_account_cryptocurrency_quantity")}</Field.Label>
+                    <Field.Label>{t("crypto_asset_quantity", t("crypto_account_cryptocurrency_quantity"))}</Field.Label>
                     <MoneyInput name="quantity" control={control} currency={cryptoSymbol} decimalScale={8} showWordsHelper={false} placeholder='1.00' />
                     <Field.ErrorText>{errors.quantity?.message}</Field.ErrorText>
                 </Field.Root>
@@ -115,4 +115,4 @@ const CryptoAccountCryptocurrencyModal: React.FC<ModalProps> = ({
     );
 };
 
-export default CryptoAccountCryptocurrencyModal;
+export default CryptoAssetModal;

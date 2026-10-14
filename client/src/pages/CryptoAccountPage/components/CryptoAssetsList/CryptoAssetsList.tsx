@@ -1,17 +1,16 @@
 import React, { Fragment, useMemo } from 'react';
 import { SimpleGrid } from '@chakra-ui/react';
-import { useCryptoAccountCryptocurrencies } from '@/pages/CryptoAccountPage/hooks/useCryptoAccountCryptocurrencies';
+import { useCryptoAssets } from '@/pages/CryptoAccountPage/hooks/useCryptoAssets';
 import { CryptoAccountEntity } from '@/models/crypto/CryptoAccountEntity';
-import { CryptoAccountCryptocurrencyEntity } from '@/models/crypto/CryptoAccountCryptocurrencyEntity';
-import CryptoAccountCryptocurrency from '@/pages/CryptoAccountPage/components/CryptoAccountCryptocurrency/CryptoAccountCryptocurrency';
-import CryptoAccountCryptocurrencyModal from '@/pages/CryptoAccountPage/modals/CryptoAccountCryptocurrencyModal';
+import { CryptoAssetEntity } from '@/models/crypto/CryptoAssetEntity';
+import CryptoAsset from '@/pages/CryptoAccountPage/components/CryptoAsset/CryptoAsset';
+import CryptoAssetModal from '@/pages/CryptoAccountPage/modals/CryptoAssetModal';
 import CryptoAccountHeader from '@/pages/CryptoAccountPage/components/CryptoAccountHeader/CryptoAccountHeader';
 import { useEntityModal } from '@/shared/hooks/useEntityModal';
 import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
 import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 import AddButton from '@/shared/components/AddButton/AddButton';
 import { useTranslation } from 'react-i18next';
-
 import Placeholder from '@/shared/components/Placeholder/Placeholder';
 
 interface Props {
@@ -19,7 +18,7 @@ interface Props {
 	onDataChanged: () => void;
 }
 
-const CryptoAccountCryptocurrenciesList: React.FC<Props> = (props: Props) => {
+const CryptoAssetsList: React.FC<Props> = ({ cryptoAccount, onDataChanged }: Props) => {
 	const { 
 		activeEntity,
 		modalRef,
@@ -29,29 +28,28 @@ const CryptoAccountCryptocurrenciesList: React.FC<Props> = (props: Props) => {
 		onDeleteClicked,
 		mode,
 		onActionEnded,
-	} = useEntityModal<CryptoAccountCryptocurrencyEntity>();
+	} = useEntityModal<CryptoAssetEntity>();
 	
 	const { 
-		cryptoAccountCryptocurrencies,
+		cryptoAssets,
 		totalBalanceUsd,
-		addCryptoAccountCryptocurrencyEntity,
-		updateCryptoAccountCryptocurrencyEntity,
-		deleteCryptoAccountCryptocurrencyEntity,
-		reloadCryptoAccountCryptocurrencies
-	} = useCryptoAccountCryptocurrencies(props.cryptoAccount.id);
+		addCryptoAssetEntity,
+		updateCryptoAssetEntity,
+		deleteCryptoAssetEntity
+	} = useCryptoAssets(cryptoAccount.id);
 
 	const existingCryptocurrencyIds = useMemo(
-		() => cryptoAccountCryptocurrencies.map(c => c.cryptocurrency?.id).filter(Boolean),
-		[cryptoAccountCryptocurrencies]
+		() => cryptoAssets.map(asset => asset.cryptocurrency?.id).filter(Boolean),
+		[cryptoAssets]
 	);
 
-	const onCryptocurrencyCryptoaccountSaved = async (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => {
+	const onCryptoAssetSaved = async (cryptoAsset: CryptoAssetEntity) => {
 		if (mode === ActiveEntityMode.Add) {
-			await addCryptoAccountCryptocurrencyEntity(cryptoAccountCryptocurrency);
+			await addCryptoAssetEntity(cryptoAsset);
 		} else if (mode === ActiveEntityMode.Edit) {
-			await updateCryptoAccountCryptocurrencyEntity(cryptoAccountCryptocurrency);
+			await updateCryptoAssetEntity(cryptoAsset);
 		}
-		props.onDataChanged();
+		onDataChanged();
 		onActionEnded();
 	};
 
@@ -59,26 +57,25 @@ const CryptoAccountCryptocurrenciesList: React.FC<Props> = (props: Props) => {
 
 	const onDeleteConfirmed = async () => {
 		if (!activeEntity) return;
-		await deleteCryptoAccountCryptocurrencyEntity(activeEntity);
-		props.onDataChanged();
+		await deleteCryptoAssetEntity(activeEntity);
+		onDataChanged();
 		onActionEnded();
 	};
 
 	return (
 		<Fragment>
 			<CryptoAccountHeader
-				cryptoAccount={props.cryptoAccount}
+				cryptoAccount={cryptoAccount}
 				totalBalanceUsd={totalBalanceUsd}
 				onAddClicked={onAddClicked}
 			/>
 
-			{cryptoAccountCryptocurrencies.length > 0 ? (
+			{cryptoAssets.length > 0 ? (
 				<SimpleGrid pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(350px, 3fr))'>
-					{cryptoAccountCryptocurrencies.map((cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => (
-						<CryptoAccountCryptocurrency
-							onReloadCryptoAccountCryptocurrencies={reloadCryptoAccountCryptocurrencies}
-							cryptoAccountCryptocurrency={cryptoAccountCryptocurrency}
-							key={cryptoAccountCryptocurrency.id}
+					{cryptoAssets.map((cryptoAsset: CryptoAssetEntity) => (
+						<CryptoAsset
+							cryptoAsset={cryptoAsset}
+							key={cryptoAsset.id}
 							onEditClicked={onEditClicked}
 							onDeleteClicked={onDeleteClicked}
 						/>
@@ -90,12 +87,12 @@ const CryptoAccountCryptocurrenciesList: React.FC<Props> = (props: Props) => {
 				</Placeholder>
 			)}
 
-			<CryptoAccountCryptocurrencyModal
+			<CryptoAssetModal
 				modalRef={modalRef}
-				cryptoAccountCryptocurrency={activeEntity}
-				cryptoAccount={props.cryptoAccount}
+				cryptoAsset={activeEntity}
+				cryptoAccount={cryptoAccount}
 				existingCryptocurrencyIds={existingCryptocurrencyIds}
-				onSaved={onCryptocurrencyCryptoaccountSaved}
+				onSaved={onCryptoAssetSaved}
 			/>
 			<ConfirmModal onConfirmed={onDeleteConfirmed}
 				title={t("crypto_account_cryptocurrency_delete_title")}
@@ -106,4 +103,4 @@ const CryptoAccountCryptocurrenciesList: React.FC<Props> = (props: Props) => {
 	);
 };
 
-export default CryptoAccountCryptocurrenciesList;
+export default CryptoAssetsList;

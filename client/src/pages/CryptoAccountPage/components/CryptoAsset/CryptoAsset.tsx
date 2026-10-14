@@ -3,31 +3,30 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaBitcoin } from 'react-icons/fa';
 import { getIconUrl } from '@/api/crypto/cryptocurrencyApi';
-import { CryptoAccountCryptocurrencyEntity } from '@/models/crypto/CryptoAccountCryptocurrencyEntity';
+import { CryptoAssetEntity } from '@/models/crypto/CryptoAssetEntity';
 import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
 import StoredIcon from '@/shared/components/StoredIcon';
 import EntityCard from '@/shared/components/EntityCard/EntityCard';
 import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
 
 type Props = {
-    cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity;
-    onReloadCryptoAccountCryptocurrencies: () => void;
-    onEditClicked: (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => void;
-    onDeleteClicked: (cryptoAccountCryptocurrency: CryptoAccountCryptocurrencyEntity) => void;
+    cryptoAsset: CryptoAssetEntity;
+    onEditClicked: (cryptoAsset: CryptoAssetEntity) => void;
+    onDeleteClicked: (cryptoAsset: CryptoAssetEntity) => void;
 };
 
-const CryptoAccountCryptocurrency: React.FC<Props> = ({
-    cryptoAccountCryptocurrency,
+const CryptoAsset: React.FC<Props> = ({
+    cryptoAsset,
     onEditClicked,
     onDeleteClicked,
 }) => {
     const { t } = useTranslation();
 
-    if (!cryptoAccountCryptocurrency || !cryptoAccountCryptocurrency.cryptocurrency) {
+    if (!cryptoAsset || !cryptoAsset.cryptocurrency) {
         return null;
     }
 
-    const { quantity = 0, cryptocurrency } = cryptoAccountCryptocurrency;
+    const { quantity = 0, cryptocurrency } = cryptoAsset;
     const iconUrl = cryptocurrency.iconKey ? getIconUrl(cryptocurrency.iconKey) : undefined;
     const totalValue = quantity * (cryptocurrency.price ?? 0);
 
@@ -66,8 +65,8 @@ const CryptoAccountCryptocurrency: React.FC<Props> = ({
                         </HStack>
 
                         <CardActionButtons
-                            onEdit={() => onEditClicked(cryptoAccountCryptocurrency)}
-                            onDelete={() => onDeleteClicked(cryptoAccountCryptocurrency)}
+                            onEdit={() => onEditClicked(cryptoAsset)}
+                            onDelete={() => onDeleteClicked(cryptoAsset)}
                         />
                     </Flex>
                 </Stack>
@@ -75,7 +74,7 @@ const CryptoAccountCryptocurrency: React.FC<Props> = ({
                 <Flex justify="space-between" align="flex-end" pt={3} borderTopWidth="1px" borderColor="border_primary" mt={3}>
                     <Stack gap={0}>
                         <Text fontSize="2xs" color="text_secondary">
-                            {t("crypto_account_cryptocurrency_quantity")}
+                            {t("crypto_asset_quantity", t("crypto_account_cryptocurrency_quantity"))}
                         </Text>
                         <Text fontSize="sm" fontWeight="700" color="text_primary">
                             {quantity} {cryptocurrency.symbol}
@@ -84,7 +83,7 @@ const CryptoAccountCryptocurrency: React.FC<Props> = ({
 
                     <Stack gap={0} align="flex-end">
                         <Text fontSize="2xs" color="text_secondary">
-                            {t("crypto_account_cryptocurrency_total_value")}
+                            {t("crypto_asset_total_value", t("crypto_account_cryptocurrency_total_value"))}
                         </Text>
                         <Text fontSize="xl" fontWeight="900" letterSpacing="tight" color="text_primary">
                             {formatMoneyByCurrencyCulture(totalValue, "USD")}
@@ -96,4 +95,4 @@ const CryptoAccountCryptocurrency: React.FC<Props> = ({
     );
 };
 
-export default CryptoAccountCryptocurrency;
+export default CryptoAsset;

@@ -175,9 +175,9 @@ namespace Audex.WebApi.Mappings
         public partial SecurityStatsModel Map(SecurityStatsDto dto);
         public partial SecurityStatsDto Map(SecurityStatsModel model);
 
-        public partial CryptoAccountCryptocurrencyModel Map(CryptoAccountCryptocurrencyDto dto);
-        public partial CryptoAccountCryptocurrencyDto Map(CryptoAccountCryptocurrencyModel model);
-        public partial IEnumerable<CryptoAccountCryptocurrencyModel> Map(IEnumerable<CryptoAccountCryptocurrencyDto> dtos);
+        public partial CryptoAssetModel Map(CryptoAssetDto dto);
+        public partial CryptoAssetDto Map(CryptoAssetModel model);
+        public partial IEnumerable<CryptoAssetModel> Map(IEnumerable<CryptoAssetDto> dtos);
 
         public partial CryptoAccountModel Map(CryptoAccountDto dto);
         public partial CryptoAccountDto Map(CryptoAccountModel model);

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { TFunction } from 'i18next';
 
-export const getCryptoAccountCryptocurrencyValidationSchema = (t: TFunction) => z.object({
+export const getCryptoAssetValidationSchema = (t: TFunction) => z.object({
   id: z.string().optional(),
   cryptocurrency: z.object({
     id: z.string().min(1, t("validation_cryptocurrency_required")),
@@ -14,4 +14,4 @@ export const getCryptoAccountCryptocurrencyValidationSchema = (t: TFunction) => 
   quantity: z.number().gte(0, t("validation_non_negative_number"))
 });
 
-export type CryptoAccountCryptocurrencyFormInput = z.infer<ReturnType<typeof getCryptoAccountCryptocurrencyValidationSchema>>;
+export type CryptoAssetFormInput = z.infer<ReturnType<typeof getCryptoAssetValidationSchema>>;

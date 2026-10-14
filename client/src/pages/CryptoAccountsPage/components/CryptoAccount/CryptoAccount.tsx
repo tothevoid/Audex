@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { Fragment, useEffect, useState } from 'react';
 import { SiBinance } from 'react-icons/si';
 import { CryptoAccountEntity } from '@/models/crypto/CryptoAccountEntity';
-import { getTotalBalance } from '@/api/crypto/cryptoAccountCryptocurrencyApi';
+import { getTotalBalance } from '@/api/crypto/cryptoAssetApi';
 import { getCryptoProviderIconUrl } from '@/api/crypto/cryptoProviderApi';
 import StoredIcon from '@/shared/components/StoredIcon/StoredIcon';
 import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';

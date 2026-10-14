@@ -92,7 +92,7 @@ namespace Audex.Application.Extensions
             services.AddTransient<IBrokerAccountFundsTransferService, BrokerAccountFundsTransferService>();
             services.AddTransient<IBrokerAccountTaxDeductionService, BrokerAccountTaxDeductionService>();
             services.AddTransient<ICryptoAccountService, CryptoAccountService>();
-            services.AddTransient<ICryptoAccountCryptocurrencyService, CryptoAccountCryptocurrencyService>();
+            services.AddTransient<ICryptoAssetService, CryptoAssetService>();
             services.AddTransient<ICryptocurrencyService, CryptocurrencyService>();
             services.AddTransient<ICryptoProviderService, CryptoProviderService>();
             services.AddTransient<ICryptoAccountStatsService, CryptoAccountStatsService>();

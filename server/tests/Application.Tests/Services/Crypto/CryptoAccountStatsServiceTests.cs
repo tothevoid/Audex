@@ -1,6 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
-using Audex.Application.Interfaces.Crypto;
 using Audex.Application.DTO.Crypto;
+using Audex.Application.Interfaces.Crypto;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 using Xunit;
@@ -16,12 +16,12 @@ namespace Audex.Application.Tests.Services.Crypto
         [Fact]
         public async Task TestGetStatsAsync()
         {
-            var (accountId, cryptoId) = await SetupDependencies();
+            var (accountId, cryptoId) = await SetupDependenciesAsync();
 
-            await ExecuteScopeAsync(async sp =>
+            await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICryptoAccountCryptocurrencyService>();
-                await service.AddAsync(new CryptoAccountCryptocurrencyDto
+                var service = serviceProvider.GetRequiredService<ICryptoAssetService>();
+                await service.AddAsync(new CryptoAssetDto
                 {
                     CryptoAccountId = accountId,
                     CryptocurrencyId = cryptoId,
@@ -29,28 +29,28 @@ namespace Audex.Application.Tests.Services.Crypto
                 });
             });
 
-            var stats = await ExecuteScopeAsync(async sp =>
+            var stats = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICryptoAccountStatsService>();
+                var service = serviceProvider.GetRequiredService<ICryptoAccountStatsService>();
                 return await service.GetStatsAsync();
             });
 
             Assert.NotNull(stats);
             Assert.NotEmpty(stats.CryptoDistribution);
             Assert.NotEmpty(stats.AccountsDistribution);
-            Assert.Contains(stats.CryptoDistribution, d => d.Amount >= 300.0m && d.Name.Contains("SOL") && d.ConvertedAmount > 0);
-            Assert.Contains(stats.AccountsDistribution, d => d.Name == "Main Account" && d.ConvertedAmount > 0);
+            Assert.Contains(stats.CryptoDistribution, distribution => distribution.Amount >= 300.0m && distribution.Name.Contains("SOL") && distribution.ConvertedAmount > 0);
+            Assert.Contains(stats.AccountsDistribution, distribution => distribution.Name == "Main Account" && distribution.ConvertedAmount > 0);
         }
 
         [Fact]
         public async Task TestGetStatsByCryptoAccountAsync()
         {
-            var (accountId, cryptoId) = await SetupDependencies();
+            var (accountId, cryptoId) = await SetupDependenciesAsync();
 
-            await ExecuteScopeAsync(async sp =>
+            await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICryptoAccountCryptocurrencyService>();
-                await service.AddAsync(new CryptoAccountCryptocurrencyDto
+                var service = serviceProvider.GetRequiredService<ICryptoAssetService>();
+                await service.AddAsync(new CryptoAssetDto
                 {
                     CryptoAccountId = accountId,
                     CryptocurrencyId = cryptoId,
@@ -58,30 +58,30 @@ namespace Audex.Application.Tests.Services.Crypto
                 });
             });
 
-            var stats = await ExecuteScopeAsync(async sp =>
+            var stats = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICryptoAccountStatsService>();
+                var service = serviceProvider.GetRequiredService<ICryptoAccountStatsService>();
                 return await service.GetStatsByCryptoAccountAsync(accountId);
             });
 
             Assert.NotNull(stats);
             Assert.NotEmpty(stats.CryptoDistribution);
             Assert.Empty(stats.AccountsDistribution);
-            Assert.Contains(stats.CryptoDistribution, d => d.Amount >= 300.0m && d.Name.Contains("SOL"));
+            Assert.Contains(stats.CryptoDistribution, distribution => distribution.Amount >= 300.0m && distribution.Name.Contains("SOL"));
         }
 
-        private async Task<(Guid accountId, Guid cryptoId)> SetupDependencies()
+        private async Task<(Guid accountId, Guid cryptoId)> SetupDependenciesAsync()
         {
-            var providerId = await ExecuteScopeAsync(async sp =>
+            var providerId = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICryptoProviderService>();
+                var service = serviceProvider.GetRequiredService<ICryptoProviderService>();
                 var provider = await service.AddAsync(new CryptoProviderDto { Name = "Main" });
                 return provider.Id;
             });
 
-            var accountId = await ExecuteScopeAsync(async sp =>
+            var accountId = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICryptoAccountService>();
+                var service = serviceProvider.GetRequiredService<ICryptoAccountService>();
                 return await service.AddAsync(new CryptoAccountDto
                 {
                     Name = "Main Account",
@@ -89,9 +89,9 @@ namespace Audex.Application.Tests.Services.Crypto
                 });
             });
 
-            var crypto = await ExecuteScopeAsync(async sp =>
+            var crypto = await ExecuteScopeAsync(async serviceProvider =>
             {
-                var service = sp.GetRequiredService<ICryptocurrencyService>();
+                var service = serviceProvider.GetRequiredService<ICryptocurrencyService>();
                 return await service.AddAsync(new CryptocurrencyDto { Name = "Solana", Symbol = "SOL", Price = 150m }, null);
             });
 

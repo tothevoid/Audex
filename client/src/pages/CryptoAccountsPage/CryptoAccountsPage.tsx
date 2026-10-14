@@ -2,7 +2,7 @@ import React, { Fragment, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import CryptoAccountHeader from "@/pages/CryptoAccountPage/components/CryptoAccountHeader/CryptoAccountHeader";
 import CryptoAccountTabs from "@/pages/CryptoAccountPage/components/CryptoAccountTabs/CryptoAccountTabs";
-import { getTotalBalance } from "@/api/crypto/cryptoAccountCryptocurrencyApi";
+import { getTotalBalance } from "@/api/crypto/cryptoAssetApi";
 
 const CryptoAccountsPage: React.FC = () => {
     const { t } = useTranslation();
@@ -12,7 +12,7 @@ const CryptoAccountsPage: React.FC = () => {
     const fetchData = useCallback(async () => {
         const balance = await getTotalBalance();
         setTotalBalanceUsd(balance);
-        setDataVersion((v) => v + 1);
+        setDataVersion((previousVersion) => previousVersion + 1);
     }, []);
 
     useEffect(() => {

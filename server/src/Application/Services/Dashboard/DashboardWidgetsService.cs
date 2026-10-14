@@ -38,7 +38,7 @@ namespace Audex.Application.Services.Dashboard
         private readonly IDepositService _depositService;
         private readonly IDebtService _debtService;
         private readonly ICryptoAccountService _cryptoAccountService;
-        private readonly ICryptoAccountCryptocurrencyService _cryptoAccountCryptocurrencyService;
+        private readonly ICryptoAssetService _cryptoAssetService;
         private readonly ICurrencyService _currencyService;
         private readonly IBankService _bankService;
         private readonly ITransactionsService _transactionsService;
@@ -55,7 +55,7 @@ namespace Audex.Application.Services.Dashboard
             IDepositService depositService,
             IDebtService debtService,
             ICryptoAccountService cryptoAccountService,
-            ICryptoAccountCryptocurrencyService cryptoAccountCryptocurrencyService,
+            ICryptoAssetService cryptoAssetService,
             ICurrencyService currencyService,
             IBankService bankService,
             ITransactionsService transactionsService,
@@ -71,7 +71,7 @@ namespace Audex.Application.Services.Dashboard
             _depositService = depositService;
             _debtService = debtService;
             _cryptoAccountService = cryptoAccountService;
-            _cryptoAccountCryptocurrencyService = cryptoAccountCryptocurrencyService;
+            _cryptoAssetService = cryptoAssetService;
             _currencyService = currencyService;
             _bankService = bankService;
             _transactionsService = transactionsService;
@@ -380,7 +380,7 @@ namespace Audex.Application.Services.Dashboard
 
             foreach (var cryptoAccount in cryptoAccounts)
             {
-                var balance = await _cryptoAccountCryptocurrencyService.GetTotalBalanceByCryptoAccountAsync(cryptoAccount.Id);
+                var balance = await _cryptoAssetService.GetTotalBalanceByCryptoAccountAsync(cryptoAccount.Id);
                 if (balance <= 0)
                 {
                     continue;
