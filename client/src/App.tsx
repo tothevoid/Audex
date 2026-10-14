@@ -1,102 +1,31 @@
 import '@/App.scss';
-import Header from '@/features/Navigation/Header/Header';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { Box, Theme } from '@chakra-ui/react';
+import { useColorMode } from '@/shared/context/useColorMode';
+import { Toaster } from '@/shared/components/Toaster';
+import RequireAuth from '@/shared/components/RequireAuth/RequireAuth';
+import MainLayout from '@/shared/components/MainLayout/MainLayout';
+
+import AuthPage from '@/pages/Auth/AuthPage';
+import DashboardPage from '@/pages/Dashboard/DashboardPage';
+import AccountsPage from '@/pages/Accounts/AccountsPage';
 import TransactionsPage from '@/pages/Transactions/TransactionsPage';
 import DepositsPage from '@/pages/Deposits/DepositsPage';
-
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Outlet, Navigate, useLocation } from 'react-router-dom';
-import AccountsPage from '@/pages/Accounts/AccountsPage';
-import DataPage from '@/pages/Data/DataPage';
 import BrokerAccountsPage from '@/pages/BrokerAccounts/BrokerAccountsPage';
 import SecuritiesPage from '@/pages/SecuritiesPage/SecuritiesPage';
 import BrokerAccountPage from '@/pages/BrokerAccount/BrokerAccountPage';
 import SecurityPage from '@/pages/SecurityPage/SecurityPage';
-import DashboardPage from '@/pages/Dashboard/DashboardPage';
 import DebtsPage from '@/pages/Debts/DebtsPage';
 import CryptocurrenciesPage from '@/pages/CryptocurrenciesPage/CryptocurrenciesPage';
 import CryptoAccountsPage from '@/pages/CryptoAccountsPage/CryptoAccountsPage';
 import CryptoAccountPage from '@/pages/CryptoAccountPage/CryptoAccountPage';
-import AuthPage from '@/pages/Auth/AuthPage';
-import { UserProvider } from '@/features/UserProfileSettingsModal/hooks/UserProvider';
+import CashAccountPage from '@/pages/CashAccountPage/CashAccountPage';
+import DataPage from '@/pages/Data/DataPage';
 import NotificationsPage from '@/pages/Notifications/NotificationsPage';
-import CashAccountPage from '@/pages/CashAccountPage/CashAccountPage.tsx';
-import SchedulerPage from '@/pages/Scheduler/SchedulerPage.tsx';
-import { getAccessToken } from '@/api/tokenStorage';
-import { refreshToken } from '@/api/auth/authApi';
-import { Box, Theme } from '@chakra-ui/react';
-import { useColorMode } from '@/shared/context/useColorMode';
-import { Toaster } from '@/shared/components/Toaster';
-import { useServerToasts } from '@/shared/hooks/useServerToasts';
-import { signalRService } from '@/shared/services/signalRService';
+import SchedulerPage from '@/pages/Scheduler/SchedulerPage';
 
-const RequireAuth = () => {
-	const token = getAccessToken();
-	const [checkingAuth, setCheckingAuth] = useState<boolean>(!token);
-	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!token);
-	const location = useLocation();
-
-	useEffect(() => {
-		const currentToken = getAccessToken();
-
-		if (currentToken) {
-			setIsAuthenticated(true);
-			setCheckingAuth(false);
-			return;
-		}
-
-		refreshToken()
-			.then(refreshedToken => {
-				setIsAuthenticated(!!refreshedToken);
-			})
-			.catch(() => {
-				setIsAuthenticated(false);
-			})
-			.finally(() => {
-				setCheckingAuth(false);
-			});
-	}, []);
-
-	if (checkingAuth) {
-		return null;
-	}
-
-	return isAuthenticated ? <Outlet /> : <Navigate to="/auth" replace state={{ from: location.pathname }} />;
-};
-
-const PageWrapper = () => {
-	useServerToasts();
-
-	useEffect(() => {
-		const initializeConnection = async () => {
-			await signalRService.startAsync();
-		};
-
-		initializeConnection();
-
-		return () => {
-			const closeConnection = async () => {
-				await signalRService.stopAsync();
-			};
-
-			closeConnection();
-		};
-	}, []);
-
-	return (
-		<UserProvider>
-			<div className="app">
-				<div className="header">
-					<Header />
-				</div>
-				<main className="app-main">
-					<Outlet />
-				</main>
-			</div>
-		</UserProvider>
-	);
-};
-
-const App = () => {
+export const App: React.FC = () => {
 	const { resolvedColorMode } = useColorMode();
 
 	return (
@@ -106,7 +35,7 @@ const App = () => {
 					<Routes>
 						<Route path="/auth" element={<AuthPage />} />
 						<Route element={<RequireAuth />}>
-							<Route element={<PageWrapper />}>
+							<Route element={<MainLayout />}>
 								<Route path="/" element={<DashboardPage />} />
 								<Route path="/dashboard" element={<Navigate to="/" replace />} />
 								<Route path="/accounts" element={<AccountsPage />} />

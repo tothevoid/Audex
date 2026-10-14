@@ -19,5 +19,8 @@
     "notifications_go_to": "Перейти",
     "notifications_no_history": "У вас пока нет уведомлений",
     "notifications_delete_confirm_title": "Удаление уведомления",
-    "notifications_delete_confirm_message": "Вы уверены, что хотите удалить это уведомление?"
+    "notifications_delete_confirm_message": "Вы уверены, что хотите удалить это уведомление?",
+    "notifications_mark_read_error": "Не удалось отметить уведомление как прочитанное",
+    "notifications_mark_all_read_error": "Не удалось отметить все уведомления как прочитанные",
+    "notifications_delete_error": "Не удалось удалить уведомление"
 }

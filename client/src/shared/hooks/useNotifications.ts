@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { NotificationEntity } from "@/models/notifications/NotificationEntity";
 import {
     deleteNotification as apiDeleteNotification,
@@ -8,6 +9,8 @@ import {
     markNotificationAsRead as apiMarkAsRead,
     NotificationsQuery
 } from "@/api/notifications/notificationApi";
+import { notify } from "@/shared/components/Toaster/notify";
+import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 import { useNotificationEvents } from "./useNotificationEvents";
 import { usePagedQuery } from "./usePagedQuery";
 
@@ -19,6 +22,7 @@ export interface UseNotificationsOptions {
 }
 
 export const useNotifications = (options: UseNotificationsOptions = {}) => {
+    const { t } = useTranslation();
     const {
         autoLoad = true,
         initialOnlyUnread = false,
@@ -41,10 +45,7 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         pageIndex,
         pageSize: recordsQuantity,
         isLoading,
-        isLoadingNextPage,
-        hasNextPage,
         loadPage,
-        loadNextPage,
         refreshPage,
         reset
     } = usePagedQuery<NotificationEntity, NotificationsQuery>({
@@ -58,14 +59,31 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         try {
             const count = await getUnreadNotificationCount();
             setUnreadCount(count);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Failed to load unread notification count", error);
         }
     }, []);
 
     useEffect(() => {
-        loadUnreadCount();
-    }, [loadUnreadCount]);
+        let isMounted = true;
+
+        const syncUnreadCount = async () => {
+            try {
+                const count = await getUnreadNotificationCount();
+                if (isMounted) {
+                    setUnreadCount(count);
+                }
+            } catch (error: unknown) {
+                console.error("Failed to load unread notification count", error);
+            }
+        };
+
+        syncUnreadCount();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     useNotificationEvents({
         onNotificationReceived: useCallback((_notification: NotificationEntity) => {
@@ -88,37 +106,34 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         e?.stopPropagation();
         try {
             await apiMarkAsRead(id);
-        } catch (error) {
-            console.error("Failed to mark notification as read", error);
-        } finally {
-            loadUnreadCount();
+            await loadUnreadCount();
             refreshPage();
+        } catch (error: unknown) {
+            notify.error(t("notifications_mark_read_error"), parseErrorMessage(error));
         }
     };
 
     const markAllAsRead = async () => {
         try {
             await apiMarkAllAsRead();
-        } catch (error) {
-            console.error("Failed to mark all notifications as read", error);
-        } finally {
             setUnreadCount(0);
             if (onlyUnreadFilter) {
                 reset();
             } else {
                 refreshPage();
             }
+        } catch (error: unknown) {
+            notify.error(t("notifications_mark_all_read_error"), parseErrorMessage(error));
         }
     };
 
     const deleteNotification = async (id: string) => {
         try {
             await apiDeleteNotification(id);
-        } catch (error) {
-            console.error("Failed to delete notification", error);
-        } finally {
-            loadUnreadCount();
+            await loadUnreadCount();
             refreshPage();
+        } catch (error: unknown) {
+            notify.error(t("notifications_delete_error"), parseErrorMessage(error));
         }
     };
 
@@ -131,15 +146,12 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         pageIndex,
         recordsQuantity,
         isLoading,
-        hasNextPage,
-        isLoadingNextPage,
         onlyUnreadFilter,
         selectedCategory,
         categories,
         setOnlyUnreadFilter,
         setSelectedCategory,
         loadPage,
-        loadNextPage,
         markAsRead,
         markAllAsRead,
         deleteNotification,
