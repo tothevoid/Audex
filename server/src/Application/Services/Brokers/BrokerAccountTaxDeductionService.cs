@@ -1,4 +1,4 @@
-﻿using Audex.Application.Interfaces.Brokers;
+using Audex.Application.Interfaces.Brokers;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,6 +9,7 @@ using Audex.Infrastructure.Interfaces.Database;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using Audex.Infrastructure.Queries;
 
 namespace Audex.Application.Services.Brokers
 {
@@ -27,11 +28,18 @@ namespace Audex.Application.Services.Brokers
 
         public async Task<IEnumerable<BrokerAccountTaxDeductionDto>> GetAllAsync(Guid? brokerAccountId = null)
         {
-            Expression<Func<BrokerAccountTaxDeduction, bool>> filter = brokerAccountId != null ? 
-                (taxDeduction) => taxDeduction.BrokerAccountId == brokerAccountId : 
-                null;
+            var queryBuilder = new ComplexQueryBuilder<BrokerAccountTaxDeduction>();
 
-            var entities = await _brokerAccountTaxDeductionRepo.GetAllAsync(filter, GetFullHierarchyColumns);
+            if (brokerAccountId.HasValue && brokerAccountId.Value != Guid.Empty)
+            {
+                queryBuilder.AddFilter(taxDeduction => taxDeduction.BrokerAccountId == brokerAccountId.Value);
+            }
+
+            queryBuilder
+                .AddJoins(GetFullHierarchyColumns)
+                .AddOrder(taxDeduction => taxDeduction.DateApplied, isDescending: true);
+
+            var entities = await _brokerAccountTaxDeductionRepo.GetAllAsync(queryBuilder.GetQuery());
             return _mapper.Map(entities);
         }
 

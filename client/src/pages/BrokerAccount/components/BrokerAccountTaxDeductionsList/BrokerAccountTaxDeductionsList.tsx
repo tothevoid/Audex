@@ -63,7 +63,7 @@ const BrokerAccountTaxDeductionsList: React.FC<Props> = ({ brokerAccountId, onDa
         return { brokerAccountId };
     }, [brokerAccountId, activeEntity]);
 
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const isGlobalBrokerAccount = !brokerAccountId;
 
     return <Box>
