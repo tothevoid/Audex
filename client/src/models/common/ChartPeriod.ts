@@ -1,4 +1,4 @@
-export enum SecurityHistoryPeriod {
+export enum ChartPeriod {
     Day1 = 0,
     Week1 = 1,
     Month1 = 2,
@@ -7,4 +7,5 @@ export enum SecurityHistoryPeriod {
     Year1 = 5,
     Year5 = 6,
     Year10 = 7,
+    All = 8,
 }

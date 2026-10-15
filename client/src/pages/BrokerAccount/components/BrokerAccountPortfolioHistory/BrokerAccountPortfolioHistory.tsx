@@ -1,54 +1,125 @@
-import { Fragment, useEffect, useState } from "react";
-import { SimpleGrid, Stack, Text, Card, Skeleton } from "@chakra-ui/react";
+import React, { Fragment, useEffect, useState } from "react";
+import { SimpleGrid, Stack, Text } from "@chakra-ui/react";
 import DatePicker from "@/shared/components/DatePicker/DatePicker";
 import { useTranslation } from "react-i18next";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
-import MoneyCard from "@/shared/components/MoneyCard/MoneyCard";
 import { Nullable } from "@/shared/utilities/nullable";
-import { getBrokerAccountPortfolioHistory } from "@/api/brokers/brokerAccountPortfolioHistoryApi";
+import {
+    getBrokerAccountPortfolioDateBounds,
+    getBrokerAccountPortfolioHistory,
+    getBrokerAccountPortfolioHistoryByPeriod,
+} from "@/api/brokers/brokerAccountPortfolioHistoryApi";
 import { BrokerAccountPortfolioHistoryEntity } from "@/models/brokers/BrokerAccountPortfolioHistoryEntity";
-import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
-import { getDiffColor } from "@/shared/utilities/numericDiffsUtilities";
+import { BrokerAccountPortfolioDateBoundsEntity } from "@/models/brokers/BrokerAccountPortfolioDateBoundsEntity";
+import { BrokerAccountPortfolioTimelinePointEntity } from "@/models/brokers/BrokerAccountPortfolioTimelinePointEntity";
+import { BrokerAccountHistoryChart } from "@/pages/BrokerAccount/components/BrokerAccountHistoryChart/BrokerAccountHistoryChart";
+import { ChartPeriod } from "@/models/common/ChartPeriod";
+import { BrokerAccountPortfolioSnapshotCards } from "./BrokerAccountPortfolioSnapshotCards";
 
 interface Props {
     brokerAccountId?: Nullable<string>;
 }
-
-const formatDateToIso = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-};
 
 const BrokerAccountPortfolioHistory: React.FC<Props> = ({ brokerAccountId }) => {
     const { user } = useUserProfile();
     const { t } = useTranslation();
 
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-    const [history, setHistory] = useState<BrokerAccountPortfolioHistoryEntity | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [dateBounds, setDateBounds] =
+        useState<Nullable<BrokerAccountPortfolioDateBoundsEntity>>(null);
+    const [history, setHistory] =
+        useState<Nullable<BrokerAccountPortfolioHistoryEntity>>(null);
+    const [isSnapshotLoading, setIsSnapshotLoading] = useState<boolean>(false);
 
+    const [selectedPeriod, setSelectedPeriod] =
+        useState<ChartPeriod>(ChartPeriod.Month1);
+    const [rangePoints, setRangePoints] = useState<
+        BrokerAccountPortfolioTimelinePointEntity[]
+    >([]);
+    const [isChartLoading, setIsChartLoading] = useState<boolean>(false);
+
+    // 1. Load Date Bounds (Min & Max dates)
+    useEffect(() => {
+        let isMounted = true;
+        const loadBounds = async () => {
+            const boundsResult = await getBrokerAccountPortfolioDateBounds(
+                brokerAccountId
+            );
+            if (boundsResult && isMounted) {
+                setDateBounds(boundsResult);
+                if (boundsResult.maxDate) {
+                    setSelectedDate((previousDate) =>
+                        previousDate > boundsResult.maxDate!
+                            ? boundsResult.maxDate!
+                            : previousDate
+                    );
+                }
+            }
+        };
+
+        loadBounds();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [brokerAccountId]);
+
+    const minDate = dateBounds?.minDate ?? null;
+    const maxDate = dateBounds?.maxDate ?? new Date();
+
+    // 2. Load Chart Range Data
+    useEffect(() => {
+        let isMounted = true;
+        const loadRange = async () => {
+            setIsChartLoading(true);
+            try {
+                const points = await getBrokerAccountPortfolioHistoryByPeriod(
+                    selectedPeriod,
+                    brokerAccountId,
+                    dateBounds?.maxDate,
+                    dateBounds?.minDate
+                );
+
+                if (isMounted) {
+                    setRangePoints(points);
+                }
+            } finally {
+                if (isMounted) {
+                    setIsChartLoading(false);
+                }
+            }
+        };
+
+        loadRange();
+
+        return () => {
+            isMounted = false;
+        };
+    }, [brokerAccountId, selectedPeriod, dateBounds]);
+
+    // 3. Load Single Date Snapshot
     useEffect(() => {
         if (!selectedDate) return;
 
         let isMounted = true;
-        const load = async () => {
-            setIsLoading(true);
+        const loadSnapshot = async () => {
+            setIsSnapshotLoading(true);
             try {
-                const isoDate = formatDateToIso(selectedDate);
-                const result = await getBrokerAccountPortfolioHistory(brokerAccountId, isoDate);
+                const result = await getBrokerAccountPortfolioHistory(
+                    brokerAccountId,
+                    selectedDate
+                );
                 if (result && isMounted) {
                     setHistory(result);
                 }
             } finally {
                 if (isMounted) {
-                    setIsLoading(false);
+                    setIsSnapshotLoading(false);
                 }
             }
         };
 
-        load();
+        loadSnapshot();
 
         return () => {
             isMounted = false;
@@ -59,10 +130,19 @@ const BrokerAccountPortfolioHistory: React.FC<Props> = ({ brokerAccountId }) => 
 
     const currencyName = user.currency.name;
 
-    const pnlSign = history && history.profitAndLoss > 0 ? "+" : "";
-
     return (
         <SimpleGrid marginBlock={4} gap={4}>
+            {/* Interactive Portfolio & P&L Dynamics Chart */}
+            <BrokerAccountHistoryChart
+                data={rangePoints}
+                currencyName={currencyName}
+                selectedPeriod={selectedPeriod}
+                onSelectPeriod={setSelectedPeriod}
+                isLoading={isChartLoading}
+                onPointClick={setSelectedDate}
+            />
+
+            {/* Date Selection for Detailed Snapshot */}
             <Stack direction="row" alignItems="center" gap={4}>
                 <Text color="text_primary" fontWeight="bold">
                     {t("broker_account_portfolio_history_date_select")}:
@@ -74,78 +154,19 @@ const BrokerAccountPortfolioHistory: React.FC<Props> = ({ brokerAccountId }) => 
                             setSelectedDate(date);
                         }
                     }}
-                    maxDate={new Date()}
+                    minDate={minDate}
+                    maxDate={maxDate}
                     width="200px"
                     fullWidth={false}
                 />
             </Stack>
 
-            {isLoading ? (
-                <>
-                    <SimpleGrid columns={2} gap={4}>
-                        <Skeleton height="100px" borderRadius="md" />
-                        <Skeleton height="100px" borderRadius="md" />
-                    </SimpleGrid>
-                    <SimpleGrid columns={2} gap={4}>
-                        <Skeleton height="100px" borderRadius="md" />
-                        <Skeleton height="100px" borderRadius="md" />
-                    </SimpleGrid>
-                    <SimpleGrid columns={2} gap={4}>
-                        <Skeleton height="100px" borderRadius="md" />
-                        <Skeleton height="100px" borderRadius="md" />
-                    </SimpleGrid>
-                </>
-            ) : (
-                history && (
-                    <>
-                        <SimpleGrid columns={2} gap={4}>
-                            <Card.Root backgroundColor="background_primary" borderColor="border_primary" color="text_primary">
-                                <Card.Header>
-                                    {t("broker_account_portfolio_history_portfolio_value")}
-                                </Card.Header>
-                                <Card.Body fontSize="xl" fontWeight={700} display="flex" flexDirection="row" alignItems="baseline" gap={2} flexWrap="wrap">
-                                    <Text as="span">{formatMoneyByCurrencyCulture(history.portfolioValue, currencyName)}</Text>
-                                    {history.profitAndLoss !== 0 && (
-                                        <Text as="span" color={getDiffColor(history.profitAndLoss)}>
-                                            ({pnlSign}{formatMoneyByCurrencyCulture(history.profitAndLoss, currencyName)})
-                                        </Text>
-                                    )}
-                                </Card.Body>
-                            </Card.Root>
-
-                            <MoneyCard
-                                title={t("broker_account_portfolio_history_main_currency_amount")}
-                                value={history.mainCurrencyAmount}
-                                currency={currencyName}
-                            />
-                        </SimpleGrid>
-                        <SimpleGrid columns={2} gap={4}>
-                            <MoneyCard
-                                title={t("broker_account_portfolio_history_total_dividends")}
-                                value={history.totalDividends}
-                                currency={currencyName}
-                            />
-                            <MoneyCard
-                                title={t("broker_account_portfolio_history_total_tax_deduction")}
-                                value={history.totalTaxDeduction}
-                                currency={currencyName}
-                            />
-                        </SimpleGrid>
-                        <SimpleGrid columns={2} gap={4}>
-                            <MoneyCard
-                                title={t("broker_account_portfolio_history_total_deposited")}
-                                value={history.totalDeposited}
-                                currency={currencyName}
-                            />
-                            <MoneyCard
-                                title={t("broker_account_portfolio_history_total_withdrawn")}
-                                value={history.totalWithdraw}
-                                currency={currencyName}
-                            />
-                        </SimpleGrid>
-                    </>
-                )
-            )}
+            {/* Snapshot Cards */}
+            <BrokerAccountPortfolioSnapshotCards
+                history={history}
+                currencyName={currencyName}
+                isLoading={isSnapshotLoading}
+            />
         </SimpleGrid>
     );
 };

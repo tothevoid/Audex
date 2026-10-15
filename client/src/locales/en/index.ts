@@ -1,6 +1,7 @@
 import commonGeneral from './common/general.json';
 import commonModals from './common/modals.json';
 import datePicker from './components/datePicker.json';
+import chart from './components/chart.json';
 import toast from './components/toast.json';
 import actions from './actions/actions.json';
 import notifications from './common/notifications.json';
@@ -27,6 +28,7 @@ const en = {
     ...commonGeneral,
     ...commonModals,
     ...datePicker,
+    ...chart,
     ...toast,
     ...actions,
     ...notifications,

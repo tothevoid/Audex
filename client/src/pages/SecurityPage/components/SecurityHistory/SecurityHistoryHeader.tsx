@@ -1,10 +1,22 @@
 import React from "react";
-import { Box, Flex, HStack, Icon, Text } from "@chakra-ui/react";
+import { Flex, HStack, Icon, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
 import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import { ChartPeriod } from "@/shared/utilities/formatters/dateFormatter";
-import { PERIOD_OPTIONS, HistoryStats } from "./types";
+import { ChartPeriodSelector } from "@/shared/components/ChartPeriodSelector";
+import { HistoryStats } from "./types";
+
+const PERIODS: readonly ChartPeriod[] = [
+    ChartPeriod.Day1,
+    ChartPeriod.Week1,
+    ChartPeriod.Month1,
+    ChartPeriod.Month3,
+    ChartPeriod.Month6,
+    ChartPeriod.Year1,
+    ChartPeriod.Year5,
+    ChartPeriod.Year10,
+];
 
 interface Props {
     stats: HistoryStats;
@@ -87,30 +99,12 @@ const SecurityHistoryHeader: React.FC<Props> = ({
             )}
 
             {/* Right: Period selector pills */}
-            <HStack gap={1} backgroundColor="background_secondary" p={1} borderRadius="lg" borderWidth="1px" borderColor="border_primary" flexWrap="wrap">
-                {PERIOD_OPTIONS.map(({ id, labelKey }) => {
-                    const isSelected = selectedPeriod === id;
-                    return (
-                        <Box
-                            as="button"
-                            key={id}
-                            onClick={() => onSelectPeriod(id)}
-                            px={3}
-                            py={1}
-                            borderRadius="md"
-                            fontSize="xs"
-                            fontWeight={isSelected ? 800 : 600}
-                            backgroundColor={isSelected ? "action_primary" : "transparent"}
-                            color={isSelected ? "white" : "text_secondary"}
-                            cursor="pointer"
-                            transition="all 0.15s ease"
-                            _hover={isSelected ? {} : { color: "text_primary", backgroundColor: "background_secondary" }}
-                        >
-                            {t(labelKey)}
-                        </Box>
-                    );
-                })}
-            </HStack>
+            <ChartPeriodSelector
+                periods={PERIODS}
+                selectedPeriod={selectedPeriod}
+                onSelectPeriod={onSelectPeriod}
+                size="sm"
+            />
         </Flex>
     );
 };

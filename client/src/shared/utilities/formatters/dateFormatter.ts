@@ -1,4 +1,7 @@
 import { i18n } from "i18next";
+import { ChartPeriod } from "@/models/common/ChartPeriod";
+
+export { ChartPeriod };
 
 export const formatTime = (date: Date, format: i18n) => {
 	return new Intl.DateTimeFormat(format.language, {
@@ -81,17 +84,27 @@ export const formatShortMonth = (month: number, format: i18n, year?: number): st
 	return new Date(targetYear, month - 1, 1).toLocaleString(format.language, { month: 'short' });
 };
 
-export type ChartPeriod = "1D" | "1W" | "1M" | "3M" | "6M" | "1Y" | "5Y" | "10Y";
+export const ALL_CHART_PERIODS: readonly ChartPeriod[] = [
+	ChartPeriod.Day1,
+	ChartPeriod.Week1,
+	ChartPeriod.Month1,
+	ChartPeriod.Month3,
+	ChartPeriod.Month6,
+	ChartPeriod.Year1,
+	ChartPeriod.Year5,
+	ChartPeriod.Year10,
+	ChartPeriod.All,
+] as const;
 
 export const formatChartAxisDate = (date: Date, period: ChartPeriod, format: i18n): string => {
 	const lang = format?.language || "en";
-	if (period === "1D") {
+	if (period === ChartPeriod.Day1) {
 		return new Intl.DateTimeFormat(lang, { hour: "2-digit", minute: "2-digit" }).format(date);
 	}
-	if (period === "1W" || period === "1M" || period === "3M") {
+	if (period === ChartPeriod.Week1 || period === ChartPeriod.Month1 || period === ChartPeriod.Month3) {
 		return new Intl.DateTimeFormat(lang, { day: "numeric", month: "short" }).format(date);
 	}
-	if (period === "6M" || period === "1Y") {
+	if (period === ChartPeriod.Month6 || period === ChartPeriod.Year1) {
 		return new Intl.DateTimeFormat(lang, { day: "numeric", month: "short", year: "2-digit" }).format(date);
 	}
 	return new Intl.DateTimeFormat(lang, { month: "short", year: "numeric" }).format(date);
@@ -99,7 +112,7 @@ export const formatChartAxisDate = (date: Date, period: ChartPeriod, format: i18
 
 export const formatChartTooltipDate = (date: Date, period: ChartPeriod, format: i18n): string => {
 	const lang = format?.language || "en";
-	if (period === "1D" || period === "1W") {
+	if (period === ChartPeriod.Day1 || period === ChartPeriod.Week1) {
 		return new Intl.DateTimeFormat(lang, { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(date);
 	}
 	return formatDate(date, format);

@@ -1,15 +1,16 @@
-import React from 'react';
-import { Badge, BadgeProps } from '@chakra-ui/react';
+import { Badge, BadgeProps, Box } from '@chakra-ui/react';
 
 export type AccentBadgeVariant = 'success' | 'danger' | 'info' | 'neutral' | 'primary' | 'warning';
 
 export interface AccentBadgeProps extends Omit<BadgeProps, 'variant'> {
     variant?: AccentBadgeVariant;
+    showDot?: boolean;
     children: React.ReactNode;
 }
 
 export const AccentBadge: React.FC<AccentBadgeProps> = ({
     variant = 'success',
+    showDot = false,
     children,
     size = 'md',
     borderRadius = 'md',
@@ -69,6 +70,17 @@ export const AccentBadge: React.FC<AccentBadgeProps> = ({
             fontWeight={fontWeight}
             {...rest}
         >
+            {showDot && (
+                <Box
+                    as="span"
+                    w="6px"
+                    h="6px"
+                    borderRadius="full"
+                    bg={styles.color}
+                    mr={1.5}
+                    display="inline-block"
+                />
+            )}
             {children}
         </Badge>
     );

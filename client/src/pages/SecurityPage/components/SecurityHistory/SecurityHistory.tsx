@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Card, Flex, Icon, Skeleton, Text } from "@chakra-ui/react";
+import { Card, Flex, Icon, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
+import { LoadingChart } from "@/shared/components/LoadingChart";
 import { BsClockHistory } from "react-icons/bs";
 import { getTickerHistory } from "@/api/securities/securityApi";
 import { SecurityHistory as SecurityHistoryModel } from "@/models/securities/SecurityHistory";
 import { formatDate, ChartPeriod } from "@/shared/utilities/formatters/dateFormatter";
 import SecurityHistoryHeader from "./SecurityHistoryHeader";
-import { PERIOD_OPTIONS, HistoryStats } from "./types";
+import { HistoryStats } from "./types";
 import SecurityHistoryChart, { ProcessedHistoryItem } from "./SecurityHistoryChart";
 
 interface Props {
@@ -29,7 +30,7 @@ const SecurityHistory: React.FC<Props> = ({ ticker, currencyName }) => {
     const { t, i18n } = useTranslation();
 
     const [history, setHistory] = useState<SecurityHistoryModel | null>(null);
-    const [selectedPeriod, setSelectedPeriod] = useState<ChartPeriod>("1D");
+    const [selectedPeriod, setSelectedPeriod] = useState<ChartPeriod>(ChartPeriod.Day1);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -37,8 +38,7 @@ const SecurityHistory: React.FC<Props> = ({ ticker, currencyName }) => {
         const load = async () => {
             setIsLoading(true);
             try {
-                const periodOption = PERIOD_OPTIONS.find((p) => p.id === selectedPeriod) ?? PERIOD_OPTIONS[0];
-                const data = await getTickerHistory(ticker, periodOption.period);
+                const data = await getTickerHistory(ticker, selectedPeriod);
                 if (isMounted) {
                     setHistory(data || null);
                 }
@@ -100,27 +100,27 @@ const SecurityHistory: React.FC<Props> = ({ ticker, currencyName }) => {
                     hasData={processedHistory.length > 0}
                 />
 
-                {isLoading ? (
-                    <Skeleton height="380px" borderRadius="lg" />
-                ) : processedHistory.length === 0 ? (
-                    <Flex direction="column" align="center" justify="center" gap={3} height="350px" color="text_secondary">
-                        <Icon color="text_secondary">
-                            <BsClockHistory size={36} />
-                        </Icon>
-                        <Text fontSize="md" fontWeight={600}>
-                            {t("security_history_no_data")}
-                        </Text>
-                    </Flex>
-                ) : (
-                    <SecurityHistoryChart
-                        data={processedHistory}
-                        startPrice={stats.startPrice}
-                        avgPrice={stats.avgPrice}
-                        isPositive={stats.isPositive}
-                        currencyName={currencyName}
-                        selectedPeriod={selectedPeriod}
-                    />
-                )}
+                <LoadingChart isLoading={isLoading} height="380px" borderRadius="lg">
+                    {processedHistory.length === 0 ? (
+                        <Flex direction="column" align="center" justify="center" gap={3} height="350px" color="text_secondary">
+                            <Icon color="text_secondary">
+                                <BsClockHistory size={36} />
+                            </Icon>
+                            <Text fontSize="md" fontWeight={600}>
+                                {t("security_history_no_data")}
+                            </Text>
+                        </Flex>
+                    ) : (
+                        <SecurityHistoryChart
+                            data={processedHistory}
+                            startPrice={stats.startPrice}
+                            avgPrice={stats.avgPrice}
+                            isPositive={stats.isPositive}
+                            currencyName={currencyName}
+                            selectedPeriod={selectedPeriod}
+                        />
+                    )}
+                </LoadingChart>
             </Card.Body>
         </Card.Root>
     );

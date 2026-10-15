@@ -1,5 +1,5 @@
 import { SecurityHistory } from '@/models/securities/SecurityHistory';
-import { SecurityHistoryPeriod } from '@/models/securities/SecurityHistoryPeriod';
+import { ChartPeriod } from '@/shared/utilities/formatters/dateFormatter';
 import { 
     createEntityWithIconResult, 
     deleteEntity, 
@@ -35,7 +35,7 @@ export const getSecurityStats = async (securityId: string): Promise<SecurityStat
 
 export const getTickerHistory = async (
     ticker: string,
-    period: SecurityHistoryPeriod = SecurityHistoryPeriod.Day1
+    period: ChartPeriod = ChartPeriod.Day1
 ): Promise<SecurityHistory | void> => {
     return getEntity<SecurityHistory>(
         `${basicUrl}/GetTickerHistory?ticker=${ticker}&period=${period}`

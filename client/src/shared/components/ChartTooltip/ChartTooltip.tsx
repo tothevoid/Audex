@@ -1,6 +1,9 @@
 import React, { PropsWithChildren, ReactNode } from "react";
-import { Box, BoxProps, Flex, Text } from "@chakra-ui/react";
+import { Box, BoxProps, Flex, Icon, Text } from "@chakra-ui/react";
+import { BsArrowDownRight, BsArrowUpRight } from "react-icons/bs";
 import { CHART_THEME_COLORS } from "@/shared/constants/chartColors";
+import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
+import { Nullable } from "@/shared/utilities/nullable";
 
 interface ContainerProps extends BoxProps {
     minW?: string | number;
@@ -56,31 +59,66 @@ export const ChartTooltipHeader: React.FC<HeaderProps> = ({
     );
 };
 
-interface ItemProps {
+export type ChartTooltipItemVariant = "default" | "pnl";
+
+export interface ChartTooltipItemProps {
     label: string;
-    value: ReactNode;
+    variant?: ChartTooltipItemVariant;
+    amount?: number;
+    currencyName?: Nullable<string>;
+    digits?: number;
+    value?: ReactNode;
     color?: string;
     valueColor?: string;
     isBold?: boolean;
+    showTrend?: boolean;
 }
 
-export const ChartTooltipItem: React.FC<ItemProps> = ({
+export const ChartTooltipItem: React.FC<ChartTooltipItemProps> = ({
     label,
+    variant = "default",
+    amount,
+    currencyName,
+    digits = 2,
     value,
     color,
-    valueColor = "text_primary",
-    isBold = false,
+    valueColor,
+    isBold,
+    showTrend = false,
 }) => {
+    let resolvedValue: ReactNode = value;
+    let resolvedColor = color;
+    let resolvedValueColor = valueColor ?? "text_primary";
+    const resolvedIsBold = isBold ?? (variant === "pnl");
+
+    if (variant === "pnl" && amount !== undefined) {
+        const isNegative = amount < 0;
+        const isPositive = amount > 0;
+
+        resolvedColor ??= isNegative
+            ? "var(--chakra-colors-loss)"
+            : "var(--chakra-colors-gain)";
+
+        resolvedValueColor = valueColor ?? (isPositive ? "gain" : isNegative ? "loss" : "text_primary");
+
+        const sign = isPositive ? "+" : "";
+        resolvedValue = currencyName
+            ? `${sign}${formatMoneyByCurrencyCulture(amount, currencyName, digits)}`
+            : `${sign}${amount}`;
+    }
+
+    const showTrendIcon = showTrend && variant === "pnl" && amount !== undefined;
+
     return (
         <Flex alignItems="center" justifyContent="space-between" gap={3} fontSize="xs">
             <Flex alignItems="center" gap={2} minW={0}>
-                {color && (
+                {resolvedColor && (
                     <Box
                         w={2}
                         h={2}
                         borderRadius="full"
-                        bg={color}
-                        boxShadow={`0 0 6px ${color}80`}
+                        bg={resolvedColor}
+                        boxShadow={`0 0 6px ${resolvedColor}80`}
                         flexShrink={0}
                     />
                 )}
@@ -88,9 +126,24 @@ export const ChartTooltipItem: React.FC<ItemProps> = ({
                     {label}
                 </Text>
             </Flex>
-            <Text fontWeight={isBold ? "bold" : "semibold"} color={valueColor} whiteSpace="nowrap">
-                {value}
-            </Text>
+            <Flex
+                alignItems="center"
+                gap={1}
+                fontWeight={resolvedIsBold ? "bold" : "semibold"}
+                color={resolvedValueColor}
+                whiteSpace="nowrap"
+            >
+                {showTrendIcon && (
+                    <Icon color={resolvedValueColor} display="inline-flex" alignItems="center">
+                        {amount < 0 ? (
+                            <BsArrowDownRight size={12} />
+                        ) : (
+                            <BsArrowUpRight size={12} />
+                        )}
+                    </Icon>
+                )}
+                <Text as="span">{resolvedValue}</Text>
+            </Flex>
         </Flex>
     );
 };

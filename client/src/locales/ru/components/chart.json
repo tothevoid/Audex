@@ -1,0 +1,21 @@
+{
+    "chart_period_1d": "1Д",
+    "chart_period_1w": "1Н",
+    "chart_period_1m": "1М",
+    "chart_period_3m": "3М",
+    "chart_period_6m": "6М",
+    "chart_period_1y": "1Г",
+    "chart_period_5y": "5Л",
+    "chart_period_10y": "10Л",
+    "chart_period_all": "Всё",
+
+    "chart_period_full_1d": "1 День",
+    "chart_period_full_1w": "1 Неделя",
+    "chart_period_full_1m": "1 Месяц",
+    "chart_period_full_3m": "3 Месяца",
+    "chart_period_full_6m": "6 Месяцев",
+    "chart_period_full_1y": "1 Год",
+    "chart_period_full_5y": "5 Лет",
+    "chart_period_full_10y": "10 Лет",
+    "chart_period_full_all": "Всё время"
+}

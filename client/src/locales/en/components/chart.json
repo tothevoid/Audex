@@ -1,0 +1,21 @@
+{
+    "chart_period_1d": "1D",
+    "chart_period_1w": "1W",
+    "chart_period_1m": "1M",
+    "chart_period_3m": "3M",
+    "chart_period_6m": "6M",
+    "chart_period_1y": "1Y",
+    "chart_period_5y": "5Y",
+    "chart_period_10y": "10Y",
+    "chart_period_all": "All",
+
+    "chart_period_full_1d": "1 Day",
+    "chart_period_full_1w": "1 Week",
+    "chart_period_full_1m": "1 Month",
+    "chart_period_full_3m": "3 Months",
+    "chart_period_full_6m": "6 Months",
+    "chart_period_full_1y": "1 Year",
+    "chart_period_full_5y": "5 Years",
+    "chart_period_full_10y": "10 Years",
+    "chart_period_full_all": "All Time"
+}

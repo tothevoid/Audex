@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
-import { ChartTooltipContainer, ChartTooltipHeader, ChartTooltipItem } from "@/shared/components/ChartTooltip/ChartTooltip";
+import { ChartTooltipContainer, ChartTooltipHeader, ChartTooltipItem } from "@/shared/components/ChartTooltip";
 import { CHART_THEME_COLORS } from "@/shared/constants/chartColors";
 import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import { formatShortMonth } from "@/shared/utilities/formatters/dateFormatter";
@@ -130,10 +130,10 @@ const TransfersHistoryTooltip: React.FC<Props> = ({
                 ))}
                 <Box borderTopWidth="1px" borderColor={CHART_THEME_COLORS.divider} pt={1.5} mt={0.5}>
                     <ChartTooltipItem
+                        variant="pnl"
                         label={t("transfers_history_chart_net_flow")}
-                        value={`${netFlow > 0 ? "+" : ""}${formatMoneyByCurrencyCulture(netFlow, currencyName)}`}
-                        valueColor={netFlow > 0 ? "var(--chakra-colors-gain)" : netFlow < 0 ? "var(--chakra-colors-loss)" : "var(--chakra-colors-text_primary)"}
-                        isBold
+                        amount={netFlow}
+                        currencyName={currencyName}
                     />
                 </Box>
             </Box>
