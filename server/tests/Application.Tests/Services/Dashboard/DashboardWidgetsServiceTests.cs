@@ -265,5 +265,26 @@ namespace Audex.Application.Tests.Services.Dashboard
             Assert.Contains("RGBI", result);
             Assert.Contains("MCFTR", result);
         }
+
+        [Fact]
+        public async Task TestGetBrokerPnlWidgetAsync_ReturnsCalculatedPnlAndCurrency()
+        {
+            var userId = UserProfileConstants.UserProfileId;
+            var request = new BrokerPnlWidgetRequestDto
+            {
+                DashboardId = Guid.NewGuid(),
+                WidgetId = "broker-pnl-1"
+            };
+
+            var result = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var widgetsService = serviceProvider.GetRequiredService<IDashboardWidgetsService>();
+                return await widgetsService.GetBrokerPnlWidgetAsync(userId, request);
+            });
+
+            Assert.NotNull(result);
+            Assert.False(string.IsNullOrWhiteSpace(result.CurrencyName));
+            Assert.Null(result.SelectedAccountName);
+        }
     }
 }

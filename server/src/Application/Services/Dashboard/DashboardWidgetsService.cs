@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Audex.Application.Constants;
+using Audex.Application.DTO.Brokers;
 using Audex.Application.DTO.Dashboard;
 using Audex.Application.DTO.Dashboard.Widgets;
 using Audex.Application.DTO.Deposits;
@@ -20,6 +22,7 @@ using Audex.Application.Interfaces.Integrations.Oil;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Transactions;
 using Audex.Application.Interfaces.User;
+using Audex.Application.Utilities;
 using Audex.Application.Utilities.Dashboard;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Entities.User;
@@ -77,6 +80,56 @@ namespace Audex.Application.Services.Dashboard
             _transactionsService = transactionsService;
             _userProfileService = userProfileService;
             _localizationService = localizationService;
+        }
+
+        public async Task<BrokerPnlWidgetDto> GetBrokerPnlWidgetAsync(
+            Guid userId,
+            BrokerPnlWidgetRequestDto request,
+            CancellationToken cancellationToken = default)
+        {
+            var widgetSettings = await GetWidgetSettingsAsync<BrokerPnlWidgetSettingsDto>(
+                userId,
+                request.DashboardId,
+                request.WidgetId);
+
+            var targetBrokerAccountId = request.BrokerAccountId ?? widgetSettings?.BrokerAccountId;
+
+            var userProfile = await _userProfileService.GetAsync();
+
+            // NOTE: Currently reusing existing BrokerAccountSummaryService endpoints directly.
+            // A dedicated refactoring task has been created to extract lightweight PnL and daily portfolio methods
+            // to avoid loading unneeded data (dividends, transaction commissions/taxes, individual security records).
+            var dailyStats = targetBrokerAccountId.HasValue
+                ? await _brokerAccountSummaryService.GetDailyStatsByBrokerAccountAsync(targetBrokerAccountId.Value)
+                : await _brokerAccountSummaryService.GetDailyStatsAsync();
+
+            var dailyAbsoluteChange = FinancialUtilities.CalculateChange(dailyStats.CurrentPortfolioValue, dailyStats.StartPortfolioValue);
+            var dailyPercentageChange = FinancialUtilities.CalculateChangePercent(dailyStats.CurrentPortfolioValue, dailyStats.StartPortfolioValue);
+
+            var portfolio = targetBrokerAccountId.HasValue
+                ? await _brokerAccountSummaryService.GetPortfolioValuesByBrokerAccountAsync(targetBrokerAccountId.Value)
+                : await _brokerAccountSummaryService.GetPortfolioValuesAsync();
+
+            var totalAbsolutePnl = portfolio.ProfitAndLoss;
+            var investedValue = portfolio.CurrentAmount - portfolio.ProfitAndLoss;
+            var totalPercentagePnl = investedValue > 0
+                ? Math.Round((portfolio.ProfitAndLoss / investedValue) * 100m, 2)
+                : 0m;
+
+            var selectedAccount = targetBrokerAccountId.HasValue
+                ? await _brokerAccountService.GetByIdAsync(targetBrokerAccountId.Value)
+                : null;
+
+            return new BrokerPnlWidgetDto
+            {
+                DailyAbsoluteChange = dailyAbsoluteChange,
+                DailyPercentageChange = dailyPercentageChange,
+                TotalAbsolutePnl = totalAbsolutePnl,
+                TotalPercentagePnl = totalPercentagePnl,
+                CurrencyName = userProfile!.Currency!.Name,
+                FetchedAt = DateTime.UtcNow,
+                SelectedAccountName = selectedAccount?.Name
+            };
         }
 
         public async Task<OilWidgetDto> GetOilWidgetAsync(Guid userId, OilWidgetRequestDto request)

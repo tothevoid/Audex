@@ -11,6 +11,7 @@ using Audex.Shared.Common;
 using Audex.Application.DTO.Crypto;
 using Audex.Application.DTO.Currencies;
 using Audex.Application.DTO.Dashboard;
+using Audex.Application.DTO.Dashboard.Widgets;
 using Audex.Application.DTO.Debts;
 using Audex.Application.DTO.Deposits;
 using Audex.Application.DTO.Notifications;
@@ -278,5 +279,8 @@ namespace Audex.WebApi.Mappings
         public partial UserDashboardModel Map(UserDashboardDto dto);
         public partial UserDashboardDto Map(UserDashboardModel model);
         public partial IEnumerable<UserDashboardModel> Map(IEnumerable<UserDashboardDto> dtos);
+
+        public partial BrokerPnlWidgetModel Map(BrokerPnlWidgetDto dto);
+        public partial BrokerPnlWidgetRequestDto Map(BrokerPnlWidgetRequestModel model);
     }
 }

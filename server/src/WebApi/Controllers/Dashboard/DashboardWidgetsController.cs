@@ -2,10 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Dashboard.Widgets;
 using Audex.Application.Interfaces.Dashboard;
 using Audex.Infrastructure.Constants;
+using Audex.WebApi.Mappings;
+using Audex.WebApi.Models.Dashboard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,10 +21,25 @@ namespace Audex.WebApi.Controllers.Dashboard
     public class DashboardWidgetsController : ControllerBase
     {
         private readonly IDashboardWidgetsService _dashboardWidgetsService;
+        private readonly WebApiMapper _mapper;
 
-        public DashboardWidgetsController(IDashboardWidgetsService dashboardWidgetsService)
+        public DashboardWidgetsController(
+            IDashboardWidgetsService dashboardWidgetsService,
+            WebApiMapper mapper)
         {
             _dashboardWidgetsService = dashboardWidgetsService;
+            _mapper = mapper;
+        }
+
+        [HttpPost("GetBrokerPnl")]
+        public async Task<ActionResult<BrokerPnlWidgetModel>> GetBrokerPnlAsync(
+            [FromBody] BrokerPnlWidgetRequestModel request,
+            CancellationToken cancellationToken)
+        {
+            var userId = GetUserId();
+            var requestDto = _mapper.Map(request);
+            var widgetData = await _dashboardWidgetsService.GetBrokerPnlWidgetAsync(userId, requestDto, cancellationToken);
+            return Ok(_mapper.Map(widgetData));
         }
 
         [HttpPost("GetOil")]

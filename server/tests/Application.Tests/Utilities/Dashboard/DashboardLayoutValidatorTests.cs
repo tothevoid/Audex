@@ -356,6 +356,31 @@ namespace Audex.Application.Tests.Utilities.Dashboard
         }
 
         [Fact]
+        public void ValidateAndParse_WithBrokerPnlWidget_ReturnsParsedWidgets()
+        {
+            const string layoutJson = """
+            [
+                {
+                    "id": "broker-pnl-1",
+                    "type": "BrokerPnl",
+                    "title": "Дневной и общий P&L",
+                    "refreshIntervalSeconds": 60,
+                    "grid": { "x": 0, "y": 0, "w": 6, "h": 4 },
+                    "settings": {
+                        "brokerAccountId": "00000000-0000-0000-0000-000000000001"
+                    }
+                }
+            ]
+            """;
+
+            var widgets = DashboardLayoutValidator.ValidateAndParse(layoutJson);
+
+            Assert.Single(widgets);
+            Assert.Equal("broker-pnl-1", widgets[0].Id);
+            Assert.Equal("BrokerPnl", widgets[0].Type);
+        }
+
+        [Fact]
         public void ValidateAndParse_WithCurrencyRatesWidget_ReturnsParsedWidgets()
         {
             var layoutJson = """

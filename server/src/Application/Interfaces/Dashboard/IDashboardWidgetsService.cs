@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Dashboard.Widgets;
 
@@ -7,6 +8,8 @@ namespace Audex.Application.Interfaces.Dashboard
 {
     public interface IDashboardWidgetsService
     {
+        Task<BrokerPnlWidgetDto> GetBrokerPnlWidgetAsync(Guid userId, BrokerPnlWidgetRequestDto request, CancellationToken cancellationToken = default);
+
         Task<OilWidgetDto> GetOilWidgetAsync(Guid userId, OilWidgetRequestDto request);
 
         Task<IReadOnlyList<string>> GetSupportedOilSymbolsAsync();
