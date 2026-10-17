@@ -3,7 +3,6 @@ import { Badge, Box, Flex, HStack, Span, Text } from '@chakra-ui/react';
 import { PiCoinsLight } from 'react-icons/pi';
 import { useTranslation } from 'react-i18next';
 import { DividendPaymentEntity } from '@/models/brokers/DividendPaymentEntity';
-import { formatTime } from '@/shared/utilities/formatters/dateFormatter';
 import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
 import { getIconUrl } from '@/api/securities/securityApi';
 import StoredIcon from '@/shared/components/StoredIcon';
@@ -23,8 +22,8 @@ const DividendPayment: React.FC<Props> = ({
     onEditClicked,
     onDeleteClicked
 }) => {
-    const { dividend, securitiesQuantity, tax, receivedAt, brokerAccount } = dividendPayment;
-    const { t, i18n } = useTranslation();
+    const { dividend, securitiesQuantity, tax, brokerAccount } = dividendPayment;
+    const { t } = useTranslation();
 
     const security = dividend.security;
     const currencyName = security?.currency?.name;
@@ -34,25 +33,8 @@ const DividendPayment: React.FC<Props> = ({
     return (
         <EntityCard p={3} my={2}>
             <Flex justifyContent="space-between" alignItems="center" gap={3}>
-                {/* Left Section: Time + Icon + Security Info */}
+                {/* Left Section: Icon + Security Info */}
                 <Flex alignItems="center" gap={3} flex={1} minW={0}>
-                    {/* Left Time Badge */}
-                    <Badge
-                        size="sm"
-                        variant="subtle"
-                        backgroundColor="background_secondary"
-                        color="text_secondary"
-                        borderRadius="md"
-                        px={2}
-                        py={1}
-                        fontSize="xs"
-                        fontWeight="semibold"
-                        letterSpacing="tight"
-                        flexShrink={0}
-                    >
-                        {formatTime(receivedAt, i18n)}
-                    </Badge>
-
                     {/* Security Avatar / Icon */}
                     <Flex
                         w={10}
