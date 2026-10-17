@@ -1,4 +1,3 @@
-import React from "react";
 import { Box, Text, Wrap } from "@chakra-ui/react";
 import { LuCheck } from "react-icons/lu";
 
