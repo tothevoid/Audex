@@ -191,22 +191,81 @@ namespace Audex.Application.Tests.Services.Brokers.Statements
                 price: 6402m,
                 isSell: false);
 
+            var statementTransaction = new ParsedStatementTransactionDto
+            {
+                Isin = "RU0009024277",
+                SecurityName = "Лукойл",
+                Ticker = "LKOH",
+                TradeDateTime = new DateTime(2025, 12, 8, 16, 46, 27, DateTimeKind.Utc),
+                IsSell = false,
+                Quantity = 1,
+                Price = 6900m,
+                BrokerCommission = 1m,
+                StockExchangeCommission = 0.5m,
+                Tax = 0m
+            };
+
             // Act
             var result = await ExecuteScopeAsync(async scopeProvider =>
             {
                 var engine = scopeProvider.GetRequiredService<IBrokerStatementDiffEngine>();
-                return await engine.ComputeDiffAsync(account.Id, "vtb", "Europe/Moscow", Array.Empty<ParsedStatementTransactionDto>());
+                return await engine.ComputeDiffAsync(account.Id, "vtb", "Europe/Moscow", new[] { statementTransaction });
             });
 
             // Assert
             Assert.NotNull(result);
             Assert.Equal(1, result.MissingCount);
 
-            var diffItem = result.DiffItems.First();
+            var diffItem = result.DiffItems.First(item => item.DiffType == StatementDiffType.MissingInStatement);
             Assert.Equal(StatementDiffType.MissingInStatement, diffItem.DiffType);
             Assert.Equal(existingTransaction.Id, diffItem.DatabaseTransaction!.Id);
             Assert.Null(diffItem.StatementTransaction);
             Assert.False(diffItem.SelectedForApply);
+        }
+
+        [Fact]
+        public async Task ComputeDiffAsync_Should_Not_Classify_DatabaseTransaction_As_Missing_When_Outside_Statement_Period()
+        {
+            // Arrange
+            var (account, security) = await SetupTestEnvironmentAsync(
+                isin: "RU000A0JRKT8",
+                ticker: "PHOR",
+                name: "ФосАгро ао");
+
+            // Database transaction is 4 days before statement start (falls within LoadDatabaseTransactions -3 days buffer)
+            var outsideTransaction = await AddTransactionAsync(
+                brokerAccountId: account.Id,
+                securityId: security.Id,
+                date: new DateTime(2025, 10, 13, 10, 0, 0, DateTimeKind.Utc),
+                quantity: 1,
+                price: 6402m,
+                isSell: false);
+
+            var statementTransaction = new ParsedStatementTransactionDto
+            {
+                Isin = "RU000A0JRKT8",
+                SecurityName = "ФосАгро ао",
+                Ticker = "PHOR",
+                TradeDateTime = new DateTime(2025, 10, 17, 10, 0, 0, DateTimeKind.Utc),
+                IsSell = false,
+                Quantity = 5,
+                Price = 6500m,
+                BrokerCommission = 2m,
+                StockExchangeCommission = 1m,
+                Tax = 0m
+            };
+
+            // Act
+            var result = await ExecuteScopeAsync(async scopeProvider =>
+            {
+                var engine = scopeProvider.GetRequiredService<IBrokerStatementDiffEngine>();
+                return await engine.ComputeDiffAsync(account.Id, "vtb", "Europe/Moscow", new[] { statementTransaction });
+            });
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(0, result.MissingCount);
+            Assert.DoesNotContain(result.DiffItems, item => item.DatabaseTransaction?.Id == outsideTransaction.Id);
         }
 
         [Fact]

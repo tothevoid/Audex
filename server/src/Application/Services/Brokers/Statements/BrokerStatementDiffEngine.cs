@@ -87,7 +87,12 @@ namespace Audex.Application.Services.Brokers.Statements
                 diffItems,
                 matchedDatabaseIds);
 
-            AppendMissingDatabaseTransactions(diffItems, databaseTransactions, matchedDatabaseIds);
+            AppendMissingDatabaseTransactions(
+                diffItems,
+                databaseTransactions,
+                matchedDatabaseIds,
+                result.PeriodStart.Value,
+                result.PeriodEnd.Value);
             result.SetDiffItems(diffItems);
 
             return result;
@@ -379,15 +384,39 @@ namespace Audex.Application.Services.Brokers.Statements
         private static void AppendMissingDatabaseTransactions(
             List<BrokerStatementDiffItemDto> diffItems,
             IReadOnlyList<SecurityTransaction> databaseTransactions,
-            HashSet<Guid> matchedDatabaseIds)
+            HashSet<Guid> matchedDatabaseIds,
+            DateTime periodStart,
+            DateTime periodEnd)
         {
             foreach (var databaseTransaction in databaseTransactions)
             {
-                if (!matchedDatabaseIds.Contains(databaseTransaction.Id))
+                if (!matchedDatabaseIds.Contains(databaseTransaction.Id) &&
+                    IsWithinStatementPeriod(databaseTransaction.Date, periodStart, periodEnd))
                 {
                     diffItems.Add(BrokerStatementDiffItemDto.CreateMissingInStatement(databaseTransaction));
                 }
             }
+        }
+
+        private static bool IsWithinStatementPeriod(
+            DateTime databaseTransactionDate,
+            DateTime periodStart,
+            DateTime periodEnd)
+        {
+            var transactionDate = DateOnly.FromDateTime(databaseTransactionDate);
+            var startDate = DateOnly.FromDateTime(periodStart);
+            var endDate = DateOnly.FromDateTime(periodEnd);
+
+            if (transactionDate >= startDate && transactionDate <= endDate)
+            {
+                return true;
+            }
+
+            var transactionLocalDate = DateOnly.FromDateTime(databaseTransactionDate.ToLocalTime());
+            var startLocalDate = DateOnly.FromDateTime(periodStart.ToLocalTime());
+            var endLocalDate = DateOnly.FromDateTime(periodEnd.ToLocalTime());
+
+            return transactionLocalDate >= startLocalDate && transactionLocalDate <= endLocalDate;
         }
 
 
