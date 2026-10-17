@@ -7,9 +7,16 @@ export const getChartLabelConfig = () => {
     };
 };
 
+export interface ChartPayloadItem {
+    payload?: {
+        date?: string;
+    };
+}
+
 export interface ChartClickEvent {
     activeLabel?: unknown;
     activeTooltipIndex?: unknown;
+    activePayload?: readonly ChartPayloadItem[];
 }
 
 export const extractDateFromChartClick = (
@@ -18,8 +25,16 @@ export const extractDateFromChartClick = (
 ): Date | null => {
     let dateString: string | undefined;
 
-    if (typeof event?.activeLabel === "string") {
+    const payloadDate = event?.activePayload?.[0]?.payload?.date;
+    if (typeof payloadDate === "string") {
+        dateString = payloadDate;
+    } else if (typeof event?.activeLabel === "string") {
         dateString = event.activeLabel;
+    } else if (
+        typeof event?.activeLabel === "number" &&
+        data[event.activeLabel]
+    ) {
+        dateString = data[event.activeLabel].date;
     } else if (
         typeof event?.activeTooltipIndex === "number" &&
         data[event.activeTooltipIndex]

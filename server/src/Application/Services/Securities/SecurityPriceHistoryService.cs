@@ -13,6 +13,7 @@ using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Notifications;
 using Audex.Application.Interfaces.Securities;
 using Audex.Application.Mappings;
+using Audex.Application.Utilities;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Entities.Notifications;
 using Audex.Infrastructure.Entities.Securities;
@@ -57,7 +58,15 @@ namespace Audex.Application.Services.Securities
             DateOnly? endDate = null,
             CancellationToken cancellationToken = default)
         {
-            var effectiveEndDate = endDate ?? DateOnly.FromDateTime(DateTime.UtcNow);
+            var yesterday = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
+            var effectiveEndDate = endDate.HasValue
+                ? DateUtilities.Min(endDate.Value, yesterday)
+                : yesterday;
+
+            if (startDate.HasValue && startDate.Value > effectiveEndDate)
+            {
+                return;
+            }
 
             foreach (var security in securities)
             {

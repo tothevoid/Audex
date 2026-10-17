@@ -45,7 +45,7 @@ namespace Audex.Application.Services.Brokers
 
         public async Task<IEnumerable<BrokerAccountTaxDeductionDto>> GetTillDateAsync(DateOnly date, Guid? brokerAccountId = null)
         {
-            var endDateTime = date.ToDateTime(TimeOnly.MaxValue);
+            var endDateTime = date.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc);
             Expression<Func<BrokerAccountTaxDeduction, bool>> filter = brokerAccountId.HasValue
                 ? taxDeduction => taxDeduction.BrokerAccountId == brokerAccountId.Value && taxDeduction.DateApplied <= endDateTime
                 : taxDeduction => taxDeduction.DateApplied <= endDateTime;

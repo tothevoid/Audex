@@ -5,6 +5,7 @@ import {
     AreaChart,
     Area,
     CartesianGrid,
+    XAxis,
     YAxis,
     Tooltip,
 } from "recharts";
@@ -82,6 +83,7 @@ export const BrokerAccountValueChart: React.FC<Props> = ({
                             stroke="var(--chakra-colors-border_primary)"
                             vertical={false}
                         />
+                        <XAxis dataKey="date" hide />
                         <YAxis
                             domain={["auto", "auto"]}
                             stroke="var(--chakra-colors-text_secondary)"

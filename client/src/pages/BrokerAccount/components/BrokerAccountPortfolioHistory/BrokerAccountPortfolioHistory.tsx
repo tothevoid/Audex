@@ -69,23 +69,37 @@ const BrokerAccountPortfolioHistory: React.FC<Props> = ({ brokerAccountId }) => 
 
     // 2. Load Chart Range Data
     useEffect(() => {
+        if (!dateBounds) {
+            return;
+        }
+
         let isMounted = true;
         const loadRange = async () => {
             setIsChartLoading(true);
+            setIsSnapshotLoading(true);
             try {
                 const points = await getBrokerAccountPortfolioHistoryByPeriod(
                     selectedPeriod,
                     brokerAccountId,
-                    dateBounds?.maxDate,
-                    dateBounds?.minDate
+                    dateBounds.maxDate,
+                    dateBounds.minDate
                 );
 
                 if (isMounted) {
                     setRangePoints(points);
+                    const formattedSelectedDate = convertToDateOnly(selectedDate);
+                    const matchedPoint =
+                        points.find((point) => point.date === formattedSelectedDate) ??
+                        points[points.length - 1];
+
+                    if (matchedPoint) {
+                        setHistory(matchedPoint);
+                    }
                 }
             } finally {
                 if (isMounted) {
                     setIsChartLoading(false);
+                    setIsSnapshotLoading(false);
                 }
             }
         };
@@ -97,9 +111,11 @@ const BrokerAccountPortfolioHistory: React.FC<Props> = ({ brokerAccountId }) => 
         };
     }, [brokerAccountId, selectedPeriod, dateBounds]);
 
-    // 3. Load Single Date Snapshot
+    // 3. Load Single Date Snapshot (only if selected date is outside chart range)
     useEffect(() => {
-        if (!selectedDate) return;
+        if (!selectedDate || isChartLoading || !dateBounds) {
+            return;
+        }
 
         const formattedSelectedDate = convertToDateOnly(selectedDate);
         const existingPoint = rangePoints.find(
@@ -112,30 +128,32 @@ const BrokerAccountPortfolioHistory: React.FC<Props> = ({ brokerAccountId }) => 
             return;
         }
 
-        let isMounted = true;
-        const loadSnapshot = async () => {
-            setIsSnapshotLoading(true);
-            try {
-                const result = await getBrokerAccountPortfolioHistory(
-                    brokerAccountId,
-                    selectedDate
-                );
-                if (result && isMounted) {
-                    setHistory(result);
+        if (rangePoints.length > 0) {
+            let isMounted = true;
+            const loadSnapshot = async () => {
+                setIsSnapshotLoading(true);
+                try {
+                    const result = await getBrokerAccountPortfolioHistory(
+                        brokerAccountId,
+                        selectedDate
+                    );
+                    if (result && isMounted) {
+                        setHistory(result);
+                    }
+                } finally {
+                    if (isMounted) {
+                        setIsSnapshotLoading(false);
+                    }
                 }
-            } finally {
-                if (isMounted) {
-                    setIsSnapshotLoading(false);
-                }
-            }
-        };
+            };
 
-        loadSnapshot();
+            loadSnapshot();
 
-        return () => {
-            isMounted = false;
-        };
-    }, [brokerAccountId, selectedDate, rangePoints]);
+            return () => {
+                isMounted = false;
+            };
+        }
+    }, [brokerAccountId, selectedDate, rangePoints, isChartLoading, dateBounds]);
 
     if (!user) return <Fragment />;
 

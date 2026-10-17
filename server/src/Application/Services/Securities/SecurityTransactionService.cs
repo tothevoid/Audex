@@ -92,7 +92,7 @@ namespace Audex.Application.Services.Securities
 
         public async Task<IEnumerable<SecurityTransactionDto>> GetTillDateAsync(DateOnly date, Guid? brokerAccountId = null)
         {
-            var endDateTime = date.ToDateTime(TimeOnly.MaxValue);
+            var endDateTime = date.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc);
             Expression<Func<SecurityTransaction, bool>> filter = brokerAccountId.HasValue
                 ? transaction => transaction.BrokerAccountId == brokerAccountId.Value && transaction.Date <= endDateTime
                 : transaction => transaction.Date <= endDateTime;

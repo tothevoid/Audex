@@ -86,7 +86,7 @@ namespace Audex.Application.Services.Brokers
 
         public async Task<IEnumerable<BrokerAccountFundsTransferDto>> GetTillDateAsync(DateOnly date, Guid? brokerAccountId = null)
         {
-            var endDateTime = date.ToDateTime(TimeOnly.MaxValue);
+            var endDateTime = date.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc);
             Expression<Func<BrokerAccountFundsTransfer, bool>> filter = brokerAccountId.HasValue
                 ? transfer => transfer.BrokerAccountId == brokerAccountId.Value && transfer.Date <= endDateTime
                 : transfer => transfer.Date <= endDateTime;
