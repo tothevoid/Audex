@@ -10,6 +10,7 @@ import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 import SectionHeader from '@/shared/components/SectionHeader';
 import { Nullable } from '@/shared/utilities/nullable';
 import PaginatedList from '@/shared/components/PaginatedList/PaginatedList';
+import AddButton from '@/shared/components/AddButton/AddButton';
 
 interface Props {
 	securityId: string;
@@ -72,7 +73,7 @@ const DividendList: React.FC<Props> = (props) => {
 				title={t("security_page_tabs_dividends")}
 				size="lg"
 				onAdd={onAddClicked}
-				addButtonTitle={t("security_page_summary_add")}
+				addButtonTitle={t("security_page_add_dividend_button")}
 				my={4}
 			/>
 			<PaginatedList
@@ -85,6 +86,8 @@ const DividendList: React.FC<Props> = (props) => {
 					loadPage
 				}}
 				emptyText={t("dividends_empty")}
+				emptyAction={<AddButton buttonTitle={t("security_page_add_dividend_button")} onClick={onAddClicked} />}
+				itemGap={0}
 				keySelector={(dividend) => dividend.id}
 				renderItem={(dividend) => (
 					<Dividend
@@ -96,7 +99,7 @@ const DividendList: React.FC<Props> = (props) => {
 			/>
 			<ConfirmModal
 				onConfirmed={onDeleteConfirmed}
-				title={t("transaction_delete_title")}
+				title={t("entity_dividend_delete_title")}
 				message={t("modals_delete_message")}
 				confirmActionName={t("modals_delete_button")}
 				ref={confirmModalRef}

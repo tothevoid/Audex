@@ -5,6 +5,8 @@
     "entity_dividend_snapshot_date": "Дата фиксации реестра",
     "entity_dividend_payment_date": "Дата выплаты",
     "entity_dividend_security_amount": "Дивиденд на акцию",
+    "security_page_add_dividend_button": "Добавить дивиденд",
+    "entity_dividend_delete_title": "Удалить дивиденд",
 
     "entity_dividend_payment_form_title": "Выплата дивидендов",
     "entity_dividend_payment_broker_account": "Брокерский счёт",

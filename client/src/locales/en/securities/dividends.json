@@ -5,6 +5,8 @@
     "entity_dividend_snapshot_date": "Snapshot date",
     "entity_dividend_payment_date": "Payment date",
     "entity_dividend_security_amount": "Dividend",
+    "security_page_add_dividend_button": "Add dividend",
+    "entity_dividend_delete_title": "Delete dividend",
 
     "entity_dividend_payment_form_title": "Dividend payment",
     "entity_dividend_payment_broker_account": "Broker account",
