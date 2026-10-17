@@ -6,6 +6,7 @@ interface Props<TFieldValues extends FieldValues> {
     control: Control<TFieldValues>;
     fullWidth?: boolean;
     isDateTime?: boolean;
+    showSeconds?: boolean;
     disabled?: boolean;
     minDate?: Date | null;
     maxDate?: Date | null;
@@ -18,6 +19,8 @@ const DateSelect = <TFieldValues extends FieldValues>({
     name,
     control,
     fullWidth = true,
+    isDateTime = false,
+    showSeconds = true,
     disabled = false,
     minDate,
     maxDate,
@@ -35,6 +38,8 @@ const DateSelect = <TFieldValues extends FieldValues>({
                     value={value}
                     onChange={onChange}
                     fullWidth={fullWidth}
+                    isDateTime={isDateTime}
+                    showSeconds={showSeconds}
                     disabled={disabled}
                     minDate={minDate}
                     maxDate={maxDate}

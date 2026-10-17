@@ -1,14 +1,17 @@
 import React, { useCallback, useMemo } from "react";
 import {
+    Box,
     Button,
     DatePicker as ChakraDatePicker,
     Flex,
+    HStack,
     IconButton,
     Portal,
 } from "@chakra-ui/react";
 import { CalendarDate, DateValue } from "@internationalized/date";
 import { LuCalendar, LuX } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
+import TimeInput from "@/shared/components/TimeInput/TimeInput";
 
 export interface DatePickerProps {
     value?: Date | string | null;
@@ -16,6 +19,8 @@ export interface DatePickerProps {
     minDate?: Date | null;
     maxDate?: Date | null;
     isClearable?: boolean;
+    isDateTime?: boolean;
+    showSeconds?: boolean;
     placeholder?: string;
     size?: "xs" | "sm" | "md" | "lg";
     width?: string | number | object;
@@ -39,6 +44,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     minDate,
     maxDate,
     isClearable = false,
+    isDateTime = false,
+    showSeconds = true,
     placeholder,
     size = "sm",
     width,
@@ -77,10 +84,47 @@ export const DatePicker: React.FC<DatePickerProps> = ({
         }
 
         const firstDateValue = details.value[0];
-        onChange?.(new Date(firstDateValue.year, firstDateValue.month - 1, firstDateValue.day));
+        const nextDate = new Date(firstDateValue.year, firstDateValue.month - 1, firstDateValue.day);
+
+        if (isDateTime) {
+            const timeSource = selectedDate && !isNaN(selectedDate.getTime()) ? selectedDate : new Date();
+            nextDate.setHours(
+                timeSource.getHours(),
+                timeSource.getMinutes(),
+                timeSource.getSeconds(),
+                timeSource.getMilliseconds()
+            );
+        }
+
+        onChange?.(nextDate);
     };
 
-    return (
+    const handleTimeChange = (timeString: string) => {
+        if (!timeString) {
+            return;
+        }
+
+        const baseDate = selectedDate && !isNaN(selectedDate.getTime()) ? new Date(selectedDate) : new Date();
+        const timeSegments = timeString.split(":").map(Number);
+        const hours = timeSegments[0] ?? 0;
+        const minutes = timeSegments[1] ?? 0;
+        const seconds = timeSegments[2] ?? 0;
+
+        baseDate.setHours(hours, minutes, seconds, 0);
+        onChange?.(baseDate);
+    };
+
+    const timeValue = useMemo(() => {
+        if (!selectedDate) {
+            return "";
+        }
+        const hours = String(selectedDate.getHours()).padStart(2, "0");
+        const minutes = String(selectedDate.getMinutes()).padStart(2, "0");
+        const seconds = String(selectedDate.getSeconds()).padStart(2, "0");
+        return showSeconds ? `${hours}:${minutes}:${seconds}` : `${hours}:${minutes}`;
+    }, [selectedDate, showSeconds]);
+
+    const datePickerRoot = (
         <ChakraDatePicker.Root
             value={rootValues}
             onValueChange={handleValueChange}
@@ -95,7 +139,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
             name={name}
             id={id}
             positioning={{ placement: "bottom-start", sameWidth: false }}
-            width={fullWidth ? "100%" : width}
+            width={fullWidth && !isDateTime ? "100%" : width}
             maxW={maxW}
         >
             <ChakraDatePicker.Control>
@@ -192,6 +236,30 @@ export const DatePicker: React.FC<DatePickerProps> = ({
                 </ChakraDatePicker.Positioner>
             </Portal>
         </ChakraDatePicker.Root>
+    );
+
+    if (!isDateTime) {
+        return datePickerRoot;
+    }
+
+    const timeInputWidth = showSeconds ? "125px" : "100px";
+
+    return (
+        <HStack gap={2} width={fullWidth ? "100%" : width} maxW={maxW} align="center">
+            <Box flex={1} minW={0}>
+                {datePickerRoot}
+            </Box>
+            <TimeInput
+                value={timeValue}
+                onChange={handleTimeChange}
+                disabled={disabled}
+                size={size}
+                step={showSeconds ? "1" : undefined}
+                width={timeInputWidth}
+                minW={timeInputWidth}
+                maxW={timeInputWidth}
+            />
+        </HStack>
     );
 };
 
