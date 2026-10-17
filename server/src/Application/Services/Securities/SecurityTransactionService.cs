@@ -149,16 +149,34 @@ namespace Audex.Application.Services.Securities
                 .OrderBy(dividendPayment => dividendPayment.ReceivedAt)
                 .ToArray();
 
+            var distinctDividends = dividendsPayments
+                .GroupBy(dividendPayment => dividendPayment.DividendId)
+                .Select(dividendGroup =>
+                {
+                    var firstPayment = dividendGroup.First();
+                    var totalSecuritiesQuantity = dividendGroup.Sum(payment => payment.SecuritiesQuantity);
+                    var totalTax = dividendGroup.Sum(payment => payment.Tax);
+                    var taxPerShare = totalSecuritiesQuantity > 0 ? totalTax / totalSecuritiesQuantity : 0;
+                    var netDividendPerShare = firstPayment.Dividend.Amount - taxPerShare;
+
+                    return new
+                    {
+                        SnapshotDate = firstPayment.Dividend.SnapshotDate,
+                        NetDividendPerShare = netDividendPerShare
+                    };
+                })
+                .ToArray();
+
             var convertedTransactions = new List<SecurityTransactionsHistoryDto>();
 
             //TODO: include sold securities
             foreach (var transaction in transactions)
             {
-                var date = DateOnly.FromDateTime(transaction.Date);
+                var transactionDate = DateOnly.FromDateTime(transaction.Date);
 
-                var paymentsSum = dividendsPayments
-                    .Where(payment => payment.Dividend.SnapshotDate > date)
-                    .Sum(payment => payment.Dividend.Amount - payment.Tax / payment.SecuritiesQuantity);
+                var paymentsSum = distinctDividends
+                    .Where(distinctDividend => distinctDividend.SnapshotDate > transactionDate)
+                    .Sum(distinctDividend => distinctDividend.NetDividendPerShare);
 
                 convertedTransactions.Add(new SecurityTransactionsHistoryDto()
                 {

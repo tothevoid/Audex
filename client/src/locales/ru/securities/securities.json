@@ -32,7 +32,7 @@
     "securities_transactions_with_dividends": "с дивидендами",
     "securities_transactions_without_dividends": "без дивидендов",
     "securities_transactions_volume": "Объём",
-    "securities_transactions_current_price": "тек.",
+    "securities_transactions_current_price": "текущее",
     "security_page_tabs_history": "История котировок",
     "security_page_tabs_transactions": "Сделки",
     "security_page_tabs_dividends": "Дивиденды",
@@ -73,7 +73,6 @@
     "security_transaction_broker_commission_short": "брокеру",
     "security_transaction_exchange_commission_short": "бирже",
     "security_transaction_tax_short": "налог",
-
     "security_transactions_toast_created_title": "Сделка добавлена",
     "security_transactions_toast_created_desc": "Транзакция по ценной бумаге «{{name}}» успешно добавлена",
     "security_transactions_toast_updated_title": "Сделка обновлена",
