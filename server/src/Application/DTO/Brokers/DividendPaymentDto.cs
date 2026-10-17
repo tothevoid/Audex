@@ -1,8 +1,6 @@
-﻿using Audex.Infrastructure.Entities.Brokers;
-using Audex.Infrastructure.Entities.Securities;
-using Audex.Shared.Entities;
 using System;
 using Audex.Application.DTO.Securities;
+using Audex.Shared.Entities;
 
 namespace Audex.Application.DTO.Brokers
 {
@@ -21,5 +19,9 @@ namespace Audex.Application.DTO.Brokers
         public decimal Tax { get; set; }
 
         public DateOnly ReceivedAt { get; set; }
+
+        public decimal GrossAmount => SecuritiesQuantity * (Dividend?.Amount ?? 0m);
+
+        public decimal NetAmount => GrossAmount - Tax;
     }
 }

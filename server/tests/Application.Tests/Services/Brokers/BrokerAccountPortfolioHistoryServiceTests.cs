@@ -120,13 +120,13 @@ namespace Audex.Application.Tests.Services.Brokers
             var reportByAccount = await ExecuteScopeAsync(async sp =>
             {
                 var reportService = sp.GetRequiredService<IBrokerAccountPortfolioHistoryService>();
-                return await reportService.GetByBrokerAccountAsync(targetDate, brokerAccountId);
+                return await reportService.GetHistoryAsync(targetDate, brokerAccountId);
             });
 
             Assert.NotNull(reportByAccount);
             Assert.Equal(targetDate, reportByAccount.Date);
             Assert.Equal(5000m, reportByAccount.TotalDeposited);
-            Assert.Equal(1000m, reportByAccount.TotalWithdraw);
+            Assert.Equal(1000m, reportByAccount.TotalWithdrawn);
             Assert.Equal(500m, reportByAccount.TotalTaxDeduction);
             Assert.Equal(15m, reportByAccount.TotalDividends);
             Assert.Equal(3015m, reportByAccount.MainCurrencyAmount);
@@ -136,11 +136,85 @@ namespace Audex.Application.Tests.Services.Brokers
             var reportAll = await ExecuteScopeAsync(async sp =>
             {
                 var reportService = sp.GetRequiredService<IBrokerAccountPortfolioHistoryService>();
-                return await reportService.GetAllAsync(targetDate);
+                return await reportService.GetHistoryAsync(targetDate);
             });
 
             Assert.NotNull(reportAll);
             Assert.Equal(targetDate, reportAll.Date);
+        }
+
+        [Fact]
+        public async Task TestGetDateBoundsAsync_ReturnsEarliestTransactionAndMaxDate()
+        {
+            var (brokerAccountId, accountId, securityId) = await SetupDependencies();
+
+            var initialBounds = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var historyService = serviceProvider.GetRequiredService<IBrokerAccountPortfolioHistoryService>();
+                return await historyService.GetDateBoundsAsync(brokerAccountId);
+            });
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            Assert.Equal(today, initialBounds.MinDate);
+            Assert.Equal(today, initialBounds.MaxDate);
+
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var transactionService = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                await transactionService.AddAsync(new SecurityTransactionDto
+                {
+                    SecurityId = securityId,
+                    BrokerAccountId = brokerAccountId,
+                    Quantity = 10,
+                    Price = 100m,
+                    IsSell = false,
+                    Date = new DateTime(2026, 3, 15, 10, 0, 0, DateTimeKind.Utc)
+                });
+            });
+
+            var updatedBounds = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var historyService = serviceProvider.GetRequiredService<IBrokerAccountPortfolioHistoryService>();
+                return await historyService.GetDateBoundsAsync(brokerAccountId);
+            });
+
+            Assert.Equal(new DateOnly(2026, 3, 15), updatedBounds.MinDate);
+            Assert.Equal(today, updatedBounds.MaxDate);
+        }
+
+        [Fact]
+        public async Task TestGetRangeHistoryAsync_ReturnsPointsForDateRange()
+        {
+            var (brokerAccountId, accountId, securityId) = await SetupDependencies();
+
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var fundsService = serviceProvider.GetRequiredService<IBrokerAccountFundsTransferService>();
+                await fundsService.AddAsync(new BrokerAccountFundsTransferDto
+                {
+                    BrokerAccountId = brokerAccountId,
+                    AccountId = accountId,
+                    Amount = 3000m,
+                    Income = true,
+                    Date = new DateTime(2026, 4, 1, 10, 0, 0, DateTimeKind.Utc)
+                });
+            });
+
+            var points = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var historyService = serviceProvider.GetRequiredService<IBrokerAccountPortfolioHistoryService>();
+                return await historyService.GetRangeHistoryAsync(
+                    new DateOnly(2026, 4, 1),
+                    new DateOnly(2026, 4, 3),
+                    brokerAccountId);
+            });
+
+            Assert.NotNull(points);
+            var pointList = points.ToList();
+            Assert.Equal(3, pointList.Count);
+            Assert.Equal(new DateOnly(2026, 4, 1), pointList[0].Date);
+            Assert.Equal(3000m, pointList[0].PortfolioValue);
+            Assert.Equal(new DateOnly(2026, 4, 3), pointList[2].Date);
+            Assert.Equal(3000m, pointList[2].PortfolioValue);
         }
 
         private async Task<(Guid brokerAccountId, Guid accountId, Guid securityId)> SetupDependencies()

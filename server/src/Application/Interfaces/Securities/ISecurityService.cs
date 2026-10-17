@@ -17,10 +17,11 @@ namespace Audex.Application.Interfaces.Securities
         Task<MarketSecurityInfoDto?> SearchMarketAsync(string query);
 
         Task<IEnumerable<SecurityDto>> FindByTickersAsync(IEnumerable<string> tickers);
+        Task<IEnumerable<SecurityDto>> GetByIdsAsync(IEnumerable<Guid> ids);
 
         Task<SecurityDto> GetByIdAsync(Guid id, bool loadHierarchy = true, bool disableTracking = true);
         Task<SecurityStatsDto> GetStatsAsync(Guid securityId);
-        Task<SecurityHistoryDto> GetTickerHistoryAsync(string ticker, SecurityHistoryPeriod period = SecurityHistoryPeriod.Day1);
+        Task<SecurityHistoryDto> GetTickerHistoryAsync(string ticker, ChartPeriod period = ChartPeriod.Day1);
         Task<OperationResultDto<SecurityDto>> AddAsync(SecurityDto security, IFormFile? securityIcon);
         Task<OperationResultDto<SecurityDto>> UpdateAsync(SecurityDto security, IFormFile? securityIcon);
         Task<FileStreamDto> GetIconStreamAsync(string iconKey);

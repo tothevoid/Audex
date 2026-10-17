@@ -16,5 +16,7 @@
   "pull_quotations_name": "Обновление котировок MOEX",
   "pull_quotations_desc": "Периодическое получение актуальных котировок ценных бумаг с Московской биржи",
   "pull_crypto_prices_name": "Обновление цен криптовалют",
-  "pull_crypto_prices_desc": "Периодическое получение актуальных цен криптовалют в USD с CoinGecko"
+  "pull_crypto_prices_desc": "Периодическое получение актуальных цен криптовалют в USD с CoinGecko",
+  "sync_security_prices_history_name": "Синхронизация истории котировок акций",
+  "sync_security_prices_history_desc": "Проактивное кэширование дневных цен закрытия ценных бумаг с MOEX для аналитики портфеля"
 }

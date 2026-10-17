@@ -50,6 +50,20 @@ namespace Audex.Application.Services.Brokers
             return _mapper.Map(pagedDividends);
         }
 
+        public async Task<IEnumerable<DividendPaymentDto>> GetTillDateAsync(DateOnly date, Guid? brokerAccountId = null)
+        {
+            Expression<Func<DividendPayment, bool>> filter = brokerAccountId.HasValue
+                ? dividendPayment => dividendPayment.BrokerAccountId == brokerAccountId.Value && dividendPayment.ReceivedAt <= date
+                : dividendPayment => dividendPayment.ReceivedAt <= date;
+
+            var dividends = await _dividendPaymentRepo.GetAllAsync(
+                filter,
+                include: query => query.Include(payment => payment.Dividend),
+                disableTracking: true);
+
+            return _mapper.Map(dividends);
+        }
+
         public async Task<decimal> GetSumTillSpecificDateAsync(DateOnly date, Guid? brokerAccountId)
         {
             Expression<Func<DividendPayment, bool>> filter = brokerAccountId != null ?

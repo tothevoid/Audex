@@ -1,4 +1,3 @@
-import { BrokerAccountPortfolioHistoryEntity } from '@/models/brokers/BrokerAccountPortfolioHistoryEntity';
 import {
     BrokerAccountPortfolioDateBoundsEntity,
     BrokerAccountPortfolioDateBoundsEntityResponse,
@@ -48,13 +47,13 @@ export const calculatePortfolioRangeStartDate = (
 export const getBrokerAccountPortfolioHistory = async (
     brokerAccountId: Nullable<string> = null,
     date: Date | string
-): Promise<BrokerAccountPortfolioHistoryEntity | void> => {
+): Promise<BrokerAccountPortfolioTimelinePointEntity | void> => {
     const formattedDate = convertToDateOnly(date);
     const url = brokerAccountId
         ? `${basicUrl}/GetByBrokerAccount?date=${formattedDate}&brokerAccountId=${brokerAccountId}`
         : `${basicUrl}/GetAll?date=${formattedDate}`;
 
-    return await getEntity<BrokerAccountPortfolioHistoryEntity>(url);
+    return await getEntity<BrokerAccountPortfolioTimelinePointEntity>(url);
 };
 
 export const getBrokerAccountPortfolioDateBounds = async (
@@ -83,10 +82,15 @@ export const getBrokerAccountPortfolioHistoryRange = async (
     const formattedStartDate = convertToDateOnly(startDate);
     const formattedEndDate = convertToDateOnly(endDate);
 
-    const url = brokerAccountId
-        ? `${basicUrl}/GetRangeByBrokerAccount?startDate=${formattedStartDate}&endDate=${formattedEndDate}&brokerAccountId=${brokerAccountId}`
-        : `${basicUrl}/GetRange?startDate=${formattedStartDate}&endDate=${formattedEndDate}`;
+    const queryParameters = new URLSearchParams({
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+    });
+    if (brokerAccountId) {
+        queryParameters.set('brokerAccountId', brokerAccountId);
+    }
 
+    const url = `${basicUrl}/GetRange?${queryParameters.toString()}`;
     const result = await getAllEntities<BrokerAccountPortfolioTimelinePointEntity>(url);
     const points = result ?? [];
 

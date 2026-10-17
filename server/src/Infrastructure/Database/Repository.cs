@@ -29,6 +29,11 @@ namespace Audex.Infrastructure.Database
             await _entities.AddAsync(entity);
         }
 
+        public async Task AddRangeAsync(IEnumerable<TEntity> entities)
+        {
+            await _entities.AddRangeAsync(entities);
+        }
+
         public async Task<TEntity> GetByIdAsync(Guid id,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> include = null,
             bool disableTracking = true)
@@ -201,15 +206,23 @@ namespace Audex.Infrastructure.Database
             _entities.Remove(entity);
         }
 
-        public async Task<TEntity> GetMinAsync(Expression<Func<TEntity, object>> sortField)
+        public async Task<TEntity> GetMinAsync(Expression<Func<TEntity, object>> sortField, Expression<Func<TEntity, bool>> filter = null)
         {
             IQueryable<TEntity> query = _entities.AsNoTracking();
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
             return await query.OrderBy(sortField).Take(1).FirstOrDefaultAsync();
         }
 
-        public async Task<TEntity> GetMaxAsync(Expression<Func<TEntity, object>> sortField)
+        public async Task<TEntity> GetMaxAsync(Expression<Func<TEntity, object>> sortField, Expression<Func<TEntity, bool>> filter = null)
         {
             IQueryable<TEntity> query = _entities.AsNoTracking();
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
             return await query.OrderByDescending(sortField).Take(1).FirstOrDefaultAsync();
         }
 

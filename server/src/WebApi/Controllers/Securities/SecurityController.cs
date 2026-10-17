@@ -68,7 +68,7 @@ namespace Audex.WebApi.Controllers.Securities
         [HttpGet(nameof(GetTickerHistory))]
         public async Task<SecurityHistoryModel> GetTickerHistory(
             [FromQuery] string ticker,
-            [FromQuery] SecurityHistoryPeriod period = SecurityHistoryPeriod.Day1)
+            [FromQuery] ChartPeriod period = ChartPeriod.Day1)
         {
             var history = await _securityService.GetTickerHistoryAsync(ticker, period);
             return _mapper.Map(history);

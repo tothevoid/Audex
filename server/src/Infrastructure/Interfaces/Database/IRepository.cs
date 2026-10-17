@@ -13,6 +13,7 @@ namespace Audex.Infrastructure.Interfaces.Database
         where TEntity: class
     {
         Task AddAsync(TEntity entity);
+        Task AddRangeAsync(IEnumerable<TEntity> entities);
 
         Task<TEntity> GetByIdAsync(Guid id,
             Func<IQueryable<TEntity>, IQueryable<TEntity>> include = null,
@@ -39,9 +40,9 @@ namespace Audex.Infrastructure.Interfaces.Database
 
         Task DeleteAsync(Guid id);
 
-        Task<TEntity> GetMinAsync(Expression<Func<TEntity, object>> sortField);
+        Task<TEntity> GetMinAsync(Expression<Func<TEntity, object>> sortField, Expression<Func<TEntity, bool>> filter = null);
 
-        Task<TEntity> GetMaxAsync(Expression<Func<TEntity, object>> sortField);
+        Task<TEntity> GetMaxAsync(Expression<Func<TEntity, object>> sortField, Expression<Func<TEntity, bool>> filter = null);
 
         Task<decimal> GetSumAsync(Expression<Func<TEntity, decimal>> projection,
             Expression<Func<TEntity, bool>> filter = null);

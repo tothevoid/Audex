@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { BrokerAccountPortfolioHistoryEntity } from "@/models/brokers/BrokerAccountPortfolioHistoryEntity";
+import { BrokerAccountPortfolioTimelinePointEntity } from "@/models/brokers/BrokerAccountPortfolioTimelinePointEntity";
 import { Nullable } from "@/shared/utilities/nullable";
 import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import { getDiffColor } from "@/shared/utilities/numericDiffsUtilities";
@@ -9,7 +9,7 @@ import MoneyCard from "@/shared/components/MoneyCard/MoneyCard";
 import { LoadingGrid } from "@/shared/components/LoadingGrid";
 
 interface Props {
-    history: Nullable<BrokerAccountPortfolioHistoryEntity>;
+    history: Nullable<BrokerAccountPortfolioTimelinePointEntity>;
     currencyName: string;
     isLoading?: boolean;
 }
@@ -106,7 +106,7 @@ export const BrokerAccountPortfolioSnapshotCards: React.FC<Props> = ({
 
             <MoneyCard
                 title={t("broker_account_portfolio_history_total_withdrawn")}
-                value={history?.totalWithdraw ?? 0}
+                value={history?.totalWithdrawn ?? 0}
                 currency={currencyName}
             />
         </LoadingGrid>

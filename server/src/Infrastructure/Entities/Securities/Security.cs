@@ -33,5 +33,7 @@ namespace Audex.Infrastructure.Entities.Securities
         public ICollection<Dividend> Dividends { get; set; }
 
         public ICollection<SecurityTransaction> SecurityTransactions { get; set; }
+
+        public ICollection<SecurityPriceHistory> SecurityPriceHistories { get; set; }
     }
 }

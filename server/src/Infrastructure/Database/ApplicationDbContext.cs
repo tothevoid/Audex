@@ -46,6 +46,7 @@ namespace Audex.Infrastructure.Database
             modelBuilder.ApplyConfiguration(new CurrencyConfiguration());
             modelBuilder.ApplyConfiguration(new DepositConfiguration());
             modelBuilder.ApplyConfiguration(new SecurityConfiguration());
+            modelBuilder.ApplyConfiguration(new SecurityPriceHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new SecurityTransactionConfiguration());
             modelBuilder.ApplyConfiguration(new SecurityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new DividendConfiguration());

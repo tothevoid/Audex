@@ -15,6 +15,8 @@ namespace Audex.Application.Constants
             public const string BackupReadyMessage = "notifications.backup_ready_message";
             public const string BackupFailedTitle = "notifications.backup_failed_title";
             public const string BackupFailedMessage = "notifications.backup_failed_message";
+            public const string MissingSecurityQuotesTitle = "notifications.missing_security_quotes_title";
+            public const string MissingSecurityQuotesMessage = "notifications.missing_security_quotes_message";
         }
 
         public static class Scheduler
@@ -25,6 +27,7 @@ namespace Audex.Application.Constants
             public const string BackupSuccess = "scheduler.backup_success";
             public const string PullQuotationsSuccess = "scheduler.pull_quotations_success";
             public const string PullCryptoPricesSuccess = "scheduler.pull_crypto_prices_success";
+            public const string SyncSecurityPricesHistorySuccess = "scheduler.sync_security_prices_history_success";
         }
 
         public static class Reports
@@ -114,6 +117,12 @@ namespace Audex.Application.Constants
             {
                 public const string Name = "jobs.pull_crypto_prices_name";
                 public const string Description = "jobs.pull_crypto_prices_desc";
+            }
+
+            public static class SyncSecurityPricesHistory
+            {
+                public const string Name = "jobs.sync_security_prices_history_name";
+                public const string Description = "jobs.sync_security_prices_history_desc";
             }
         }
 

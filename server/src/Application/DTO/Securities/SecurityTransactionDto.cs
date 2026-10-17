@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Audex.Application.DTO.Brokers;
 using Audex.Shared.Entities;
 
@@ -28,6 +28,12 @@ namespace Audex.Application.DTO.Securities
 
         public bool IsSell { get; set; }
 
-        public decimal GetTotalPrice => Quantity * Price + BrokerCommission + StockExchangeCommission + Tax;
+        public decimal TotalCommissionsAndTax => BrokerCommission + StockExchangeCommission + Tax;
+
+        public decimal NetTotalPrice => IsSell
+            ? Quantity * Price - TotalCommissionsAndTax
+            : Quantity * Price + TotalCommissionsAndTax;
+
+        public decimal GetTotalPrice => NetTotalPrice;
     }
 }

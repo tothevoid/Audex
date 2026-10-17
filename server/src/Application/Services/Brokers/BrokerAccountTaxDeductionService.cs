@@ -43,6 +43,17 @@ namespace Audex.Application.Services.Brokers
             return _mapper.Map(entities);
         }
 
+        public async Task<IEnumerable<BrokerAccountTaxDeductionDto>> GetTillDateAsync(DateOnly date, Guid? brokerAccountId = null)
+        {
+            var endDateTime = date.ToDateTime(TimeOnly.MaxValue);
+            Expression<Func<BrokerAccountTaxDeduction, bool>> filter = brokerAccountId.HasValue
+                ? taxDeduction => taxDeduction.BrokerAccountId == brokerAccountId.Value && taxDeduction.DateApplied <= endDateTime
+                : taxDeduction => taxDeduction.DateApplied <= endDateTime;
+
+            var taxDeductions = await _brokerAccountTaxDeductionRepo.GetAllAsync(filter, disableTracking: true);
+            return _mapper.Map(taxDeductions);
+        }
+
         public async Task<decimal> GetSumTillSpecificDateAsync(DateOnly date, Guid? brokerAccountId)
         {
             Expression<Func<BrokerAccountTaxDeduction, bool>> filter = brokerAccountId != null ?

@@ -72,6 +72,11 @@ namespace Audex.Application.Mappings
         public partial SecurityTypeDto Map(SecurityType entity);
         public partial IEnumerable<SecurityTypeDto> Map(IEnumerable<SecurityType> entities);
 
+        [MapperIgnoreTarget(nameof(SecurityPriceHistory.Security))]
+        public partial SecurityPriceHistory Map(SecurityPriceHistoryDto dto);
+        public partial SecurityPriceHistoryDto Map(SecurityPriceHistory entity);
+        public partial IEnumerable<SecurityPriceHistoryDto> Map(IEnumerable<SecurityPriceHistory> entities);
+
         public partial Dividend Map(DividendDto dto);
         public partial DividendDto Map(Dividend entity);
         public partial IEnumerable<DividendDto> Map(IEnumerable<Dividend> entities);

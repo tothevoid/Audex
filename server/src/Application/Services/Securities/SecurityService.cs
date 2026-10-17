@@ -92,6 +92,17 @@ namespace Audex.Application.Services.Securities
             return _mapper.Map(securities);
         }
 
+        public async Task<IEnumerable<SecurityDto>> GetByIdsAsync(IEnumerable<Guid> ids)
+        {
+            var idList = ids.ToList();
+            var securities = await _securityRepo.GetAllAsync(
+                filter: security => idList.Contains(security.Id),
+                include: GetFullHierarchyColumns,
+                disableTracking: true);
+
+            return _mapper.Map(securities);
+        }
+
         public async Task<SecurityStatsDto> GetStatsAsync(Guid securityId)
         {
             // TODO: compare performance between db calls and linq calls
@@ -153,19 +164,20 @@ namespace Audex.Application.Services.Securities
 
         public async Task<SecurityHistoryDto> GetTickerHistoryAsync(
             string ticker,
-            SecurityHistoryPeriod period = SecurityHistoryPeriod.Day1)
+            ChartPeriod period = ChartPeriod.Day1)
         {
             var to = DateOnly.FromDateTime(DateTime.Now);
             var (from, interval) = period switch
             {
-                SecurityHistoryPeriod.Day1 => (to.AddDays(-1), 10),
-                SecurityHistoryPeriod.Week1 => (to.AddDays(-7), 60),
-                SecurityHistoryPeriod.Month1 => (to.AddMonths(-1), 24),
-                SecurityHistoryPeriod.Month3 => (to.AddMonths(-3), 24),
-                SecurityHistoryPeriod.Month6 => (to.AddMonths(-6), 24),
-                SecurityHistoryPeriod.Year1 => (to.AddYears(-1), 24),
-                SecurityHistoryPeriod.Year5 => (to.AddYears(-5), 7),
-                SecurityHistoryPeriod.Year10 => (to.AddYears(-10), 31),
+                ChartPeriod.Day1 => (to.AddDays(-1), 10),
+                ChartPeriod.Week1 => (to.AddDays(-7), 60),
+                ChartPeriod.Month1 => (to.AddMonths(-1), 24),
+                ChartPeriod.Month3 => (to.AddMonths(-3), 24),
+                ChartPeriod.Month6 => (to.AddMonths(-6), 24),
+                ChartPeriod.Year1 => (to.AddYears(-1), 24),
+                ChartPeriod.Year5 => (to.AddYears(-5), 7),
+                ChartPeriod.Year10 => (to.AddYears(-10), 31),
+                ChartPeriod.All => (to.AddYears(-20), 31),
                 _ => (to.AddYears(-1), 24)
             };
 

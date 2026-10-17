@@ -9,6 +9,9 @@ namespace Audex.Application.Interfaces.Brokers
     public interface IBrokerAccountFundsTransferService
     {
         Task<PagedResult<BrokerAccountFundsTransferDto>> GetAllAsync(BrokerAccountFundsTransferFilterDto filter = null);
+        Task<DateOnly?> GetEarliestDateAsync(Guid? brokerAccountId = null);
+        Task<DateOnly?> GetLatestDateAsync(Guid? brokerAccountId = null);
+        Task<IEnumerable<BrokerAccountFundsTransferDto>> GetTillDateAsync(DateOnly date, Guid? brokerAccountId = null);
         Task<(decimal deposited, decimal withdrawn)> GetSumTillSpecificDateAsync(DateOnly date, Guid? brokerAccountId);
         Task<BrokerAccountFundsTransferDto> AddAsync(BrokerAccountFundsTransferDto transfer);
         Task UpdateAsync(BrokerAccountFundsTransferDto transfer);

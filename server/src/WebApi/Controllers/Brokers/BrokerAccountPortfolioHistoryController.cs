@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Interfaces.Brokers;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Audex.WebApi.Controllers.Brokers
@@ -21,15 +22,38 @@ namespace Audex.WebApi.Controllers.Brokers
         }
 
         [HttpGet(nameof(GetAll))]
-        public async Task<BrokerAccountPortfolioHistoryDto> GetAll([FromQuery] DateOnly date)
+        public async Task<BrokerAccountPortfolioTimelinePointDto> GetAll([FromQuery] DateOnly date)
         {
-            return await _brokerAccountPortfolioHistoryService.GetAllAsync(AdjustDate(date));
+            return await _brokerAccountPortfolioHistoryService.GetHistoryAsync(AdjustDate(date));
         }
 
         [HttpGet(nameof(GetByBrokerAccount))]
-        public async Task<BrokerAccountPortfolioHistoryDto> GetByBrokerAccount([FromQuery] DateOnly date, [FromQuery] Guid brokerAccountId)
+        public async Task<BrokerAccountPortfolioTimelinePointDto> GetByBrokerAccount([FromQuery] DateOnly date, [FromQuery] Guid brokerAccountId)
         {
-            return await _brokerAccountPortfolioHistoryService.GetByBrokerAccountAsync(AdjustDate(date), brokerAccountId);
+            return await _brokerAccountPortfolioHistoryService.GetHistoryAsync(AdjustDate(date), brokerAccountId);
+        }
+
+        [HttpGet(nameof(GetDateBounds))]
+        public async Task<BrokerAccountPortfolioDateBoundsDto> GetDateBounds([FromQuery] Guid? brokerAccountId = null)
+        {
+            return await _brokerAccountPortfolioHistoryService.GetDateBoundsAsync(brokerAccountId);
+        }
+
+        [HttpGet(nameof(GetRange))]
+        public async Task<IEnumerable<BrokerAccountPortfolioTimelinePointDto>> GetRange(
+            [FromQuery] BrokerAccountPortfolioRangeFilterDto filter)
+        {
+            return await _brokerAccountPortfolioHistoryService.GetRangeHistoryAsync(
+                filter.StartDate,
+                filter.EndDate,
+                filter.BrokerAccountId);
+        }
+
+        [HttpGet(nameof(GetRangeByBrokerAccount))]
+        public Task<IEnumerable<BrokerAccountPortfolioTimelinePointDto>> GetRangeByBrokerAccount(
+            [FromQuery] BrokerAccountPortfolioRangeFilterDto filter)
+        {
+            return GetRange(filter);
         }
 
         private DateOnly AdjustDate(DateOnly date)

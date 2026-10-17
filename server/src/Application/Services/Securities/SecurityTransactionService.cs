@@ -52,6 +52,55 @@ namespace Audex.Application.Services.Securities
             return _mapper.Map(pagedTransactions);
         }
 
+        public async Task<DateOnly?> GetEarliestDateAsync(Guid? brokerAccountId = null)
+        {
+            Expression<Func<SecurityTransaction, bool>> filter = brokerAccountId.HasValue
+                ? transaction => transaction.BrokerAccountId == brokerAccountId.Value
+                : null;
+
+            var earliestTransaction = await _securityTransactionRepo.GetMinAsync(transaction => transaction.Date, filter);
+            return earliestTransaction != null ? DateOnly.FromDateTime(earliestTransaction.Date) : null;
+        }
+
+        public async Task<DateOnly?> GetEarliestDateBySecurityAsync(Guid securityId)
+        {
+            var earliestTransaction = await _securityTransactionRepo.GetMinAsync(
+                transaction => transaction.Date,
+                transaction => transaction.SecurityId == securityId);
+
+            return earliestTransaction != null ? DateOnly.FromDateTime(earliestTransaction.Date) : null;
+        }
+
+        public async Task<IEnumerable<Guid>> GetDistinctSecurityIdsAsync()
+        {
+            var transactions = await _securityTransactionRepo.GetAllAsync(disableTracking: true);
+            return transactions
+                .Select(transaction => transaction.SecurityId)
+                .Distinct()
+                .ToList();
+        }
+
+        public async Task<DateOnly?> GetLatestDateAsync(Guid? brokerAccountId = null)
+        {
+            Expression<Func<SecurityTransaction, bool>> filter = brokerAccountId.HasValue
+                ? transaction => transaction.BrokerAccountId == brokerAccountId.Value
+                : null;
+
+            var latestTransaction = await _securityTransactionRepo.GetMaxAsync(transaction => transaction.Date, filter);
+            return latestTransaction != null ? DateOnly.FromDateTime(latestTransaction.Date) : null;
+        }
+
+        public async Task<IEnumerable<SecurityTransactionDto>> GetTillDateAsync(DateOnly date, Guid? brokerAccountId = null)
+        {
+            var endDateTime = date.ToDateTime(TimeOnly.MaxValue);
+            Expression<Func<SecurityTransaction, bool>> filter = brokerAccountId.HasValue
+                ? transaction => transaction.BrokerAccountId == brokerAccountId.Value && transaction.Date <= endDateTime
+                : transaction => transaction.Date <= endDateTime;
+
+            var transactions = await _securityTransactionRepo.GetAllAsync(filter, disableTracking: true);
+            return _mapper.Map(transactions);
+        }
+
         public async Task<Dictionary<string, SecurityTransactionsSummaryDto>> GetSummaryTillSpecificDateAsync(DateOnly date, Guid? brokerAccountId)
         {
             Expression<Func<SecurityTransaction, bool>> filter = brokerAccountId != null ?

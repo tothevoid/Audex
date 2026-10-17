@@ -766,6 +766,33 @@ namespace Audex.Infrastructure.Migrations
                     b.ToTable("Security");
                 });
 
+            modelBuilder.Entity("Audex.Infrastructure.Entities.Securities.SecurityPriceHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("ClosePrice")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("FetchedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("SecurityId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SecurityId", "Date")
+                        .IsUnique();
+
+                    b.ToTable("SecurityPriceHistories", (string)null);
+                });
+
             modelBuilder.Entity("Audex.Infrastructure.Entities.Securities.SecurityTransaction", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1475,6 +1502,17 @@ namespace Audex.Infrastructure.Migrations
                     b.Navigation("Type");
                 });
 
+            modelBuilder.Entity("Audex.Infrastructure.Entities.Securities.SecurityPriceHistory", b =>
+                {
+                    b.HasOne("Audex.Infrastructure.Entities.Securities.Security", "Security")
+                        .WithMany("SecurityPriceHistories")
+                        .HasForeignKey("SecurityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Security");
+                });
+
             modelBuilder.Entity("Audex.Infrastructure.Entities.Securities.SecurityTransaction", b =>
                 {
                     b.HasOne("Audex.Infrastructure.Entities.Brokers.BrokerAccount", "BrokerAccount")
@@ -1700,6 +1738,8 @@ namespace Audex.Infrastructure.Migrations
                     b.Navigation("BrokerAccountSecurities");
 
                     b.Navigation("Dividends");
+
+                    b.Navigation("SecurityPriceHistories");
 
                     b.Navigation("SecurityTransactions");
                 });

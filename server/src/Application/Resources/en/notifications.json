@@ -9,5 +9,7 @@
   "backup_ready_encrypted_title": "Encrypted DB backup ready",
   "backup_ready_message": "Database backup successfully created: {0}",
   "backup_failed_title": "DB backup failed",
-  "backup_failed_message": "Failed to create database backup: {0}"
+  "backup_failed_message": "Failed to create database backup: {0}",
+  "missing_security_quotes_title": "Missing Security Quotes",
+  "missing_security_quotes_message": "No price quotes found for security {0} for the past year prior to {1}."
 }

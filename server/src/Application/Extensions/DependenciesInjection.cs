@@ -108,6 +108,7 @@ namespace Audex.Application.Extensions
 
             services.AddTransient<IAllAssetsReportService, AllAssetsReportService>();
             services.AddTransient<IBrokerAccountPortfolioHistoryService, BrokerAccountPortfolioHistoryService>();
+            services.AddTransient<ISecurityPriceHistoryService, SecurityPriceHistoryService>();
             services.AddSingleton<IPullQuotationsService, PullQuotationsService>();
             services.AddSingleton<ITimeZoneService, TimeZoneService>();
 
@@ -138,20 +139,29 @@ namespace Audex.Application.Extensions
             services.AddTransient<ISchedulerJournalService, SchedulerJournalService>();
             services.AddTransient<ISchedulerAttachmentService, SchedulerAttachmentService>();
 
-            services.AddTransient<IScheduledJob, AssetReportJob>();
-            services.AddTransient<IScheduledJob, DatabaseBackupJob>();
-            services.AddTransient<IScheduledJob, PullQuotationsJob>();
-            services.AddTransient<IScheduledJob, CleanUpOldNotificationsJob>();
-            services.AddTransient<IScheduledJob, CleanUpExpiredRefreshTokensJob>();
-            services.AddTransient<IScheduledJob, PullCryptoPricesJob>();
+            services.AddScheduledJobs();
 
-            services.AddTransient<AssetReportJob>();
-            services.AddTransient<DatabaseBackupJob>();
-            services.AddTransient<PullQuotationsJob>();
-            services.AddTransient<CleanUpOldNotificationsJob>();
-            services.AddTransient<CleanUpExpiredRefreshTokensJob>();
-            services.AddTransient<PullCryptoPricesJob>();
+            return services;
+        }
 
+        private static IServiceCollection AddScheduledJobs(this IServiceCollection services)
+        {
+            services.AddScheduledJob<AssetReportJob>();
+            services.AddScheduledJob<DatabaseBackupJob>();
+            services.AddScheduledJob<PullQuotationsJob>();
+            services.AddScheduledJob<CleanUpOldNotificationsJob>();
+            services.AddScheduledJob<CleanUpExpiredRefreshTokensJob>();
+            services.AddScheduledJob<PullCryptoPricesJob>();
+            services.AddScheduledJob<SyncSecurityPricesHistoryJob>();
+
+            return services;
+        }
+
+        private static IServiceCollection AddScheduledJob<TJob>(this IServiceCollection services)
+            where TJob : class, IScheduledJob
+        {
+            services.AddTransient<TJob>();
+            services.AddTransient<IScheduledJob, TJob>(serviceProvider => serviceProvider.GetRequiredService<TJob>());
             return services;
         }
     }

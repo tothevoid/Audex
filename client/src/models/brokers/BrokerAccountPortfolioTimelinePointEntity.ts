@@ -6,4 +6,6 @@ export interface BrokerAccountPortfolioTimelinePointEntity {
     totalWithdrawn: number;
     mainCurrencyAmount: number;
     securitiesValue: number;
+    totalDividends: number;
+    totalTaxDeduction: number;
 }

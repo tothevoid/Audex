@@ -10,6 +10,7 @@ namespace Audex.Application.Interfaces.Brokers
     public interface IDividendPaymentService
     {
         Task<PagedResult<DividendPaymentDto>> GetAllAsync(DividendPaymentFilterDto filter);
+        Task<IEnumerable<DividendPaymentDto>> GetTillDateAsync(DateOnly date, Guid? brokerAccountId = null);
 
         Task<decimal> GetSumTillSpecificDateAsync(DateOnly date, Guid? brokerAccountId);
 

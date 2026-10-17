@@ -9,5 +9,7 @@
   "backup_ready_encrypted_title": "Зашифрованная резервная копия БД готова",
   "backup_ready_message": "Резервная копия базы данных успешно создана: {0}",
   "backup_failed_title": "Ошибка создания резервной копии БД",
-  "backup_failed_message": "Не удалось создать резервную копию базы данных: {0}"
+  "backup_failed_message": "Не удалось создать резервную копию базы данных: {0}",
+  "missing_security_quotes_title": "Отсутствуют котировки",
+  "missing_security_quotes_message": "Для ценной бумаги {0} не найдены котировки за последний год до {1}."
 }

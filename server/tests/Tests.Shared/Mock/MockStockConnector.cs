@@ -35,8 +35,17 @@ namespace Audex.Tests.Shared.Mock
         public Task<IEnumerable<MarketDataRow>> GetExtendedValuesByTickersAsync(IEnumerable<SecurityDto> tickers) =>
             Task.FromResult(Enumerable.Empty<MarketDataRow>());
 
-        public Task<IEnumerable<SecurityCandleDto>> GetCandlesAsync(SecurityDto security, DateOnly from, DateOnly to, int interval = 24) =>
-            Task.FromResult(Enumerable.Empty<SecurityCandleDto>());
+        public Func<SecurityDto, DateOnly, DateOnly, int, Task<IEnumerable<SecurityCandleDto>>>? GetCandlesHandler { get; set; }
+
+        public Task<IEnumerable<SecurityCandleDto>> GetCandlesAsync(SecurityDto security, DateOnly from, DateOnly to, int interval = 24)
+        {
+            if (GetCandlesHandler != null)
+            {
+                return GetCandlesHandler(security, from, to, interval);
+            }
+
+            return Task.FromResult(Enumerable.Empty<SecurityCandleDto>());
+        }
 
         public Task<MarketSecurityInfoDto?> FindSecurityInfoAsync(string query)
         {

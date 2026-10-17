@@ -16,5 +16,7 @@
   "pull_quotations_name": "Update MOEX Quotations",
   "pull_quotations_desc": "Periodically fetch latest security quotes from MOEX exchange",
   "pull_crypto_prices_name": "Update Cryptocurrency Prices",
-  "pull_crypto_prices_desc": "Periodically fetch latest cryptocurrency prices in USD from CoinGecko"
+  "pull_crypto_prices_desc": "Periodically fetch latest cryptocurrency prices in USD from CoinGecko",
+  "sync_security_prices_history_name": "Historical Stock Prices Synchronization",
+  "sync_security_prices_history_desc": "Proactively cache daily closing prices of securities from MOEX for portfolio analytics"
 }

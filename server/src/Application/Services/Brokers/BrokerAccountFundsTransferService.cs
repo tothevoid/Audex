@@ -64,6 +64,37 @@ namespace Audex.Application.Services.Brokers
             return builder;
         }
 
+        public async Task<DateOnly?> GetEarliestDateAsync(Guid? brokerAccountId = null)
+        {
+            Expression<Func<BrokerAccountFundsTransfer, bool>> filter = brokerAccountId.HasValue
+                ? transfer => transfer.BrokerAccountId == brokerAccountId.Value
+                : null;
+
+            var earliestTransfer = await _transfersRepo.GetMinAsync(transfer => transfer.Date, filter);
+            return earliestTransfer != null ? DateOnly.FromDateTime(earliestTransfer.Date) : null;
+        }
+
+        public async Task<DateOnly?> GetLatestDateAsync(Guid? brokerAccountId = null)
+        {
+            Expression<Func<BrokerAccountFundsTransfer, bool>> filter = brokerAccountId.HasValue
+                ? transfer => transfer.BrokerAccountId == brokerAccountId.Value
+                : null;
+
+            var latestTransfer = await _transfersRepo.GetMaxAsync(transfer => transfer.Date, filter);
+            return latestTransfer != null ? DateOnly.FromDateTime(latestTransfer.Date) : null;
+        }
+
+        public async Task<IEnumerable<BrokerAccountFundsTransferDto>> GetTillDateAsync(DateOnly date, Guid? brokerAccountId = null)
+        {
+            var endDateTime = date.ToDateTime(TimeOnly.MaxValue);
+            Expression<Func<BrokerAccountFundsTransfer, bool>> filter = brokerAccountId.HasValue
+                ? transfer => transfer.BrokerAccountId == brokerAccountId.Value && transfer.Date <= endDateTime
+                : transfer => transfer.Date <= endDateTime;
+
+            var transfers = await _transfersRepo.GetAllAsync(filter, disableTracking: true);
+            return _mapper.Map(transfers);
+        }
+
         public async Task<(decimal deposited, decimal withdrawn)> GetSumTillSpecificDateAsync(DateOnly date, Guid? brokerAccountId)
         {
             async Task<decimal> GetSum(bool isIncome)

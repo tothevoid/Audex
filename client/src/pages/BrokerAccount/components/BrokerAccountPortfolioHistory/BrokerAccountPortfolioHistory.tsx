@@ -4,12 +4,12 @@ import DatePicker from "@/shared/components/DatePicker/DatePicker";
 import { useTranslation } from "react-i18next";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { Nullable } from "@/shared/utilities/nullable";
+import { convertToDateOnly } from "@/shared/utilities/dateUtils";
 import {
     getBrokerAccountPortfolioDateBounds,
     getBrokerAccountPortfolioHistory,
     getBrokerAccountPortfolioHistoryByPeriod,
 } from "@/api/brokers/brokerAccountPortfolioHistoryApi";
-import { BrokerAccountPortfolioHistoryEntity } from "@/models/brokers/BrokerAccountPortfolioHistoryEntity";
 import { BrokerAccountPortfolioDateBoundsEntity } from "@/models/brokers/BrokerAccountPortfolioDateBoundsEntity";
 import { BrokerAccountPortfolioTimelinePointEntity } from "@/models/brokers/BrokerAccountPortfolioTimelinePointEntity";
 import { BrokerAccountHistoryChart } from "@/pages/BrokerAccount/components/BrokerAccountHistoryChart/BrokerAccountHistoryChart";
@@ -28,7 +28,7 @@ const BrokerAccountPortfolioHistory: React.FC<Props> = ({ brokerAccountId }) => 
     const [dateBounds, setDateBounds] =
         useState<Nullable<BrokerAccountPortfolioDateBoundsEntity>>(null);
     const [history, setHistory] =
-        useState<Nullable<BrokerAccountPortfolioHistoryEntity>>(null);
+        useState<Nullable<BrokerAccountPortfolioTimelinePointEntity>>(null);
     const [isSnapshotLoading, setIsSnapshotLoading] = useState<boolean>(false);
 
     const [selectedPeriod, setSelectedPeriod] =
@@ -101,6 +101,17 @@ const BrokerAccountPortfolioHistory: React.FC<Props> = ({ brokerAccountId }) => 
     useEffect(() => {
         if (!selectedDate) return;
 
+        const formattedSelectedDate = convertToDateOnly(selectedDate);
+        const existingPoint = rangePoints.find(
+            (point) => point.date === formattedSelectedDate
+        );
+
+        if (existingPoint) {
+            setHistory(existingPoint);
+            setIsSnapshotLoading(false);
+            return;
+        }
+
         let isMounted = true;
         const loadSnapshot = async () => {
             setIsSnapshotLoading(true);
@@ -124,7 +135,7 @@ const BrokerAccountPortfolioHistory: React.FC<Props> = ({ brokerAccountId }) => 
         return () => {
             isMounted = false;
         };
-    }, [brokerAccountId, selectedDate]);
+    }, [brokerAccountId, selectedDate, rangePoints]);
 
     if (!user) return <Fragment />;
 
