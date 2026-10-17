@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Audex.Application.DTO.Common;
 using Audex.Application.DTO.Scheduler;
 using Audex.Application.Enums.Scheduler;
 using Audex.Application.Interfaces.Scheduler;
@@ -65,21 +66,21 @@ namespace Audex.WebApi.Controllers.Scheduler
         }
 
         [HttpPost("Tasks")]
-        public async Task<ActionResult<ScheduledTaskModel>> CreateTask([FromBody] CreateScheduledTaskModel model)
+        public async Task<ActionResult<OperationResultDto<ScheduledTaskModel>>> CreateTask([FromBody] CreateScheduledTaskModel model)
         {
             try
             {
                 var dto = _mapper.Map(model);
                 var created = await _schedulerTaskService.CreateTaskAsync(dto);
-                return Ok(_mapper.Map(created));
+                return Ok(OperationResultDto<ScheduledTaskModel>.Success(_mapper.Map(created)));
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new ProblemDetails { Detail = ex.Message });
+                return Ok(OperationResultDto<ScheduledTaskModel>.Failure(ex.Message));
             }
             catch (InvalidOperationException ex)
             {
-                return Conflict(new ProblemDetails { Detail = ex.Message });
+                return Ok(OperationResultDto<ScheduledTaskModel>.Failure(ex.Message));
             }
         }
 

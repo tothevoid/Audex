@@ -152,36 +152,37 @@ export const SchedulerTaskMasterList: React.FC<SchedulerTaskMasterListProps> = (
                         }}
                         transition="all 0.15s ease"
                     >
-                        <Flex justify="space-between" align="flex-start" gap={2}>
+                        <Flex justify="space-between" align="flex-start" gap={3}>
                             <HStack gap={2} align="flex-start" flex="1" minW={0}>
                                 <Box
-                                    mt={1}
+                                    mt={1.5}
                                     w={2.5}
                                     h={2.5}
                                     borderRadius="full"
                                     bg={statusColor}
                                     flexShrink={0}
                                 />
-                                <VStack align="flex-start" gap={1} flex="1" minW={0}>
-                                    <HStack gap={1.5} wrap="wrap">
-                                        <Text
-                                            fontWeight={isSelected ? 'bold' : 'semibold'}
-                                            fontSize="sm"
-                                            color="text_primary"
-                                            truncate
-                                        >
-                                            {task.displayName}
-                                        </Text>
+                                <VStack align="flex-start" gap={1.5} flex="1" minW={0}>
+                                    <Text
+                                        fontWeight={isSelected ? 'bold' : 'semibold'}
+                                        fontSize="sm"
+                                        color="text_primary"
+                                        lineClamp={2}
+                                        wordBreak="break-word"
+                                    >
+                                        {task.displayName}
+                                    </Text>
+
+                                    <HStack gap={1.5} wrap="wrap" align="center">
                                         <Badge size="xs" colorPalette="blue">
                                             {task.category}
                                         </Badge>
-                                    </HStack>
-
-                                    <HStack gap={1} color="text_secondary" fontSize="xs">
-                                        <Icon fontSize="xs" color="action_primary"><MdSchedule /></Icon>
-                                        <Text truncate>
-                                            {formatCronExpression(task.cronExpression, i18n, t)}
-                                        </Text>
+                                        <HStack gap={1} color="text_secondary" fontSize="xs">
+                                            <Icon fontSize="xs" color="action_primary"><MdSchedule /></Icon>
+                                            <Text truncate>
+                                                {formatCronExpression(task.cronExpression, i18n, t)}
+                                            </Text>
+                                        </HStack>
                                     </HStack>
 
                                     {task.isEnabled && task.nextExecutionUtc ? (
