@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Audex.Application.Integrations.Stock.Moex.Model
 {
@@ -14,5 +14,7 @@ namespace Audex.Application.Integrations.Stock.Moex.Model
         {
             return $"{Ticker}_{BoardId}";
         }
+
+        public int BoardPriority => MoexBoardPriorities.GetPriority(BoardId);
     }
 }

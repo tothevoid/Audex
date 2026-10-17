@@ -133,23 +133,20 @@ namespace Audex.Application.Services.Brokers
         private async Task PullQuotations(IEnumerable<SecurityDto> securities)
         {
             var date = DateTime.UtcNow;
-            var tickersValues = (await _stockConnector
-                .GetValuesByTickersAsync(securities)).ToList();
-                
-            var filteredValue = tickersValues
-                .Where(marketValue => (marketValue.LastValue ?? marketValue.MarketPrice) != null)
-                .OrderByDescending(marketValue => marketValue.Date)
-                .DistinctBy(marketValue => marketValue.Ticker)
-                .ToDictionary((marketValue) => marketValue.Ticker, (marketValue) => marketValue);
+            var tickerValues = (await _stockConnector.GetValuesByTickersAsync(securities))
+                .ToDictionary(marketValue => marketValue.Ticker, marketValue => marketValue);
            
             foreach (var security in securities)
             {
-                var row = filteredValue.GetValueOrDefault(security.Ticker);
-                if (row == null) continue;
+                var marketDataRow = tickerValues.GetValueOrDefault(security.Ticker);
+                if (marketDataRow == null)
+                {
+                    continue;
+                }
 
                 // TODO: use service instead of repo
                 var updatingSecurity = await _securityRepo.GetByIdAsync(security.Id, null, false);
-                updatingSecurity.ActualPrice = row.GetLastValue();
+                updatingSecurity.ActualPrice = marketDataRow.GetLastValue();
                 updatingSecurity.PriceFetchedAt = DateTime.UtcNow;
             }
 

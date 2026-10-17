@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Audex.Application.Integrations.Stock.Moex.Model
 {
@@ -32,5 +32,7 @@ namespace Audex.Application.Integrations.Stock.Moex.Model
             // if security has no liquidity, LastValue can be null, then we use MarketPrice
             return LastValue ?? MarketPrice ?? 0;
         }
+
+        public int BoardPriority => MoexBoardPriorities.GetPriority(BoardId);
     }
 }

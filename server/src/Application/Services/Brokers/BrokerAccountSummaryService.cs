@@ -21,6 +21,7 @@ namespace Audex.Application.Services.Brokers
         private readonly IStockConnector _stockConnector;
         private readonly IBrokerAccountTaxDeductionService _taxDeductionService;
         private readonly ISecurityTransactionService _securityTransactionService;
+        private readonly ISecurityPriceHistoryService _securityPriceHistoryService;
 
         public BrokerAccountSummaryService(
             IBrokerAccountSecurityService brokerAccountSecurityService,
@@ -30,7 +31,8 @@ namespace Audex.Application.Services.Brokers
             IStockConnector stockConnector,
             IUserProfileService userProfileService,
             IBrokerAccountTaxDeductionService taxDeductionService,
-            ISecurityTransactionService securityTransactionService)
+            ISecurityTransactionService securityTransactionService,
+            ISecurityPriceHistoryService securityPriceHistoryService)
         {
             _brokerAccountSecurityService = brokerAccountSecurityService;
             _fundsTransferService = fundsTransferService;
@@ -40,6 +42,7 @@ namespace Audex.Application.Services.Brokers
             _userProfileService = userProfileService;
             _taxDeductionService = taxDeductionService;
             _securityTransactionService = securityTransactionService;
+            _securityPriceHistoryService = securityPriceHistoryService;
         }
 
         public async Task<BrokerAccountSummaryDto> GetSummaryAsync()
@@ -156,9 +159,11 @@ namespace Audex.Application.Services.Brokers
             foreach (var securitySummary in securitySummaries)
             {
                 var currentPrice = securitySummary.CurrentPrice;
-                var startPrice = securitySummary.StartPrice;
+                var basePrice = securitySummary.PreviousDayClosePrice > 0 
+                    ? securitySummary.PreviousDayClosePrice 
+                    : securitySummary.StartPrice;
 
-                startPortfolioValue += startPrice * securitySummary.Quantity;
+                startPortfolioValue += basePrice * securitySummary.Quantity;
                 currentPortfolioValue += currentPrice * securitySummary.Quantity;
             }
 
@@ -201,21 +206,20 @@ namespace Audex.Application.Services.Brokers
             var marketValues = (await _stockConnector
                 .GetExtendedValuesByTickersAsync(tickers.Values));
 
-            var securityStats = new List<BrokerAccountDailySecurityStatsDto>();
+            var yesterday = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
+            var securityIds = tickers.Values.Select(security => security.Id);
+            var candlePriceMap = await _securityPriceHistoryService.GetPriceMapTillDateAsync(securityIds, yesterday);
 
-            var handledTickers = new HashSet<string>();
+            var securityStats = new List<BrokerAccountDailySecurityStatsDto>();
 
             foreach (var marketValue in marketValues)
             {
-                if (handledTickers.Contains(marketValue.Ticker))
+                if (!tickers.TryGetValue(marketValue.Ticker, out var security))
                 {
                     continue;
                 }
 
-                var security = tickers[marketValue.Ticker];
-
                 var currentPrice = marketValue.GetLastValue();
-
                 var quantity = securitiesQuantities[security.Id];
 
                 if (quantity == 0)
@@ -223,17 +227,30 @@ namespace Audex.Application.Services.Brokers
                     continue;
                 }
 
+                decimal previousClosePrice;
+                decimal startPrice;
+
+                if (candlePriceMap.TryGetValue(security.Id, out decimal candleClosePrice) && candleClosePrice > 0)
+                {
+                    previousClosePrice = candleClosePrice;
+                    startPrice = marketValue.Open ?? candleClosePrice;
+                }
+                else
+                {
+                    previousClosePrice = marketValue.PrevPrice ?? 0;
+                    startPrice = marketValue.Open ?? marketValue.PrevPrice ?? 0;
+                }
+
                 securityStats.Add(new BrokerAccountDailySecurityStatsDto()
                 {
                     CurrentPrice = currentPrice,
                     Security = security,
-                    StartPrice = marketValue.PrevPrice ?? marketValue.Open ?? 0,
+                    StartPrice = startPrice,
                     MinPrice = marketValue.Low,
                     MaxPrice = marketValue.High,
-                    PreviousDayClosePrice = marketValue.PrevPrice ?? 0,
+                    PreviousDayClosePrice = previousClosePrice,
                     Quantity = quantity
                 });
-                handledTickers.Add(marketValue.Ticker);
             }
 
             return securityStats;

@@ -176,6 +176,65 @@ namespace Audex.Application.Tests.Integrations.Stock
             Assert.Equal(SecurityTypeConstants.Stock, result.TypeId);
         }
 
+        [Fact]
+        public async Task GetValuesByTickers_WhenMultipleBoardsForSameTicker_ShouldPickPriorityBoardAndDeduplicate()
+        {
+            // Arrange
+            var jsonResponse = @"{
+                ""marketdata"": {
+                    ""columns"": [""SECID"", ""BOARDID"", ""LAST"", ""SYSTIME"", ""MARKETPRICE"", ""OPEN"", ""LOW"", ""HIGH""],
+                    ""data"": [
+                        [""SBER"", ""SMAL"", 300.0, ""2026-10-16 18:40:00"", 300.0, 298.0, 295.0, 301.0],
+                        [""SBER"", ""TQBR"", 310.0, ""2026-10-16 18:45:00"", 310.0, 305.0, 304.0, 311.0],
+                        [""GAZP"", ""TQBR"", 135.5, ""2026-10-16 18:45:00"", 135.5, 134.0, 133.0, 136.0]
+                    ]
+                },
+                ""securities"": {
+                    ""columns"": [""SECID"", ""BOARDID"", ""PREVPRICE""],
+                    ""data"": [
+                        [""SBER"", ""SMAL"", 298.0],
+                        [""SBER"", ""TQBR"", 308.0],
+                        [""GAZP"", ""TQBR"", 134.0]
+                    ]
+                }
+            }";
+
+            var handler = new MockHttpMessageHandler(jsonResponse);
+            var httpClient = new HttpClient(handler);
+            var factory = new StubHttpClientFactory(httpClient);
+            var connector = new MoexConnector(factory);
+
+            var securities = new List<SecurityDto>
+            {
+                new() { Ticker = "SBER", TypeId = SecurityTypeConstants.Stock },
+                new() { Ticker = "GAZP", TypeId = SecurityTypeConstants.Stock }
+            };
+
+            // Act
+            var result = (await connector.GetValuesByTickersAsync(securities)).ToList();
+
+            // Assert
+            Assert.Equal(2, result.Count);
+
+            var sberRow = result.FirstOrDefault(marketRow => marketRow.Ticker == "SBER");
+            Assert.NotNull(sberRow);
+            Assert.Equal("TQBR", sberRow.BoardId);
+            Assert.Equal(310.0m, sberRow.LastValue);
+
+            var gazpRow = result.FirstOrDefault(marketRow => marketRow.Ticker == "GAZP");
+            Assert.NotNull(gazpRow);
+            Assert.Equal("TQBR", gazpRow.BoardId);
+            Assert.Equal(135.5m, gazpRow.LastValue);
+
+            // Act for extended values (which includes PrevPrice from securities table)
+            var extendedResult = (await connector.GetExtendedValuesByTickersAsync(securities)).ToList();
+            var extendedSberRow = extendedResult.FirstOrDefault(marketRow => marketRow.Ticker == "SBER");
+            Assert.NotNull(extendedSberRow);
+            Assert.Equal("TQBR", extendedSberRow.BoardId);
+            Assert.Equal(310.0m, extendedSberRow.LastValue);
+            Assert.Equal(308.0m, extendedSberRow.PrevPrice);
+        }
+
         private class StubHttpClientFactory(HttpClient client) : IHttpClientFactory
         {
             public HttpClient CreateClient(string name) => client;

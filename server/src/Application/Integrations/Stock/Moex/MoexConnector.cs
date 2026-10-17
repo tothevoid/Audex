@@ -52,7 +52,7 @@ namespace Audex.Application.Integrations.Stock.Moex
                 result.AddRange(await FetchAndApplySecuritiesAsync(httpClient, query));
             }
 
-            return result;
+            return ResolveBestMarketDataRows(result);
         }
 
         public async Task<IEnumerable<MarketDataRow>> GetValuesByTickersAsync(IEnumerable<SecurityDto> securities)
@@ -75,7 +75,17 @@ namespace Audex.Application.Integrations.Stock.Moex
                 dataRows.AddRange(await FetchMarketDataRowsAsync(httpClient, currencySecuritiesQuery));
             }
 
-            return dataRows;
+            return ResolveBestMarketDataRows(dataRows);
+        }
+
+        private static List<MarketDataRow> ResolveBestMarketDataRows(IEnumerable<MarketDataRow> marketDataRows)
+        {
+            return marketDataRows
+                .Where(marketRow => (marketRow.LastValue ?? marketRow.MarketPrice) != null)
+                .OrderBy(marketRow => marketRow.BoardPriority)
+                .ThenByDescending(marketRow => marketRow.Date)
+                .DistinctBy(marketRow => marketRow.Ticker)
+                .ToList();
         }
 
         private static async Task<IEnumerable<MarketDataRow>> FetchMarketDataRowsAsync(HttpClient httpClient, string query)
@@ -153,7 +163,7 @@ namespace Audex.Application.Integrations.Stock.Moex
                         High = row.GetDecimal(highIndex, 0)
                     }
                 )
-                .OrderBy(row => GetBoardPriority(row.BoardId));
+                .OrderBy(row => row.BoardPriority);
         }
 
         private static IEnumerable<MarketDataRow> ParseAndApplySecuritiesRows(IEnumerable<MarketDataRow> marketDataRows, 
@@ -175,7 +185,7 @@ namespace Audex.Application.Integrations.Stock.Moex
                         PrevPrice = row.TryGetDecimal(prevPrice)
                     }
                 )
-                .OrderBy(row => GetBoardPriority(row.BoardId))
+                .OrderBy(row => row.BoardPriority)
                 .ToDictionary(key => key.GetUniqueKey(), value => value);
 
             foreach (var marketDataRow in marketDataRows)
@@ -191,20 +201,6 @@ namespace Audex.Application.Integrations.Stock.Moex
 
             return marketDataRows;
         }
-
-        private static int GetBoardPriority(string boardId) => boardId switch
-        {
-            "TQBR" => 1,
-            "TQTF" => 2,
-            "TQPI" => 3,
-            "SMAL" => 4,
-            "SPEQ" => 5,
-            "EQRP" => 6,
-            "EQOB" => 7,
-            "TQOD" => 8,
-            "CETS" => 9,
-            _ => 100
-        };
 
         private static Dictionary<string, int> GetColumnIndexMapping(IEnumerable<string> columns) => ParsingUtilities.GetColumnIndexMapping(columns);
 

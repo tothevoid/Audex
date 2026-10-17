@@ -273,10 +273,7 @@ namespace Audex.Application.Services.Securities
                     }
                 ]);
 
-                var latestMarketRow = marketDataRows
-                    .Where(marketRow => (marketRow.LastValue ?? marketRow.MarketPrice) != null)
-                    .OrderByDescending(marketRow => marketRow.Date)
-                    .FirstOrDefault();
+                var latestMarketRow = marketDataRows.FirstOrDefault();
 
                 if (latestMarketRow != null)
                 {
