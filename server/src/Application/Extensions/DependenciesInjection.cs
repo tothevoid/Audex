@@ -83,6 +83,7 @@ namespace Audex.Application.Extensions
             services.AddTransient<IUserDashboardService, UserDashboardService>();
             services.AddTransient<IDashboardService, DashboardService>();
             services.AddTransient<IDashboardWidgetsService, DashboardWidgetsService>();
+            services.AddTransient<IBrokerPnlWidgetService, BrokerPnlWidgetService>();
             services.AddTransient<IDebtService, DebtService>();
             services.AddTransient<IDebtTagService, DebtTagService>();
             services.AddTransient<INotificationService, NotificationService>();

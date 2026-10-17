@@ -2,6 +2,7 @@ import React from "react";
 import { DashboardWidgetType, WidgetType } from "@/models/dashboard/WidgetEntity";
 import { WidgetDescriptor, WidgetTemplateInfo } from "./types";
 import { oilWidgetDescriptor } from "./Oil";
+import { brokerPnlWidgetDescriptor } from "./BrokerPnl";
 import { securitiesDailyWidgetDescriptor } from "./SecuritiesDaily";
 import { currencyRatesWidgetDescriptor } from "./CurrencyRates";
 import { indicesWidgetDescriptor } from "./Indices";
@@ -20,6 +21,7 @@ import {
 } from "./Distribution";
 
 const activeDescriptors: Record<WidgetType, WidgetDescriptor> = {
+    [DashboardWidgetType.BrokerPnl]: brokerPnlWidgetDescriptor,
     [DashboardWidgetType.TotalBalance]: totalBalanceWidgetDescriptor,
     [DashboardWidgetType.CashDistribution]: cashDistributionWidgetDescriptor,
     [DashboardWidgetType.BankAccountsDistribution]: bankAccountsDistributionWidgetDescriptor,

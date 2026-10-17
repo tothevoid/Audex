@@ -13,7 +13,8 @@ export enum DashboardWidgetType {
     CryptoDistribution = 'CryptoDistribution',
     BanksDistribution = 'BanksDistribution',
     SpentsDistribution = 'SpentsDistribution',
-    IncomesDistribution = 'IncomesDistribution'
+    IncomesDistribution = 'IncomesDistribution',
+    BrokerPnl = 'BrokerPnl'
 }
 
 export type WidgetType = keyof typeof DashboardWidgetType;

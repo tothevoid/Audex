@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Box, Field, Flex, Skeleton, Text, Wrap } from "@chakra-ui/react";
+import { Field, Flex, Skeleton, Wrap } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { LuCheck } from "react-icons/lu";
 import { WidgetSettingsProps } from "../types";
 import { OilWidgetSettings } from "@/models/dashboard/widgets/oil/OilWidgetEntity";
 import { getOilSymbols } from "@/api/dashboard/widgets/oil/oilWidgetApi";
+import { ChipGroup } from "@/shared/components/ChipGroup";
 
 export const OilSettings: React.FC<WidgetSettingsProps<OilWidgetSettings>> = ({
     settings,
@@ -67,38 +67,16 @@ export const OilSettings: React.FC<WidgetSettingsProps<OilWidgetSettings>> = ({
                     <Skeleton height="32px" width="70px" borderRadius="md" />
                 </Wrap>
             ) : (
-                <Wrap gap={2} mt={1}>
-                    {availableSymbols.map((symbol) => {
-                        const isSelected = selectedSymbols.includes(symbol);
-                        return (
-                            <Box
-                                key={symbol}
-                                px={3}
-                                py={1.5}
-                                borderRadius="md"
-                                cursor="pointer"
-                                borderWidth="1px"
-                                borderColor={isSelected ? "action_primary" : "border_primary"}
-                                backgroundColor={isSelected ? "action_primary" : "background_secondary"}
-                                color={isSelected ? "white" : "text_primary"}
-                                fontSize="xs"
-                                fontWeight="medium"
-                                display="flex"
-                                alignItems="center"
-                                gap={1.5}
-                                transition="all 0.15s ease"
-                                onClick={() => toggleSymbol(symbol)}
-                                _hover={{
-                                    borderColor: "action_primary",
-                                    opacity: isSelected ? 0.9 : 1
-                                }}
-                            >
-                                {isSelected && <LuCheck size={12} />}
-                                <Text fontWeight="bold">{symbol}</Text>
-                            </Box>
-                        );
-                    })}
-                </Wrap>
+                <ChipGroup<string>
+                    options={availableSymbols.map((symbol) => ({
+                        value: symbol,
+                        label: symbol
+                    }))}
+                    values={selectedSymbols}
+                    isMulti
+                    onToggle={toggleSymbol}
+                    fontWeight="bold"
+                />
             )}
         </Field.Root>
     );

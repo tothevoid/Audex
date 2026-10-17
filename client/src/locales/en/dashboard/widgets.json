@@ -36,6 +36,14 @@
     "widget_oil_desc": "Live quotes for crude oil futures.",
     "widget_oil_select_symbols": "Displayed Benchmarks",
 
+    "widget_broker_pnl_title": "Daily & Total P&L",
+    "widget_broker_pnl_desc": "Consolidated daily and all-time investment returns across brokerage accounts",
+    "widget_broker_pnl_daily": "Today's P&L",
+    "widget_broker_pnl_total": "All-Time P&L",
+    "widget_broker_pnl_all_accounts": "All Broker Accounts",
+    "widget_broker_pnl_select_account": "Broker Account",
+    "widget_broker_pnl_empty": "No brokerage data available",
+
     "widget_securities_daily_title": "Daily Securities",
     "widget_securities_daily_desc": "Daily performance and dynamics of portfolio securities",
     "widget_securities_daily_empty": "No securities in portfolio",

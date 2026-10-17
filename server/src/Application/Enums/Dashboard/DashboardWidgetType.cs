@@ -17,6 +17,7 @@ namespace Audex.Application.Enums.Dashboard
         CryptoDistribution = 13,
         BanksDistribution = 14,
         SpentsDistribution = 15,
-        IncomesDistribution = 16
+        IncomesDistribution = 16,
+        BrokerPnl = 17
     }
 }

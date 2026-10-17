@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Box, Field, Flex, Skeleton, Text, Wrap } from "@chakra-ui/react";
+import { Field, Flex, Skeleton, Wrap } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { LuCheck } from "react-icons/lu";
 import { WidgetSettingsProps } from "../types";
 import { IndicesWidgetSettings } from "@/models/dashboard/widgets/indices/IndicesWidgetEntity";
 import { getSupportedIndices } from "@/api/dashboard/widgets/indices/indicesWidgetApi";
+import { ChipGroup } from "@/shared/components/ChipGroup";
 
 export const IndicesSettings: React.FC<WidgetSettingsProps<IndicesWidgetSettings>> = ({
     settings,
@@ -69,38 +69,16 @@ export const IndicesSettings: React.FC<WidgetSettingsProps<IndicesWidgetSettings
                     <Skeleton height="32px" width="70px" borderRadius="md" />
                 </Wrap>
             ) : (
-                <Wrap gap={2} mt={1}>
-                    {availableCodes.map((code) => {
-                        const isSelected = selectedCodes.includes(code);
-                        return (
-                            <Box
-                                key={code}
-                                px={3}
-                                py={1.5}
-                                borderRadius="md"
-                                cursor="pointer"
-                                borderWidth="1px"
-                                borderColor={isSelected ? "action_primary" : "border_primary"}
-                                backgroundColor={isSelected ? "action_primary" : "background_secondary"}
-                                color={isSelected ? "white" : "text_primary"}
-                                fontSize="xs"
-                                fontWeight="medium"
-                                display="flex"
-                                alignItems="center"
-                                gap={1.5}
-                                transition="all 0.15s ease"
-                                onClick={() => toggleCode(code)}
-                                _hover={{
-                                    borderColor: "action_primary",
-                                    opacity: isSelected ? 0.9 : 1
-                                }}
-                            >
-                                {isSelected && <LuCheck size={12} />}
-                                <Text fontWeight="bold">{code}</Text>
-                            </Box>
-                        );
-                    })}
-                </Wrap>
+                <ChipGroup<string>
+                    options={availableCodes.map((code) => ({
+                        value: code,
+                        label: code
+                    }))}
+                    values={selectedCodes}
+                    isMulti
+                    onToggle={toggleCode}
+                    fontWeight="bold"
+                />
             )}
         </Field.Root>
     );

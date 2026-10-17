@@ -36,6 +36,14 @@
     "widget_oil_desc": "Котировки фьючерсов на нефть",
     "widget_oil_select_symbols": "Отображаемые сорта нефти",
 
+    "widget_broker_pnl_title": "Дневной и общий P&L",
+    "widget_broker_pnl_desc": "Консолидированный дневной и накопленный финансовый результат по брокерским счетам",
+    "widget_broker_pnl_daily": "За сегодня",
+    "widget_broker_pnl_total": "За все время",
+    "widget_broker_pnl_all_accounts": "Все брокерские счета",
+    "widget_broker_pnl_select_account": "Брокерский счёт",
+    "widget_broker_pnl_empty": "Нет данных по брокерским счетам",
+
     "widget_securities_daily_title": "Ценные бумаги за день",
     "widget_securities_daily_desc": "Суточная динамика ценных бумаг в портфеле",
     "widget_securities_daily_empty": "В портфеле нет ценных бумаг",

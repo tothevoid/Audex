@@ -5,4 +5,5 @@ export * from "./SecuritiesDaily";
 export * from "./CurrencyRates";
 export * from "./Indices";
 export * from "./Distribution";
+export * from "./BrokerPnl";
 
