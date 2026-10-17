@@ -45,10 +45,18 @@ This document contains guidelines, coding standards, and architectural patterns 
 ### 9. Transparent Linter & Tooling Diagnostics
 - **No Silent Rule Disabling**: When a major dependency update (e.g. ESLint plugins, compiler rules) introduces a new batch of diagnostics or stricter rules (e.g. React Compiler rules), NEVER silently disable, replace, or suppress the rules in config files without first analyzing the diagnostics and presenting the architectural trade-offs to the user.
 
-### 10. Git & Version Control Policy: No Commits in Main Repository
+### 10. Git & Version Control Policy: No Commits in Main Repo & Explicit Approval for Docs Repo
 - **Commit Prohibition in Main Repo**: The agent MUST NEVER create git commits (`git commit`), amend commits, or push (`git push`) in the main codebase repository (`Audex`).
 - **User Commits Code**: All commits and pushes in the main repository are handled exclusively by the user.
-- **Allowed Documentation Repo**: The agent is ONLY permitted to create commits in the documentation repository (`*.Docs`).
+- **Documentation Repo (`*.Docs`) Policy**:
+  - The agent is ONLY permitted to create commits in the documentation repository (`*.Docs`).
+  - **No Immediate/Autonomous Commits**: The agent MUST NEVER commit documentation immediately upon implementing a feature.
+  - **User Review First**: The user must review and verify the feature first. The agent may ONLY execute git commits/pushes in `*.Docs` after receiving an explicit instruction from the user (e.g. "коммитим", "закоммить документацию").
+
+### 11. No Over-Defensive Nullability & No Defensive Null Spraying
+- **Full Execution Control Mandate**: In a full-stack codebase where the agent has end-to-end architectural control across backend DTOs, database models, and frontend interfaces, NEVER spray unnecessary nullability (`?`, `| null`, `?.`, `?? null`, `?? ""`) "just in case".
+- **Reflect Domain Guarantees Faithfully**: If a domain contract guarantees data presence (e.g. user profile currency, non-nullable entity identifiers, required API payload fields), type it strictly as non-nullable. Do not force consumers to write redundant null checks, fallback operators, or optional chaining for invariants guaranteed by design.
+- **Nullability Only for Genuine Domain Absence**: Use `null` / `undefined` strictly when absence of a value carries true domain meaning (e.g. "All Accounts" filter where `brokerAccountId` is null). Never use nullability as a defensive crutch.
 
 ---
 
@@ -189,6 +197,7 @@ This document contains guidelines, coding standards, and architectural patterns 
 - **Dual Translations Mandatory**: Every user-facing string MUST be added to **both** the corresponding English (`client/src/locales/en/<domain>/<file>.json`) and Russian (`client/src/locales/ru/<domain>/<file>.json`) files.
 - **Key Format**: Use `snake_case` keys categorized by domain/feature (e.g. `broker_account_page_*`, `entity_*`, `validation_*`).
 - **Hook**: Access strings via `const { t } = useTranslation()`.
+- **No Inline Fallback Strings**: NEVER pass hardcoded inline fallback strings as the second argument to `t(...)` (e.g. `t("key", "Текст")`). Translation keys are strictly defined and maintained in JSON dictionary files (`client/src/locales/ru/` and `client/src/locales/en/`). Call `t("key")` cleanly without defensive fallback overhead.
 - **Preserve Blank Lines**: Keep blank lines in JSON files between logical key blocks for semantic grouping. Do NOT delete or format away empty lines.
 
 ### Zod Validation Schemas & Localization
