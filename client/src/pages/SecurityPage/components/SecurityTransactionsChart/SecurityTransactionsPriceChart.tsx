@@ -125,6 +125,7 @@ export const SecurityTransactionsPriceChart: React.FC<Props> = ({
                             strokeWidth={2.5}
                             fillOpacity={1}
                             fill="url(#valueWithPaymentsGradient)"
+                            connectNulls={true}
                             activeDot={{
                                 r: 6,
                                 stroke: "var(--chakra-colors-background_primary)",
@@ -146,6 +147,7 @@ export const SecurityTransactionsPriceChart: React.FC<Props> = ({
                             stroke="#3B82F6"
                             strokeWidth={2}
                             strokeDasharray="4 4"
+                            connectNulls={true}
                             activeDot={{ r: 5 }}
                             dot={{ r: 3, fill: "#3B82F6", strokeWidth: 1 }}
                             name={t("securities_transactions_without_dividends")}

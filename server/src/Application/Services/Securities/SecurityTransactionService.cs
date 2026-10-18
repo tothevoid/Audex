@@ -167,23 +167,32 @@ namespace Audex.Application.Services.Securities
                 })
                 .ToArray();
 
+            var dailyTransactions = transactions
+                .GroupBy(transaction => DateOnly.FromDateTime(transaction.Date))
+                .OrderBy(dayGroup => dayGroup.Key);
+
             var convertedTransactions = new List<SecurityTransactionsHistoryDto>();
 
             //TODO: include sold securities
-            foreach (var transaction in transactions)
+            foreach (var dayGroup in dailyTransactions)
             {
-                var transactionDate = DateOnly.FromDateTime(transaction.Date);
+                var dayDate = dayGroup.Key;
+                var totalVolume = dayGroup.Sum(transaction => transaction.Quantity);
+                var totalCost = dayGroup.Sum(transaction => transaction.Price * transaction.Quantity);
+                var weightedAveragePrice = totalVolume > 0
+                    ? totalCost / totalVolume
+                    : dayGroup.Last().Price;
 
                 var paymentsSum = distinctDividends
-                    .Where(distinctDividend => distinctDividend.SnapshotDate > transactionDate)
+                    .Where(distinctDividend => distinctDividend.SnapshotDate > dayDate)
                     .Sum(distinctDividend => distinctDividend.NetDividendPerShare);
 
                 convertedTransactions.Add(new SecurityTransactionsHistoryDto()
                 {
-                    Date = transaction.Date,
-                    ValueWithPayments = transaction.Price - paymentsSum,
-                    ValueWithoutPayments = transaction.Price,
-                    Volume = transaction.Quantity
+                    Date = DateTime.SpecifyKind(dayDate.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc),
+                    ValueWithPayments = weightedAveragePrice - paymentsSum,
+                    ValueWithoutPayments = weightedAveragePrice,
+                    Volume = totalVolume
                 });
             }
 

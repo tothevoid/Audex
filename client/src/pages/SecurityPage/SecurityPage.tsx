@@ -54,7 +54,7 @@ const SecurityPage: React.FC = () => {
 	return <Stack color="text_primary" gap={4}>
 		<SecurityHeader security={state.security} securityStats={state.securityStats} />
 
-  		<Tabs.Root variant="enclosed" defaultValue="history">
+  		<Tabs.Root lazyMount={true} unmountOnExit={true} variant="enclosed" defaultValue="history">
 			<Tabs.List>
 				<Tabs.Trigger value="history">
 					<MdHistory/>

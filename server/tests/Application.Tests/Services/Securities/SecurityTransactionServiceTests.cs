@@ -435,6 +435,78 @@ namespace Audex.Application.Tests.Services.Securities
             Assert.Equal(1, combinedFilterResult.TotalCount);
         }
 
+        [Fact]
+        public async Task TestGetTransactionsHistoryAggregatesByDay()
+        {
+            var (securityId, brokerAccountId) = await SetupDependencies();
+
+            var sameDayDate = new DateTime(2026, 7, 9, 10, 0, 0, DateTimeKind.Utc);
+            var sameDaySecondTime = new DateTime(2026, 7, 9, 15, 30, 0, DateTimeKind.Utc);
+            var differentDayDate = new DateTime(2026, 7, 10, 11, 0, 0, DateTimeKind.Utc);
+
+            var transactionFirstDto = new SecurityTransactionDto
+            {
+                SecurityId = securityId,
+                BrokerAccountId = brokerAccountId,
+                Quantity = 10,
+                Price = 100m,
+                Date = sameDayDate,
+                BrokerCommission = 1m,
+                StockExchangeCommission = 0.5m,
+                IsSell = false
+            };
+
+            var transactionSecondDto = new SecurityTransactionDto
+            {
+                SecurityId = securityId,
+                BrokerAccountId = brokerAccountId,
+                Quantity = 20,
+                Price = 130m,
+                Date = sameDaySecondTime,
+                BrokerCommission = 1m,
+                StockExchangeCommission = 0.5m,
+                IsSell = false
+            };
+
+            var transactionThirdDto = new SecurityTransactionDto
+            {
+                SecurityId = securityId,
+                BrokerAccountId = brokerAccountId,
+                Quantity = 5,
+                Price = 120m,
+                Date = differentDayDate,
+                BrokerCommission = 1m,
+                StockExchangeCommission = 0.5m,
+                IsSell = false
+            };
+
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                await service.AddAsync(transactionFirstDto);
+                await service.AddAsync(transactionSecondDto);
+                await service.AddAsync(transactionThirdDto);
+            });
+
+            var historyResult = await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISecurityTransactionService>();
+                return (await service.GetTransactionsHistoryAsync(securityId)).ToList();
+            });
+
+            // 2 transactions on 2026-07-09 should be aggregated into 1 entry, plus 1 on 2026-07-10 = 2 total
+            Assert.Equal(2, historyResult.Count);
+
+            var firstDayEntry = historyResult[0];
+            Assert.Equal(30, firstDayEntry.Volume); // 10 + 20
+            // Weighted average price: (10 * 100 + 20 * 130) / 30 = 3600 / 30 = 120
+            Assert.Equal(120m, firstDayEntry.ValueWithoutPayments);
+
+            var secondDayEntry = historyResult[1];
+            Assert.Equal(5, secondDayEntry.Volume);
+            Assert.Equal(120m, secondDayEntry.ValueWithoutPayments);
+        }
+
         private async Task<(Guid securityId, Guid brokerAccountId)> SetupDependencies()
         {
             var securityTypeId = await ExecuteScopeAsync(async sp =>
