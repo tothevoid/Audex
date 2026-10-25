@@ -47,7 +47,7 @@ namespace InfrastructureManager.Application.Services
             var startInfo = new ProcessStartInfo
             {
                 FileName = "pg_dump",
-                Arguments = $"-h {npgsql.Host} -p {npgsql.Port} -U {npgsql.Username} -d {npgsql.Database} -w --clean --if-exists --no-owner --no-privileges --inserts --encoding=UTF8",
+                Arguments = $"-h {npgsql.Host} -p {npgsql.Port} -U {npgsql.Username} -d {npgsql.Database} -w --clean --if-exists --no-owner --no-privileges --encoding=UTF8",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
