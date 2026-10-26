@@ -1,7 +1,6 @@
 import React from "react";
 import { Box, HStack, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
-import { LuTrendingUp } from "react-icons/lu";
 import TrendDiff from "@/shared/components/TrendDiff";
 import { getCurrencySymbol } from "@/shared/utilities/currencyUtils";
 import { formatAdaptiveNumber } from "@/shared/utilities/formatters/moneyFormatter";
@@ -41,30 +40,10 @@ export const IndexQuoteCard: React.FC<IndexQuoteCardProps> = ({ quote }) => {
                 boxShadow: "sm"
             }}
         >
-            {/* Centered Index Icon */}
-            <Box
-                w={12}
-                h={12}
-                borderRadius="full"
-                backgroundColor="background_primary"
-                borderWidth="1px"
-                borderColor="border_primary"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                color="action_primary"
-                fontSize="1.5rem"
-                mb={2}
-                boxShadow="xs"
-            >
-                <LuTrendingUp />
-            </Box>
-
-
             {/* Index Code (IMOEX / RTSI / RGBI / MCFTR) */}
             <Text
                 fontWeight="extrabold"
-                fontSize="sm"
+                fontSize="2xl"
                 letterSpacing="widest"
                 color="text_secondary"
                 lineHeight="1.2"

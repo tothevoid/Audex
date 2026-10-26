@@ -55,26 +55,12 @@ export const SecurityDailyCard: React.FC<SecurityDailyCardProps> = ({
                 boxShadow: "sm"
             }}
         >
-            {/* Centered Stock Icon in Circular Container */}
-            <Box
-                w={12}
-                h={12}
-                borderRadius="full"
-                backgroundColor="background_primary"
-                borderWidth="1px"
-                borderColor="border_primary"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                color="action_primary"
-                mb={2}
-                boxShadow="xs"
-                overflow="hidden"
-            >
+            {/* Stock Icon */}
+            <Box mb={2}>
                 <StoredIcon
                     src={iconUrl}
-                    fallbackIcon={<HiOutlineBuildingOffice2 size={22} color="var(--chakra-colors-action_primary)" />}
-                    size="md"
+                    fallbackIcon={<HiOutlineBuildingOffice2 size={24} color="var(--chakra-colors-action_primary)" />}
+                    size="lg"
                 />
             </Box>
 
@@ -137,7 +123,7 @@ export const SecurityDailyCard: React.FC<SecurityDailyCardProps> = ({
                     opacity={0.8}
                 >
                     <Text fontWeight="semibold" letterSpacing="wide">
-                        {stat.quantity} {t("broker_account_security_card_pieces", "шт.")}
+                        {stat.quantity} {t("broker_account_security_card_pieces")}
                     </Text>
                 </Box>
             )}
