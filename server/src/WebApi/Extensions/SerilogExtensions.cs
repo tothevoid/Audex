@@ -8,6 +8,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
 using Audex.WebApi.Constants;
+using Audex.WebApi.Formatters;
 using Audex.WebApi.Middlewares;
 
 namespace Audex.WebApi.Extensions
@@ -30,6 +31,7 @@ namespace Audex.WebApi.Extensions
                     .MinimumLevel.Warning()
                     .MinimumLevel.Override(rootNamespace, LogEventLevel.Information)
                     .MinimumLevel.Override(nameof(Serilog), LogEventLevel.Information)
+                    .MinimumLevel.Override("TickerQ", LogEventLevel.Information)
                     .Enrich.FromLogContext()
                     .Enrich.WithEnvironmentName()
                     .Enrich.WithMachineName()
@@ -45,7 +47,9 @@ namespace Audex.WebApi.Extensions
                 }
                 else
                 {
-                    loggerConfiguration.WriteTo.Async(asyncSink => asyncSink.Console(new CompactJsonFormatter()));
+                    loggerConfiguration.WriteTo.Async(asyncSink => asyncSink.Console(
+                        formatter: new PrettyJsonFormatter(),
+                        restrictedToMinimumLevel: LogEventLevel.Error));
                 }
 
                 loggerConfiguration.WriteTo.Async(asyncSink => asyncSink.File(
