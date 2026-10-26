@@ -53,16 +53,21 @@ const CollectionPagination: React.FC<Props> = ({
 			gap={3}
 			py={3}
 		>
-			<HStack gap={3}>
+			<HStack gap={3} flexShrink={0}>
 				{showTotalCount && (
-					<Text fontSize="xs" color="text_secondary" fontWeight="medium">
+					<Text fontSize="xs" color="text_secondary" fontWeight="medium" whiteSpace="nowrap">
 						{t("general_total_count", { count })}
 					</Text>
 				)}
 
 				{showPageSizeSelector && (
-					<HStack gap={1.5}>
-						<Text fontSize="xs" color="text_secondary" display={{ base: "none", sm: "block" }}>
+					<HStack gap={1.5} flexShrink={0}>
+						<Text
+							fontSize="xs"
+							color="text_secondary"
+							whiteSpace="nowrap"
+							display={{ base: "none", sm: "block" }}
+						>
 							{t("pagination_page_size_label")}
 						</Text>
 						<NativeSelect.Root size="xs" minWidth="115px">
