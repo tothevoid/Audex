@@ -39,7 +39,7 @@ namespace Audex.Application.Jobs
         }
 
         [TickerFunction(functionName: "PullCryptoPrices")]
-        public async Task Pull(
+        public async Task PullCryptoPricesAsync(
             TickerFunctionContext context,
             CancellationToken cancellationToken = default)
         {
@@ -53,6 +53,7 @@ namespace Audex.Application.Jobs
             ScheduledTaskTriggerSource triggerSource,
             CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var pullResult = await _cryptocurrencyService.PullPricesAsync(cancellationToken);
             if (!pullResult.IsSuccess)
             {

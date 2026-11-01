@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Auth;
 using Audex.Application.DTO.Common;
@@ -30,6 +31,6 @@ namespace Audex.Application.Interfaces.Auth
 
         Task<bool> RevokeOtherTokensAsync(Guid userProfileId, string? currentRefreshToken);
 
-        Task<int> CleanUpExpiredRefreshTokensAsync(int olderThanDays = 30);
+        Task<int> CleanUpExpiredRefreshTokensAsync(int olderThanDays = 30, CancellationToken cancellationToken = default);
     }
 }

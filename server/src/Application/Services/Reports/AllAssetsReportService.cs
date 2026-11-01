@@ -20,6 +20,7 @@ using Audex.Infrastructure.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audex.Application.Services.Reports
@@ -58,39 +59,48 @@ namespace Audex.Application.Services.Reports
             _localizer = localizer;
         }
 
-        public async Task<GeneratedReportDto> CreateReportAsync()
+        public async Task<GeneratedReportDto> CreateReportAsync(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var lang = await _localizer.GetUserLanguageAsync();
 
             using var workbook = new XLWorkbook();
 
+            cancellationToken.ThrowIfCancellationRequested();
             var totalsSheet = workbook.Worksheets.Add(_localizer.Get(LocalizationKeys.Reports.SheetTotals, lang));
             await CreateTotalsWorksheet(totalsSheet, lang);
             totalsSheet.Columns().AdjustToContents();
 
+            cancellationToken.ThrowIfCancellationRequested();
             var bankAccounts = await _bankService.GetAllAsync();
             foreach (var bank in bankAccounts)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 await CreateBankAccountWorksheet(workbook, bank, lang);
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             var cashAccountsSheet = await GetCashAccounts();
             foreach (var cashAccount in cashAccountsSheet)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var sheetName = _localizer.Get(LocalizationKeys.Reports.SheetCash, lang, cashAccount.Name);
                 var accountWorksheet = workbook.Worksheets.Add(sheetName);
                 await CreateCashAccountsWorksheet(accountWorksheet, cashAccount, lang);
                 accountWorksheet.Columns().AdjustToContents();
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             var brokerSheet = workbook.Worksheets.Add(_localizer.Get(LocalizationKeys.Reports.SheetInvestments, lang));
             await CreateBrokerAccountWorksheet(brokerSheet, lang);
             brokerSheet.Columns().AdjustToContents();
 
+            cancellationToken.ThrowIfCancellationRequested();
             var debtorsSheet = workbook.Worksheets.Add(_localizer.Get(LocalizationKeys.Reports.SheetDebtors, lang));
             await CreateDebtorsWorksheet(debtorsSheet, lang);
             debtorsSheet.Columns().AdjustToContents();
 
+            cancellationToken.ThrowIfCancellationRequested();
             using var ms = new System.IO.MemoryStream();
             workbook.SaveAs(ms);
 

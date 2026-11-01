@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Audex.Application.DTO.FileStorage;
 using Audex.Application.Interfaces.FileStorage;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Minio;
 using Minio.DataModel.Args;
@@ -55,21 +56,30 @@ namespace Audex.Application.Services.FileStorage
                 .WithContentType(contentType));
         }
 
-        public async Task UploadBytesAsync(string bucketName, byte[] data, string key, string contentType)
+        public async Task UploadBytesAsync(
+            string bucketName,
+            byte[] data,
+            string key,
+            string contentType,
+            CancellationToken cancellationToken = default)
         {
             if (data == null || data.Length == 0)
             {
                 return;
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
+
             var existsArgs = new BucketExistsArgs().WithBucket(bucketName);
-            var hasBucket = await _minio.BucketExistsAsync(existsArgs);
+            var hasBucket = await _minio.BucketExistsAsync(existsArgs, cancellationToken);
 
             if (!hasBucket)
             {
-                await _minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName));
+                cancellationToken.ThrowIfCancellationRequested();
+                await _minio.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName), cancellationToken);
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             using var stream = new System.IO.MemoryStream(data);
 
             await _minio.PutObjectAsync(new PutObjectArgs()
@@ -77,7 +87,7 @@ namespace Audex.Application.Services.FileStorage
                 .WithObject(key)
                 .WithStreamData(stream)
                 .WithObjectSize(data.Length)
-                .WithContentType(string.IsNullOrWhiteSpace(contentType) ? "application/octet-stream" : contentType));
+                .WithContentType(string.IsNullOrWhiteSpace(contentType) ? "application/octet-stream" : contentType), cancellationToken);
         }
 
         public async Task<FileStreamDto> GetFileStreamAsync(string bucketName, string key)

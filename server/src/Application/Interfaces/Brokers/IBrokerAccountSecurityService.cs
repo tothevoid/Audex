@@ -1,7 +1,8 @@
-﻿using Audex.Application.DTO.Brokers;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using Audex.Application.DTO.Brokers;
 
 namespace Audex.Application.Interfaces.Brokers
 {
@@ -11,7 +12,7 @@ namespace Audex.Application.Interfaces.Brokers
         
         Task<IEnumerable<BrokerAccountSecurityDto>> GetByBrokerAccountAsync(Guid brokerAccountId);
 
-        Task PullQuotationsAsync();
+        Task PullQuotationsAsync(CancellationToken cancellationToken = default);
 
         Task PullQuotationsByBrokerAccountAsync(Guid brokerAccountId);
         

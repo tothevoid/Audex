@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Audex.Application.DTO.FileStorage;
 
@@ -8,7 +9,7 @@ namespace Audex.Application.Interfaces.FileStorage
     {
         Task UploadFileAsync(string bucketName, IFormFile file, string key);
 
-        Task UploadBytesAsync(string bucketName, byte[] data, string key, string contentType);
+        Task UploadBytesAsync(string bucketName, byte[] data, string key, string contentType, CancellationToken cancellationToken = default);
 
         Task<FileStreamDto> GetFileStreamAsync(string bucketName, string key);
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -47,17 +47,19 @@ namespace Audex.Application.Services.Scheduler
                 throw new ArgumentException($"Unknown task '{taskName}'", nameof(taskName));
             }
 
-            var ticker = await _tickerRepo.FindAsync(t => t.Function == taskName);
+            var ticker = await _tickerRepo.FindAsync(tickerEntity => tickerEntity.Function == taskName);
             if (ticker == null)
             {
                 throw new InvalidOperationException($"Task '{taskName}' is not configured/registered by user. Create a schedule first.");
             }
 
-            var job = _jobs.FirstOrDefault(j => j.GetType() == descriptor.JobType);
+            var job = _jobs.FirstOrDefault(registeredJob => registeredJob.GetType() == descriptor.JobType);
             if (job == null)
             {
                 throw new InvalidOperationException($"Job instance for '{descriptor.JobType.Name}' was not found in DI container.");
             }
+
+            cancellationToken.ThrowIfCancellationRequested();
 
             var occurrence = new CronTickerOccurrenceEntity<ScheduledCronTicker>
             {
@@ -85,12 +87,23 @@ namespace Audex.Application.Services.Scheduler
                 _occurrenceRepo.Update(occurrence);
                 await _db.CommitAsync();
             }
-            catch (Exception ex)
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                stopwatch.Stop();
+                occurrence.Status = TickerStatus.Cancelled;
+                occurrence.ElapsedTime = stopwatch.ElapsedMilliseconds;
+                occurrence.ExceptionMessage = "The operation was canceled.";
+                occurrence.UpdatedAt = DateTime.UtcNow;
+                _occurrenceRepo.Update(occurrence);
+                await _db.CommitAsync();
+                throw;
+            }
+            catch (Exception exception)
             {
                 stopwatch.Stop();
                 occurrence.Status = TickerStatus.Failed;
                 occurrence.ElapsedTime = stopwatch.ElapsedMilliseconds;
-                occurrence.ExceptionMessage = ex.Message;
+                occurrence.ExceptionMessage = exception.Message;
                 occurrence.UpdatedAt = DateTime.UtcNow;
                 _occurrenceRepo.Update(occurrence);
                 await _db.CommitAsync();

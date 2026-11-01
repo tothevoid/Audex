@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +40,7 @@ namespace Audex.Application.Jobs
         }
 
         [TickerFunction(functionName: "CleanUpOldNotifications")]
-        public async Task CleanUp(
+        public async Task CleanUpOldNotificationsAsync(
             TickerFunctionContext context,
             CancellationToken cancellationToken = default)
         {
@@ -54,7 +54,8 @@ namespace Audex.Application.Jobs
             ScheduledTaskTriggerSource triggerSource,
             CancellationToken cancellationToken)
         {
-            await _notificationService.CleanUpOldNotificationsAsync(olderThanDays: 90);
+            cancellationToken.ThrowIfCancellationRequested();
+            await _notificationService.CleanUpOldNotificationsAsync(olderThanDays: 90, cancellationToken: cancellationToken);
             var logMessage = await _localizer.GetForUserAsync(LocalizationKeys.Scheduler.CleanUpNotificationsSuccess, UserProfileConstants.UserProfileId, 90);
             return JobExecutionResult.Success(logMessage);
         }

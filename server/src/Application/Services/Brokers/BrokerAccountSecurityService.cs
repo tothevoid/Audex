@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audex.Application.Services.Brokers
@@ -106,8 +107,9 @@ namespace Audex.Application.Services.Brokers
             return _mapper.Map(brokerAccountSecurities);
         }
 
-        public async Task PullQuotationsAsync()
+        public async Task PullQuotationsAsync(CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var securities = (await _securityService.GetAllAsync()).ToList();
 
             if (!securities.Any())
@@ -115,7 +117,7 @@ namespace Audex.Application.Services.Brokers
                 return;
             }
 
-            await PullQuotations(securities);
+            await PullQuotations(securities, cancellationToken);
         }
 
         public async Task PullQuotationsByBrokerAccountAsync(Guid brokerAccountId)
@@ -130,14 +132,18 @@ namespace Audex.Application.Services.Brokers
             await PullQuotations(mappedSecurities.Select(brokerAccountSecurity => brokerAccountSecurity.Security).ToList());
         }
 
-        private async Task PullQuotations(IEnumerable<SecurityDto> securities)
+        private async Task PullQuotations(
+            IEnumerable<SecurityDto> securities,
+            CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var date = DateTime.UtcNow;
-            var tickerValues = (await _stockConnector.GetValuesByTickersAsync(securities))
+            var tickerValues = (await _stockConnector.GetValuesByTickersAsync(securities, cancellationToken))
                 .ToDictionary(marketValue => marketValue.Ticker, marketValue => marketValue);
            
             foreach (var security in securities)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var marketDataRow = tickerValues.GetValueOrDefault(security.Ticker);
                 if (marketDataRow == null)
                 {
@@ -150,6 +156,7 @@ namespace Audex.Application.Services.Brokers
                 updatingSecurity.PriceFetchedAt = DateTime.UtcNow;
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             _pullQuotationsService.UpdatePullDate(date);
             await _db.CommitAsync();
             await _serverNotifier.SendToAllAsync(ServerNotificationEvents.QuotesRecalculated, new QuotesRecalculatedDto { Date = date });

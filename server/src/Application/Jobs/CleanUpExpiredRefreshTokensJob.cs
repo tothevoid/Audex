@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -59,10 +59,12 @@ namespace Audex.Application.Jobs
             ScheduledTaskTriggerSource triggerSource,
             CancellationToken cancellationToken)
         {
-            var deletedCount = await _authService.CleanUpExpiredRefreshTokensAsync(olderThanDays: 30);
+            cancellationToken.ThrowIfCancellationRequested();
+            var deletedCount = await _authService.CleanUpExpiredRefreshTokensAsync(olderThanDays: 30, cancellationToken: cancellationToken);
 
             if (deletedCount > 0)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var title = await _localizer.GetForUserAsync(LocalizationKeys.Notifications.SessionCleanupTitle, UserProfileConstants.UserProfileId);
                 var message = await _localizer.GetForUserAsync(LocalizationKeys.Notifications.SessionCleanupMessage, UserProfileConstants.UserProfileId, deletedCount);
 

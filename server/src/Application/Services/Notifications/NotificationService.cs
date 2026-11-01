@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Common;
 using Audex.Application.DTO.Notifications;
@@ -58,8 +59,11 @@ namespace Audex.Application.Services.Notifications
             return unread.Count();
         }
 
-        public async Task CleanUpOldNotificationsAsync(int olderThanDays = 90)
+        public async Task CleanUpOldNotificationsAsync(
+            int olderThanDays = 90,
+            CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var threshold = DateTime.UtcNow.AddDays(-olderThanDays);
             var oldReadNotifications = (await _notificationRepo.GetAllAsync(
                 filter: notification => notification.UserProfileId == UserProfileConstants.UserProfileId && notification.IsRead && notification.CreatedAt < threshold,
@@ -69,9 +73,11 @@ namespace Audex.Application.Services.Notifications
 
             foreach (var item in oldReadNotifications)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 await _notificationRepo.DeleteAsync(item.Id);
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             await _db.CommitAsync();
         }
 

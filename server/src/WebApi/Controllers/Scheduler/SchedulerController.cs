@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -126,23 +127,30 @@ namespace Audex.WebApi.Controllers.Scheduler
         }
 
         [HttpPost("Tasks/{taskName}/RunNow")]
-        public async Task<IActionResult> RunNow(string taskName)
+        public async Task<IActionResult> RunNow(string taskName, CancellationToken cancellationToken)
         {
             try
             {
-                await _scheduleExecutor.ExecuteJobAsync(taskName, triggerSource: ScheduledTaskTriggerSource.Manual);
+                await _scheduleExecutor.ExecuteJobAsync(
+                    taskName,
+                    triggerSource: ScheduledTaskTriggerSource.Manual,
+                    cancellationToken: cancellationToken);
                 return Ok();
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status408RequestTimeout);
             }
             catch (ArgumentException)
             {
                 return NotFound();
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException exception)
             {
                 return Problem(
                     statusCode: StatusCodes.Status400BadRequest,
                     title: "Task is not registered",
-                    detail: ex.Message);
+                    detail: exception.Message);
             }
         }
 

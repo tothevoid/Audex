@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,7 +40,7 @@ namespace Audex.Application.Jobs
         }
 
         [TickerFunction(functionName: "PullQuotations")]
-        public async Task Pull(
+        public async Task PullQuotationsAsync(
             TickerFunctionContext context,
             CancellationToken cancellationToken = default)
         {
@@ -54,7 +54,8 @@ namespace Audex.Application.Jobs
             ScheduledTaskTriggerSource triggerSource,
             CancellationToken cancellationToken)
         {
-            await _brokerAccountSecurityService.PullQuotationsAsync();
+            cancellationToken.ThrowIfCancellationRequested();
+            await _brokerAccountSecurityService.PullQuotationsAsync(cancellationToken);
             var logMessage = await _localizer.GetForUserAsync(LocalizationKeys.Scheduler.PullQuotationsSuccess, UserProfileConstants.UserProfileId);
             return JobExecutionResult.Success(logMessage);
         }

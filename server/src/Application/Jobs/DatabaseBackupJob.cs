@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -73,17 +73,23 @@ namespace Audex.Application.Jobs
             ScheduledTaskTriggerSource triggerSource,
             CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var password = _customPassword;
             _customPassword = null;
 
-            var backup = await _backupService.CreateBackupAsync(password);
+            var backup = await _backupService.CreateBackupAsync(password, cancellationToken: cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+
             var objectKey = $"{DateTime.UtcNow:yyyy/MM}/{backup.FileName}";
 
             await _fileStorageService.UploadBytesAsync(
                 bucketName: "backups",
                 data: backup.Data,
                 key: objectKey,
-                contentType: backup.ContentType);
+                contentType: backup.ContentType,
+                cancellationToken: cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
 
             var attachment = new ScheduledTaskAttachment
             {

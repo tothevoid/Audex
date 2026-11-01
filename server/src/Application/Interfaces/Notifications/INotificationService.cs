@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Notifications;
 using Audex.Infrastructure.Entities.Notifications;
@@ -27,7 +28,7 @@ namespace Audex.Application.Interfaces.Notifications
 
         Task DeleteAsync(Guid notificationId);
 
-        Task CleanUpOldNotificationsAsync(int olderThanDays = 90);
+        Task CleanUpOldNotificationsAsync(int olderThanDays = 90, CancellationToken cancellationToken = default);
     }
 }
 

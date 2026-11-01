@@ -20,6 +20,7 @@ using System.Security;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Audex.Application.Constants;
 using Audex.Application.Interfaces.Localization;
@@ -280,8 +281,11 @@ namespace Audex.Application.Services.Auth
             return RevokeTokensInternalAsync(userProfileId, currentRefreshToken);
         }
 
-        public async Task<int> CleanUpExpiredRefreshTokensAsync(int olderThanDays = 30)
+        public async Task<int> CleanUpExpiredRefreshTokensAsync(
+            int olderThanDays = 30,
+            CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var threshold = DateTime.UtcNow.AddDays(-olderThanDays);
 
             // Filter criteria:
@@ -298,9 +302,11 @@ namespace Audex.Application.Services.Auth
 
             foreach (var token in tokensToDelete)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 await _refreshTokenRepo.DeleteAsync(token.Id);
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
             await _uow.CommitAsync();
             return tokensToDelete.Count;
         }

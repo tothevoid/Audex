@@ -42,11 +42,17 @@ namespace Audex.Application.Jobs
                 return;
             }
 
+            cancellationToken.ThrowIfCancellationRequested();
+
             await _serverNotifier.SendToAllAsync(ServerNotificationEvents.ScheduledTaskStarted, TaskName);
            
             try
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 var result = await ExecuteCoreAsync(triggerSource, cancellationToken);
+
+                cancellationToken.ThrowIfCancellationRequested();
 
                 if (result?.Attachment != null && occurrenceId.HasValue && occurrenceId.Value != Guid.Empty)
                 {
@@ -55,9 +61,14 @@ namespace Audex.Application.Jobs
 
                 await OnSuccessAsync(triggerSource, result, cancellationToken);
             }
-            catch (Exception ex)
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
-                await OnFailureAsync(triggerSource, ex, cancellationToken);
+                await OnCanceledAsync(triggerSource, cancellationToken);
+                throw;
+            }
+            catch (Exception exception)
+            {
+                await OnFailureAsync(triggerSource, exception, cancellationToken);
                 throw;
             }
         }
@@ -74,6 +85,10 @@ namespace Audex.Application.Jobs
         protected virtual Task OnFailureAsync(
             ScheduledTaskTriggerSource triggerSource,
             Exception exception,
+            CancellationToken cancellationToken) => Task.CompletedTask;
+
+        protected virtual Task OnCanceledAsync(
+            ScheduledTaskTriggerSource triggerSource,
             CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

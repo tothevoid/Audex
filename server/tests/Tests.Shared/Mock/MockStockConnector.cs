@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Securities;
 using Audex.Application.Integrations.Stock;
@@ -19,7 +20,9 @@ namespace Audex.Tests.Shared.Mock
 
         public int FindCallsCount { get; private set; }
 
-        public Task<IEnumerable<MarketDataRow>> GetValuesByTickersAsync(IEnumerable<SecurityDto> tickers)
+        public Task<IEnumerable<MarketDataRow>> GetValuesByTickersAsync(
+            IEnumerable<SecurityDto> tickers,
+            CancellationToken cancellationToken = default)
         {
             if (GetValuesByTickersHandler != null)
             {

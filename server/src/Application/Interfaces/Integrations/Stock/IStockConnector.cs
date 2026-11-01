@@ -1,18 +1,19 @@
 #nullable enable
-using Audex.Application.DTO.Securities;
-using Audex.Application.Integrations.Stock;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Audex.Application.DTO.Securities;
+using Audex.Application.Integrations.Stock;
 using Audex.Application.Integrations.Stock.Moex.Model;
 
 namespace Audex.Application.Interfaces.Integrations.Stock
 {
     public interface IStockConnector
     {
-        Task<IEnumerable<MarketDataRow>> GetValuesByTickersAsync(IEnumerable<SecurityDto> tickers);
+        Task<IEnumerable<MarketDataRow>> GetValuesByTickersAsync(IEnumerable<SecurityDto> tickers, CancellationToken cancellationToken = default);
 
         Task<IEnumerable<SecurityHistoryValueDto>> GetTickerHistoryAsync(SecurityDto security, DateOnly from, DateOnly to, int interval = 24);
 

@@ -98,6 +98,11 @@ namespace Audex.Application.Services.Scheduler
 
                         _logger.LogInformation("Catch-up run for task '{TaskName}' completed successfully.", task.TaskName);
                     }
+                    catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                    {
+                        _logger.LogWarning("Catch-up run for task '{TaskName}' was cancelled.", task.TaskName);
+                        break;
+                    }
                     catch (Exception exception)
                     {
                         _logger.LogError(exception, "Catch-up run for task '{TaskName}' failed.", task.TaskName);

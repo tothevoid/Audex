@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using Audex.Application.DTO.Securities;
@@ -55,7 +56,9 @@ namespace Audex.Application.Integrations.Stock.Moex
             return ResolveBestMarketDataRows(result);
         }
 
-        public async Task<IEnumerable<MarketDataRow>> GetValuesByTickersAsync(IEnumerable<SecurityDto> securities)
+        public async Task<IEnumerable<MarketDataRow>> GetValuesByTickersAsync(
+            IEnumerable<SecurityDto> securities,
+            CancellationToken cancellationToken = default)
         {
             var httpClient = httpClientFactory.CreateClient();
 
@@ -65,14 +68,16 @@ namespace Audex.Application.Integrations.Stock.Moex
 
             if (baseSecurities.Count > 0)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var baseSecuritiesQuery = MoexUrlFactory.GetBaseSecuritiesQuery(baseSecurities);
-                dataRows.AddRange(await FetchMarketDataRowsAsync(httpClient, baseSecuritiesQuery));
+                dataRows.AddRange(await FetchMarketDataRowsAsync(httpClient, baseSecuritiesQuery, cancellationToken));
             }
 
             if (currencySecurities.Count > 0)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var currencySecuritiesQuery = MoexUrlFactory.GetBaseCurrencySecuritiesQuery(currencySecurities);
-                dataRows.AddRange(await FetchMarketDataRowsAsync(httpClient, currencySecuritiesQuery));
+                dataRows.AddRange(await FetchMarketDataRowsAsync(httpClient, currencySecuritiesQuery, cancellationToken));
             }
 
             return ResolveBestMarketDataRows(dataRows);
@@ -88,17 +93,23 @@ namespace Audex.Application.Integrations.Stock.Moex
                 .ToList();
         }
 
-        private static async Task<IEnumerable<MarketDataRow>> FetchMarketDataRowsAsync(HttpClient httpClient, string query)
+        private static async Task<IEnumerable<MarketDataRow>> FetchMarketDataRowsAsync(
+            HttpClient httpClient,
+            string query,
+            CancellationToken cancellationToken = default)
         {
-            var tickersData = await FetchTickersDataAsync(httpClient, query);
+            var tickersData = await FetchTickersDataAsync(httpClient, query, cancellationToken);
 
             return ParseMarketDataRows(tickersData.MarketData.Columns, tickersData.MarketData);
         }
 
-        private static async Task<MoexResponse> FetchTickersDataAsync(HttpClient httpClient, string query)
+        private static async Task<MoexResponse> FetchTickersDataAsync(
+            HttpClient httpClient,
+            string query,
+            CancellationToken cancellationToken = default)
         {
-            var result = await httpClient.GetAsync(query);
-            return await result.Content.ReadFromJsonAsync<MoexResponse>() ?? new MoexResponse();
+            var result = await httpClient.GetAsync(query, cancellationToken);
+            return await result.Content.ReadFromJsonAsync<MoexResponse>(cancellationToken: cancellationToken) ?? new MoexResponse();
         }
 
         private static async Task<IEnumerable<MarketDataRow>> FetchAndApplySecuritiesAsync(HttpClient httpClient, string query)

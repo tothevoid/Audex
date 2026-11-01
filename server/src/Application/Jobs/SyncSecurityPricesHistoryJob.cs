@@ -39,7 +39,7 @@ namespace Audex.Application.Jobs
         }
 
         [TickerFunction(functionName: "SyncSecurityPricesHistory")]
-        public async Task Execute(
+        public async Task SyncSecurityPricesHistoryAsync(
             TickerFunctionContext context,
             CancellationToken cancellationToken = default)
         {
@@ -53,6 +53,7 @@ namespace Audex.Application.Jobs
             ScheduledTaskTriggerSource triggerSource,
             CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var syncedSecuritiesCount = await _securityPriceHistoryService.SyncActiveSecuritiesPriceHistoryAsync(cancellationToken);
             var logMessage = await _localizer.GetForUserAsync(
                 LocalizationKeys.Scheduler.SyncSecurityPricesHistorySuccess,

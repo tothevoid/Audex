@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Audex.Application.DTO.DatabaseBackup;
@@ -30,11 +31,15 @@ namespace Audex.Application.Services.DatabaseBackup
             _logger = logger;
         }
 
-        public async Task<GeneratedBackupDto> CreateBackupAsync(string? password = null)
+        public async Task<GeneratedBackupDto> CreateBackupAsync(
+            string? password = null,
+            CancellationToken cancellationToken = default)
         {
-            var rawZipBytes = await _databaseBackupProvider.ExportDatabaseDumpAsync();
+            cancellationToken.ThrowIfCancellationRequested();
+            var rawZipBytes = await _databaseBackupProvider.ExportDatabaseDumpAsync(cancellationToken);
             var isEncrypted = !string.IsNullOrEmpty(password);
 
+            cancellationToken.ThrowIfCancellationRequested();
             var data = isEncrypted
                 ? await _backupEncryptionService.EncryptAsync(rawZipBytes, password!)
                 : rawZipBytes;
