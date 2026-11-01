@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System;
 using Audex.Application.DTO.Currencies;
@@ -30,10 +31,10 @@ namespace Audex.WebApi.Controllers.Currencies
         }
 
         [HttpGet("SyncRates")]
-        public async Task SyncRates()
+        public async Task SyncRates(CancellationToken cancellationToken = default)
         {
             var profile = await _userProfileService.GetAsync();
-            await _currencyService.SyncRatesAsync(profile.Currency);
+            await _currencyService.SyncRatesAsync(profile.Currency, cancellationToken);
         }
 
         [HttpGet]

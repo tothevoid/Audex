@@ -4,6 +4,7 @@
   "category_reports": "Отчеты",
   "category_brokers": "Брокеры",
   "category_crypto": "Криптовалюта",
+  "category_currencies": "Валюты",
   "category_general": "Общие",
   "cleanup_expired_tokens_name": "Очистка сессионных токенов",
   "cleanup_expired_tokens_desc": "Удаление истекших и отозванных JWT refresh-токенов старше 30 дней",
@@ -18,5 +19,7 @@
   "pull_crypto_prices_name": "Обновление цен криптовалют",
   "pull_crypto_prices_desc": "Периодическое получение актуальных цен криптовалют в USD с CoinGecko",
   "sync_security_prices_history_name": "Синхронизация истории котировок акций",
-  "sync_security_prices_history_desc": "Проактивное кэширование дневных цен закрытия ценных бумаг с MOEX для аналитики портфеля"
+  "sync_security_prices_history_desc": "Проактивное кэширование дневных цен закрытия ценных бумаг с MOEX для аналитики портфеля",
+  "sync_currency_rates_name": "Синхронизация курсов валют",
+  "sync_currency_rates_desc": "Периодическое получение актуальных курсов валют"
 }

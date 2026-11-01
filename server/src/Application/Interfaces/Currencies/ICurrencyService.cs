@@ -1,13 +1,14 @@
-﻿using Audex.Application.DTO.Currencies;
+using Audex.Application.DTO.Currencies;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Audex.Application.Interfaces.Currencies
 {
     public interface ICurrencyService
     {
-        Task SyncRatesAsync(CurrencyDto mainCurrency);
+        Task<int> SyncRatesAsync(CurrencyDto mainCurrency, CancellationToken cancellationToken = default);
         Task<IEnumerable<CurrencyDto>> GetAllAsync();
         Task<CurrencyDto> GetByIdAsync(Guid id);
         Task<Guid> AddAsync(CurrencyDto currency);

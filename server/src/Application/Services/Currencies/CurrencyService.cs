@@ -1,55 +1,55 @@
-﻿using Audex.Application.DTO.Currencies;
-using Audex.Application.Interfaces.Currencies;
-using Audex.Application.Mappings;
-using Audex.Infrastructure.Entities.Currencies;
-using Audex.Infrastructure.Interfaces.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Audex.Application.DTO;
+using Audex.Application.DTO.Currencies;
+using Audex.Application.Interfaces.Currencies;
 using Audex.Application.Interfaces.Integrations.Currency;
-using Audex.Application.Interfaces.User;
-using Audex.Infrastructure.Entities.User;
+using Audex.Application.Mappings;
+using Audex.Infrastructure.Entities.Currencies;
+using Audex.Infrastructure.Interfaces.Database;
 
 namespace Audex.Application.Services.Currencies
 {
-    public class CurrencyService: ICurrencyService
+    public class CurrencyService : ICurrencyService
     {
-        private readonly IUnitOfWork _db;
-        private readonly IRepository<Currency> _currencyRepo;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IRepository<Currency> _currencyRepository;
         private readonly ApplicationMapper _mapper;
         private readonly ICurrencyGrabber _currencyGrabber;
-      
-        public CurrencyService(IUnitOfWork uow, ApplicationMapper mapper, ICurrencyGrabber currencyGrabber)
+
+        public CurrencyService(
+            IUnitOfWork unitOfWork,
+            ApplicationMapper mapper,
+            ICurrencyGrabber currencyGrabber)
         {
-            _db = uow;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _currencyRepo = uow.CreateRepository<Currency>();
+            _currencyRepository = unitOfWork.CreateRepository<Currency>();
             _currencyGrabber = currencyGrabber;
         }
 
         public async Task<IEnumerable<CurrencyDto>> GetAllAsync()
         {
-            var transactions = await _currencyRepo.GetAllAsync();
-            return _mapper.Map(transactions);
+            var currencies = await _currencyRepository.GetAllAsync();
+            return _mapper.Map(currencies);
         }
 
         public async Task<CurrencyDto> GetByIdAsync(Guid id)
         {
-            var transactions = await _currencyRepo.GetByIdAsync(id);
-            return _mapper.Map(transactions);
+            var currency = await _currencyRepository.GetByIdAsync(id);
+            return _mapper.Map(currency);
         }
 
-        //TODO: Guid parameter instead of DTO
-        //TODO: Should be in separate service
-        public async Task SyncRatesAsync(CurrencyDto mainCurrency)
+        public async Task<int> SyncRatesAsync(CurrencyDto mainCurrency, CancellationToken cancellationToken = default)
         {
-            var currencies = (await _currencyRepo.GetAllAsync(disableTracking: false)).ToList();
-            var currenciesNames = currencies.Select(x => x.Name).ToHashSet();
+            var currencies = (await _currencyRepository.GetAllAsync(disableTracking: false)).ToList();
+            var currencyNames = currencies.Select(currency => currency.Name).ToHashSet();
 
-            var rates = await _currencyGrabber.GetRatesAsync(mainCurrency.Name, currenciesNames);
+            var rates = await _currencyGrabber.GetRatesAsync(mainCurrency.Name, currencyNames, cancellationToken);
 
+            var updatedCount = 0;
             foreach (var currency in currencies)
             {
                 if (currency.Id == mainCurrency.Id)
@@ -58,31 +58,41 @@ namespace Audex.Application.Services.Currencies
                     continue;
                 }
 
-                currency.Rate = rates.TryGetValue(currency.Name, out var rate) ? rate : 1;
+                if (rates.TryGetValue(currency.Name, out var rate))
+                {
+                    currency.Rate = rate;
+                    updatedCount++;
+                }
+                else
+                {
+                    currency.Rate = 1;
+                }
             }
-            await _db.CommitAsync();
+
+            await _unitOfWork.CommitAsync();
+            return updatedCount;
         }
 
         public async Task UpdateAsync(CurrencyDto currencyDto)
         {
             var currency = _mapper.Map(currencyDto);
-            _currencyRepo.Update(currency);
-            await _db.CommitAsync();
+            _currencyRepository.Update(currency);
+            await _unitOfWork.CommitAsync();
         }
 
         public async Task<Guid> AddAsync(CurrencyDto currencyDto)
         {
             var currency = _mapper.Map(currencyDto);
             currency.Id = Guid.NewGuid();
-            await _currencyRepo.AddAsync(currency);
-            await _db.CommitAsync();
+            await _currencyRepository.AddAsync(currency);
+            await _unitOfWork.CommitAsync();
             return currency.Id;
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            await _currencyRepo.DeleteAsync(id);
-            await _db.CommitAsync();
+            await _currencyRepository.DeleteAsync(id);
+            await _unitOfWork.CommitAsync();
         }
     }
 }

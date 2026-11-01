@@ -24,7 +24,7 @@ namespace Audex.Application.Tests.Services.Scheduler
                 var descriptors = registry.GetAllDescriptors();
 
                 Assert.NotNull(descriptors);
-                Assert.True(descriptors.Count >= 7);
+                Assert.True(descriptors.Count >= 8);
                 Assert.Contains(descriptors, descriptor => descriptor.TaskName == "GenerateAllAssetsReport");
                 Assert.Contains(descriptors, descriptor => descriptor.TaskName == "DatabaseBackup");
                 Assert.Contains(descriptors, descriptor => descriptor.TaskName == "PullQuotations");
@@ -32,6 +32,7 @@ namespace Audex.Application.Tests.Services.Scheduler
                 Assert.Contains(descriptors, descriptor => descriptor.TaskName == "CleanUpExpiredRefreshTokens");
                 Assert.Contains(descriptors, descriptor => descriptor.TaskName == "PullCryptoPrices");
                 Assert.Contains(descriptors, descriptor => descriptor.TaskName == "SyncSecurityPricesHistory");
+                Assert.Contains(descriptors, descriptor => descriptor.TaskName == "SyncCurrencyRates");
                 return Task.CompletedTask;
             });
         }
@@ -63,6 +64,22 @@ namespace Audex.Application.Tests.Services.Scheduler
 
                 Assert.NotNull(descriptor);
                 Assert.Equal("SyncSecurityPricesHistory", descriptor.TaskName);
+                Assert.True(descriptor.AllowStartupCatchUp);
+                return Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task GetDescriptor_SyncCurrencyRates_HasStartupCatchUpEnabled()
+        {
+            await ExecuteScopeAsync(serviceProvider =>
+            {
+                var registry = serviceProvider.GetRequiredService<IScheduledJobRegistry>();
+
+                var descriptor = registry.GetDescriptor("SyncCurrencyRates");
+
+                Assert.NotNull(descriptor);
+                Assert.Equal("SyncCurrencyRates", descriptor.TaskName);
                 Assert.True(descriptor.AllowStartupCatchUp);
                 return Task.CompletedTask;
             });

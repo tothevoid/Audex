@@ -28,6 +28,7 @@ namespace Audex.Application.Constants
             public const string PullQuotationsSuccess = "scheduler.pull_quotations_success";
             public const string PullCryptoPricesSuccess = "scheduler.pull_crypto_prices_success";
             public const string SyncSecurityPricesHistorySuccess = "scheduler.sync_security_prices_history_success";
+            public const string SyncCurrencyRatesSuccess = "scheduler.sync_currency_rates_success";
         }
 
         public static class Reports
@@ -80,6 +81,7 @@ namespace Audex.Application.Constants
                 public const string Reports = "jobs.category_reports";
                 public const string Brokers = "jobs.category_brokers";
                 public const string Crypto = "jobs.category_crypto";
+                public const string Currencies = "jobs.category_currencies";
                 public const string General = "jobs.category_general";
             }
 
@@ -123,6 +125,12 @@ namespace Audex.Application.Constants
             {
                 public const string Name = "jobs.sync_security_prices_history_name";
                 public const string Description = "jobs.sync_security_prices_history_desc";
+            }
+
+            public static class SyncCurrencyRates
+            {
+                public const string Name = "jobs.sync_currency_rates_name";
+                public const string Description = "jobs.sync_currency_rates_desc";
             }
         }
 

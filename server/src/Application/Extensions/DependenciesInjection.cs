@@ -154,6 +154,7 @@ namespace Audex.Application.Extensions
             services.AddScheduledJob<CleanUpExpiredRefreshTokensJob>();
             services.AddScheduledJob<PullCryptoPricesJob>();
             services.AddScheduledJob<SyncSecurityPricesHistoryJob>();
+            services.AddScheduledJob<SyncCurrencyRatesJob>();
 
             return services;
         }
