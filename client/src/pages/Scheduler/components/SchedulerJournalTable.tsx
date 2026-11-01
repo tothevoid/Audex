@@ -1,255 +1,195 @@
 import React, { useMemo, useState } from 'react';
-import { Badge, Box, Flex, HStack, Icon, SimpleGrid, Spinner, Table, Text, VStack } from '@chakra-ui/react';
+import {
+    Badge,
+    HStack,
+    Icon,
+    Table,
+    Text
+} from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { formatDateTimeWithSeconds } from '@/shared/utilities/formatters/dateFormatter';
 import {
     MdAttachFile,
-    MdErrorOutline,
-    MdInfoOutline,
     MdKeyboardArrowDown,
     MdKeyboardArrowUp
 } from 'react-icons/md';
 import { ScheduledTaskJournalEntity } from '@/models/scheduler/ScheduledTaskJournalEntity';
-import { ScheduledTaskEntity, ScheduledTaskTriggerSource } from '@/models/scheduler/ScheduledTaskEntity';
-import { formatDuration, getStatusBadgeProps, getStatusFilterOptions } from '@/pages/Scheduler/schedulerUtils';
-import BaseSelect from '@/shared/components/BaseSelect/BaseSelect';
-import { SchedulerAttachmentList } from './SchedulerAttachmentList';
-import CopyButton from '@/shared/components/CopyButton/CopyButton';
-import RefreshButton from '@/shared/components/RefreshButton';
+import { ScheduledTaskTriggerSource } from '@/models/scheduler/ScheduledTaskEntity';
+import { formatDuration, getStatusBadgeProps } from '@/pages/Scheduler/schedulerUtils';
+import { SchedulerJournalDetailRow } from './SchedulerJournalDetailRow';
+import { TableWrapper, TableColumnConfig } from '@/shared/components/TableWrapper';
 
-interface FilterOption {
-    value: string;
-    label: string;
-}
+const DEFAULT_PAGE_SIZE = 15;
+const ROW_HEIGHT = '40px';
 
 interface SchedulerJournalTableProps {
     records: ScheduledTaskJournalEntity[];
-    tasks?: ScheduledTaskEntity[];
     isLoading: boolean;
-    selectedTask?: string;
-    selectedStatus?: string;
-    hideTaskFilter?: boolean;
+    pageSize?: number;
     hideTaskColumn?: boolean;
-    onTaskFilterChange?: (task: string) => void;
-    onStatusFilterChange?: (status: string) => void;
-    onRefresh: () => void;
 }
 
 export const SchedulerJournalTable: React.FC<SchedulerJournalTableProps> = ({
     records,
-    tasks = [],
     isLoading,
-    selectedTask = 'All',
-    selectedStatus = 'All',
-    hideTaskFilter = false,
-    hideTaskColumn = false,
-    onTaskFilterChange,
-    onStatusFilterChange,
-    onRefresh
+    pageSize = DEFAULT_PAGE_SIZE,
+    hideTaskColumn = false
 }) => {
     const { t, i18n } = useTranslation();
     const [expandedMap, setExpandedMap] = useState<Record<string, boolean>>({});
 
-    const toggleExpand = (id: string) => {
-        setExpandedMap((prev) => ({ ...prev, [id]: !prev[id] }));
+    const toggleExpand = (recordId: string) => {
+        setExpandedMap((previous) => ({ ...previous, [recordId]: !previous[recordId] }));
     };
 
-    const taskOptions: FilterOption[] = useMemo(() => [
-        { value: 'All', label: t('scheduler_all_tasks') },
-        ...tasks.map((task) => ({ value: task.taskName, label: task.displayName }))
-    ], [tasks, t]);
+    const columnSpan = hideTaskColumn ? 4 : 5;
 
-    const statusOptions: FilterOption[] = useMemo(() => getStatusFilterOptions(t), [t]);
+    const columns: TableColumnConfig<ScheduledTaskJournalEntity>[] = useMemo(() => {
+        const columnDefinitions: TableColumnConfig<ScheduledTaskJournalEntity>[] = [
+            {
+                id: 'time',
+                header: t('scheduler_journal_time'),
+                width: hideTaskColumn ? '30%' : '20%',
+                skeletonWidth: '70%',
+                render: (record) => (
+                    <HStack gap={2} align="center">
+                        <Text whiteSpace="nowrap">
+                            {formatDateTimeWithSeconds(new Date(record.executedAtUtc), i18n)}
+                        </Text>
+                        {hideTaskColumn && Boolean(record.attachments && record.attachments.length > 0) && (
+                            <Icon color="blue.400" fontSize="16px" flexShrink={0}>
+                                <MdAttachFile />
+                            </Icon>
+                        )}
+                        {hideTaskColumn && Boolean(record.errorMessage || record.logMessage || (record.attachments && record.attachments.length > 0)) && (
+                            <Icon color="text_secondary" fontSize="16px" flexShrink={0}>
+                                {expandedMap[record.id] ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
+                            </Icon>
+                        )}
+                    </HStack>
+                )
+            }
+        ];
 
-    const selectedTaskOption = taskOptions.find((opt) => opt.value === selectedTask) ?? taskOptions[0];
-    const selectedStatusOption = statusOptions.find((opt) => opt.value === selectedStatus) ?? statusOptions[0];
+        if (!hideTaskColumn) {
+            columnDefinitions.push({
+                id: 'taskName',
+                header: t('scheduler_task_name'),
+                width: '30%',
+                skeletonWidth: '80%',
+                render: (record) => {
+                    const hasAttachments = Boolean(record.attachments && record.attachments.length > 0);
+                    const isExpandable = Boolean(record.errorMessage || record.logMessage || hasAttachments);
+                    const isExpanded = isExpandable && !!expandedMap[record.id];
 
-    const colSpan = hideTaskColumn ? 5 : 6;
+                    return (
+                        <HStack gap={2} align="center">
+                            <Text color="text_primary" fontWeight="medium" truncate title={record.displayName}>
+                                {record.displayName}
+                            </Text>
+                            {hasAttachments && (
+                                <Icon color="blue.400" fontSize="16px" flexShrink={0}>
+                                    <MdAttachFile />
+                                </Icon>
+                            )}
+                            {isExpandable && (
+                                <Icon color="text_secondary" fontSize="16px" flexShrink={0}>
+                                    {isExpanded ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
+                                </Icon>
+                            )}
+                        </HStack>
+                    );
+                }
+            });
+        }
+
+        columnDefinitions.push(
+            {
+                id: 'source',
+                header: t('scheduler_journal_source'),
+                width: hideTaskColumn ? '22%' : '16%',
+                skeletonWidth: '60%',
+                render: (record) => (
+                    <Text color="text_secondary" whiteSpace="nowrap">
+                        {record.triggerSource === ScheduledTaskTriggerSource.Scheduled
+                            ? t('scheduler_journal_source_scheduled')
+                            : t('scheduler_journal_source_manual')}
+                    </Text>
+                )
+            },
+            {
+                id: 'status',
+                header: t('scheduler_status'),
+                width: hideTaskColumn ? '24%' : '18%',
+                skeletonWidth: '70%',
+                skeletonBorderRadius: 'full',
+                render: (record) => {
+                    const badge = getStatusBadgeProps(record.status, t);
+                    return (
+                        <Badge size="sm" colorPalette={badge.colorPalette} whiteSpace="nowrap">
+                            {badge.label}
+                        </Badge>
+                    );
+                }
+            },
+            {
+                id: 'duration',
+                header: t('scheduler_duration'),
+                width: hideTaskColumn ? '24%' : '16%',
+                skeletonWidth: '50%',
+                render: (record) => (
+                    <Text color="text_secondary" whiteSpace="nowrap">
+                        {formatDuration(record.durationMs)}
+                    </Text>
+                )
+            }
+        );
+
+        return columnDefinitions;
+    }, [hideTaskColumn, expandedMap, t, i18n]);
 
     return (
-        <VStack align="stretch" gap={4}>
-            <Flex justify="space-between" align="center" wrap="wrap" gap={3}>
-                <HStack gap={3} wrap="wrap">
-                    {!hideTaskFilter && onTaskFilterChange && (
-                        <Box width="220px">
-                            <BaseSelect
-                                collection={taskOptions}
-                                selectedValue={selectedTaskOption}
-                                onSelected={(opt) => onTaskFilterChange(opt.value)}
-                                labelSelector={(opt) => opt.label}
-                                valueSelector={(opt) => opt.value}
-                                placeholder={t('scheduler_all_tasks')}
+        <TableWrapper
+            columns={columns}
+            isLoading={isLoading}
+            rowCount={records.length > 0 ? records.length : pageSize}
+            rowHeight={ROW_HEIGHT}
+            minWidth="800px"
+            isEmpty={records.length === 0}
+            emptyText={t('scheduler_journal_empty')}
+        >
+            {records.map((record) => {
+                const hasAttachments = Boolean(record.attachments && record.attachments.length > 0);
+                const hasLog = Boolean(record.errorMessage || record.logMessage);
+                const isExpandable = hasLog || hasAttachments;
+                const isExpanded = isExpandable && !!expandedMap[record.id];
+
+                return (
+                    <React.Fragment key={record.id}>
+                        <Table.Row
+                            height={ROW_HEIGHT}
+                            onClick={() => isExpandable && toggleExpand(record.id)}
+                            cursor={isExpandable ? 'pointer' : 'default'}
+                            _hover={isExpandable ? { backgroundColor: 'background_secondary' } : undefined}
+                            backgroundColor={isExpanded ? 'background_secondary' : 'inherit'}
+                            transition="background-color 0.15s ease"
+                        >
+                            {columns.map((column) => (
+                                <Table.Cell key={column.id} verticalAlign="middle" whiteSpace="nowrap">
+                                    {column.render ? column.render(record, 0) : null}
+                                </Table.Cell>
+                            ))}
+                        </Table.Row>
+
+                        {isExpanded && (
+                            <SchedulerJournalDetailRow
+                                record={record}
+                                columnSpan={columnSpan}
                             />
-                        </Box>
-                    )}
-
-                    {onStatusFilterChange && (
-                        <Box width="200px">
-                            <BaseSelect
-                                collection={statusOptions}
-                                selectedValue={selectedStatusOption}
-                                onSelected={(opt) => onStatusFilterChange(opt.value)}
-                                labelSelector={(opt) => opt.label}
-                                valueSelector={(opt) => opt.value}
-                                placeholder={t('scheduler_all_statuses')}
-                            />
-                        </Box>
-                    )}
-                </HStack>
-
-                <RefreshButton
-                    isRefreshing={isLoading}
-                    title={t('scheduler_refresh')}
-                    onClick={onRefresh}
-                />
-            </Flex>
-
-            {isLoading ? (
-                <Flex justify="center" align="center" minH="200px">
-                    <Spinner size="xl" color="action_primary" />
-                </Flex>
-            ) : records.length === 0 ? (
-                <Box p={8} textAlign="center" borderRadius="md" backgroundColor="background_secondary" borderWidth="1px" borderColor="border_primary">
-                    <Text color="text_secondary">{t('scheduler_journal_empty')}</Text>
-                </Box>
-            ) : (
-                <Box overflowX="auto" borderRadius="md" borderWidth="1px" borderColor="border_primary">
-                    <Table.Root size="sm" variant="outline">
-                        <Table.Header backgroundColor="background_secondary">
-                            <Table.Row>
-                                <Table.ColumnHeader color="text_primary">{t('scheduler_journal_time')}</Table.ColumnHeader>
-                                {!hideTaskColumn && (
-                                    <Table.ColumnHeader color="text_primary">{t('scheduler_task_name')}</Table.ColumnHeader>
-                                )}
-                                <Table.ColumnHeader color="text_primary">{t('scheduler_journal_source')}</Table.ColumnHeader>
-                                <Table.ColumnHeader color="text_primary">{t('scheduler_status')}</Table.ColumnHeader>
-                                <Table.ColumnHeader color="text_primary">{t('scheduler_duration')}</Table.ColumnHeader>
-                                <Table.ColumnHeader color="text_primary" textAlign="right"></Table.ColumnHeader>
-                            </Table.Row>
-                        </Table.Header>
-                        <Table.Body backgroundColor="background_primary">
-                            {records.map((record) => {
-                                const hasAttachments = Boolean(record.attachments && record.attachments.length > 0);
-                                const hasLog = Boolean(record.errorMessage || record.logMessage);
-                                const isExpandable = hasLog || hasAttachments;
-                                const isExpanded = isExpandable && !!expandedMap[record.id];
-
-                                return (
-                                    <React.Fragment key={record.id}>
-                                        <Table.Row
-                                            onClick={() => isExpandable && toggleExpand(record.id)}
-                                            cursor={isExpandable ? 'pointer' : 'default'}
-                                            _hover={isExpandable ? { backgroundColor: 'background_secondary' } : undefined}
-                                            backgroundColor={isExpanded ? 'background_secondary' : 'inherit'}
-                                            transition="background-color 0.15s ease"
-                                        >
-                                            <Table.Cell color="text_primary" whiteSpace="nowrap">
-                                                {formatDateTimeWithSeconds(new Date(record.executedAtUtc), i18n)}
-                                            </Table.Cell>
-                                            {!hideTaskColumn && (
-                                                <Table.Cell color="text_primary" fontWeight="medium">
-                                                    {record.displayName}
-                                                </Table.Cell>
-                                            )}
-                                            <Table.Cell color="text_secondary">
-                                                {record.triggerSource === ScheduledTaskTriggerSource.Scheduled
-                                                    ? t('scheduler_journal_source_scheduled')
-                                                    : t('scheduler_journal_source_manual')}
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                {(() => {
-                                                    const badge = getStatusBadgeProps(record.status, t);
-                                                    return (
-                                                        <Badge size="sm" colorPalette={badge.colorPalette}>
-                                                            {badge.label}
-                                                        </Badge>
-                                                    );
-                                                })()}
-                                            </Table.Cell>
-                                            <Table.Cell color="text_secondary">
-                                                {formatDuration(record.durationMs)}
-                                            </Table.Cell>
-                                            <Table.Cell textAlign="right">
-                                                <HStack justify="flex-end" gap={2}>
-                                                    {hasAttachments && (
-                                                        <Badge size="xs" colorPalette="blue">
-                                                            <Icon mr={1}><MdAttachFile /></Icon>
-                                                            {record.attachments.length}
-                                                        </Badge>
-                                                    )}
-                                                    {isExpandable && (
-                                                        <Icon color="text_secondary" fontSize="18px">
-                                                            {isExpanded ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
-                                                        </Icon>
-                                                    )}
-                                                </HStack>
-                                            </Table.Cell>
-                                        </Table.Row>
-
-                                        {isExpanded && (
-                                            <Table.Row backgroundColor="background_secondary">
-                                                <Table.Cell colSpan={colSpan} p={4}>
-                                                    <SimpleGrid columns={{ base: 1, md: hasLog && hasAttachments ? 2 : 1 }} gap={4}>
-                                                        {/* Блок лога / результата */}
-                                                        {hasLog && (
-                                                            <Box
-                                                                p={3.5}
-                                                                borderRadius="md"
-                                                                backgroundColor="background_primary"
-                                                                borderWidth="1px"
-                                                                borderColor="border_primary"
-                                                            >
-                                                                <Flex justify="space-between" align="center" mb={2}>
-                                                                    <HStack gap={1.5} color="text_primary">
-                                                                        <Icon color={record.errorMessage ? 'red.400' : 'blue.400'}>
-                                                                            {record.errorMessage ? <MdErrorOutline /> : <MdInfoOutline />}
-                                                                        </Icon>
-                                                                        <Text fontSize="xs" fontWeight="semibold">
-                                                                            {t('scheduler_journal_log')}
-                                                                        </Text>
-                                                                    </HStack>
-                                                                    <CopyButton
-                                                                        text={record.errorMessage || record.logMessage || ''}
-                                                                        size="2xs"
-                                                                        color={record.errorMessage ? 'red.200' : 'text_secondary'}
-                                                                    />
-                                                                </Flex>
-
-                                                                {record.errorMessage ? (
-                                                                    <Box
-                                                                        p={2.5}
-                                                                        borderRadius="md"
-                                                                        backgroundColor="red.950"
-                                                                        borderColor="red.800"
-                                                                        borderWidth="1px"
-                                                                    >
-                                                                        <Text fontSize="xs" color="red.200" fontFamily="mono">
-                                                                            {record.errorMessage}
-                                                                        </Text>
-                                                                    </Box>
-                                                                ) : (
-                                                                    <Text fontSize="xs" color="text_secondary">
-                                                                        {record.logMessage}
-                                                                    </Text>
-                                                                )}
-                                                            </Box>
-                                                        )}
-
-                                                        {/* Блок прикрепленных файлов */}
-                                                        {hasAttachments && (
-                                                            <SchedulerAttachmentList attachments={record.attachments} />
-                                                        )}
-                                                    </SimpleGrid>
-                                                </Table.Cell>
-                                            </Table.Row>
-                                        )}
-                                    </React.Fragment>
-                                );
-                            })}
-                        </Table.Body>
-                    </Table.Root>
-                </Box>
-            )}
-        </VStack>
+                        )}
+                    </React.Fragment>
+                );
+            })}
+        </TableWrapper>
     );
 };

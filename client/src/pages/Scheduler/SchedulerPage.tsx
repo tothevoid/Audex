@@ -8,6 +8,7 @@ import { getPagedScheduledTaskJournal } from '@/api/scheduler/schedulerJournalAp
 import { SchedulerTaskMasterList } from './components/SchedulerTaskMasterList';
 import { SchedulerTaskDetailPane } from './components/SchedulerTaskDetailPane';
 import { SchedulerJournalTable } from './components/SchedulerJournalTable';
+import { SchedulerJournalFilterBar } from './components/SchedulerJournalFilterBar';
 import { ScheduleConfigModal, ScheduleConfigModalRef } from './components/ScheduleConfigModal';
 import { CreateTaskModal, CreateTaskModalRef } from './components/CreateTaskModal';
 import CollectionPagination from '@/shared/components/CollectionPagination/CollectionPagination';
@@ -144,16 +145,21 @@ const SchedulerPage: React.FC = () => {
                                 onTaskUpdated={handleTaskUpdated}
                             />
                         ) : (
-                            <VStack align="stretch" gap={5}>
-                                <SchedulerJournalTable
-                                    records={journal}
+                            <VStack align="stretch" gap={2.5}>
+                                <SchedulerJournalFilterBar
                                     tasks={tasks}
-                                    isLoading={isJournalLoading}
                                     selectedTask={selectedTaskFilter}
                                     selectedStatus={selectedStatusFilter}
+                                    isLoading={isJournalLoading}
                                     onTaskFilterChange={handleTaskFilterChange}
                                     onStatusFilterChange={handleStatusFilterChange}
                                     onRefresh={reloadJournal}
+                                />
+
+                                <SchedulerJournalTable
+                                    records={journal}
+                                    isLoading={isJournalLoading}
+                                    pageSize={pageSize}
                                 />
 
                                 <CollectionPagination
@@ -161,6 +167,8 @@ const SchedulerPage: React.FC = () => {
                                     page={currentPage}
                                     pageSize={pageSize}
                                     onPageChange={loadPage}
+                                    disabled={isJournalLoading}
+                                    size="sm"
                                 />
                             </VStack>
                         )}

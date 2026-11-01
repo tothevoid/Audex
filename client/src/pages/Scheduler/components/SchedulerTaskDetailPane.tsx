@@ -27,6 +27,7 @@ import { deleteScheduledTask, runTaskNow } from '@/api/scheduler/schedulerTaskAp
 import { getPagedScheduledTaskJournal } from '@/api/scheduler/schedulerJournalApi';
 import { formatCronExpression, formatDuration, getStatusBadgeProps } from '@/pages/Scheduler/schedulerUtils';
 import { SchedulerJournalTable } from './SchedulerJournalTable';
+import { SchedulerJournalFilterBar } from './SchedulerJournalFilterBar';
 import { useSchedulerEvents } from '@/shared/hooks/useSchedulerEvents';
 import usePagedQuery from '@/shared/hooks/usePagedQuery';
 import CollectionPagination from '@/shared/components/CollectionPagination/CollectionPagination';
@@ -266,22 +267,31 @@ export const SchedulerTaskDetailPane: React.FC<SchedulerTaskDetailPaneProps> = (
             </Card.Root>
 
             {/* Reused Journal Table filtered for this specific task */}
-            <SchedulerJournalTable
-                records={history}
-                isLoading={isLoadingHistory}
-                selectedStatus={selectedStatusFilter}
-                hideTaskFilter
-                hideTaskColumn
-                onStatusFilterChange={setSelectedStatusFilter}
-                onRefresh={reloadHistory}
-            />
+            <VStack align="stretch" gap={2.5}>
+                <SchedulerJournalFilterBar
+                    selectedStatus={selectedStatusFilter}
+                    isLoading={isLoadingHistory}
+                    hideTaskFilter
+                    onStatusFilterChange={setSelectedStatusFilter}
+                    onRefresh={reloadHistory}
+                />
 
-            <CollectionPagination
-                count={totalCount}
-                page={currentPage}
-                pageSize={pageSize}
-                onPageChange={loadPage}
-            />
+                <SchedulerJournalTable
+                    records={history}
+                    isLoading={isLoadingHistory}
+                    pageSize={pageSize}
+                    hideTaskColumn
+                />
+
+                <CollectionPagination
+                    count={totalCount}
+                    page={currentPage}
+                    pageSize={pageSize}
+                    onPageChange={loadPage}
+                    disabled={isLoadingHistory}
+                    size="sm"
+                />
+            </VStack>
         </VStack>
     );
 };
