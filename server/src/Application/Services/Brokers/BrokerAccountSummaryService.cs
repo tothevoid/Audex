@@ -206,9 +206,8 @@ namespace Audex.Application.Services.Brokers
             var marketValues = (await _stockConnector
                 .GetExtendedValuesByTickersAsync(tickers.Values));
 
-            var yesterday = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
             var securityIds = tickers.Values.Select(security => security.Id);
-            var candlePriceMap = await _securityPriceHistoryService.GetPriceMapTillDateAsync(securityIds, yesterday);
+            var yesterdayCandlePriceMap = await _securityPriceHistoryService.GetYesterdayPriceMapAsync(securityIds);
 
             var securityStats = new List<BrokerAccountDailySecurityStatsDto>();
 
@@ -230,7 +229,7 @@ namespace Audex.Application.Services.Brokers
                 decimal previousClosePrice;
                 decimal startPrice;
 
-                if (candlePriceMap.TryGetValue(security.Id, out decimal candleClosePrice) && candleClosePrice > 0)
+                if (yesterdayCandlePriceMap.TryGetValue(security.Id, out decimal candleClosePrice) && candleClosePrice > 0)
                 {
                     previousClosePrice = candleClosePrice;
                     startPrice = marketValue.Open ?? candleClosePrice;

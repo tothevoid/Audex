@@ -21,8 +21,11 @@ namespace Audex.Application.Interfaces.Securities
             DateOnly startDate,
             DateOnly endDate);
 
-        Task<Dictionary<Guid, decimal>> GetPriceMapTillDateAsync(
+        Task<Dictionary<Guid, decimal>> GetPriceMapByDateAsync(
             IEnumerable<Guid> securityIds,
             DateOnly date);
+
+        Task<Dictionary<Guid, decimal>> GetYesterdayPriceMapAsync(
+            IEnumerable<Guid> securityIds);
     }
 }

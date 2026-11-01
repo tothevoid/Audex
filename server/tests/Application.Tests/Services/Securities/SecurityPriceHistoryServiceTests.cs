@@ -151,6 +151,93 @@ namespace Audex.Application.Tests.Services.Securities
             });
         }
 
+        [Fact]
+        public async Task TestGetPriceMapByDateAsync_ReturnsOnlyPricesForExactDate()
+        {
+            var securityIdWithDate = await CreateSecurityAsync("LKOH", "Лукойл");
+            var securityIdWithOtherDate = await CreateSecurityAsync("ROSN", "Роснефть");
+            var targetDate = new DateOnly(2026, 10, 15);
+            var otherDate = new DateOnly(2026, 10, 14);
+
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+                var priceHistoryRepository = unitOfWork.CreateRepository<SecurityPriceHistory>();
+
+                await priceHistoryRepository.AddAsync(new SecurityPriceHistory
+                {
+                    Id = Guid.NewGuid(),
+                    SecurityId = securityIdWithDate,
+                    Date = targetDate,
+                    ClosePrice = 7100m
+                });
+
+                await priceHistoryRepository.AddAsync(new SecurityPriceHistory
+                {
+                    Id = Guid.NewGuid(),
+                    SecurityId = securityIdWithOtherDate,
+                    Date = otherDate,
+                    ClosePrice = 520m
+                });
+
+                await unitOfWork.CommitAsync();
+            });
+
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var priceHistoryService = serviceProvider.GetRequiredService<ISecurityPriceHistoryService>();
+                var priceMap = await priceHistoryService.GetPriceMapByDateAsync(
+                    new[] { securityIdWithDate, securityIdWithOtherDate },
+                    targetDate);
+
+                Assert.Single(priceMap);
+                Assert.True(priceMap.ContainsKey(securityIdWithDate));
+                Assert.Equal(7100m, priceMap[securityIdWithDate]);
+                Assert.False(priceMap.ContainsKey(securityIdWithOtherDate));
+            });
+        }
+
+        [Fact]
+        public async Task TestGetYesterdayPriceMapAsync_ReturnsPricesForYesterdayOnly()
+        {
+            var securityId = await CreateSecurityAsync("NVTK", "Новатэк");
+            var yesterday = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
+            var olderDate = yesterday.AddDays(-2);
+
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+                var priceHistoryRepository = unitOfWork.CreateRepository<SecurityPriceHistory>();
+
+                await priceHistoryRepository.AddAsync(new SecurityPriceHistory
+                {
+                    Id = Guid.NewGuid(),
+                    SecurityId = securityId,
+                    Date = olderDate,
+                    ClosePrice = 900m
+                });
+
+                await priceHistoryRepository.AddAsync(new SecurityPriceHistory
+                {
+                    Id = Guid.NewGuid(),
+                    SecurityId = securityId,
+                    Date = yesterday,
+                    ClosePrice = 950m
+                });
+
+                await unitOfWork.CommitAsync();
+            });
+
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var priceHistoryService = serviceProvider.GetRequiredService<ISecurityPriceHistoryService>();
+                var yesterdayPriceMap = await priceHistoryService.GetYesterdayPriceMapAsync(new[] { securityId });
+
+                Assert.Single(yesterdayPriceMap);
+                Assert.Equal(950m, yesterdayPriceMap[securityId]);
+            });
+        }
+
         private async Task<Guid> CreateSecurityAsync(string ticker, string name)
         {
             return await ExecuteScopeAsync(async serviceProvider =>

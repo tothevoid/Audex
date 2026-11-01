@@ -94,14 +94,19 @@ namespace Audex.Application.Services.Securities
             return applicationMapper.Map(priceHistories);
         }
 
-        public async Task<Dictionary<Guid, decimal>> GetPriceMapTillDateAsync(
+        public async Task<Dictionary<Guid, decimal>> GetPriceMapByDateAsync(
             IEnumerable<Guid> securityIds,
             DateOnly date)
         {
             var securityIdList = securityIds.ToList();
+            if (securityIdList.Count == 0)
+            {
+                return [];
+            }
+
             var priceHistories = await _securityPriceHistoryRepository.GetAllAsync(
                 priceHistory => securityIdList.Contains(priceHistory.SecurityId) &&
-                                priceHistory.Date <= date &&
+                                priceHistory.Date == date &&
                                 priceHistory.ClosePrice > 0,
                 disableTracking: true);
 
@@ -109,7 +114,14 @@ namespace Audex.Application.Services.Securities
                 .GroupBy(priceHistory => priceHistory.SecurityId)
                 .ToDictionary(
                     group => group.Key,
-                    group => group.OrderBy(priceHistory => priceHistory.Date).LastOrDefault()?.ClosePrice ?? 0m);
+                    group => group.Last().ClosePrice);
+        }
+
+        public async Task<Dictionary<Guid, decimal>> GetYesterdayPriceMapAsync(
+            IEnumerable<Guid> securityIds)
+        {
+            var yesterday = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
+            return await GetPriceMapByDateAsync(securityIds, yesterday);
         }
 
 

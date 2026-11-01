@@ -1,9 +1,20 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Accounts;
 using Audex.Application.DTO.Brokers;
+using Audex.Application.DTO.Securities;
+using Audex.Application.Integrations.Stock.Moex.Model;
 using Audex.Application.Interfaces.Accounts;
 using Audex.Application.Interfaces.Brokers;
+using Audex.Application.Interfaces.Integrations.Stock;
+using Audex.Application.Interfaces.Securities;
 using Audex.Infrastructure.Constants;
+using Audex.Infrastructure.Entities.Securities;
+using Audex.Infrastructure.Interfaces.Database;
+using Audex.Tests.Shared.Mock;
 
 namespace Audex.Application.Tests.Services.Brokers
 {
@@ -173,6 +184,167 @@ namespace Audex.Application.Tests.Services.Brokers
             });
 
             return (brokerAccountId, accountId);
+        }
+
+        [Fact]
+        public async Task TestGetDailyStats_WhenYesterdayCandleExists_PrefersCandleClosePrice()
+        {
+            var ticker = "DAILY_CANDLE_TEST";
+            var (brokerAccountId, securityId) = await SetupBrokerAccountWithSecurity(ticker);
+
+            var yesterday = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
+            var olderDate = yesterday.AddDays(-5);
+
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+                var priceHistoryRepository = unitOfWork.CreateRepository<SecurityPriceHistory>();
+
+                await priceHistoryRepository.AddAsync(new SecurityPriceHistory
+                {
+                    Id = Guid.NewGuid(),
+                    SecurityId = securityId,
+                    Date = olderDate,
+                    ClosePrice = 85m
+                });
+
+                await priceHistoryRepository.AddAsync(new SecurityPriceHistory
+                {
+                    Id = Guid.NewGuid(),
+                    SecurityId = securityId,
+                    Date = yesterday,
+                    ClosePrice = 112m
+                });
+
+                await unitOfWork.CommitAsync();
+
+                var mockConnector = (MockStockConnector)serviceProvider.GetRequiredService<IStockConnector>();
+                mockConnector.GetExtendedValuesByTickersHandler = _ => Task.FromResult<IEnumerable<MarketDataRow>>([
+                    new MarketDataRow
+                    {
+                        Ticker = ticker,
+                        LastValue = 120m,
+                        Open = 115m,
+                        PrevPrice = 110m,
+                        Low = 105m,
+                        High = 125m,
+                        Date = DateTime.UtcNow
+                    }
+                ]);
+            });
+
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var summaryService = serviceProvider.GetRequiredService<IBrokerAccountSummaryService>();
+                var dailyStats = await summaryService.GetDailyStatsByBrokerAccountAsync(brokerAccountId);
+
+                Assert.NotNull(dailyStats);
+                var securityStat = Assert.Single(dailyStats.BrokerAccountDailySecurityStats);
+                Assert.Equal(112m, securityStat.PreviousDayClosePrice);
+                Assert.Equal(115m, securityStat.StartPrice);
+                Assert.Equal(120m, securityStat.CurrentPrice);
+            });
+        }
+
+        [Fact]
+        public async Task TestGetDailyStats_WhenYesterdayCandleDoesNotExist_FallsBackToMoexPrevPrice()
+        {
+            var ticker = "DAILY_FALLBACK_TEST";
+            var (brokerAccountId, securityId) = await SetupBrokerAccountWithSecurity(ticker);
+
+            var yesterday = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(-1);
+            var olderDate = yesterday.AddDays(-5);
+
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var unitOfWork = serviceProvider.GetRequiredService<IUnitOfWork>();
+                var priceHistoryRepository = unitOfWork.CreateRepository<SecurityPriceHistory>();
+
+                // Only older candle exists, yesterday is missing
+                await priceHistoryRepository.AddAsync(new SecurityPriceHistory
+                {
+                    Id = Guid.NewGuid(),
+                    SecurityId = securityId,
+                    Date = olderDate,
+                    ClosePrice = 85m
+                });
+
+                await unitOfWork.CommitAsync();
+
+                var mockConnector = (MockStockConnector)serviceProvider.GetRequiredService<IStockConnector>();
+                mockConnector.GetExtendedValuesByTickersHandler = _ => Task.FromResult<IEnumerable<MarketDataRow>>([
+                    new MarketDataRow
+                    {
+                        Ticker = ticker,
+                        LastValue = 120m,
+                        Open = 115m,
+                        PrevPrice = 110m,
+                        Low = 105m,
+                        High = 125m,
+                        Date = DateTime.UtcNow
+                    }
+                ]);
+            });
+
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var summaryService = serviceProvider.GetRequiredService<IBrokerAccountSummaryService>();
+                var dailyStats = await summaryService.GetDailyStatsByBrokerAccountAsync(brokerAccountId);
+
+                Assert.NotNull(dailyStats);
+                var securityStat = Assert.Single(dailyStats.BrokerAccountDailySecurityStats);
+                Assert.Equal(110m, securityStat.PreviousDayClosePrice);
+                Assert.Equal(115m, securityStat.StartPrice);
+                Assert.Equal(120m, securityStat.CurrentPrice);
+            });
+        }
+
+        private async Task<(Guid brokerAccountId, Guid securityId)> SetupBrokerAccountWithSecurity(string ticker)
+        {
+            return await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var brokerService = serviceProvider.GetRequiredService<IBrokerService>();
+                var brokerId = await brokerService.AddAsync(new BrokerDto { Name = $"Broker_{ticker}" });
+
+                var typeService = serviceProvider.GetRequiredService<IBrokerAccountTypeService>();
+                var typeId = await typeService.AddAsync(new BrokerAccountTypeDto { Name = $"AccountType_{ticker}" });
+
+                var brokerAccountService = serviceProvider.GetRequiredService<IBrokerAccountService>();
+                var brokerAccountId = await brokerAccountService.AddAsync(new BrokerAccountDto
+                {
+                    Name = $"Account_{ticker}",
+                    BrokerId = brokerId,
+                    TypeId = typeId,
+                    CurrencyId = CurrencyConstants.RUB,
+                    MainCurrencyAmount = 1000m
+                });
+
+                var securityTypeService = serviceProvider.GetRequiredService<ISecurityTypeService>();
+                var securityTypeId = await securityTypeService.AddAsync(new SecurityTypeDto { Name = $"SecType_{ticker}" });
+
+                var securityService = serviceProvider.GetRequiredService<ISecurityService>();
+                var securityResult = await securityService.AddAsync(new SecurityDto
+                {
+                    Name = $"Name_{ticker}",
+                    Ticker = ticker,
+                    TypeId = securityTypeId,
+                    CurrencyId = CurrencyConstants.RUB,
+                    ActualPrice = 120m
+                }, null);
+
+                var securityId = securityResult.Data!.Id;
+
+                var brokerAccountSecurityService = serviceProvider.GetRequiredService<IBrokerAccountSecurityService>();
+                await brokerAccountSecurityService.AddAsync(new BrokerAccountSecurityDto
+                {
+                    BrokerAccountId = brokerAccountId,
+                    SecurityId = securityId,
+                    Quantity = 10,
+                    Price = 100m
+                });
+
+                return (brokerAccountId, securityId);
+            });
         }
     }
 }
