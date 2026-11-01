@@ -74,6 +74,7 @@ export function PaginatedList<T>({
 				showTotalCount={showTotalCount}
 				onPageChange={(targetPage, targetPageSize) => loadPage(targetPage, targetPageSize)}
 				size={size}
+				disabled={isLoading}
 			/>
 		</Box>
 	);

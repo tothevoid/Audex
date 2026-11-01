@@ -12,6 +12,7 @@ interface Props {
 	pageSizeOptions?: number[];
 	showPageSizeSelector?: boolean;
 	showTotalCount?: boolean;
+	disabled?: boolean;
 	onPageChange: (page: number, pageSize: number) => void;
 	size?: "xs" | "sm" | "md" | "lg";
 }
@@ -23,8 +24,9 @@ const CollectionPagination: React.FC<Props> = ({
 	pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
 	showPageSizeSelector = true,
 	showTotalCount = true,
+	disabled = false,
 	onPageChange,
-	size = "md"
+	size = "sm"
 }) => {
 	const { t } = useTranslation();
 
@@ -51,9 +53,13 @@ const CollectionPagination: React.FC<Props> = ({
 			justifyContent="space-between"
 			flexWrap="wrap"
 			gap={3}
-			py={3}
+			pt={1}
+			pb={2}
+			opacity={disabled ? 0.6 : 1}
+			pointerEvents={disabled ? "none" : "auto"}
+			transition="opacity 0.2s ease"
 		>
-			<HStack gap={3} flexShrink={0}>
+			<HStack gap={3} flexShrink={0} align="center">
 				{showTotalCount && (
 					<Text fontSize="xs" color="text_secondary" fontWeight="medium" whiteSpace="nowrap">
 						{t("general_total_count", { count })}
@@ -61,7 +67,7 @@ const CollectionPagination: React.FC<Props> = ({
 				)}
 
 				{showPageSizeSelector && (
-					<HStack gap={1.5} flexShrink={0}>
+					<HStack gap={1.5} flexShrink={0} align="center">
 						<Text
 							fontSize="xs"
 							color="text_secondary"
@@ -70,7 +76,7 @@ const CollectionPagination: React.FC<Props> = ({
 						>
 							{t("pagination_page_size_label")}
 						</Text>
-						<NativeSelect.Root size="xs" minWidth="115px">
+						<NativeSelect.Root size="sm" minWidth="80px" disabled={disabled}>
 							<NativeSelect.Field
 								value={pageSize}
 								onChange={handlePageSizeChange}
@@ -78,11 +84,11 @@ const CollectionPagination: React.FC<Props> = ({
 								borderColor="border_primary"
 								color="text_primary"
 								fontSize="xs"
-								height="28px"
+								height="32px"
 								py={0.5}
 								pl={2.5}
 								pr={7}
-								cursor="pointer"
+								cursor={disabled ? "not-allowed" : "pointer"}
 								borderRadius="md"
 							>
 								{pageSizeOptions.map((optionSize) => (
@@ -110,7 +116,7 @@ const CollectionPagination: React.FC<Props> = ({
 				>
 					<ButtonGroup variant="ghost" size={size}>
 						<Pagination.PrevTrigger asChild>
-							<IconButton color="text_primary" size={size}>
+							<IconButton color="text_primary" size={size} disabled={disabled}>
 								<LuChevronLeft />
 							</IconButton>
 						</Pagination.PrevTrigger>
@@ -120,13 +126,14 @@ const CollectionPagination: React.FC<Props> = ({
 									color="text_primary"
 									size={size}
 									variant={{ base: "ghost", _selected: "outline" }}
+									disabled={disabled}
 								>
 									{pageItem.value}
 								</IconButton>
 							)}
 						/>
 						<Pagination.NextTrigger asChild>
-							<IconButton color="text_primary" size={size}>
+							<IconButton color="text_primary" size={size} disabled={disabled}>
 								<LuChevronRight />
 							</IconButton>
 						</Pagination.NextTrigger>
