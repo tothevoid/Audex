@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -67,7 +67,8 @@ namespace Audex.Application.Services.Scheduler
                         DisplayNameKey: attr.DisplayNameKey,
                         DescriptionKey: attr.DescriptionKey,
                         CategoryKey: attr.CategoryKey,
-                        DefaultCronExpression: Utilities.Scheduler.CronExpressionHelper.ToStandardCron(attr.DefaultCronExpression)
+                        DefaultCronExpression: Utilities.Scheduler.CronExpressionHelper.ToStandardCron(attr.DefaultCronExpression),
+                        AllowStartupCatchUp: attr.AllowStartupCatchUp
                     );
 
                     result[attr.TaskName] = descriptor;

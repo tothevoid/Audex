@@ -17,20 +17,21 @@ namespace Audex.Application.Tests.Services.Scheduler
         [Fact]
         public async Task GetAllDescriptors_ReturnsRegisteredJobs()
         {
-            await ExecuteScopeAsync(sp =>
+            await ExecuteScopeAsync(serviceProvider =>
             {
-                var registry = sp.GetRequiredService<IScheduledJobRegistry>();
+                var registry = serviceProvider.GetRequiredService<IScheduledJobRegistry>();
 
                 var descriptors = registry.GetAllDescriptors();
 
                 Assert.NotNull(descriptors);
-                Assert.True(descriptors.Count >= 6);
-                Assert.Contains(descriptors, d => d.TaskName == "GenerateAllAssetsReport");
-                Assert.Contains(descriptors, d => d.TaskName == "DatabaseBackup");
-                Assert.Contains(descriptors, d => d.TaskName == "PullQuotations");
-                Assert.Contains(descriptors, d => d.TaskName == "CleanUpOldNotifications");
-                Assert.Contains(descriptors, d => d.TaskName == "CleanUpExpiredRefreshTokens");
-                Assert.Contains(descriptors, d => d.TaskName == "PullCryptoPrices");
+                Assert.True(descriptors.Count >= 7);
+                Assert.Contains(descriptors, descriptor => descriptor.TaskName == "GenerateAllAssetsReport");
+                Assert.Contains(descriptors, descriptor => descriptor.TaskName == "DatabaseBackup");
+                Assert.Contains(descriptors, descriptor => descriptor.TaskName == "PullQuotations");
+                Assert.Contains(descriptors, descriptor => descriptor.TaskName == "CleanUpOldNotifications");
+                Assert.Contains(descriptors, descriptor => descriptor.TaskName == "CleanUpExpiredRefreshTokens");
+                Assert.Contains(descriptors, descriptor => descriptor.TaskName == "PullCryptoPrices");
+                Assert.Contains(descriptors, descriptor => descriptor.TaskName == "SyncSecurityPricesHistory");
                 return Task.CompletedTask;
             });
         }
@@ -38,15 +39,31 @@ namespace Audex.Application.Tests.Services.Scheduler
         [Fact]
         public async Task GetDescriptor_ValidTask_ReturnsDescriptor()
         {
-            await ExecuteScopeAsync(sp =>
+            await ExecuteScopeAsync(serviceProvider =>
             {
-                var registry = sp.GetRequiredService<IScheduledJobRegistry>();
+                var registry = serviceProvider.GetRequiredService<IScheduledJobRegistry>();
 
-                var desc = registry.GetDescriptor("GenerateAllAssetsReport");
+                var descriptor = registry.GetDescriptor("GenerateAllAssetsReport");
 
-                Assert.NotNull(desc);
-                Assert.Equal("GenerateAllAssetsReport", desc.TaskName);
-                Assert.NotEmpty(desc.DisplayNameKey);
+                Assert.NotNull(descriptor);
+                Assert.Equal("GenerateAllAssetsReport", descriptor.TaskName);
+                Assert.NotEmpty(descriptor.DisplayNameKey);
+                return Task.CompletedTask;
+            });
+        }
+
+        [Fact]
+        public async Task GetDescriptor_SyncSecurityPricesHistory_HasStartupCatchUpEnabled()
+        {
+            await ExecuteScopeAsync(serviceProvider =>
+            {
+                var registry = serviceProvider.GetRequiredService<IScheduledJobRegistry>();
+
+                var descriptor = registry.GetDescriptor("SyncSecurityPricesHistory");
+
+                Assert.NotNull(descriptor);
+                Assert.Equal("SyncSecurityPricesHistory", descriptor.TaskName);
+                Assert.True(descriptor.AllowStartupCatchUp);
                 return Task.CompletedTask;
             });
         }

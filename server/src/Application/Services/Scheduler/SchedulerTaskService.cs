@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -65,9 +66,20 @@ namespace Audex.Application.Services.Scheduler
 
         public async Task<IEnumerable<ScheduledTaskDto>> GetAllTasksAsync()
         {
-            var lang = await _localizer.GetUserLanguageAsync();
+            return await GetTasksInternalAsync();
+        }
+
+        public async Task<IEnumerable<ScheduledTaskDto>> GetActiveTasksAsync()
+        {
+            return await GetTasksInternalAsync(ticker => ticker.IsEnabled && !ticker.IsSystemPaused);
+        }
+
+        private async Task<IEnumerable<ScheduledTaskDto>> GetTasksInternalAsync(Expression<Func<ScheduledCronTicker, bool>> filter = null)
+        {
+            var language = await _localizer.GetUserLanguageAsync();
 
             var tickers = await _tickerRepo.GetAllAsync(
+                filter: filter,
                 include: GetFullHierarchyColumns,
                 disableTracking: true);
             var currentUtcTime = DateTime.UtcNow;
@@ -78,7 +90,7 @@ namespace Audex.Application.Services.Scheduler
                 {
                     var descriptor = _jobRegistry.TryGetDescriptor(ticker.Function, out var jobDescriptor) ? jobDescriptor : null;
                     var latestOccurrence = ticker.Occurrences.FirstOrDefault();
-                    return MapToDto(ticker, descriptor, latestOccurrence, currentUtcTime, lang);
+                    return MapToDto(ticker, descriptor, latestOccurrence, currentUtcTime, language);
                 })
                 .ToList();
         }

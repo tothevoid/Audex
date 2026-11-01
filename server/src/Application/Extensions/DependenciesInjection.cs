@@ -138,6 +138,7 @@ namespace Audex.Application.Extensions
             services.AddTransient<ISchedulerTaskService, SchedulerTaskService>();
             services.AddTransient<ISchedulerJournalService, SchedulerJournalService>();
             services.AddTransient<ISchedulerAttachmentService, SchedulerAttachmentService>();
+            services.AddTransient<ISchedulerCatchUpService, SchedulerCatchUpService>();
 
             services.AddScheduledJobs();
 

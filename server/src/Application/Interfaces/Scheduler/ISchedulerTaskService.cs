@@ -10,6 +10,8 @@ namespace Audex.Application.Interfaces.Scheduler
 
         Task<IEnumerable<ScheduledTaskDto>> GetAllTasksAsync();
 
+        Task<IEnumerable<ScheduledTaskDto>> GetActiveTasksAsync();
+
         Task<ScheduledTaskDto> GetTaskByNameAsync(string taskName);
 
         Task<ScheduledTaskDto> CreateTaskAsync(CreateScheduledTaskDto dto);

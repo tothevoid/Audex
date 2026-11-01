@@ -10,6 +10,7 @@ using Audex.Application.Extensions;
 using Audex.Infrastructure.Database;
 using Audex.Infrastructure.Extensions;
 using Audex.Infrastructure.Messages;
+using Audex.WebApi.BackgroundServices;
 using Audex.WebApi.Extensions;
 using Audex.WebApi.Middlewares;
 using TickerQ.DependencyInjection;
@@ -38,6 +39,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddInfrastructureServices();
 builder.Services.AddApplicationServices();
+builder.Services.AddHostedService<SchedulerStartupCatchUpBackgroundService>();
 builder.Services.AddJwtAuth(builder.Configuration);
 
 builder.Services.AddMappings();

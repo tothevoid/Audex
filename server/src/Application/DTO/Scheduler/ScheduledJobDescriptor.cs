@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Audex.Application.DTO.Scheduler
 {
@@ -8,5 +8,6 @@ namespace Audex.Application.DTO.Scheduler
         string DisplayNameKey,
         string DescriptionKey,
         string CategoryKey,
-        string DefaultCronExpression);
+        string DefaultCronExpression,
+        bool AllowStartupCatchUp = false);
 }

@@ -320,5 +320,41 @@ namespace Audex.Application.Tests.Services.Scheduler
                 await service.DeleteTaskAsync("DatabaseBackup");
             });
         }
+
+        [Fact]
+        public async Task GetActiveTasksAsync_ReturnsOnlyEnabledAndActiveTasks()
+        {
+            await ExecuteScopeAsync(async serviceProvider =>
+            {
+                var service = serviceProvider.GetRequiredService<ISchedulerTaskService>();
+
+                await service.DeleteTaskAsync("DatabaseBackup");
+                await service.DeleteTaskAsync("CleanUpOldNotifications");
+
+                await service.CreateTaskAsync(new CreateScheduledTaskDto
+                {
+                    TaskName = "DatabaseBackup",
+                    CronExpression = "0 3 * * *",
+                    IsEnabled = true
+                });
+
+                await service.CreateTaskAsync(new CreateScheduledTaskDto
+                {
+                    TaskName = "CleanUpOldNotifications",
+                    CronExpression = "0 4 * * *",
+                    IsEnabled = false
+                });
+
+                var activeTasks = await service.GetActiveTasksAsync();
+
+                Assert.NotNull(activeTasks);
+                var activeList = activeTasks.ToList();
+                Assert.Contains(activeList, task => task.TaskName == "DatabaseBackup" && task.IsEnabled);
+                Assert.DoesNotContain(activeList, task => task.TaskName == "CleanUpOldNotifications");
+
+                await service.DeleteTaskAsync("DatabaseBackup");
+                await service.DeleteTaskAsync("CleanUpOldNotifications");
+            });
+        }
     }
 }

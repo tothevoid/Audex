@@ -19,7 +19,8 @@ namespace Audex.Application.Jobs
         displayNameKey: LocalizationKeys.Jobs.SyncSecurityPricesHistory.Name,
         descriptionKey: LocalizationKeys.Jobs.SyncSecurityPricesHistory.Description,
         categoryKey: LocalizationKeys.Jobs.Categories.Brokers,
-        defaultCronExpression: "0 5 0 * * *")]
+        defaultCronExpression: "0 5 0 * * *",
+        allowStartupCatchUp: true)]
     public class SyncSecurityPricesHistoryJob : ScheduledJobBase
     {
         private readonly ISecurityPriceHistoryService _securityPriceHistoryService;
