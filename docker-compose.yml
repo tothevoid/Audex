@@ -132,7 +132,6 @@ services:
       context: ./client
       args:
         SERVER_API_URL: "${PUBLIC_SERVER_URL}"
-        CLIENT_HOST: ${PUBLIC_CLIENT_URL}
     ports:
       - ${CLIENT_PORT}:80
     logging: *logging-infra

@@ -3,7 +3,7 @@ import { BackupValidationResult, RestoreBackupResult } from '@/models/system/bac
 import { Nullable } from '@/shared/utilities/nullable';
 import { parseErrorMessage } from '@/shared/utilities/webApiUtilities';
 
-const basicUrl = '/DatabaseBackup';
+const basicUrl = "DatabaseBackup";
 
 export type ExportBackupResponse = FileDownloadResult;
 

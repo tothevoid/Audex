@@ -7,10 +7,8 @@ RUN npm install --frozen-lockfile
 
 #env
 ARG SERVER_API_URL
-ARG CLIENT_HOST
 
 ENV VITE_SERVER_API_URL=$SERVER_API_URL
-ENV CLIENT_HOST=$CLIENT_HOST
 
 COPY . .
 RUN npm run build

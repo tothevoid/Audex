@@ -10,6 +10,7 @@ using Audex.Infrastructure.Database;
 using Audex.Infrastructure.Interfaces.DatabaseBackup;
 using Audex.Infrastructure.Services.DatabaseBackup;
 using Audex.WebApi.Mappings;
+using Audex.WebApi.Models.Common;
 using System.Net.Http;
 using System.Text;
 
@@ -92,14 +93,19 @@ namespace Audex.WebApi.Extensions
 
         public static IServiceCollection AddClientCors(this IServiceCollection services, IConfiguration configuration)
         {
-            var clientUrl = configuration.GetSection("Client").GetSection("Url").Value;
+            var clientOptions = configuration.GetSection("Client").Get<ClientOptions>();
+
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowReactApp",
                     policy =>
                     {
-                        policy.WithOrigins(clientUrl)
-                            .AllowAnyMethod()
+                        if (!string.IsNullOrWhiteSpace(clientOptions?.Url))
+                        {
+                            policy.WithOrigins(clientOptions.Url);
+                        }
+
+                        policy.AllowAnyMethod()
                             .AllowCredentials()
                             .AllowAnyHeader();
                     });

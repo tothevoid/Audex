@@ -8,7 +8,7 @@ import {
     BrokerStatementImporterEntity
 } from "@/models/brokers/BrokerStatementImportModels";
 
-const basicUrl = "/BrokerStatementImport";
+const basicUrl = "BrokerStatementImport";
 
 export const getStatementImporters = async (): Promise<BrokerStatementImporterEntity[]> => {
     return await getAllEntities<BrokerStatementImporterEntity>(`${basicUrl}/Importers`);
