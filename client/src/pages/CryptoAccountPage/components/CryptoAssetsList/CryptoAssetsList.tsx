@@ -1,5 +1,5 @@
 import React, { Fragment, useMemo } from 'react';
-import { SimpleGrid } from '@chakra-ui/react';
+import CardsGrid from '@/shared/components/CardsGrid';
 import { useCryptoAssets } from '@/pages/CryptoAccountPage/hooks/useCryptoAssets';
 import { CryptoAccountEntity } from '@/models/crypto/CryptoAccountEntity';
 import { CryptoAssetEntity } from '@/models/crypto/CryptoAssetEntity';
@@ -71,7 +71,7 @@ const CryptoAssetsList: React.FC<Props> = ({ cryptoAccount, onDataChanged }: Pro
 			/>
 
 			{cryptoAssets.length > 0 ? (
-				<SimpleGrid pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(350px, 3fr))'>
+				<CardsGrid>
 					{cryptoAssets.map((cryptoAsset: CryptoAssetEntity) => (
 						<CryptoAsset
 							cryptoAsset={cryptoAsset}
@@ -80,7 +80,7 @@ const CryptoAssetsList: React.FC<Props> = ({ cryptoAccount, onDataChanged }: Pro
 							onDeleteClicked={onDeleteClicked}
 						/>
 					))}
-				</SimpleGrid>
+				</CardsGrid>
 			) : (
 				<Placeholder text={t("crypto_account_page_no_cryptocurrencies")}>
 					<AddButton onClick={onAddClicked} buttonTitle={t('add_crypto_account_cryptocurrency_title')}/>

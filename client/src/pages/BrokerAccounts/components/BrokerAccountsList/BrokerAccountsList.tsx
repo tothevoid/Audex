@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { SimpleGrid } from '@chakra-ui/react';
+import CardsGrid from '@/shared/components/CardsGrid';
 import { useTranslation } from 'react-i18next';
 import BrokerAccount from '@/pages/BrokerAccounts/components/BrokerAccount/BrokerAccount';
 import { BrokerAccountEntity } from '@/models/brokers/BrokerAccountEntity';
@@ -75,7 +75,7 @@ const BrokerAccountsList: React.FC = () => {
 	return (
 		<Fragment>
 			{getHeader()}
-			<SimpleGrid pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(400px, 3fr))'>
+			<CardsGrid>
 				{
 					brokerAccounts.map((brokerAccount: BrokerAccountEntity) => 
 						<BrokerAccount brokerAccount={brokerAccount}
@@ -83,7 +83,7 @@ const BrokerAccountsList: React.FC = () => {
 							onDeleteClick={onDeleteClicked} 
 							key={brokerAccount.id}/>)
 				}
-			</SimpleGrid>
+			</CardsGrid>
 			<ConfirmModal onConfirmed={onDeleteConfirmed}
 				title={t("broker_account_delete_title")}
 				message={t("modals_delete_message")}

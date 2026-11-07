@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { SimpleGrid } from '@chakra-ui/react';
+import CardsGrid from '@/shared/components/CardsGrid';
 import BrokerAccountSecurity from '@/pages/BrokerAccount/components/BrokerAccountSecurity/BrokerAccountSecurity';
 import { BrokerAccountSecurityEntity } from '@/models/brokers/BrokerAccountSecurityEntity';
 import { useBrokerAccountsSecurities } from '@/pages/BrokerAccount/hooks/useBrokerAccountsSecurities';
@@ -21,7 +21,7 @@ const BrokerAccountSecuritiesList: React.FC<Props> = ({ brokerAccountId, refresh
 
 	return (
 		<Fragment>
-			<SimpleGrid pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(350px, 3fr))'>
+			<CardsGrid>
 				{
 					brokerAccountSecurities.map((brokerAccountSecurity: BrokerAccountSecurityEntity) => 
 						<BrokerAccountSecurity 
@@ -29,7 +29,7 @@ const BrokerAccountSecuritiesList: React.FC<Props> = ({ brokerAccountId, refresh
 							brokerAccountSecurity={brokerAccountSecurity}  
 						/>)
 				}
-			</SimpleGrid>
+			</CardsGrid>
 		</Fragment>
 	);
 };

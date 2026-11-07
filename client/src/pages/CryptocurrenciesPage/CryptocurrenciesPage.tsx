@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { useTranslation } from "react-i18next";
-import { SimpleGrid } from "@chakra-ui/react";
+import CardsGrid from "@/shared/components/CardsGrid";
 import { useCryptocurrencies } from "./hooks/useCryptocurrencies";
 import { CryptocurrencyEntity } from "@/models/crypto/CryptocurrencyEntity";
 import Cryptocurrency from "./components/Cryptocurrency/Cryptocurrency";
@@ -79,7 +79,7 @@ const CryptocurrenciesPage: React.FC = () => {
 
     return <Fragment>
         {getHeader()}
-        <SimpleGrid pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(300px, 3fr))'>
+        <CardsGrid>
             {
                 cryptocurrencies.map((cryptocurrency: CryptocurrencyEntity) => 
                     <Cryptocurrency key={cryptocurrency.id} 
@@ -87,7 +87,7 @@ const CryptocurrenciesPage: React.FC = () => {
                         onEditClicked={onEditClicked} 
                         onDeletedClicked={onDeleteClicked}/>)
             }
-        </SimpleGrid>
+        </CardsGrid>
         <ConfirmModal onConfirmed={onDeleteConfirmed}
             title={t("cryptocurrency_delete_title")}
             message={t("modals_delete_message")}

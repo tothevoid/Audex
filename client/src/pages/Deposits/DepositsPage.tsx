@@ -1,6 +1,7 @@
 import React from "react";
 import { DepositEntity } from "@/models/deposits/DepositEntity";
-import { SimpleGrid, Box } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import CardsGrid from "@/shared/components/CardsGrid";
 import DepositStats from "./components/DepositStats/DepositStats";
 import Deposit from "./components/Deposit/Deposit";
 import DepositsRangeSlider from "./components/DepositsRangeSlider/DepositsRangeSlider";
@@ -107,7 +108,7 @@ const DepositsPage: React.FC = () => {
 					</Placeholder>
 				</Box>
 			)}
-			<SimpleGrid pb={5} gap={6} templateColumns="repeat(auto-fill, minmax(300px, 4fr))">
+			<CardsGrid>
 				{deposits.map((deposit: DepositEntity) => (
 					<Deposit
 						key={deposit.id}
@@ -117,7 +118,7 @@ const DepositsPage: React.FC = () => {
 						onDeleteClicked={onDeleteClicked}
 					/>
 				))}
-			</SimpleGrid>
+			</CardsGrid>
 			<ConfirmModal
 				onConfirmed={onDeleteConfirmed}
 				title={t("deposit_delete_title")}

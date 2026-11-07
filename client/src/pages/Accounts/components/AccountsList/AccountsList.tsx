@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Account from '@/pages/Accounts/components/Account/Account';
-import { Box, SimpleGrid } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
+import CardsGrid from '@/shared/components/CardsGrid';
 import { useTranslation } from 'react-i18next';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
 import { BaseModalRef } from '@/shared/utilities/modalUtilities';
@@ -109,7 +110,7 @@ const AccountsList: React.FC<Props> = ({ onAccountsChanged, accountCurrencySumma
 		/>
 		{
 			accounts.length > 0 ?
-				<SimpleGrid pb={5} gap={4} templateColumns='repeat(auto-fill, minmax(350px, 3fr))'>
+				<CardsGrid>
 				{
 					accounts.map((account: AccountEntity) => {
 						return <Account key={account.id} account={account} 
@@ -118,7 +119,7 @@ const AccountsList: React.FC<Props> = ({ onAccountsChanged, accountCurrencySumma
 							onTransferClicked={onTransferClicked}/>;
 					})
 				}
-				</SimpleGrid>:
+				</CardsGrid>:
 				<Placeholder text={t("accounts_list_no_accounts")}>
 					{getAddButton()}
 				</Placeholder>

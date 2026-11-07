@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { SimpleGrid, Box } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
+import CardsGrid from "@/shared/components/CardsGrid";
 import { useTranslation } from "react-i18next";
 import { DebtEntity } from "@/models/debts/DebtEntity";
 import { DebtTagEntity } from "@/models/debts/DebtTagEntity";
@@ -168,7 +169,7 @@ const DebtsList: React.FC<Props> = ({
                 onOpenTagManagerModal={onOpenTagManagerModal}
                 onOpenTagStatsModal={onOpenTagStatsModal}
             />
-            <SimpleGrid pb={5} gap={6} templateColumns="repeat(auto-fill, minmax(300px, 4fr))">
+            <CardsGrid>
                 {filteredDebts.map((debt: DebtEntity) => (
                     <Debt
                         key={debt.id}
@@ -180,7 +181,7 @@ const DebtsList: React.FC<Props> = ({
                         onManageTagsClicked={handleManageTagsClicked}
                     />
                 ))}
-            </SimpleGrid>
+            </CardsGrid>
             <ConfirmModal
                 onConfirmed={onDeleteConfirmed}
                 title={t("debts_delete_title")}

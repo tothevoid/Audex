@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { SimpleGrid } from '@chakra-ui/react';
+import CardsGrid from '@/shared/components/CardsGrid';
 import { useTranslation } from 'react-i18next';
 import CryptoAccount from '@/pages/CryptoAccountsPage/components/CryptoAccount/CryptoAccount';
 import { CryptoAccountEntity } from '@/models/crypto/CryptoAccountEntity';
@@ -78,7 +78,7 @@ const CryptoAccountsList: React.FC<Props> = (props: Props) => {
     return (
         <Fragment>
             {getHeader()}
-            <SimpleGrid pb={5} gap={4} templateColumns="repeat(auto-fill, minmax(400px, 3fr))">
+            <CardsGrid>
                 {cryptoAccounts.map((cryptoAccount: CryptoAccountEntity) => (
                     <CryptoAccount
                         cryptoAccount={cryptoAccount}
@@ -87,7 +87,7 @@ const CryptoAccountsList: React.FC<Props> = (props: Props) => {
                         key={cryptoAccount.id}
                     />
                 ))}
-            </SimpleGrid>
+            </CardsGrid>
             <ConfirmModal
                 onConfirmed={onDeleteConfirmed}
                 title={t("crypto_account_delete_title")}

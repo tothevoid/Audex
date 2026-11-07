@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { SimpleGrid } from '@chakra-ui/react';
+import CardsGrid from '@/shared/components/CardsGrid';
 import { useTranslation } from 'react-i18next';
 import Security from '@/pages/SecuritiesPage/components/Security/Security';
 import { SecurityEntity } from '@/models/securities/SecurityEntity';
@@ -84,7 +84,7 @@ const SecuritiesList: React.FC = () => {
     return (
         <Fragment>
             {getHeader()}
-            <SimpleGrid pb={5} gap={4} templateColumns="repeat(auto-fill, minmax(320px, 1fr))">
+            <CardsGrid>
                 {securities.map((security: SecurityEntity) => (
                     <Security
                         key={security.id}
@@ -93,7 +93,7 @@ const SecuritiesList: React.FC = () => {
                         onDeleteClicked={onDeleteClicked}
                     />
                 ))}
-            </SimpleGrid>
+            </CardsGrid>
             <ConfirmModal
                 onConfirmed={onDeleteConfirmed}
                 title={t("security_delete_title")}
