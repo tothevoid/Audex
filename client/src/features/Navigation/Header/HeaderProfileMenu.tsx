@@ -1,39 +1,36 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Popover } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { useUserProfile } from '@/features/UserProfileSettingsModal/hooks/UserProfileContext';
 import { logout } from '@/api/auth/authApi';
+import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import UserProfileSettingsModal from '@/features/UserProfileSettingsModal/UserProfileSettingsModal';
+import ChangePasswordModal from '@/features/ChangePasswordModal/ChangePasswordModal';
+import TokensModal from '@/features/TokensModal/TokensModal';
 import { HeaderProfileButton } from './HeaderProfileButton';
 import { HeaderProfileCard } from './HeaderProfileCard';
 
-interface HeaderProfileMenuProps {
-    onOpenSettings: () => void;
-    onOpenChangePassword: () => void;
-    onOpenTokens: () => void;
-}
-
-export const HeaderProfileMenu: React.FC<HeaderProfileMenuProps> = ({
-    onOpenSettings,
-    onOpenChangePassword,
-    onOpenTokens
-}) => {
+export const HeaderProfileMenu: React.FC = () => {
     const { t } = useTranslation();
     const { user } = useUserProfile();
     const [open, setOpen] = useState(false);
+    const userProfileSettingsRef = useRef<BaseModalRef>(null);
+    const changePasswordModalRef = useRef<BaseModalRef>(null);
+    const tokensModalRef = useRef<BaseModalRef>(null);
 
     const handleOpenSettings = () => {
         setOpen(false);
-        onOpenSettings();
+        userProfileSettingsRef.current?.openModal();
     };
 
     const handleOpenChangePassword = () => {
         setOpen(false);
-        onOpenChangePassword();
+        changePasswordModalRef.current?.openModal();
     };
 
     const handleOpenTokens = () => {
         setOpen(false);
-        onOpenTokens();
+        tokensModalRef.current?.openModal();
     };
 
     const handleLogout = async () => {
@@ -46,22 +43,27 @@ export const HeaderProfileMenu: React.FC<HeaderProfileMenuProps> = ({
     const userInitial = userName.charAt(0).toUpperCase();
 
     return (
-        <Popover.Root open={open} onOpenChange={e => setOpen(e.open)} positioning={{ placement: 'bottom-end' }}>
-            <Popover.Trigger asChild>
-                <HeaderProfileButton
+        <>
+            <Popover.Root open={open} onOpenChange={(eventDetails) => setOpen(eventDetails.open)} positioning={{ placement: 'bottom-end' }}>
+                <Popover.Trigger asChild>
+                    <HeaderProfileButton
+                        userName={userName}
+                        userInitial={userInitial}
+                        isOpen={open}
+                    />
+                </Popover.Trigger>
+                <HeaderProfileCard
                     userName={userName}
                     userInitial={userInitial}
-                    isOpen={open}
+                    onOpenSettings={handleOpenSettings}
+                    onOpenChangePassword={handleOpenChangePassword}
+                    onOpenTokens={handleOpenTokens}
+                    onLogout={handleLogout}
                 />
-            </Popover.Trigger>
-            <HeaderProfileCard
-                userName={userName}
-                userInitial={userInitial}
-                onOpenSettings={handleOpenSettings}
-                onOpenChangePassword={handleOpenChangePassword}
-                onOpenTokens={handleOpenTokens}
-                onLogout={handleLogout}
-            />
-        </Popover.Root>
+            </Popover.Root>
+            <UserProfileSettingsModal ref={userProfileSettingsRef} />
+            <ChangePasswordModal ref={changePasswordModalRef} />
+            <TokensModal ref={tokensModalRef} />
+        </>
     );
 };
