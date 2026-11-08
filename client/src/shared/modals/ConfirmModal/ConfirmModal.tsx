@@ -1,64 +1,54 @@
-import { Button, CloseButton, Dialog, Portal, useDisclosure } from "@chakra-ui/react";
-import React, { forwardRef, useImperativeHandle } from "react";
+import { forwardRef } from "react";
+import { Box, Button, Dialog, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import BaseModal from "@/shared/modals/BaseModal/BaseModal";
 
-interface Props {
-    onConfirmed: () => Promise<void>;
+export interface ConfirmModalProps {
+    onConfirmed: () => Promise<void> | void;
     title: string;
     message?: string;
     confirmActionName?: string;
     description?: string;
 }
 
-export const ConfirmModal = forwardRef<BaseModalRef, Props>((props: Props, ref) => {
-    const { open, onOpen, onClose } = useDisclosure();
-    const cancelRef = React.useRef<HTMLButtonElement>(null!);
-    useImperativeHandle(ref, () => ({
-        openModal: onOpen,
-        closeModal: onClose
-    }));
+export const ConfirmModal = forwardRef<BaseModalRef, ConfirmModalProps>(
+    ({ onConfirmed, title, message, confirmActionName }, ref) => {
+        const { t } = useTranslation();
 
-    const onConfirmed = () => {
-        onClose();
-        props.onConfirmed();
-    };
-
-    const { t } = useTranslation();
-
-    return <Dialog.Root
-        onEscapeKeyDown={onClose}
-        onOpenChange={(e) => { if (!e.open) onClose(); }}
-        placement="center"
-        open={open}
-        role="alertdialog">
-        <Portal>
-            <Dialog.Backdrop/>
-            <Dialog.Positioner>
-                <Dialog.Content
-                    backgroundColor="background_primary"
-                    borderColor="border_primary"
-                    color="text_primary"
-                >
-                    <Dialog.Header fontSize='lg' fontWeight='bold' color="text_primary">
-                        {props.title}
-                    </Dialog.Header>
-                    <Dialog.Body color="text_primary">
-                        {props.message}
-                    </Dialog.Body>
-                    <Dialog.Footer gap={3}>
-                        <Button background="red.600" onClick={onConfirmed}>
-                            {props.confirmActionName}
+        return (
+            <BaseModal
+                ref={ref}
+                title={title}
+                maxW="480px"
+                role="alertdialog"
+                footer={({ closeModal }) => (
+                    <Flex gap={3} justify="flex-end" w="100%">
+                        <Button
+                            background="red.600"
+                            onClick={() => {
+                                closeModal();
+                                onConfirmed();
+                            }}
+                        >
+                            {confirmActionName}
                         </Button>
                         <Dialog.ActionTrigger asChild>
-                            <Button ref={cancelRef} onClick={onClose} variant="outline">{t("modals_cancel_button")}</Button>
+                            <Button onClick={closeModal} variant="outline">
+                                {t("modals_cancel_button")}
+                            </Button>
                         </Dialog.ActionTrigger>
-                    </Dialog.Footer>
-                    <Dialog.CloseTrigger asChild>
-                        <CloseButton onClick={onClose} size="sm" color="text_primary" />
-                    </Dialog.CloseTrigger>
-                </Dialog.Content>
-            </Dialog.Positioner>
-        </Portal>
-    </Dialog.Root>;
-});
+                    </Flex>
+                )}
+            >
+                <Box color="text_primary">
+                    {message}
+                </Box>
+            </BaseModal>
+        );
+    }
+);
+
+ConfirmModal.displayName = "ConfirmModal";
+
+export default ConfirmModal;

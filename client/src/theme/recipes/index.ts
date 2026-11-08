@@ -14,4 +14,3 @@ export const slotRecipes = {
     checkbox: checkboxSlotRecipe,
     datePicker: datePickerSlotRecipe,
 };
-
