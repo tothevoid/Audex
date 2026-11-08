@@ -23,6 +23,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { TFunction } from "i18next";
+import { HeaderButton } from "./HeaderButton";
 import { useNotifications } from "@/shared/hooks/useNotifications";
 import { NotificationEntity, NotificationSeverity } from "@/models/notifications/NotificationEntity";
 
@@ -93,21 +94,10 @@ export const HeaderNotificationBell: React.FC = () => {
         <Popover.Root open={open} onOpenChange={e => setOpen(e.open)} positioning={{ placement: "bottom-end" }}>
             <Popover.Trigger asChild>
                 <Box position="relative" display="inline-block">
-                    <Button
+                    <HeaderButton
                         aria-label="Notifications"
-                        size="md"
-                        borderColor="border_primary"
-                        background="button_background_secondary"
-                        transition="all 0.2s cubic-bezier(0.4, 0, 0.2, 1)"
-                        _hover={{
-                            borderColor: "action_primary",
-                            backgroundColor: "background_primary"
-                        }}
-                    >
-                        <Icon color="card_action_icon_primary">
-                            <MdNotifications />
-                        </Icon>
-                    </Button>
+                        icon={<MdNotifications />}
+                    />
                     {unreadCount > 0 && (
                         <Badge
                             position="absolute"
