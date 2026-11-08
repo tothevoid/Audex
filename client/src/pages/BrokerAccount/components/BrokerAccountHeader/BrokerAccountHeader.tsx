@@ -92,7 +92,7 @@ const BrokerAccountHeader: React.FC<Props> = ({
                 </Flex>
 
                 {/* Metrics list */}
-                <MetricsGrid columns={{ base: 2, sm: 2, md: 4 }}>
+                <MetricsGrid columns={{ base: 2, sm: 2, md: 4, lg: 7 }}>
                     <NumericMetricItem
                         icon={<BsBank size={15} />}
                         iconBg="rgba(234, 179, 8, 0.15)"
