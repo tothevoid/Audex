@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Box, Card, Flex, NativeSelect } from "@chakra-ui/react";
+import { Box, Card, NativeSelect } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { AccountCurrencySummary } from "@/models/accounts/accountsSummary";
-import { NumericMetricItem } from "@/shared/components/MetricItem";
+import { MetricsGrid, NumericMetricItem } from "@/shared/components/MetricItem";
 import { getCurrencyColor, getCurrencyIcon } from "@/shared/utilities/currencyUtils";
 import { useColorMode } from "@/shared/context/useColorMode";
 import SectionHeader from "@/shared/components/SectionHeader";
@@ -73,16 +73,7 @@ export const AccountsHeader: React.FC<Props> = ({
                     />
 
                     {accountCurrencySummaries.length > 0 && (
-                        <Flex
-                            pt={3}
-                            mt={1}
-                            borderTopWidth="1px"
-                            borderColor="border_primary"
-                            justifyContent="flex-start"
-                            alignItems="center"
-                            flexWrap="wrap"
-                            gap={{ base: 4, md: 8 }}
-                        >
+                        <MetricsGrid layout="flex" mt={1}>
                             {accountCurrencySummaries.map((currencySummary) => {
                                 const { iconBg, iconColor } = getCurrencyColor(currencySummary.name, resolvedColorMode);
                                 const icon = getCurrencyIcon(currencySummary.name, i18n.language, "15px");
@@ -100,7 +91,7 @@ export const AccountsHeader: React.FC<Props> = ({
                                     />
                                 );
                             })}
-                        </Flex>
+                        </MetricsGrid>
                     )}
                 </Card.Body>
             </Card.Root>

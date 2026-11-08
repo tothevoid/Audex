@@ -1,5 +1,5 @@
 import React from "react";
-import { Badge, Card, Flex } from "@chakra-ui/react";
+import { Badge, Card } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { AccountEntity } from "@/models/accounts/AccountEntity";
 import { BsWallet2, BsArrowUpRight, BsArrowDownRight, BsBank } from "react-icons/bs";
@@ -7,7 +7,7 @@ import { MdSwapHoriz } from "react-icons/md";
 import SectionHeader from "@/shared/components/SectionHeader";
 import StoredIcon from "@/shared/components/StoredIcon";
 import { getBankIconUrl } from "@/api/banks/bankApi";
-import { NumericMetricItem } from "@/shared/components/MetricItem";
+import { MetricsGrid, NumericMetricItem } from "@/shared/components/MetricItem";
 
 interface CashAccountHeaderProps {
     account: AccountEntity | null;
@@ -58,16 +58,7 @@ export const CashAccountHeader: React.FC<CashAccountHeaderProps> = ({
                 />
 
                 {/* Metrics list */}
-                <Flex
-                    pt={3}
-                    mt={1}
-                    borderTopWidth="1px"
-                    borderColor="border_primary"
-                    justifyContent="flex-start"
-                    alignItems="center"
-                    flexWrap="wrap"
-                    gap={{ base: 4, md: 8 }}
-                >
+                <MetricsGrid layout="flex" mt={1}>
                     <NumericMetricItem
                         icon={<BsWallet2 size={16} />}
                         iconBg="rgba(59, 130, 246, 0.15)"
@@ -94,7 +85,7 @@ export const CashAccountHeader: React.FC<CashAccountHeaderProps> = ({
                         label={t("currency_transactions_count")}
                         value={transactionsCount}
                     />
-                </Flex>
+                </MetricsGrid>
             </Card.Body>
         </Card.Root>
     );

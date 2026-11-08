@@ -11,7 +11,7 @@ import Placeholder from "@/shared/components/Placeholder/Placeholder";
 import DebtTagBadge from "@/pages/Debts/components/DebtTagBadge/DebtTagBadge";
 import { DebtEntity } from "@/models/debts/DebtEntity";
 import { DebtTagEntity } from "@/models/debts/DebtTagEntity";
-import { NumericMetricItem } from "@/shared/components/MetricItem";
+import { MetricsGrid, NumericMetricItem } from "@/shared/components/MetricItem";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 
 interface Props {
@@ -117,16 +117,7 @@ export const DebtsHeader: React.FC<Props> = ({
 
                     {/* Metrics list */}
                     {debts.length > 0 && (
-                        <Flex
-                            pt={3}
-                            mt={3}
-                            borderTopWidth="1px"
-                            borderColor="border_primary"
-                            justifyContent="flex-start"
-                            alignItems="center"
-                            flexWrap="wrap"
-                            gap={{ base: 4, md: 8 }}
-                        >
+                        <MetricsGrid layout="flex">
                             <NumericMetricItem
                                 icon={<BsWallet2 size={16} />}
                                 iconBg="rgba(239, 68, 68, 0.15)"
@@ -154,7 +145,7 @@ export const DebtsHeader: React.FC<Props> = ({
                                 value={debts.length}
                                 size="sm"
                             />
-                        </Flex>
+                        </MetricsGrid>
                     )}
                 </Card.Body>
             </Card.Root>

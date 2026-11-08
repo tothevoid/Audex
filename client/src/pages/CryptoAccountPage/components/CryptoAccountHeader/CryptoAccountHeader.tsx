@@ -1,10 +1,10 @@
 import React from "react";
-import { Card, Flex } from "@chakra-ui/react";
+import { Card } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { CryptoAccountEntity } from "@/models/crypto/CryptoAccountEntity";
 import { BsWallet2 } from "react-icons/bs";
 import { SiBinance } from "react-icons/si";
-import { NumericMetricItem } from "@/shared/components/MetricItem";
+import { MetricsGrid, NumericMetricItem } from "@/shared/components/MetricItem";
 import { getCryptoProviderIconUrl } from "@/api/crypto/cryptoProviderApi";
 import StoredIcon from "@/shared/components/StoredIcon/StoredIcon";
 import SectionHeader from "@/shared/components/SectionHeader";
@@ -73,16 +73,7 @@ export const CryptoAccountHeader: React.FC<CryptoAccountHeaderProps> = ({
                 />
 
                 {/* Metrics list */}
-                <Flex
-                    pt={3}
-                    mt={1}
-                    borderTopWidth="1px"
-                    borderColor="border_primary"
-                    justifyContent="flex-start"
-                    alignItems="center"
-                    flexWrap="wrap"
-                    gap={{ base: 4, md: 8 }}
-                >
+                <MetricsGrid layout="flex" mt={1}>
                     <NumericMetricItem
                         icon={<BsWallet2 size={16} />}
                         iconBg="rgba(234, 179, 8, 0.15)"
@@ -104,7 +95,7 @@ export const CryptoAccountHeader: React.FC<CryptoAccountHeaderProps> = ({
                             size="sm"
                         />
                     )}
-                </Flex>
+                </MetricsGrid>
             </Card.Body>
         </Card.Root>
     );

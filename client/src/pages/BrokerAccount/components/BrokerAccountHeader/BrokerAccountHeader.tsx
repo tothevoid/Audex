@@ -5,7 +5,7 @@ import { formatShortDateTime } from "@/shared/utilities/formatters/dateFormatter
 import { BrokerAccountPortfolioEntity } from "@/models/brokers/BrokerAccountPortfolioEntity";
 import { BsWallet2, BsPiggyBank, BsArrowUpRight, BsArrowDownRight, BsBank, BsFileEarmarkSpreadsheet, BsPercent } from "react-icons/bs";
 import { TbReceiptTax } from "react-icons/tb";
-import { NumericMetricItem } from "@/shared/components/MetricItem";
+import { MetricsGrid, NumericMetricItem } from "@/shared/components/MetricItem";
 import RefreshButton from "@/shared/components/RefreshButton";
 
 interface Props {
@@ -92,16 +92,7 @@ const BrokerAccountHeader: React.FC<Props> = ({
                 </Flex>
 
                 {/* Metrics list */}
-                <Flex
-                    pt={3}
-                    mt={3}
-                    borderTopWidth="1px"
-                    borderColor="border_primary"
-                    justifyContent="flex-start"
-                    alignItems="center"
-                    flexWrap="wrap"
-                    gap={{ base: 4, md: 8 }}
-                >
+                <MetricsGrid columns={{ base: 2, sm: 2, md: 4 }}>
                     <NumericMetricItem
                         icon={<BsBank size={15} />}
                         iconBg="rgba(234, 179, 8, 0.15)"
@@ -184,7 +175,7 @@ const BrokerAccountHeader: React.FC<Props> = ({
                             size="sm"
                         />
                     )}
-                </Flex>
+                </MetricsGrid>
             </Card.Body>
         </Card.Root>
     );
