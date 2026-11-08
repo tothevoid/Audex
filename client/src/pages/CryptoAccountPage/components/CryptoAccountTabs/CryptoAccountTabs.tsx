@@ -5,6 +5,7 @@ import { IoMdStats } from "react-icons/io";
 import { MdQueryStats } from "react-icons/md";
 import CryptoAccountsList from "@/pages/CryptoAccountsPage/components/CryptoAccountsList/CryptoAccountsList";
 import CryptoAccountStats from "@/pages/CryptoAccountPage/components/CryptoAccountStats/CryptoAccountStats";
+import ResponsiveTabsList, { ResponsiveTabItem } from "@/shared/components/ResponsiveTabs/ResponsiveTabsList";
 
 interface Props {
     cryptoAccountId?: string;
@@ -19,6 +20,19 @@ const CryptoAccountTabs: React.FC<Props> = ({ cryptoAccountId, onDataChanged, da
         return <CryptoAccountStats cryptoAccountId={cryptoAccountId} dataVersion={dataVersion} />;
     }
 
+    const tabItems: ResponsiveTabItem[] = [
+        {
+            value: "crypto_accounts",
+            label: t("crypto_accounts_tab"),
+            icon: IoMdStats
+        },
+        {
+            value: "stats",
+            label: t("crypto_account_page_account_stats_tab"),
+            icon: MdQueryStats
+        }
+    ];
+
     return (
         <Tabs.Root
             lazyMount={true}
@@ -26,16 +40,7 @@ const CryptoAccountTabs: React.FC<Props> = ({ cryptoAccountId, onDataChanged, da
             variant="enclosed"
             defaultValue="crypto_accounts"
         >
-            <Tabs.List>
-                <Tabs.Trigger value="crypto_accounts">
-                    <IoMdStats />
-                    {t("crypto_accounts_tab")}
-                </Tabs.Trigger>
-                <Tabs.Trigger value="stats">
-                    <MdQueryStats />
-                    {t("crypto_account_page_account_stats_tab")}
-                </Tabs.Trigger>
-            </Tabs.List>
+            <ResponsiveTabsList items={tabItems} breakpoint="sm" />
 
             <Tabs.Content value="crypto_accounts">
                 <CryptoAccountsList onDataChanged={onDataChanged} />

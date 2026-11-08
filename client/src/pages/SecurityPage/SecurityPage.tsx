@@ -12,6 +12,7 @@ import { SecurityStats } from "@/models/securities/SecurityStats";
 import { GrTransaction } from "react-icons/gr";
 import { MdHistory } from "react-icons/md";
 import { PiCoinsLight } from "react-icons/pi";
+import ResponsiveTabsList, { ResponsiveTabItem } from "@/shared/components/ResponsiveTabs/ResponsiveTabsList";
 
 interface State {
 	security: SecurityEntity,
@@ -51,24 +52,29 @@ const SecurityPage: React.FC = () => {
 
 	const { ticker, actualPrice, currency } = state.security;
 
+	const tabItems: ResponsiveTabItem[] = [
+		{
+			value: "history",
+			label: t("security_page_tabs_history"),
+			icon: MdHistory
+		},
+		{
+			value: "transactions",
+			label: t("security_page_tabs_transactions"),
+			icon: GrTransaction
+		},
+		{
+			value: "dividends",
+			label: t("security_page_tabs_dividends"),
+			icon: PiCoinsLight
+		}
+	];
+
 	return <Stack color="text_primary" gap={4}>
 		<SecurityHeader security={state.security} securityStats={state.securityStats} />
 
   		<Tabs.Root lazyMount={true} unmountOnExit={true} variant="enclosed" defaultValue="history">
-			<Tabs.List>
-				<Tabs.Trigger value="history">
-					<MdHistory/>
-					{t("security_page_tabs_history")}
-				</Tabs.Trigger>
-				<Tabs.Trigger value="transactions">
-					<GrTransaction />
-					 {t("security_page_tabs_transactions")}
-				</Tabs.Trigger>
-				<Tabs.Trigger value="dividends">
-					<PiCoinsLight />
-					 {t("security_page_tabs_dividends")}
-				</Tabs.Trigger>
-			</Tabs.List>
+			<ResponsiveTabsList items={tabItems} breakpoint="md" />
 			<Tabs.Content value="history">
 				<SecurityHistory ticker={ticker} currencyName={currency.name} />
 			</Tabs.Content>

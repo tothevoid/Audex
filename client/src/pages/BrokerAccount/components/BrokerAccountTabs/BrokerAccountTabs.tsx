@@ -15,6 +15,7 @@ import DividendPaymentsList from "@/pages/BrokerAccount/components/DividendPayme
 import SecurityTransactionsList from "@/pages/BrokerAccount/components/SecurityTransactionsList/SecurityTransactionsList";
 import { Nullable } from "@/shared/utilities/nullable";
 import BrokerAccountsList from "@/pages/BrokerAccounts/components/BrokerAccountsList/BrokerAccountsList";
+import ResponsiveTabsList, { ResponsiveTabItem } from "@/shared/components/ResponsiveTabs/ResponsiveTabsList";
 import { ChangeAction } from "./types";
 
 interface Props {
@@ -42,45 +43,60 @@ const BrokerAccountTabs: React.FC<Props> = ({ brokerAccountId, currencyName, onA
         await onActionTriggered(ChangeAction.TaxDeductionsChanged);
     }, [onActionTriggered]);
 
-    return <Tabs.Root lazyMount={true} unmountOnExit={true} variant="enclosed" 
-        defaultValue={"daily_stats"}>
-        <Tabs.List>
-            <Tabs.Trigger value="daily_stats">
-                <IoMdStats/>
-                    {t("broker_account_page_daily_stats_tab")}
-            </Tabs.Trigger>
-            {
-                !brokerAccountId &&
-                <Tabs.Trigger value="broker_accounts">
-                    <IoMdStats/>
-                        {t("broker_account_page_broker_accounts_tab")}
-                </Tabs.Trigger>
-            }
-            <Tabs.Trigger value="stats">
-                <MdQueryStats />
-                    {t("broker_account_page_account_stats_tab")}
-            </Tabs.Trigger>
-            <Tabs.Trigger value="history">
-                <MdHistory />
-                    {t("broker_account_page_history_tab")}
-            </Tabs.Trigger>
-            <Tabs.Trigger value="transactions">
-                <GrTransaction />
-                {t("broker_account_page_transactions_tab")}
-            </Tabs.Trigger>
-            <Tabs.Trigger value="dividends">
-                <PiCoinsLight />
-                    {t("broker_account_page_dividends_tab")}
-            </Tabs.Trigger>
-            <Tabs.Trigger value="transfers">
-                <MdAttachMoney />
-                    {t("broker_account_page_transfers_tab")}
-            </Tabs.Trigger>
-            <Tabs.Trigger value="tax_deductions">
-                <TbTax />
-                    {t("broker_account_page_deduction_taxes_tab")}
-            </Tabs.Trigger>
-        </Tabs.List>
+    const tabItems: ResponsiveTabItem[] = [
+        {
+            value: "daily_stats",
+            label: t("broker_account_page_daily_stats_tab"),
+            icon: IoMdStats
+        },
+        ...(!brokerAccountId
+            ? [{
+                value: "broker_accounts",
+                label: t("broker_account_page_broker_accounts_tab"),
+                icon: IoMdStats
+            }]
+            : []
+        ),
+        {
+            value: "stats",
+            label: t("broker_account_page_account_stats_tab"),
+            icon: MdQueryStats
+        },
+        {
+            value: "history",
+            label: t("broker_account_page_history_tab"),
+            icon: MdHistory
+        },
+        {
+            value: "transactions",
+            label: t("broker_account_page_transactions_tab"),
+            icon: GrTransaction
+        },
+        {
+            value: "dividends",
+            label: t("broker_account_page_dividends_tab"),
+            icon: PiCoinsLight
+        },
+        {
+            value: "transfers",
+            label: t("broker_account_page_transfers_tab"),
+            icon: MdAttachMoney
+        },
+        {
+            value: "tax_deductions",
+            label: t("broker_account_page_deduction_taxes_tab"),
+            icon: TbTax
+        }
+    ];
+
+    return (
+        <Tabs.Root
+            lazyMount={true}
+            unmountOnExit={true}
+            variant="enclosed"
+            defaultValue="daily_stats"
+        >
+            <ResponsiveTabsList items={tabItems} breakpoint="lg" />
         {
             !brokerAccountId &&
             <Tabs.Content value="broker_accounts">
@@ -108,7 +124,8 @@ const BrokerAccountTabs: React.FC<Props> = ({ brokerAccountId, currencyName, onA
         <Tabs.Content value="tax_deductions">
             <BrokerAccountTaxDeductionsList onDataChanged={onTaxDeductionsChanged} brokerAccountId={brokerAccountId}/>
         </Tabs.Content>
-    </Tabs.Root>;
+    </Tabs.Root>
+    );
 };
 
 export default BrokerAccountTabs;
