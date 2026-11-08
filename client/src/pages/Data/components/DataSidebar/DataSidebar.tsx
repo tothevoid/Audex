@@ -10,18 +10,35 @@ export default function DataSidebar() {
 	return (
 		<Box
 			as="aside"
-			w="240px"
-			minW="240px"
+			w={{ base: "100%", lg: "240px" }}
+			minW={{ base: "100%", lg: "240px" }}
 			bg="background_primary"
 			borderRadius="lg"
 			border="1px solid"
 			borderColor="border_primary"
 			p={3}
-			position="sticky"
+			position={{ base: "static", lg: "sticky" }}
 			top="74px"
 		>
-			<Stack gap={2}>
-				<Text fontSize="lg" fontWeight="bold" px={3} py={2} color="text_primary">
+			<Stack
+				direction={{ base: "row", lg: "column" }}
+				overflowX={{ base: "auto", lg: "visible" }}
+				gap={2}
+				scrollbarWidth="none"
+				css={{
+					"&::-webkit-scrollbar": {
+						display: "none"
+					}
+				}}
+			>
+				<Text
+					fontSize="lg"
+					fontWeight="bold"
+					px={3}
+					py={2}
+					color="text_primary"
+					display={{ base: "none", lg: "block" }}
+				>
 					{t("data_title")}
 				</Text>
 				{dataTablesConfig.map((menuItem) => (
@@ -38,6 +55,8 @@ export default function DataSidebar() {
 								bg={isActive ? "background_secondary" : "transparent"}
 								color={isActive ? "action_primary" : "text_primary"}
 								fontWeight={isActive ? "semibold" : "normal"}
+								whiteSpace="nowrap"
+								flexShrink={0}
 								_hover={{ bg: "background_secondary" }}
 								transition="all 0.15s ease"
 							>
