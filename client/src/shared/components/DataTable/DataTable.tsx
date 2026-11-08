@@ -32,8 +32,8 @@ export const DataTable = <T,>({
     }
 
     return (
-        <Box className="table-fade-in">
-            <Table.Root>
+        <Box className="table-fade-in" overflowX="auto" maxW="100%">
+            <Table.Root minW="600px">
                 <Table.Header>
                     <Table.Row border="none" bg="none" color="text_primary">
                         {columns.map((col, idx) => (

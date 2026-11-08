@@ -40,7 +40,7 @@ export const TableWrapper = <TRecord,>({
     }
 
     return (
-        <Box overflowX="auto" borderRadius="md" borderWidth="1px" borderColor="border_primary">
+        <Box overflowX="auto" maxW="100%" borderRadius="md" borderWidth="1px" borderColor="border_primary">
             <Table.Root size={size} variant={variant} tableLayout={tableLayout} minWidth={minWidth}>
                 <Table.Header backgroundColor={headerBackgroundColor}>
                     <Table.Row height={rowHeight}>
