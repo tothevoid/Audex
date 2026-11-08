@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Box, Theme } from '@chakra-ui/react';
 import { useColorMode } from '@/shared/context/useColorMode';
@@ -26,6 +26,12 @@ import SchedulerPage from '@/pages/Scheduler/SchedulerPage';
 
 export const App: React.FC = () => {
 	const { resolvedColorMode } = useColorMode();
+
+	useEffect(() => {
+		if (import.meta.env.DEV && !document.title.startsWith('[DEV]')) {
+			document.title = `[DEV] ${document.title}`;
+		}
+	}, []);
 
 	return (
 		<Theme appearance={resolvedColorMode} hasBackground={false}>
