@@ -266,7 +266,32 @@ This document contains guidelines, coding standards, and architectural patterns 
   - **Listener Hooks (`useSignalR`)**: Components and hooks subscribe using `useSignalR<TPayload>(eventName, handler)`. The `useSignalR` hook is strictly a listener registration/deregistration mechanism; it must NEVER manage or trigger connection startup (`startAsync`).
   - **Prohibition of Raw JSON Message Dumping**: Sending or receiving raw JSON strings over a single generic method (e.g. `ReceiveServerMessage`) is prohibited. The backend uses the clean transport interface `IServerNotifier` (`SendToAllAsync(eventName, payload)`) with strongly-typed event constants in `Audex.Shared.Constants.ServerNotificationEvents`, broadcasting distinct named events directly over SignalR.
 - **Themes & Scrollbars**: The application supports Dark Theme and Solarized Sand Light Theme via Chakra UI v3 semantic tokens. Root elements (`html`, `body` in `index.css`) support `[data-theme="dark"]` and `[data-theme="light"]`, matching scrollbars and WebKit autofill styles. Always preserve `scrollbar-gutter: stable` on `html` to prevent layout jumping/shifting between scrollable and non-scrollable pages.
-- **Layout & Styling**: Use Chakra UI v3 theme tokens (`background_main`, `background_primary`, `background_secondary`, `text_primary`, `text_secondary`, `border_primary`, `action_primary`) and `<SimpleGrid columns={2} gap={4}>` with `<MoneyCard>` for metric grids. Do NOT use hardcoded hex/rgb/rgba colors in components.
+- **Layout & Styling**: Use Chakra UI v3 theme tokens (`background_main`, `background_primary`, `background_secondary`, `text_primary`, `text_secondary`, `border_primary`, `action_primary`) and semantic colors. Do NOT use hardcoded hex/rgb/rgba colors in components.
+
+### 📱 Responsive Design & Mobile/Tablet (iPad) Adaptation
+- **First-Class Mobile & Tablet Support**: ALL client features, pages, modals, tables, navigation bars, and metric cards MUST be designed and implemented with first-class support for both **smartphones (mobile)** and **tablets (iPad in portrait and landscape orientations)**. Desktop view is NEVER the sole design target.
+- **Device Viewports & Breakpoint Strategy**:
+  - `base` / `sm` ($< 768\text{px}$): Smartphones (iPhone, Android). Vertical stacks, 1-2 columns for metrics, drawer navigation (`HeaderMobileNav`), native picker select for tabs, full-width actions.
+  - `md` ($768\text{px} - 991\text{px}$): Tablet portrait (iPad portrait). 2 to 4 columns for metrics, compact padding, drawer navigation, touch-friendly targets.
+  - `lg` ($992\text{px} - 1279\text{px}$): Tablet landscape (iPad landscape) and small laptops. Desktop navigation (`HeaderDesktopNav`), flex-flowing metric bars, compact tab triggers.
+  - `xl`+ ($\ge 1280\text{px}$): Full desktop monitors. Multi-column grids and expanded tab bars.
+- **Responsive Navigation Architecture**:
+  - Desktop viewports ($\ge\text{lg}$) use [`HeaderDesktopNav`](client/src/features/Navigation/Header/HeaderDesktopNav.tsx).
+  - Mobile and tablet viewports ($<\text{lg}$) use [`HeaderMobileNav`](client/src/features/Navigation/Header/HeaderMobileNav.tsx) with Chakra's `IconButton` wrapped in `<Drawer.Trigger asChild>`. All routes and dropdown categories MUST derive from the centralized source of truth in [`navigationConfig.ts`](client/src/features/Navigation/Header/navigationConfig.ts).
+- **Responsive Tabs (`ResponsiveTabsList`)**:
+  - NEVER use horizontal tab scrolling with hidden scrollbars as a crutch for long tab bars.
+  - Use [`ResponsiveTabsList`](client/src/shared/components/ResponsiveTabs/ResponsiveTabsList.tsx): on mobile/tablet viewports ($<\text{breakpoint}$), it automatically renders a clean `<NativeSelect>` (triggering the operating system's native picker wheel on iOS/Android), and on desktop ($\ge\text{breakpoint}$) it renders the full horizontal `<Tabs.List>` with icons.
+- **Responsive Metric Grids (`MetricsGrid`)**:
+  - For header stats and summary bars, use responsive layout contracts: `layout={{ base: "grid", lg: "flex" }}` with `columns={{ base: 2, sm: 2, md: 4 }}` and `gap={{ base: 3, md: 4, lg: 6 }}`.
+  - This ensures a neat, equal-width 2-column or 4-column grid on mobile/tablet, while smoothly transitioning to a compact, non-stretching flex row on desktop without leaving awkward empty cells.
+- **Card Lists Grid (`CardsGrid`)**:
+  - All list pages (accounts, broker accounts, crypto accounts, securities, debts, deposits) MUST use [`CardsGrid`](client/src/shared/components/CardsGrid/CardsGrid.tsx) (`templateColumns="repeat(auto-fill, minmax(320px, 1fr))"`, `gap={4}`). Cards must naturally wrap without overflowing viewports.
+- **Responsive Modals (`BaseModal`)**:
+  - All modals must inherit responsive sizing from [`BaseModal`](client/src/shared/modals/BaseModal/BaseModal.tsx) (`maxH="calc(100dvh - 24px)"`, `p={{ base: "12px", sm: "16px", md: "24px" }}`). Modals must never overflow the mobile viewport height and must scroll internally.
+- **Zero Horizontal Page Overflow**:
+  - NEVER use fixed pixel widths on layout containers (e.g. `w="1200px"`, `minW="900px"`). Containers must always use responsive constraints (`w="100%"`, `maxW="1560px"`, `minW=0`).
+- **Touch-Friendly Targets**:
+  - Buttons, icons, select fields, and interactive cards must have comfortable touch targets (minimum $36\text{px} - 44\text{px}$) for touch interactions on iPads and smartphones.
 
 ### API Client Functions & Centralized `basicApi` Architecture
 - **Mandatory Use of `basicApi` Wrappers**: Direct `httpClient` or `axios` calls in domain API modules (`client/src/api/<domain>/`) are prohibited. All API calls must route through universal helpers in `client/src/api/basicApi.ts`:
