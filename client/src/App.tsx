@@ -1,4 +1,3 @@
-import '@/App.scss';
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Box, Theme } from '@chakra-ui/react';

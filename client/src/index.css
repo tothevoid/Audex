@@ -138,3 +138,8 @@ html.light input:-webkit-autofill:active {
   caret-color: #2b303a !important;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
