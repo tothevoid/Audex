@@ -1,30 +1,35 @@
 import React, { useState } from 'react';
 import { Box, Flex, Icon, Popover, Text, VStack } from '@chakra-ui/react';
 import { LuChevronRight } from 'react-icons/lu';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import HeaderItem from '@/features/Navigation/HeaderItem/HeaderItem';
 
-export interface HeaderNavDropdownItem {
-    path: string;
-    title: string;
-    description?: string;
-    icon?: React.ElementType;
-}
+import { HeaderNavDropdownItem } from './navigationConfig';
+
+export type { HeaderNavDropdownItem };
 
 interface HeaderNavDropdownProps {
     title: string;
-    active: boolean;
     items: HeaderNavDropdownItem[];
+    activePrefixes?: string[];
 }
 
-export const HeaderNavDropdown: React.FC<HeaderNavDropdownProps> = ({ title, active, items }) => {
+export const HeaderNavDropdown: React.FC<HeaderNavDropdownProps> = ({
+    title,
+    items,
+    activePrefixes
+}) => {
     const [open, setOpen] = useState(false);
+    const location = useLocation();
+
+    const prefixes = activePrefixes ?? items.map((navItem) => navItem.path);
+    const isActive = prefixes.some((prefixString) => location.pathname.startsWith(prefixString));
 
     return (
-        <Popover.Root open={open} onOpenChange={(e) => setOpen(e.open)} positioning={{ placement: 'bottom-start', gutter: 4 }}>
+        <Popover.Root open={open} onOpenChange={(eventDetails) => setOpen(eventDetails.open)} positioning={{ placement: 'bottom-start', gutter: 4 }}>
             <Popover.Trigger asChild>
                 <Box cursor="pointer" height="100%">
-                    <HeaderItem title={title} active={active} hasDropdown isOpen={open} />
+                    <HeaderItem title={title} active={isActive} hasDropdown isOpen={open} />
                 </Box>
             </Popover.Trigger>
 
@@ -45,10 +50,10 @@ export const HeaderNavDropdown: React.FC<HeaderNavDropdownProps> = ({ title, act
                     </Box>
 
                     <VStack align="stretch" gap={1}>
-                        {items.map((item) => (
+                        {items.map((navItem) => (
                             <NavLink
-                                key={item.path}
-                                to={item.path}
+                                key={navItem.path}
+                                to={navItem.path}
                                 onClick={() => setOpen(false)}
                                 style={{ textDecoration: 'none' }}
                             >
@@ -69,7 +74,7 @@ export const HeaderNavDropdown: React.FC<HeaderNavDropdownProps> = ({ title, act
                                         }}
                                     >
                                         <Flex align="center" gap={3}>
-                                            {item.icon && (
+                                            {navItem.icon && (
                                                 <Flex
                                                     align="center"
                                                     justify="center"
@@ -78,7 +83,7 @@ export const HeaderNavDropdown: React.FC<HeaderNavDropdownProps> = ({ title, act
                                                     color={isActive ? 'action_primary' : 'text_secondary'}
                                                     transition="all 0.2s ease"
                                                 >
-                                                    <Icon as={item.icon} boxSize="19px" />
+                                                    <Icon as={navItem.icon} boxSize="19px" />
                                                 </Flex>
                                             )}
                                             <VStack align="flex-start" gap={0}>
@@ -87,11 +92,11 @@ export const HeaderNavDropdown: React.FC<HeaderNavDropdownProps> = ({ title, act
                                                     fontWeight={isActive ? '700' : '600'}
                                                     color={isActive ? 'action_primary' : 'text_primary'}
                                                 >
-                                                    {item.title}
+                                                    {navItem.title}
                                                 </Text>
-                                                {item.description && (
+                                                {navItem.description && (
                                                     <Text fontSize="0.75rem" color="text_secondary" lineHeight="1.2">
-                                                        {item.description}
+                                                        {navItem.description}
                                                     </Text>
                                                 )}
                                             </VStack>
