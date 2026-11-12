@@ -1,5 +1,5 @@
 import { Field, Input } from "@chakra-ui/react";
-import React, { RefObject, useEffect, useMemo, useState } from "react";
+import React, { RefObject, useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
@@ -28,21 +28,17 @@ const TransactionTypeModal: React.FC<ModalProps> = ({
 	const { t } = useTranslation();
 	const validationSchema = useMemo(() => getTransactionTypeValidationSchema(t), [t]);
 
+	const setDefaultValues = useCallback((): TransactionTypeFormInput => ({
+		id: transactionType?.id ?? generateGuid(),
+		name: transactionType?.name ?? "",
+		active: transactionType?.active ?? true
+	}), [transactionType]);
+
 	const { register, reset, handleSubmit, control, formState: { errors } } = useForm<TransactionTypeFormInput>({
 		resolver: zodResolver(validationSchema),
 		mode: "onBlur",
-		defaultValues: {
-			id: transactionType?.id ?? generateGuid(),
-			name: transactionType?.name ?? "",
-			active: transactionType?.active ?? true
-		}
+		defaultValues: setDefaultValues()
 	});
-
-	useEffect(() => {
-		if (transactionType) {
-			reset(transactionType);
-		}
-	}, [transactionType, reset]);
 
 	const [icon, setIcon] = useState<File | null>(null);
 	const [customIconUrl, setCustomIconUrl] = useState<string | null>(null);
@@ -64,7 +60,9 @@ const TransactionTypeModal: React.FC<ModalProps> = ({
 	};
 
 	const onModalVisibilityChanged = (open: boolean) => {
-		if (!open) {
+		if (open) {
+			reset(setDefaultValues());
+		} else {
 			setIcon(null);
 			setCustomIconUrl(null);
 			onModalClosed();
