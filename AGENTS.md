@@ -1,389 +1,77 @@
 # Development Guidelines & Conventions for Audex
 
-This document contains guidelines, coding standards, and architectural patterns for developing features in Audex.
+Core engineering standards, Git policies, search rules, and verification workflows for **Audex**.
+- **Backend rules (.NET 10 / EF Core / Localization / Testing)**: see [server/AGENTS.md](server/AGENTS.md) (auto-loaded when working in `server/`).
+- **Frontend rules (React 19 / Chakra UI v3 / i18n / Shared Utilities)**: see [client/AGENTS.md](client/AGENTS.md) (auto-loaded when working in `client/`).
+
+> Before modifying backend or frontend files, ensure the corresponding domain guide (`server/AGENTS.md` or `client/AGENTS.md`) is loaded or read.
 
 ---
 
 ## 🧹 Clean Code & Engineering Standards
 
 ### 1. No Abbreviated or Single-Letter Variable Names
-- **Meaningful Identifiers**: NEVER use abbreviated or single-letter variable names (e.g. `tz`, `tx`, `r`, `t`, `i`, `g`, `sec`, `dto`).
-- **Expressive Naming**: All variables, parameters, lambda arguments, and properties MUST have full, descriptive names reflecting their domain meaning (e.g. `timeZone`, `transaction`, `row`, `importer`, `security`, `group`, `userProfile`).
+- **Meaningful Identifiers**: NEVER use abbreviated or single-letter variable names (`tz`, `tx`, `r`, `t`, `i`, `g`, `sec`, `dto`).
+- **Expressive Naming**: Use full descriptive domain names for all variables, parameters, lambdas, and properties (`timeZone`, `transaction`, `row`, `importer`, `security`, `group`, `userProfile`).
 
 ### 2. Method Decomposition & Single Responsibility
-- **Logical Chunking**: Structure method bodies into logically cohesive blocks separated by clear intent.
-- **Avoid Oversized Methods**: Avoid bloated or monolithic methods. Decompose complex workflows into small, focused private/static helper methods or domain services with clear responsibilities and descriptive names.
+- **Logical Chunking**: Group method bodies into cohesive blocks with clear intent.
+- **Avoid Oversized Methods**: Decompose complex workflows into small, focused helper methods or domain services with descriptive names.
 
 ### 3. Clean Namespace Usings on Backend
-- **Avoid Fully-Qualified Type Paths**: Do NOT use fully-qualified namespace paths in code (e.g. `services.AddSingleton<Audex.Application.Interfaces.Common.ITimeZoneService, Audex.Application.Services.Common.TimeZoneService>()`).
-- **Use `using` Directives**: Always place corresponding `using` directives at the top of the C# file and use clean, unqualified type names in declarations and registrations.
+- **Avoid Fully-Qualified Type Paths**: Do NOT inline full namespaces (e.g. `Audex.Application.Services.Common.TimeZoneService`). Place `using` directives at the top of C# files.
 
 ### 4. Leverage & Reuse Existing Codebase & Shared Utilities
-- **Explore Before Creating**: Always inspect the existing codebase before writing new functionality. Check whether helper functions, utilities, or models already exist (e.g. in `client/src/shared/utilities/`, `dateUtils`, formatters, `arrayUtilities`, `webApiUtilities`, base repositories, or common services).
-- **No Redundant Boilerplate**: NEVER reimplement inline loops, searches, custom date/money formatting, GUID generation, or error parsing if a shared utility already exists in `client/src/shared/utilities/`. Always reuse established patterns, shared components, and utilities rather than duplicating logic across modules.
+- **Explore Before Creating**: Check existing utilities/services before writing new helpers (`client/src/shared/utilities/`, `dateUtils`, formatters, `arrayUtilities`, `webApiUtilities`, base repositories).
+- **No Redundant Boilerplate**: NEVER reimplement loops, searches, date/money formatting, GUID generation, or error parsing if a shared utility already exists.
 
 ### 5. Strict Typing & No Type Crutches
-- **No `any` or Cast-Through-`unknown` Crutches**: NEVER use `any` or cast types through `unknown` as a workaround when concrete domain interfaces, component props, chart tooltips, or form models exist or can be defined.
-- **Valid TypeScript `catch` Syntax**: TypeScript catch blocks must use `catch (error: unknown)` or `catch (error)`. Do not use `catch (error: Error)` (which is invalid TypeScript TS1196). Error properties must be extracted using `parseErrorMessage` and `parseErrorCode`.
-- **Clean Naming & No Ghost/`Any*` Aliases**: When replacing or eliminating legacy untyped constructs, completely delete obsolete types and aliases. Do NOT leave dummy bridge aliases (especially with prefixes like `Any*`, e.g. `type AnyWidgetDescriptor = WidgetDescriptor`), which perpetuate naming ambiguity and look like type crutches.
-- **Explicit Domain Base Types Instead of Raw Utility Maps**: For extensible polymorphic abstractions (e.g. widget settings, plugin configs, entity payloads), always define a semantic domain base type (e.g. `BaseWidgetSettings`, `BasePluginConfig`) rather than scattering technical utility types like `Record<string, unknown>` across component props, modal interfaces, and function signatures.
+- **No `any` or `unknown` Cast Crutches**: Define concrete domain interfaces, props, or form models instead of casting through `any` or `unknown`.
+- **Valid TypeScript `catch` Syntax**: Use `catch (error: unknown)` or `catch (error)` (never `catch (error: Error)`). Extract details via `parseErrorMessage` and `parseErrorCode`.
+- **No Ghost/`Any*` Aliases**: Delete obsolete bridge types/aliases (`AnyWidgetDescriptor`, etc.) completely.
+- **Semantic Base Types**: Use explicit domain base types (`BaseWidgetSettings`, `BasePluginConfig`) rather than raw `Record<string, unknown>` across props and contracts.
 
 ### 6. Strict Domain Integrity & No Weakening for Compiler
-- **No Weakening Domain Models for Compiler Convenience**: NEVER make mandatory properties of domain entities, interfaces, or forms optional (`?:`) or nullable just to satisfy compiler variance, assignability to generic collections, or quick error suppression. Domain models MUST strictly reflect domain invariants.
-- **Adapters at Integration Boundaries**: If a polymorphic or generic container operates on a base type, bridge the type difference at the integration boundary (via adapter patterns or descriptor implementations), NEVER by degrading the integrity of the underlying domain model.
+- **Enforce Domain Invariants**: NEVER make mandatory entity/form fields optional (`?:`) or nullable just to satisfy compiler variance or generic assignability.
+- **Adapters at Boundaries**: Bridge polymorphic type differences at integration boundaries via adapter/descriptor patterns rather than degrading domain models.
 
 ### 7. Dependency Inversion in Types & Contracts
-- **Abstract Contracts Must Not Depend on Concrete Implementations**: Base type definition files, abstract contracts, and generic registries (e.g. `types.ts`, base descriptors) MUST NEVER import concrete feature implementations, domain settings, or plugin entities to build closed unions.
-- **Open for Extension**: Base contracts must remain decoupled and open for extension. Concrete feature modules depend on base contracts, never the reverse.
+- **No Upward Dependencies**: Abstract contracts, base types, and generic registries (`types.ts`, base descriptors) MUST NEVER import concrete feature implementations to build closed unions. Concrete modules depend on base contracts, never the reverse.
 
 ### 8. Zero Dead Code & Immediate Cleanup
-- **No Lingering Temporary Code**: When completing refactorings, changing method/prop signatures, or removing temporary bridge logic, immediately and thoroughly remove all obsolete constructs, temporary adapter functions, and dead code.
-- **Unused Imports Hygiene**: NEVER leave unused imports (`unused imports`) in files after refactoring. Clean up imports immediately upon changing file contents.
-- **No Commented-Out Code or Debug Artifacts**: Never leave commented-out code blocks, temporary `console.log` statements, mock flags, or obsolete `TODO`/`FIXME` notes. Every step must result in clean, production-ready code.
-- **Signature Cleanup**: If a function parameter, component prop, or interface field becomes unused as a result of a change, cleanly remove it from the signature and all call sites rather than leaving orphaned parameters.
+- **Immediate Cleanup**: Remove obsolete constructs, unused imports, commented-out code, debug `console.log`s, temporary adapters, and unused function/component parameters immediately.
 
 ### 9. Transparent Linter & Tooling Diagnostics
-- **No Silent Rule Disabling**: When a major dependency update (e.g. ESLint plugins, compiler rules) introduces a new batch of diagnostics or stricter rules (e.g. React Compiler rules), NEVER silently disable, replace, or suppress the rules in config files without first analyzing the diagnostics and presenting the architectural trade-offs to the user.
+- **No Silent Rule Disabling**: Never silently disable or suppress new linter/compiler diagnostics (e.g. React Compiler rules) without first analyzing them and presenting architectural trade-offs to the user.
 
-### 10. Git & Version Control Policy: No Commits in Main Repo & Explicit Approval for Docs Repo
-- **Commit Prohibition in Main Repo**: The agent MUST NEVER create git commits (`git commit`), amend commits, or push (`git push`) in the main codebase repository (`Audex`).
-- **User Commits Code**: All commits and pushes in the main repository are handled exclusively by the user.
-- **Documentation Repo (`*.Docs`) Policy**:
-  - The agent is ONLY permitted to create commits in the documentation repository (`*.Docs`).
-  - **No Immediate/Autonomous Commits**: The agent MUST NEVER commit documentation immediately upon implementing a feature.
-  - **User Review First**: The user must review and verify the feature first. The agent may ONLY execute git commits/pushes in `*.Docs` after receiving an explicit instruction from the user (e.g. "коммитим", "закоммить документацию").
+### 10. Git & Version Control Policy
+- **Commit Prohibition in Main Repo (`Audex`)**: The agent MUST NEVER run `git commit`, `git amend`, or `git push` in `Audex`. All commits/pushes in the main repository are handled exclusively by the user.
+- **Documentation Repo (`Audex.Docs`) Policy**:
+  - The agent is ONLY permitted to commit in `*.Docs`.
+  - **No Autonomous Commits**: Never commit docs immediately after implementing a feature; wait for user review and explicit approval (e.g. `"коммитим"`, `"закоммить документацию"`).
 
-### 11. No Over-Defensive Nullability & No Defensive Null Spraying
-- **Full Execution Control Mandate**: In a full-stack codebase where the agent has end-to-end architectural control across backend DTOs, database models, and frontend interfaces, NEVER spray unnecessary nullability (`?`, `| null`, `?.`, `?? null`, `?? ""`) "just in case".
-- **Reflect Domain Guarantees Faithfully**: If a domain contract guarantees data presence (e.g. user profile currency, non-nullable entity identifiers, required API payload fields), type it strictly as non-nullable. Do not force consumers to write redundant null checks, fallback operators, or optional chaining for invariants guaranteed by design.
-- **Nullability Only for Genuine Domain Absence**: Use `null` / `undefined` strictly when absence of a value carries true domain meaning (e.g. "All Accounts" filter where `brokerAccountId` is null). Never use nullability as a defensive crutch.
+### 11. No Over-Defensive Nullability
+- **Reflect Domain Guarantees**: Never spray unnecessary `?`, `| null`, `?.`, `?? null`, or `?? ""` on fields guaranteed by design across backend DTOs and frontend models. Reserve `null`/`undefined` strictly for genuine domain absence (e.g. "All Accounts" filter where `brokerAccountId` is null).
 
----
-
-## 🛠️ Server (Backend) Rules & Architecture
-
-### Stack & Solution Structure
-- **Framework**: .NET 10 Web API
-- **Layering**:
-  - `server/src/WebApi`: ASP.NET Core Controllers and DTO models. Controllers must remain thin and delegate logic to application services.
-  - `server/src/Application`: Core business logic, services (`Audex.Application.Services`), interfaces (`Audex.Application.Interfaces`), and DTOs (`Audex.Application.DTO`).
-  - `server/src/Infrastructure`: EF Core DbContext, entity configurations, and migrations.
-  - `server/src/Shared`: Common constants and helper models.
-  - `server/tests/Application.Tests`: Unit tests for application services (`Audex.Application.Tests`).
-  - `server/tests/Infrastructure.Tests`: Tests for infrastructure components (`Audex.Infrastructure.Tests`).
-  - `server/tests/Tests.Shared`: Shared fixtures and test helpers (`Audex.Tests.Shared`).
-- **Orphan Directory Prohibition**: Do NOT create or restore legacy directories (`server/BLL`, `server/DAL`, `server/Common`, `server/MoneyManager`, `server/server`, or root layer folders outside `server/src/` and `server/tests/`). Only project folders declared in `Audex.slnx` under `server/src/` and `server/tests/` are valid.
-
-### DTO Naming Conventions
-- **PascalCase with `Dto` Suffix**: All Data Transfer Object classes and files MUST use PascalCase with the `Dto` suffix (e.g. `AccountDto.cs`, `SecurityTransactionDto.cs`, `BrokerAccountSummaryDto.cs`, `UserProfileDto.cs`). Do NOT use `*DTO` all-caps suffix.
-
-### Async Method Suffix (`*Async`)
-- **Mandatory `Async` Suffix**: ALL asynchronous methods returning `Task` or `Task<T>` across all server layers MUST end with the `Async` suffix:
-  - **Infrastructure**: Repositories (`AddAsync`, `GetByIdAsync`, `GetAllAsync`, `GroupAsync`, `GetCountAsync`, `FindAsync`, `DeleteAsync`, `GetMinAsync`, `GetMaxAsync`, `GetSumAsync`, `SaveChangesAsync`), Unit of Work (`CommitAsync`), Notifiers (`SendToAllAsync`).
-  - **Application Services**: All service interfaces and implementations (`AddAsync`, `GetByIdAsync`, `GetAllAsync`, `GetPaginationAsync`, `UpdateAsync`, `DeleteAsync`, `GetSummaryAsync`, etc.).
-  - **Integrations & Jobs**: External providers (`GetCandlesAsync`, `PullRatesAsync`) and background jobs (`PullQuotationsAsync`, `CleanUpOldNotificationsAsync`).
-  - **WebApi Controllers**: Controller action methods must call these `*Async` methods with `await`.
-
-### EF Core & Service Layer Performance Guidelines
-- **BaseEntity Inheritance**: ALL database entities in `server/src/Infrastructure/Entities` (including domain entities, join entities, and lookup tables) MUST inherit from `BaseEntity`.
-- **Entity Identification**: Every entity uses `Guid Id` inherited from `BaseEntity` as its primary key. Do NOT use composite keys or explicit `builder.HasKey(...)` in entity configurations, as EF Core automatically configures `Id` by convention.
-- **Assigning Entity Ids**: When creating entity instances (including join entities) in application services, explicitly assign `Id = Guid.NewGuid()`.
-- **Navigation Property Includes (`GetFullHierarchyColumns`)**: In application services, encapsulate Entity Framework `.Include()` / `.ThenInclude()` navigation loadings inside a private helper method `GetFullHierarchyColumns(IQueryable<TEntity> query)` passed as the `include` parameter to `GetAllAsync` and `GetByIdAsync`.
-- **Join Entity Synchronization (Differential Sync)**: When updating an entity with join entity collections (e.g. `debt.DebtTags`), do NOT use `.Clear()` and re-add all items. Implement differential synchronization: remove only associations whose target IDs are missing from the request, and add new join entities only for target IDs not already associated. This avoids `DbUpdateConcurrencyException` and unnecessary DB deletes/inserts.
-- **Read Query Optimization**: All read-only queries in services MUST use `.AsNoTracking()` to avoid unnecessary change-tracking memory allocations.
-- **Batch Async Execution**: Avoid sequential `await` inside `foreach` loops for multi-account computations. Use `Task.WhenAll` or aggregated SQL queries.
-- **Direct Bulk Deletes**: Prefer EF Core `ExecuteDeleteAsync()` for primary-key deletions rather than fetching detached entity instances prior to deletion.
-- **Repository Scope & Entity Manipulator Services**: `IRepository<TEntity>` and `unitOfWork.CreateRepository<TEntity>()` are strictly prohibited in composite, calculating, reporting, or aggregation services (e.g. `BrokerAccountPortfolioHistoryService`, `DashboardService`, report generators). Repositories and `IUnitOfWork` can ONLY be used inside the dedicated domain service that acts as the primary manipulator for that entity (e.g. `SecurityTransactionService` for `SecurityTransaction`, `BrokerAccountFundsTransferService` for `BrokerAccountFundsTransfer`, `SecurityService` for `Security`). Composite services MUST delegate exclusively to the corresponding domain services via their interface contracts, rather than querying foreign entity repositories directly.
-
-### Infrastructure Model Changes & Migrations Workflow
-- **Mandatory User Confirmation for Model Changes**: NEVER modify database entities, models, or configurations in `server/src/Infrastructure` (`server/src/Infrastructure/Entities/`, `server/src/Infrastructure/Configurations/`, `ApplicationDbContext.cs`) without first explicitly presenting the proposed schema changes and obtaining confirmation from the user.
-- **Uncommitted Migration Re-generation Workflow**:
-  - If entity/model changes are approved and made, and the current migration is NOT yet committed to git:
-    1. Roll back the database to the previous migration: `dotnet ef database update <PreviousMigrationName> --project src/Infrastructure --startup-project src/WebApi`
-    2. Remove the uncommitted migration: `dotnet ef migrations remove --project src/Infrastructure --startup-project src/WebApi`
-    3. Apply the approved entity modifications.
-    4. Generate a clean new migration: `dotnet ef migrations add <MigrationName> --project src/Infrastructure --startup-project src/WebApi`
-    5. Apply the migration: `dotnet ef database update --project src/Infrastructure --startup-project src/WebApi`
-
-### Application Service Testing
-- **100% Service Coverage**: Every application service in `Audex.Application` MUST have comprehensive unit test coverage in `Audex.Application.Tests` (`server/tests/Application.Tests`).
-- **Directory Hierarchy**: Test file structure under `server/tests/Application.Tests` must mirror `server/src/Application`.
-- **Test Style**: xUnit, NSubstitute / Moq, AutoFixture using the AAA (Arrange-Act-Assert) pattern.
-- **S3 / File Storage Testing (`[Trait("Category", "S3")]`)**: All test classes or methods interacting with `IFileStorageService` / MinIO (e.g. `FileStorageServiceTests`, icon uploads/deletions in `BankServiceTests`, `SecurityServiceTests`, `TransactionTypeServiceTests`, `CryptocurrencyServiceTests`) MUST be tagged with `[Trait("Category", "S3")]`. Use `ServiceProviderFixture` for isolated container management.
-- **Auth Testing (`[Trait("Category", "Auth")]`)**: All test classes or methods testing authentication, JWT/Refresh tokens, login, and password changes (e.g. `AuthServiceTests`) MUST be tagged with `[Trait("Category", "Auth")]`.
-
-### API Controllers & Dual Endpoint Pattern
-- **Date Parameters**: Use `DateOnly` (`YYYY-MM-DD`) for API query parameters.
-- **Unused Parameters Prohibition**: Controller action method signatures MUST NOT accept parameters that are not passed to underlying services.
-- **Dual Endpoints**: When `brokerAccountId` is optional/nullable:
-  - Provide `GetAll(...)` for summary/aggregate view across all accounts.
-  - Provide `GetByBrokerAccount(..., Guid brokerAccountId)` for a single account view.
-- **Error Responses**: Exception handling must return standard RFC 7807 JSON `ProblemDetails` payloads.
-- **Operation Result Pattern (`OperationResultDto<T>`)**: For mutating operations where business validation or domain conflicts can occur (e.g. unique constraint checks like ticker uniqueness), application services and controller action methods return `OperationResultDto<T>` (`IsSuccess`, `Data`, `ErrorMessage`) rather than throwing raw unhandled exceptions. Localized error messages must be retrieved using `await _localizer.GetForUserAsync(...)`.
-
-### Backend Localization & i18n Architecture (`ILocalizationService`)
-- **Prohibition of Hardcoded Strings**: User-facing texts, notifications, error messages, export reports, and scheduled task names/descriptions MUST NOT be hardcoded in backend code.
-- **Resource JSON Dictionaries**: All backend localization strings reside under `server/src/Application/Resources/{lang}/{category}.json` (e.g. `Resources/en/jobs.json`, `Resources/ru/jobs.json`, `notifications.json`, `scheduler.json`, `report.json`, `auth.json`, `errors.json`).
-  - Resources are embedded in assembly (`<EmbeddedResource Include="Resources\**\*.json" />`).
-- **Strongly-Typed Keys (`LocalizationKeys`)**: All string keys MUST be declared as constants in `Audex.Application.Constants.LocalizationKeys` (e.g. `LocalizationKeys.Jobs.CleanUpExpiredTokens.Name`, `LocalizationKeys.Jobs.Categories.Auth`, `LocalizationKeys.Notifications.SessionCleanUpTitle`).
-- **Service Usage (`ILocalizationService`)**:
-  - `localizer.Get(key, lang, args)`: Resolves text for specific language code with format arguments and English fallback.
-  - `await localizer.GetForUserAsync(key, userId, args)`: Resolves text using target user's configured `UserProfile.LanguageCode`.
-  - `await localizer.GetUserLanguageAsync(userId)`: Centralized helper returning normalized user language code (`"en"` or `"ru"`), eliminating manual `IUserProfileService` lookups and fallbacks.
-- **Scheduled Jobs Localization (`ScheduledJobAttribute`)**: Background jobs declare localization keys via `displayNameKey`, `descriptionKey`, and `categoryKey` in `[ScheduledJob(..., displayNameKey: ..., descriptionKey: ..., categoryKey: ...)]`. The scheduler service dynamically translates descriptors upon querying.
-- **CI Integrity Gate (`LocalizationIntegrityTests`)**: All dictionary keys and `LocalizationKeys` constants are validated in automated tests. Any missing keys between English and Russian dictionaries will fail the test suite.
-
-### Server Commands
-- **Build**: `cd server && dotnet build`
-- **Run WebApi**: `dotnet run --project server/src/WebApi` (или `dotnet watch --project server/src/WebApi`)
-- **Run All Tests**: `cd server && dotnet test`
-- **Run S3 Tests**: `cd server && dotnet test --filter-trait "Category=S3"`
-- **Run Auth Tests**: `cd server && dotnet test --filter-trait "Category=Auth"`
-- **Run Project Tests directly via MTP runner**: `dotnet run --project tests/Application.Tests -- -trait "Category=Auth"` (или `dotnet test --project tests/Application.Tests/Application.Tests.csproj --filter-trait "Category=Auth"`)
-
----
-
-## 🎨 Client (Frontend) Rules & Architecture
-
-### Stack & Structure
-- **Framework**: React 19 + TypeScript + Vite (`client/src`).
-- **UI & Styling**: Chakra UI v3, `react-icons`.
-- **Theme**: Modular Dual Theme System (`client/src/theme/`) supporting **Dark Theme** (`#121212`) and **Solarized Sand Light Theme** (`#fbf8f2` warm paper/sand palette) with semantic tokens (`background_main`, `background_primary`, `background_secondary`, `text_primary`, `text_secondary`, `border_primary`, `action_primary`, `gain`, `loss`, `status_*`). Theme switching is managed via `ColorModeProvider` / `useColorMode()` and persisted in `localStorage`.
-- **i18n**: `react-i18next`.
-- **Directory Scope**: ALL client source files (components, features, pages, hooks) MUST reside under `client/src/`. Do NOT create feature folders at `client/features`.
-- **Structure**:
-  - `client/src/theme`: Modular theme system (`colors/`, `recipes/`, `types.ts`, `index.ts`).
-  - `client/src/features`: Shared domain feature modules (e.g. Navigation, UserProfileSettingsModal).
-  - `client/src/models/<domain>`: Domain interfaces, requests (`*EntityRequest`), responses (`*EntityResponse`).
-  - `client/src/api/<domain>`: API client functions and response/request mappers.
-  - `client/src/pages`: Feature pages (`BrokerAccount`, `BrokerAccounts`, `SecurityPage`, `Transactions`, etc.).
-  - `client/src/shared`: Reusable components (`MoneyCard`, `DateSelect`), hooks (`shared/hooks/`), utilities.
-  - `client/src/locales`: Localization files (`en.json`, `ru.json`).
-
-### File Placement & Naming Rules (Models, APIs & Mappers)
-1. **Entities & DTO Models**:
-   - **Path**: `client/src/models/<domain>/` (e.g. `brokers/`, `accounts/`, `securities/`, `transactions/`, `deposits/`, `debts/`, `crypto/`).
-   - **Naming**: `<EntityName>.ts` or `<EntityName>Entity.ts` (e.g. `BrokerAccountPortfolioHistoryEntity.ts`, `BrokerAccountEntity.ts`).
-   - Include domain entities, request payloads (`*EntityRequest`), and raw API responses (`*EntityResponse`).
-
-2. **API Clients**:
-   - **Path**: `client/src/api/<domain>/` (e.g. `api/brokers/`, `api/accounts/`, `api/dashboard/`).
-   - **Naming**: `<camelCaseEntity>Api.ts` (e.g. `brokerAccountPortfolioHistoryApi.ts`, `brokerAccountSummaryApi.ts`, `brokerAccountFundsTransferApi.ts`, `dashboardApi.ts`).
-   - Use standard HTTP wrappers from `client/src/api/basicApi.ts` (`getEntity`, `getAllEntities`, `postEntity`, etc.).
-
-3. **Mappers (API Mapping)**:
-   - **Path**: `client/src/api/<domain>/` (placed next to the corresponding API file).
-   - **Naming**: `<camelCaseEntity>ApiMapping.ts` or `<camelCaseEntity>Mapping.ts` (e.g. `brokerAccountApiMapping.ts`, `brokerAccountFundsTransferMapping.ts`).
-   - **Functions**: Use shared helpers (`parseEntityDates`, `formatRequestDates`) to avoid duplicated mapping boilerplate.
-
-4. **Hooks**:
-   - **Path**: `client/src/shared/hooks/` or domain-specific hooks.
-   - **Naming**: `use<PascalCaseName>.ts` (e.g. `useSignalR.ts`, `useEntityData.ts`).
-
-### Localization Rules (i18n)
-- **Modular Directory Structure**: Locales are organized semantically into domain folders under `client/src/locales/en/` and `client/src/locales/ru/`, aggregated via `index.ts`:
-  - `common/`: `general.json` (headers, dashboard, settings), `modals.json` (action buttons, confirm dialogs).
-  - `components/`: `datePicker.json` (controls and shared UI components).
-  - `accounts/`: `accounts.json` (balances, accounts page, transfer modal).
-  - `broker/`: `broker.json` (broker accounts, cards, stats), `transfers.json` (fund transfers), `taxes.json` (tax deductions).
-  - `securities/`: `securities.json` (securities, transactions, quotes), `dividends.json` (dividends, payments).
-  - `debts/`: `debts.json` (debtors, payments), `tags.json` (tags system, tag statistics).
-  - `deposits/`: `deposits.json` (deposits, earnings charts).
-  - `crypto/`: `crypto.json` (cryptocurrencies, providers, crypto accounts).
-  - `transactions/`: `transactions.json` (transactions, stats), `currency.json` (currency transactions).
-  - `data/`: `data.json` (reference tables: banks, brokers, currencies, types).
-  - `validation/`: `validation.json` (all `validation_*` error messages).
-  - `auth/`: `auth.json` (login, change password).
-- **Dual Translations Mandatory**: Every user-facing string MUST be added to **both** the corresponding English (`client/src/locales/en/<domain>/<file>.json`) and Russian (`client/src/locales/ru/<domain>/<file>.json`) files.
-- **Key Format**: Use `snake_case` keys categorized by domain/feature (e.g. `broker_account_page_*`, `entity_*`, `validation_*`).
-- **Hook**: Access strings via `const { t } = useTranslation()`.
-- **No Inline Fallback Strings**: NEVER pass hardcoded inline fallback strings as the second argument to `t(...)` (e.g. `t("key", "Текст")`). Translation keys are strictly defined and maintained in JSON dictionary files (`client/src/locales/ru/` and `client/src/locales/en/`). Call `t("key")` cleanly without defensive fallback overhead.
-- **Preserve Blank Lines**: Keep blank lines in JSON files between logical key blocks for semantic grouping. Do NOT delete or format away empty lines.
-
-### Zod Validation Schemas & Localization
-- **Factory Function Pattern**: ALL Zod validation schemas MUST be defined as factory functions accepting `t: TFunction` from `i18next` and returning `z.ZodObject`:
-  ```ts
-  import { z } from 'zod';
-  import { TFunction } from 'i18next';
-
-  export const getDebtValidationSchema = (t: TFunction) => z.object({
-      id: z.string().optional(),
-      name: z.string().min(1, t("validation_field_required")),
-      amount: z.number().gt(0, t("validation_positive_number")),
-      account: z.object({
-          id: z.string().min(1, t("validation_account_required")),
-          name: z.string()
-      }, { message: t("validation_account_required") })
-  });
-
-  export type DebtFormInput = z.infer<ReturnType<typeof getDebtValidationSchema>>;
-  ```
-- **Validation Key Prefix**: All validation error message keys in `ru.json` and `en.json` MUST use the `validation_*` prefix (e.g. `validation_field_required`, `validation_positive_number`, `validation_date_required`, `validation_<entity>_required`).
-- **Form Component Integration**: In modals/forms, instantiate the schema with `useMemo(() => get*ValidationSchema(t), [t])` so validation errors dynamically update on language switches:
-  ```tsx
-  const { t } = useTranslation();
-  const validationSchema = useMemo(() => getDebtValidationSchema(t), [t]);
-
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<DebtFormInput>({
-      resolver: zodResolver(validationSchema),
-      mode: "onBlur",
-      defaultValues: getDefaultFormState()
-  });
-  ```
-
-### React Hooks, Dependencies & Infinite Loop Prevention (No `useRef` / `JSON.stringify` Crutches)
-- **Prohibition of Hook Crutches (`useRef` / Empty Deps / Stringified Deps)**: When encountering infinite re-renders or request loops (e.g. rapid or repeating API queries triggered by `useEffect`), NEVER attempt to suppress or mask the issue inside custom hooks by:
-  - Copying hook parameters, callbacks, or filters into `useRef` containers to bypass dependency arrays.
-  - Artificially emptying `useCallback` / `useMemo` dependency arrays (`[]`) while referencing mutable ref values.
-  - Serializing dependencies (e.g. `JSON.stringify(filters)`) directly in hook `useEffect` dependency arrays to bypass React's reference change detection.
-  These crutches break idiomatic React unidirectional data flow, cause stale closures, violate the Rules of Hooks (`react-hooks/exhaustive-deps`), and mask underlying bugs in consuming components.
-- **Fix Root Cause at the Source (Caller Level)**:
-  - Always identify and eliminate unstable references in the consuming component or page.
-  - **No Inline Lambdas as Hook Props**: Do NOT pass inline arrow functions (e.g. `keySelector: (item) => item.id`) as hook options if they are recreated on every render. If default behavior exists (e.g. built-in `id` selectors in `usePagedQuery`), rely on the default rather than passing redundant inline callbacks. If a custom callback is required, stabilize it with `useCallback` or declare it outside the component.
-  - **Stable Filter Objects**: Ensure filter objects and options passed to hooks are stabilized using `useMemo` or primitives rather than passing inline unmemoized object literals.
-  - **Honest Dependency Arrays**: Custom hooks and components must always declare complete, honest dependency arrays that faithfully reflect all referenced reactive values.
-
-### UI/UX & Component Guidelines
-- **Money & Numeric Inputs (`MoneyInput`)**: ALL monetary amounts, currency rates, prices, percentages, and quantities in forms and modals MUST use the shared `<MoneyInput />` component (`client/src/shared/components/MoneyInput/MoneyInput.tsx`). Do NOT use native `<Input type="number">` or `{ valueAsNumber: true }`.
-  - **Required `currency` Prop**: Always pass `currency: string` (e.g. `currency="RUB"`, `currency={selectedCurrency?.name ?? ''}`, `currency="%"`, or `currency="шт."`).
-  - **Precision (`decimalScale`)**: Defaults to `2` (monetary amounts). Use `decimalScale={4}` for currency exchange rates / crypto prices, `decimalScale={8}` for crypto quantities, and `decimalScale={0}` for integer units/shares.
-  - **Words Helper (`showWordsHelper`)**: Automatically shows a human-readable words preview for amounts $\ge 1\,000$ (e.g. `💡 10 млн ₽` / `💡 10M USD`). Set `showWordsHelper={false}` for percentages and non-monetary quantities.
-  - **Usage Example**:
-    ```tsx
-    <Field.Root invalid={!!errors.amount}>
-        <Field.Label>{t("entity_transaction_money_quantity")}</Field.Label>
-        <MoneyInput name="amount" control={control} currency={currentCurrency} placeholder="500" />
-        <Field.ErrorText>{errors.amount?.message}</Field.ErrorText>
-    </Field.Root>
-    ```
-- **Date Picker & DateSelect**: Use the modern Chakra UI v3 `<DatePicker />` (`client/src/shared/components/DatePicker/`) or `<DateSelect />` (`client/src/shared/components/DateSelect/`). Renders popups in `<Portal>` (zero modal layout shifts), fully integrated with Chakra UI v3 semantic theme tokens (`background_primary`, `border_primary`, `action_primary`, `text_primary`), supports `isClearable`, and automatically infers localized date formatting/placeholders (`dd.MM.yyyy` for RU, `yyyy-MM-dd` for EN) from `i18n.language` and `Intl.DateTimeFormat`. Do NOT use legacy `react-datepicker` or hardcoded format strings.
-- **Toast Notifications (`Toaster` & `notify`)**: The centralized toast system (`client/src/shared/components/Toaster`) is mounted in `App.tsx` with Chakra UI v3 semantic tokens, dual theme support (Dark and Solarized Sand Light), and `bottom-end` placement.
-  - **Triggering Toasts**: Use the universal typed helper `notify` (`notify.success`, `notify.error`, `notify.warning`, `notify.info`, `notify.loading`, `notify.promise`, `notify.dismiss`). Supports optional descriptions, duration, closable flag, and custom action buttons.
-  - **Centralized API Error Toasts & Deduplication**: Network errors, 400 validation errors, and 500 server errors automatically display localized error toasts via the `httpClient` response interceptor. To prevent toast storms during backend outages, errors are deduplicated by `id` (`network_error_toast` for network failures, `api_error_${message}` for server errors). Suppress automatic toasts when custom handling is desired by passing `{ skipErrorToast: true }` in Axios request config.
-  - **SignalR Real-Time Toasts**: Incoming real-time toast alerts received via SignalR (`ServerNotificationEvents.ToastReceived`) automatically trigger toasts via `useServerToasts()`, completely decoupled from persistent bell notifications (`NotificationReceived`).
-- **SignalR Real-Time Architecture (Single Shared Connection & Typed Events)**:
-  - **Single Connection Mandate**: NEVER create independent `HubConnectionBuilder` instances inside custom hooks. All SignalR communication routes through the centralized singleton `signalRService` (`client/src/shared/services/signalRService.ts`). The connection lifecycle is tied exclusively to authenticated routes (`PageWrapper` in `App.tsx` calling `startAsync()` on mount and `stopAsync()` on unmount) with automatic reconnection and JWT authentication (`accessTokenFactory`).
-  - **Listener Hooks (`useSignalR`)**: Components and hooks subscribe using `useSignalR<TPayload>(eventName, handler)`. The `useSignalR` hook is strictly a listener registration/deregistration mechanism; it must NEVER manage or trigger connection startup (`startAsync`).
-  - **Prohibition of Raw JSON Message Dumping**: Sending or receiving raw JSON strings over a single generic method (e.g. `ReceiveServerMessage`) is prohibited. The backend uses the clean transport interface `IServerNotifier` (`SendToAllAsync(eventName, payload)`) with strongly-typed event constants in `Audex.Shared.Constants.ServerNotificationEvents`, broadcasting distinct named events directly over SignalR.
-- **Themes & Scrollbars**: The application supports Dark Theme and Solarized Sand Light Theme via Chakra UI v3 semantic tokens. Root elements (`html`, `body` in `index.css`) support `[data-theme="dark"]` and `[data-theme="light"]`, matching scrollbars and WebKit autofill styles. Always preserve `scrollbar-gutter: stable` on `html` to prevent layout jumping/shifting between scrollable and non-scrollable pages.
-- **Layout & Styling**: Use Chakra UI v3 theme tokens (`background_main`, `background_primary`, `background_secondary`, `text_primary`, `text_secondary`, `border_primary`, `action_primary`) and semantic colors. Do NOT use hardcoded hex/rgb/rgba colors in components.
-
-### 📱 Responsive Design & Mobile/Tablet (iPad) Adaptation
-- **First-Class Mobile & Tablet Support**: ALL client features, pages, modals, tables, navigation bars, and metric cards MUST be designed and implemented with first-class support for both **smartphones (mobile)** and **tablets (iPad in portrait and landscape orientations)**. Desktop view is NEVER the sole design target.
-- **Device Viewports & Breakpoint Strategy**:
-  - `base` / `sm` ($< 768\text{px}$): Smartphones (iPhone, Android). Vertical stacks, 1-2 columns for metrics, drawer navigation (`HeaderMobileNav`), native picker select for tabs, full-width actions.
-  - `md` ($768\text{px} - 991\text{px}$): Tablet portrait (iPad portrait). 2 to 4 columns for metrics, compact padding, drawer navigation, touch-friendly targets.
-  - `lg` ($992\text{px} - 1279\text{px}$): Tablet landscape (iPad landscape) and small laptops. Desktop navigation (`HeaderDesktopNav`), flex-flowing metric bars, compact tab triggers.
-  - `xl`+ ($\ge 1280\text{px}$): Full desktop monitors. Multi-column grids and expanded tab bars.
-- **Responsive Navigation Architecture**:
-  - Desktop viewports ($\ge\text{lg}$) use [`HeaderDesktopNav`](client/src/features/Navigation/Header/HeaderDesktopNav.tsx).
-  - Mobile and tablet viewports ($<\text{lg}$) use [`HeaderMobileNav`](client/src/features/Navigation/Header/HeaderMobileNav.tsx) with Chakra's `IconButton` wrapped in `<Drawer.Trigger asChild>`. All routes and dropdown categories MUST derive from the centralized source of truth in [`navigationConfig.ts`](client/src/features/Navigation/Header/navigationConfig.ts).
-- **Responsive Tabs (`ResponsiveTabsList`)**:
-  - NEVER use horizontal tab scrolling with hidden scrollbars as a crutch for long tab bars.
-  - Use [`ResponsiveTabsList`](client/src/shared/components/ResponsiveTabs/ResponsiveTabsList.tsx): on mobile/tablet viewports ($<\text{breakpoint}$), it automatically renders a clean `<NativeSelect>` (triggering the operating system's native picker wheel on iOS/Android), and on desktop ($\ge\text{breakpoint}$) it renders the full horizontal `<Tabs.List>` with icons.
-- **Responsive Metric Grids (`MetricsGrid`)**:
-  - For header stats and summary bars, use responsive layout contracts: `layout={{ base: "grid", lg: "flex" }}` with `columns={{ base: 2, sm: 2, md: 4 }}` and `gap={{ base: 3, md: 4, lg: 6 }}`.
-  - This ensures a neat, equal-width 2-column or 4-column grid on mobile/tablet, while smoothly transitioning to a compact, non-stretching flex row on desktop without leaving awkward empty cells.
-- **Card Lists Grid (`CardsGrid`)**:
-  - All list pages (accounts, broker accounts, crypto accounts, securities, debts, deposits) MUST use [`CardsGrid`](client/src/shared/components/CardsGrid/CardsGrid.tsx) (`templateColumns="repeat(auto-fill, minmax(320px, 1fr))"`, `gap={4}`). Cards must naturally wrap without overflowing viewports.
-- **Responsive Modals (`BaseModal`)**:
-  - All modals must inherit responsive sizing from [`BaseModal`](client/src/shared/modals/BaseModal/BaseModal.tsx) (`maxH="calc(100dvh - 24px)"`, `p={{ base: "12px", sm: "16px", md: "24px" }}`). Modals must never overflow the mobile viewport height and must scroll internally.
-- **Zero Horizontal Page Overflow**:
-  - NEVER use fixed pixel widths on layout containers (e.g. `w="1200px"`, `minW="900px"`). Containers must always use responsive constraints (`w="100%"`, `maxW="1560px"`, `minW=0`).
-- **Touch-Friendly Targets**:
-  - Buttons, icons, select fields, and interactive cards must have comfortable touch targets (minimum $36\text{px} - 44\text{px}$) for touch interactions on iPads and smartphones.
-
-### API Client Functions & Centralized `basicApi` Architecture
-- **Mandatory Use of `basicApi` Wrappers**: Direct `httpClient` or `axios` calls in domain API modules (`client/src/api/<domain>/`) are prohibited. All API calls must route through universal helpers in `client/src/api/basicApi.ts`:
-  - **Queries**: `getAllEntities<T>(url)`, `getAllEntitiesByConfig<TInput, TOutput>(url, data)`, `getPagedEntities<TInput, TOutput>(url, data)`, `getEntity<T>(url)`, `getEntityByConfig<T>(url, body)`, `getEntityById<T>(url, id)`.
-  - **Mutations (`OperationResult<T>`)**: `createEntityResult`, `createEntityWithIconResult`, `updateEntityResult`, `updateEntityWithIconResult`, `postEntityResult`, `deleteEntityResult`. All result helpers automatically parse localized error messages and error codes from responses.
-  - **File Downloads**: `downloadFileByUrl(url)` (GET blob), `downloadFileByConfig<TInput>(url, data)` (POST blob returning `Nullable<FileDownloadResult>` containing `{ blob, fileName? }`).
-  - **Simple Actions**: `getAction(url)`, `postAction(url, data?)`, `putAction(url, data?)`, `deleteAction(url)`.
-- **Axios FormData Multipart Boundary**: NEVER manually specify `headers: { "Content-Type": "multipart/form-data" }` when passing `FormData` to Axios or `basicApi`. Axios automatically generates the correct `Content-Type` header with the unique boundary parameter.
-- **Dual Endpoint Handling**: API functions accept `brokerAccountId: Nullable<string>` and switch URLs conditionally:
-  ```ts
-  const url = brokerAccountId
-      ? `${basicUrl}/GetByBrokerAccount?date=${date}&brokerAccountId=${brokerAccountId}`
-      : `${basicUrl}/GetAll?date=${date}`;
-  ```
-- **Centralized Error Parsing (`webApiUtilities.ts`)**: In React components and custom hooks, never swallow errors silently. Catch blocks must use `parseErrorMessage(err, t("error_data_load"))` and `parseErrorCode(err)` from `shared/utilities/webApiUtilities.ts`.
-
-### Shared Utilities Catalog & Usage Guidelines (`client/src/shared/utilities/`)
-Whenever implementing features, forms, tables, formatters, or API integrations, the agent and developers MUST use these centralized utilities rather than writing redundant inline logic:
-
-1. **Collections & Entity Lookups (`shared/utilities/arrayUtilities.ts`)**:
-   - `findEntityById<T>(items, targetId, fallback)`: Safely finds an entity by its `id: string` in a collection with an optional fallback (e.g. `items[0]`). ALWAYS use this instead of manual `selectedId ? items.find(i => i.id === selectedId) : items[0]`.
-   - `resolveDefaultEntityId<T>(items, preferredId, previousId, fallback)`: Resolves active ID by priority (`preferredId` $\to$ `previousId` $\to$ `items[0].id` $\to$ `fallback`). Use in tab bars, selectors, and dropdown filter initializations.
-   - `groupByKey<K, V>(records, keySelector)`: Groups an array into `Map<K, V[]>`. Use instead of writing custom `.reduce(...)` with `Map`.
-   - `sumEntities<T>(records, sumSelector)`: Computes sum of numeric values across a collection. Use instead of writing raw `.reduce((acc, curr) => acc + curr.amount, 0)`.
-   - `insertByPredicate<T>`, `reorderByPredicate<T>`: Reordering and inserting elements into arrays by predicate.
-
-2. **Dates & API Conversions (`shared/utilities/dateUtils.ts`)**:
-   - `convertToDateOnly(date: Date | string)`: Converts a `Date` or date string to `YYYY-MM-DD` without timezone distortion. ALWAYS use when preparing outgoing API request payloads (`DateOnly` parameters/DTOs). NEVER use `.toISOString().slice(0, 10)` (which can shift dates across UTC borders).
-   - `parseIsoDateOnly(dateString)`: Safely parses a `YYYY-MM-DD` string into a local `Date` object without UTC timezone shifts.
-   - `getDateParts(date)`: Extracts two-digit padded strings (`year`, `month`, `day`, `hours`, `minutes`, `seconds`).
-   - `getMonthByIndex(index, i18n)` / `getMonthsNames(i18n)`: Resolves localized month names via `Intl.DateTimeFormat`.
-   - `formatTimestampForReport`, `formatTimestampForBackup`: Generates standardized filesystem/export timestamp strings.
-
-3. **Formatters (`shared/utilities/formatters/`)**:
-   - **Dates (`dateFormatter.ts`)**:
-     - `formatDate(date, i18n, showYear?)`: Localized date string (e.g. `14 октября 2026 г.` / `October 14, 2026`).
-     - `formatDateTime(date, i18n, showYear?)` / `formatShortDateTime(date, i18n)`: Date with time (`dd.MM.yy, HH:mm`).
-     - `formatMonth(month, i18n)` / `formatShortMonth(month, i18n, year?)`: Full or short localized month name.
-     - `formatMonthYear(month, year)` / `formatMonthYearByDate(date)`: Returns `MM-YYYY` string.
-     - `formatChartAxisDate(date, period, i18n)` / `formatChartTooltipDate(date, period, i18n)`: Standardized Recharts axis/tooltip date formatters for periods (`1D`, `1W`, `1M`, `3M`, `6M`, `1Y`, `ALL`).
-   - **Money & Numbers (`moneyFormatter.ts` & `numberWordsFormatter.ts`)**:
-     - `formatMoneyByCurrencyCulture(value, currency, digits = 2)`: Standard currency formatting (e.g. `1 250,50 ₽`). Use everywhere across metric cards, tables, and tooltips.
-     - `formatAdaptiveNumber(value, locale, decimals?)`: Adaptive number formatting (1-2 decimal places if $|value| \ge 100$, full precision otherwise).
-     - `formatNumberToWords(value, locale)`: Human-readable amount preview for amounts $\ge 1\,000$ (e.g. `10 млн ₽`). Used in `<MoneyInput />`.
-   - **Domain Formats (`accountTypeFormatter.ts`, `securityTypeFormatter.ts`, `fileFormatter.ts`)**: Localized human-readable descriptions of account types, security categories, and byte sizes.
-
-4. **Currencies & Typography Badges (`shared/utilities/currencyUtils.tsx`)**:
-   - `getCurrencySymbol(currencyCode, locale)`: Resolves official narrow symbol (`₽`, `$`, `€`, `¥`) via Intl standard.
-   - `getCurrencyColor(currencyName, theme)`: Deterministically generates a harmonious HSL color palette for currency badges across light and dark themes.
-   - `getCurrencyIcon(currencyName, locale, ...)`: Stylized typography currency symbol node.
-
-5. **Entity Identifiers (`shared/utilities/idUtilities.ts`)**:
-   - `generateGuid()`: Universally generates RFC 4122 v4 UUIDs. ALWAYS use when creating new client-side draft entities, join entities, or unique keys. Do NOT use raw `crypto.randomUUID()` or ad-hoc math random strings.
-
-6. **Error Handling & RFC 7807 (`shared/utilities/webApiUtilities.ts`)**:
-   - `parseErrorMessage(error: unknown, defaultMessage?)`: Safely extracts human-readable error messages from Axios ProblemDetails (`detail`, `errorMessage`, `message`, `title`), `Error`, or strings.
-   - `parseErrorCode(error: unknown)`: Extracts domain error code from ProblemDetails response.
-   - `ApiException`: Strongly-typed API exception carrying status code, error code, and request ID.
-
-7. **Financial Diffs & P&L (`shared/utilities/numericDiffsUtilities.ts`)**:
-   - `calculateDiff(currentValue, initialValue, currency)`: Computes absolute and percentage profit/loss with semantic theme color (`green.600`, `red.600`, `text_primary`).
-   - `getDiffColor(profitAndLoss)`: Profit/loss color resolver.
-
-8. **Device & Browser Detection (`shared/utilities/deviceUtilities.ts`)**:
-   - `parseDeviceAndBrowser(userAgent)`: Identifies browser (Chrome, Safari, Firefox, Edge) and operating system (iOS, Android, Windows, macOS, Linux) with corresponding Material Design icon.
-
-9. **Color & Theme Accessibility (`shared/utilities/colorUtilities.ts`)**:
-   - `parseHexToRgb`, `rgbToHsl`, `hslToRgb`, `getAccessibleColor`: Color space conversions and contrast calculations for user-selected tag/category colors in light and dark themes.
-
-10. **Modal Window Reference (`shared/utilities/modalUtilities.ts`)**:
-    - `BaseModalRef`: Unified imperative handle `{ openModal: () => void; closeModal: () => void }` for all modal components.
-
-11. **Editable Grid State Machine (`shared/hooks/useEditableGrid.ts`)**:
-    - `useEditableGrid<TEntity>`: Universal hook for inline-editable spreadsheet tables with isolated drafts, change tracking, and diff commits.
-
-### Client Commands
-- **Build**: `cd client && npm run build`
-- **Dev Server**: `cd client && npm run dev`
+### 12. Lightning-Fast Codebase Search & Inspection Patterns for Agents
+- **No Blind Recursive Traversals**: NEVER run `Get-ChildItem -Path . -Recurse` or `Select-String` from the workspace root. Scanning `client/node_modules` (29,000+ files), `server/**/bin`, `server/**/obj`, and `.git` stalls commands for tens of seconds.
+- **Code/Text Search (`git grep`)**: Always use `git grep -n -i "<pattern>"` (~100–200 ms; searches tracked files only).
+- **File Lookup (`git ls-files`)**: Always use `git ls-files "*<pattern>*"` (~50–70 ms).
+- **Scoped Subdirectory Search**: For untracked/newly created files, target `client/src` or `server/src` directly—never the root.
+- **Ripgrep (`rg`)**: When available, scope explicitly (`rg "<pattern>" client/src server/src`).
 
 ---
 
 ## 🔄 Verification Commands & Workflow
-- **Scope-Dependent Pre-Verification Build Check**: BEFORE reporting completion and before asking the user about test execution or adjustments, run build verification STRICTLY according to the scope of modified files:
-  - **Documentation / Markdown Changes Only (`MoneyManager.Docs/`, `docs/`, `*.md`)**: NEVER run any build commands (`dotnet build` or `npm run build`) or test suites. Report completion immediately.
-  - **Server Changes Only (`server/`)**: Automatically run `dotnet build` in `server/` to ensure zero compilation errors. Do NOT build the client (`npm run build`).
-  - **Client Changes Only (`client/`)**: Automatically run `npm run build` in `client/` to ensure zero TypeScript and bundling errors. Do NOT build the server (`dotnet build`).
-  - **Both / Full-Stack Changes (`server/` AND `client/`)**: Run both `dotnet build` in `server/` and `npm run build` in `client/`.
-  If the build fails, fix all compilation/build errors before reporting to the user.
-- **Strict Verification Scope Isolation**: NEVER run verification commands (build or tests) for a component (client, server, or docs) if no source code changes were made to that component.
-- **Confirmation Before Long Test Suites**: Once the build succeeds, prompt the user before running long unit/integration test suites: ask whether any adjustments/corrections are needed or if we should proceed to running the test suites (`dotnet test`).
-- **Selective Test Execution**: Once confirmed by the user, execute tests selectively based on the scope of changes made during the task:
-  - **Server / Application Changes**: Run `dotnet test` in `server/`.
-  - **S3 / File Storage Changes**: Run `dotnet test --filter "Category=S3"` (or full `dotnet test`) in `server/`.
-  - **Auth Changes**: Run `dotnet test --filter "Category=Auth"` (or full `dotnet test`) in `server/`.
-  - **Full-Stack Changes**: Run `dotnet test` in `server/`.
+- **Scope-Dependent Pre-Verification Build Check**: Before reporting completion or asking about tests, verify builds strictly matching modified scopes:
+  - **Documentation / Markdown Only (`Audex.Docs/`, `docs/`, `*.md`)**: NEVER run `dotnet build`, `npm run build`, or test suites. Report completion immediately.
+  - **Server Changes Only (`server/`)**: Run `cd server && dotnet build`. Do NOT build the client.
+  - **Client Changes Only (`client/`)**: Run `cd client && npm run build`. Do NOT build the server.
+  - **Full-Stack Changes (`server/` AND `client/`)**: Run both builds (`dotnet build` and `npm run build`).
+  Fix any compilation errors before reporting back.
+- **Strict Verification Scope Isolation**: Never build or test an untouched component.
+- **Confirmation Before Long Test Suites**: Once the build succeeds, ask the user before running long test suites (`dotnet test`), unless already requested.
+- **Selective Test Execution** (in `server/`):
+  - Application/Server changes: `dotnet test`
+  - S3 / File Storage changes: `dotnet test --filter-trait "Category=S3"`
+  - Auth changes: `dotnet test --filter-trait "Category=Auth"`
