@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System;
@@ -25,9 +25,10 @@ namespace Audex.WebApi.Controllers.Transactions
         }
        
         [HttpGet]
-        public async Task<IEnumerable<TransactionModel>> GetAll(int month, int year, bool showSystem)
+        public async Task<IEnumerable<TransactionModel>> GetAll([FromQuery] GetTransactionsQuery query)
         {
-            var transactions = await _transactionService.GetAllAsync(month, year, showSystem);
+            var filter = _mapper.Map(query);
+            var transactions = await _transactionService.GetAllAsync(filter);
             return _mapper.Map(transactions);
         }
 

@@ -1,4 +1,4 @@
-﻿using Audex.Application.DTO.Transactions;
+using Audex.Application.DTO.Transactions;
 using Audex.Application.Interfaces.Transactions;
 using Audex.Application.Mappings;
 using Audex.Infrastructure.Entities.Transactions;
@@ -33,14 +33,14 @@ namespace Audex.Application.Services.Transactions
             return _mapper.Map(transaction);
         }
 
-        public async Task<IEnumerable<TransactionDto>> GetAllAsync(int month, int year, bool showSystem)
+        public async Task<IEnumerable<TransactionDto>> GetAllAsync(TransactionFilterDto filter)
         {
-            var (startDate, endDate) = GetDateRange(month, year);
+            var (startDate, endDate) = GetDateRange(filter.Month, filter.Year);
 
             var transactions = await _transactionsRepo.GetAllAsync(transaction => 
-                transaction.Date >= startDate && transaction.Date <= endDate && (showSystem || !transaction.IsSystem),
+                transaction.Date >= startDate && transaction.Date <= endDate && (filter.ShowSystem || !transaction.IsSystem),
                 GetFullHierarchyColumns);
-            return _mapper.Map(transactions.OrderByDescending(x => x.Date));
+            return _mapper.Map(transactions.OrderByDescending(transaction => transaction.Date));
         }
 
         public async Task<TransactionDto> AddAsync(TransactionDto transactionDto)
@@ -143,11 +143,16 @@ namespace Audex.Application.Services.Transactions
             await _db.CommitAsync();
         }
 
-        private (DateOnly, DateOnly) GetDateRange(int month, int year)
+        private (DateOnly, DateOnly) GetDateRange(int? month, int year)
         {
-            var startDate = new DateOnly(year, month, 1);
-            var endDate = new DateOnly(year, month, 1).AddMonths(1).AddDays(-1);
-            return (startDate, endDate);
+            if (month.HasValue && month.Value is >= 1 and <= 12)
+            {
+                var startDate = new DateOnly(year, month.Value, 1);
+                var endDate = startDate.AddMonths(1).AddDays(-1);
+                return (startDate, endDate);
+            }
+
+            return (new DateOnly(year, 1, 1), new DateOnly(year, 12, 31));
         }
 
         private IQueryable<Transaction> GetFullHierarchyColumns(

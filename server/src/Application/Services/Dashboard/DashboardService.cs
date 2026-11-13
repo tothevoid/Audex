@@ -92,7 +92,12 @@ namespace Audex.Application.Services.Dashboard
 
             var currentDate = DateTime.Now;
             var transactions = (await _transactionsService
-                .GetAllAsync(currentDate.Month, currentDate.Year, false))
+                .GetAllAsync(new TransactionFilterDto
+                {
+                    Month = currentDate.Month,
+                    Year = currentDate.Year,
+                    ShowSystem = false
+                }))
                 //TODO: migrate to db level
                 .Where(transaction => !transaction.IsSystem);
 

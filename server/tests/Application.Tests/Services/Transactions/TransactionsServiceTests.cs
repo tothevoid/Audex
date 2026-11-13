@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO.Accounts;
 using Audex.Application.DTO.Transactions;
 using Audex.Application.Interfaces.Accounts;
@@ -80,11 +80,30 @@ namespace Audex.Application.Tests.Services.Transactions
             var allRegular = await ExecuteScopeAsync(async sp =>
             {
                 var service = sp.GetRequiredService<ITransactionsService>();
-                return await service.GetAllAsync(now.Month, now.Year, false);
+                return await service.GetAllAsync(new TransactionFilterDto
+                {
+                    Month = now.Month,
+                    Year = now.Year,
+                    ShowSystem = false
+                });
             });
 
             Assert.NotNull(allRegular);
-            Assert.Contains(allRegular, t => t.Name == "Regular Tx");
+            Assert.Contains(allRegular, transaction => transaction.Name == "Regular Tx");
+
+            var allYear = await ExecuteScopeAsync(async sp =>
+            {
+                var service = sp.GetRequiredService<ITransactionsService>();
+                return await service.GetAllAsync(new TransactionFilterDto
+                {
+                    Month = null,
+                    Year = now.Year,
+                    ShowSystem = false
+                });
+            });
+
+            Assert.NotNull(allYear);
+            Assert.Contains(allYear, transaction => transaction.Name == "Regular Tx");
         }
 
         [Fact]

@@ -9,6 +9,7 @@ using Audex.Application.DTO.Brokers;
 using Audex.Application.DTO.Dashboard;
 using Audex.Application.DTO.Dashboard.Widgets;
 using Audex.Application.DTO.Deposits;
+using Audex.Application.DTO.Transactions;
 using Audex.Application.Interfaces.Accounts;
 using Audex.Application.Interfaces.Banks;
 using Audex.Application.Interfaces.Brokers;
@@ -545,7 +546,14 @@ namespace Audex.Application.Services.Dashboard
             var currencyName = userProfile?.Currency?.Name ?? string.Empty;
             var currentDate = DateTime.Now;
 
-            var transactions = (await _transactionsService.GetAllAsync(currentDate.Month, currentDate.Year, false))
+            var filter = new TransactionFilterDto
+            {
+                Month = currentDate.Month,
+                Year = currentDate.Year,
+                ShowSystem = false
+            };
+
+            var transactions = (await _transactionsService.GetAllAsync(filter))
                 .Where(transaction => !transaction.IsSystem);
 
             var spents = new Dictionary<string, decimal>();
@@ -592,7 +600,12 @@ namespace Audex.Application.Services.Dashboard
             var currencyName = userProfile?.Currency?.Name ?? string.Empty;
             var currentDate = DateTime.Now;
 
-            var transactions = (await _transactionsService.GetAllAsync(currentDate.Month, currentDate.Year, false))
+            var transactions = (await _transactionsService.GetAllAsync(new TransactionFilterDto
+            {
+                Month = currentDate.Month,
+                Year = currentDate.Year,
+                ShowSystem = false
+            }))
                 .Where(transaction => !transaction.IsSystem);
 
             var incomes = new Dictionary<string, decimal>();
