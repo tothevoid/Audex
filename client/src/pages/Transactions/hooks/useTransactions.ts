@@ -2,14 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TransactionEntity } from "@/models/transactions/TransactionEntity";
 import { createTransaction, getTransactions, updateTransaction, deleteTransaction } from "@/api/transactions/transactionApi";
-import { insertByPredicate, reorderByPredicate } from "@/shared/utilities/arrayUtilities";
+import { GetTransactionsQuery } from "@/models/transactions/GetTransactionsQuery";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 import { notify } from "@/shared/components/Toaster";
 
 export interface TransactionsQuery {
-	month: number,
-	year: number,
-	showSystem: boolean
+	month?: number | null;
+	year: number;
+	showSystem: boolean;
 }
 
 export const useTransactions = (initialQueryParameters: TransactionsQuery) => {
@@ -31,11 +31,12 @@ export const useTransactions = (initialQueryParameters: TransactionsQuery) => {
 		const load = async () => {
 			setLoading(true);
 			try {
-				const fetchedTransactions = await getTransactions(
-					queryParameters.month,
-					queryParameters.year,
-					queryParameters.showSystem
-				);
+				const query: GetTransactionsQuery = {
+					month: queryParameters.month,
+					year: queryParameters.year,
+					showSystem: queryParameters.showSystem,
+				};
+				const fetchedTransactions = await getTransactions(query);
 				if (isMounted) {
 					setTransactions(fetchedTransactions);
 					setError(null);
@@ -64,9 +65,11 @@ export const useTransactions = (initialQueryParameters: TransactionsQuery) => {
 			return;
 		}
 
-		if (isCurrentMonthTransaction(createdTransaction)) {
-			const newTransactions = insertByPredicate([...transactions], createdTransaction, 
-				(transactionElement: TransactionEntity) => (transactionElement.date <= createdTransaction.date));
+		if (isCurrentPeriodTransaction(createdTransaction)) {
+			const newTransactions = [createdTransaction, ...transactions].sort(
+				(firstTransaction, secondTransaction) =>
+					new Date(secondTransaction.date).getTime() - new Date(firstTransaction.date).getTime()
+			);
 			setTransactions(newTransactions);
 		}
 
@@ -82,21 +85,32 @@ export const useTransactions = (initialQueryParameters: TransactionsQuery) => {
 			return;
 		}
 
-		if (!isCurrentMonthTransaction(updatedTransaction)) {
+		if (!isCurrentPeriodTransaction(updatedTransaction)) {
 			deleteTransactionFromCollection(updatedTransaction);
 		} else {
+			const existingTransaction = transactions.find(
+				(transaction: TransactionEntity) => transaction.id === updatedTransaction.id
+			);
+
+			const isDateChanged = existingTransaction
+				? new Date(existingTransaction.date).toDateString() !== new Date(updatedTransaction.date).toDateString()
+				: false;
+
 			const newTransactions = transactions.map((transaction: TransactionEntity) => {
 				return transaction.id === updatedTransaction.id ?
-					{...updatedTransaction}:
+					{ ...updatedTransaction } :
 					transaction;
 			});
 
-			// TODO: date is not changed => reorder is not required 
-			const updatedTransactions = reorderByPredicate(newTransactions, updatedTransaction, 
-				(currentElement: TransactionEntity) => (currentElement.date <= updatedTransaction.date),
-				(currentElement: TransactionEntity) => (currentElement.id !== updatedTransaction.id));
-
-			setTransactions(updatedTransactions);
+			if (!isDateChanged) {
+				setTransactions(newTransactions);
+			} else {
+				const sortedTransactions = [...newTransactions].sort(
+					(firstTransaction, secondTransaction) =>
+						new Date(secondTransaction.date).getTime() - new Date(firstTransaction.date).getTime()
+				);
+				setTransactions(sortedTransactions);
+			}
 		}
 
 		notify.success(
@@ -125,9 +139,17 @@ export const useTransactions = (initialQueryParameters: TransactionsQuery) => {
 		setTransactions(updatedTransactions);
 	};
 
-	const isCurrentMonthTransaction = (transaction: TransactionEntity): boolean => {
-		return transaction.date.getMonth() === queryParameters.month - 1 &&
-			   transaction.date.getFullYear() === queryParameters.year;
+	const isCurrentPeriodTransaction = (transaction: TransactionEntity): boolean => {
+		const transactionDate = new Date(transaction.date);
+		if (transactionDate.getFullYear() !== queryParameters.year) {
+			return false;
+		}
+
+		if (queryParameters.month !== undefined && queryParameters.month !== null) {
+			return transactionDate.getMonth() === queryParameters.month - 1;
+		}
+
+		return true;
 	};
 
 	return {
