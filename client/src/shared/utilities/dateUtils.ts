@@ -12,8 +12,12 @@ export const getDateParts = (date: Date = new Date()) => ({
     seconds: pad(date.getSeconds()),
 });
 
-export const getMonthByIndex = (index: number, i18n: i18n) => 
-    getMonthsNames(i18n)[index - 1];
+export const getMonthByIndex = (index?: number | null, i18n?: i18n): string => {
+    if (!index || index < 1 || index > 12 || !i18n) {
+        return "";
+    }
+    return getMonthsNames(i18n)[index - 1];
+};
 
 export const convertToDateOnly = (date: Date | string): string => {
     if (!date) {
