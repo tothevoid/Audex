@@ -4,8 +4,11 @@ import { OperationResult } from "@/shared/models/OperationResult";
 import { Nullable } from "@/shared/utilities/nullable";
 import { parseErrorCode, parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 
-export const getAllEntities = async <T>(basicUrl: string): Promise<T[]> => {
-    const response = await httpClient.get<T[]>(basicUrl);
+export const getAllEntities = async <TOutput, TParams = unknown>(
+    basicUrl: string,
+    params?: TParams
+): Promise<TOutput[]> => {
+    const response = await httpClient.get<TOutput[]>(basicUrl, { params });
     return response.data ?? [];
 };
 

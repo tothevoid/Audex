@@ -1,13 +1,12 @@
 import { createAndGetFullEntity, deleteEntity, getAllEntities, updateEntity } from '@/api/basicApi';
 import { TransactionEntity, TransactionEntityRequest, TransactionEntityResponse } from '@/models/transactions/TransactionEntity';
+import { GetTransactionsQuery } from '@/models/transactions/GetTransactionsQuery';
 import { prepareTransaction, prepareTransactionRequest } from './transactionApiMapping';
 
 const basicUrl = `Transaction`;
 
-export const getTransactions = async (month: number, year: number, showSystem: boolean): Promise<TransactionEntity[]> => {
-	const url = `${basicUrl}?month=${month}&year=${year}&showSystem=${showSystem}`;
-
-	return getAllEntities<TransactionEntityResponse>(url)
+export const getTransactions = async (query: GetTransactionsQuery): Promise<TransactionEntity[]> => {
+	return getAllEntities<TransactionEntityResponse, GetTransactionsQuery>(basicUrl, query)
 		.then((transactionsResponses: TransactionEntityResponse[]) => transactionsResponses.map(prepareTransaction));
 };
 
