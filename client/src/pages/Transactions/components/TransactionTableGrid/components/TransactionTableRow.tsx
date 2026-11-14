@@ -8,6 +8,7 @@ import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEnti
 import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
 import { computeRowDiff, EMPTY_ROW_DIFF, RowDiff } from '@/pages/Transactions/components/TransactionTableGrid/types';
 import TableDateCell from '@/shared/components/TableDateCell/TableDateCell';
+import { getCurrencySymbol } from '@/shared/utilities/currencyUtils';
 
 export interface TransactionTableRowProps {
     row: TransactionEntity;
@@ -45,6 +46,7 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
 
         const isIncome = row.amount > 0;
         const isRowModified = isAdded || diff.isModified;
+        const currencySymbol = getCurrencySymbol(row.account?.currency?.name || '', i18n.language);
 
         const handleFieldChange = (updates: Partial<TransactionEntity>) => {
             const updatedRow: TransactionEntity = { ...row, ...updates };
@@ -156,6 +158,11 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
                                     backgroundColor="transparent"
                                     borderColor="transparent"
                                 />
+                                {currencySymbol && (
+                                    <Box as="span" fontSize="2xs" color="text_secondary" userSelect="none" flexShrink={0}>
+                                        {currencySymbol}
+                                    </Box>
+                                )}
                             </Flex>
                         </Tooltip.Trigger>
                         <Tooltip.Positioner>
@@ -173,24 +180,31 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
                 >
                     <Tooltip.Root disabled={!diff.cashback.isModified}>
                         <Tooltip.Trigger asChild>
-                            <NumericFormat
-                                customInput={Input}
-                                size="xs"
-                                disabled={isDeleted || isIncome}
-                                value={row.cashback || ''}
-                                onValueChange={(values) => {
-                                    handleFieldChange({ cashback: values.floatValue ?? 0 });
-                                }}
-                                thousandSeparator=" "
-                                decimalSeparator=","
-                                decimalScale={2}
-                                allowNegative={false}
-                                placeholder="0"
-                                autoComplete="off"
-                                color="text_primary"
-                                backgroundColor="transparent"
-                                borderColor="transparent"
-                            />
+                            <Flex align="center" gap={1}>
+                                <NumericFormat
+                                    customInput={Input}
+                                    size="xs"
+                                    disabled={isDeleted || isIncome}
+                                    value={row.cashback || ''}
+                                    onValueChange={(values) => {
+                                        handleFieldChange({ cashback: values.floatValue ?? 0 });
+                                    }}
+                                    thousandSeparator=" "
+                                    decimalSeparator=","
+                                    decimalScale={2}
+                                    allowNegative={false}
+                                    placeholder="0"
+                                    autoComplete="off"
+                                    color="text_primary"
+                                    backgroundColor="transparent"
+                                    borderColor="transparent"
+                                />
+                                {currencySymbol && (
+                                    <Box as="span" fontSize="2xs" color="text_secondary" userSelect="none" flexShrink={0}>
+                                        {currencySymbol}
+                                    </Box>
+                                )}
+                            </Flex>
                         </Tooltip.Trigger>
                         <Tooltip.Positioner>
                             <Tooltip.Content bg="background_primary" color="text_primary" borderColor="border_primary" borderWidth="1px" fontSize="2xs">

@@ -55,7 +55,7 @@ export const computeRowDiff = (
         date: { isModified: dateModified, wasText: dateModified ? formatDate(orig.date, i18n, false) : '' },
         name: { isModified: nameModified, wasText: nameModified ? (orig.name || '—') : '' },
         amount: { isModified: amountModified, wasText: amountModified ? formatMoneyByCurrencyCulture(orig.amount, orig.account?.currency?.name) : '' },
-        cashback: { isModified: cashbackModified, wasText: cashbackModified ? String(orig.cashback || 0) : '' },
+        cashback: { isModified: cashbackModified, wasText: cashbackModified ? formatMoneyByCurrencyCulture(orig.cashback || 0, orig.account?.currency?.name) : '' },
         transactionType: { isModified: typeModified, wasText: typeModified ? (orig.transactionType?.name || '—') : '' },
         account: { isModified: accountModified, wasText: accountModified ? (orig.account?.name || '—') : '' },
     };
