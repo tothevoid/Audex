@@ -43,6 +43,53 @@ namespace Audex.Application.Services.Transactions
             return _mapper.Map(transactions.OrderByDescending(transaction => transaction.Date));
         }
 
+        public async Task<TransactionSummaryDto> GetSummaryAsync(TransactionFilterDto filter)
+        {
+            var (startDate, endDate) = GetDateRange(filter.Month, filter.Year);
+
+            var transactions = await _transactionsRepo.GetAllAsync(transaction =>
+                transaction.Date >= startDate && transaction.Date <= endDate && (filter.ShowSystem || !transaction.IsSystem),
+                GetFullHierarchyColumns);
+
+            decimal totalIncome = 0;
+            decimal totalExpenses = 0;
+            decimal totalCashback = 0;
+
+            foreach (var transaction in transactions)
+            {
+                var currencyRate = transaction.Account?.Currency?.Rate ?? 1m;
+                var convertedAmount = transaction.Amount * currencyRate;
+                var convertedCashback = transaction.Cashback * currencyRate;
+
+                if (transaction.Amount > 0)
+                {
+                    totalIncome += convertedAmount;
+                }
+                else
+                {
+                    totalExpenses += Math.Abs(convertedAmount);
+                }
+
+                totalCashback += convertedCashback;
+            }
+
+            var netExpenses = totalExpenses - totalCashback;
+            var netBalance = totalIncome - netExpenses;
+
+            var daysInPeriod = endDate.DayNumber - startDate.DayNumber + 1;
+            var dailyAverageExpense = daysInPeriod > 0 ? netExpenses / daysInPeriod : 0;
+
+            return new TransactionSummaryDto
+            {
+                TotalIncome = totalIncome,
+                TotalExpenses = totalExpenses,
+                TotalCashback = totalCashback,
+                NetExpenses = netExpenses,
+                NetBalance = netBalance,
+                DailyAverageExpense = dailyAverageExpense
+            };
+        }
+
         public async Task<TransactionDto> AddAsync(TransactionDto transactionDto)
         {
             var transaction = _mapper.Map(transactionDto);

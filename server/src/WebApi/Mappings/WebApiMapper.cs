@@ -46,6 +46,7 @@ namespace Audex.WebApi.Mappings
         public partial TransactionModel Map(TransactionDto dto);
         public partial IEnumerable<TransactionModel> Map(IEnumerable<TransactionDto> dtos);
         public partial TransactionFilterDto Map(GetTransactionsQuery query);
+        public partial TransactionSummaryModel Map(TransactionSummaryDto dto);
 
         public partial AccountDto Map(AccountModel model);
         public partial AccountModel Map(AccountDto dto);

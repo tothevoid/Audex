@@ -32,6 +32,14 @@ namespace Audex.WebApi.Controllers.Transactions
             return _mapper.Map(transactions);
         }
 
+        [HttpGet("GetSummary")]
+        public async Task<TransactionSummaryModel> GetSummary([FromQuery] GetTransactionsQuery query)
+        {
+            var filter = _mapper.Map(query);
+            var summary = await _transactionService.GetSummaryAsync(filter);
+            return _mapper.Map(summary);
+        }
+
         [HttpPut]
         public async Task<TransactionModel> Add(TransactionModel transaction)
         {

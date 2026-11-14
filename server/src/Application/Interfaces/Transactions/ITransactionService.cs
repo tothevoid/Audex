@@ -9,6 +9,7 @@ namespace Audex.Application.Interfaces.Transactions
     {
         Task<TransactionDto> GetByIdAsync(Guid id);
         Task<IEnumerable<TransactionDto>> GetAllAsync(TransactionFilterDto filter);
+        Task<TransactionSummaryDto> GetSummaryAsync(TransactionFilterDto filter);
         Task<TransactionDto> AddAsync(TransactionDto transaction);
         Task DeleteAsync(Guid id);
         Task UpdateAsync(TransactionDto transactionToUpdate);
