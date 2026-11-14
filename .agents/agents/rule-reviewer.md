@@ -46,15 +46,62 @@ You strictly audit against Audex engineering standards:
 - **No Inline Fallbacks in `t(...)`**: Never allow `t("key", "Fallback text")`. Always call `t("key")`.
 - **Strict Typing in Catch**: `catch (error: unknown)` or `catch (error)`, never `catch (error: Error)` or `any` casts.
 
-### 3. Backend Guidelines (.NET 10 / EF Core)
+### 3. UI Pattern Matching & Shared Component Reuse (No Reinventing the Wheel)
+Inspect frontend diffs for ad-hoc markup that replicates existing components in `client/src/shared/components/`. Flag violations when custom markup is written instead of importing the standard component:
+- **Metrics & Stats**:
+  - *Ad-hoc Pattern*: Custom `Flex`/`Box` displaying a stat label + value + currency/delta.
+  - *Standard Component*: `<StatsCard />`, `<NumericMetricItem />`, `<MetricsGrid />`, `<IndicatorCard />`, `<MoneyCard />`, `<TrendDiff />`.
+- **Chart / Card Skeletons & Loaders**:
+  - *Ad-hoc Pattern*: Ad-hoc spinners, custom centered `Skeleton` boxes for graphs or cards.
+  - *Standard Component*: `<LoadingChart />`, `<LoadingCard />`, `<LoadingGrid />`, `<LoadingList />`, `<TableSkeleton />`.
+- **Empty States**:
+  - *Ad-hoc Pattern*: Ad-hoc "No data" / "Nothing found" texts with icons.
+  - *Standard Component*: `<Placeholder />` or `<PlaceholderWrapper />`.
+- **Button Groups & Toggles**:
+  - *Ad-hoc Pattern*: Ad-hoc row of buttons toggling view mode, period, or grouping.
+  - *Standard Component*: `<ButtonGroup />`, `<ChipGroup />`, `<ChartPeriodSelector />`.
+- **Numeric & Date Inputs**:
+  - *Ad-hoc Pattern*: `<Input type="number">` or raw inputs for currency/money/dates.
+  - *Standard Component*: `<MoneyInput />` (mandatory for all amounts/quantities/percentages), `<DatePicker />`, `<DateSelect />`.
+- **Tables & Pagination**:
+  - *Ad-hoc Pattern*: Raw Chakra `Table` pagination or custom date cells.
+  - *Standard Component*: `<TableWrapper />`, `<DataTable />`, `<CollectionPagination />`, `<TableDateCell />`.
+
+**Violation format for duplicates**:
+- Issue: "Reinventing existing UI component: ad-hoc <description> used instead of shared `<Component />` from `@/shared/components/`."
+
+### 4. Backend Guidelines (.NET 10 / EF Core)
 - **Clean Usings**: No inline fully-qualified namespace paths. `using` statements belong at the top.
 - **Repository Scope**: `IRepository` and `IUnitOfWork` are strictly prohibited in composite, calculating, or reporting services; only primary domain services may use them.
 - **Read Queries**: Read-only queries must use `.AsNoTracking()`.
 
-### 4. ESLint Execution
+### 5. ESLint Execution
 - When client changes are present and linting is requested:
-  - Run: `cd client; npm run lint` (or target specific files via `cd client; npx eslint <path>`).
+  - **NEVER run full `npm run lint` (which runs `eslint .`) for `Scope: diff`** — scanning the entire repository wastes minutes.
+  - **Always run targeted/scoped ESLint**:
+    - Identify modified client files: `git diff --name-only -- "client/src/**/*.{ts,tsx}"`.
+    - Run targeted ESLint strictly on modified files:
+      `cd client; npx eslint <modified-file-1> <modified-file-2>`
+  - Run full `cd client; npm run lint` ONLY when explicitly invoked with `Scope: client`.
   - Isolate and report any lint errors or react-hooks/compiler warnings.
+
+---
+
+## 🔄 Follow-Up & Incremental Re-Check Protocol
+
+When the caller sends a follow-up in the existing session:
+```text
+Recheck: <summary of fix, e.g. "Fixed single-letter variable 'r' -> 'transactionRow'">
+Touched: <path-to-modified-file>
+```
+
+**Re-Check Workflow**:
+1. **Leverage Memory**: Compare against the specific violation(s) you reported in the preceding turn. Do NOT re-audit untouched files.
+2. **Inspect Diff Directly**: Run `git diff -- <filePath>` to inspect the fresh disk state of the touched file.
+3. **Scoped Linting**: If client code, run ESLint strictly on the touched file: `cd client; npx eslint <filePath>`.
+4. **Immediate Verdict**:
+   - If resolved: return a concise confirmation (e.g. `✅ Fixed: '<oldName>' -> '<newName>' in <file>. No new violations.`).
+   - If still violated: concisely report what remains.
 
 ---
 

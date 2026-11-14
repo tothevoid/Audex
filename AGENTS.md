@@ -83,4 +83,10 @@ Core engineering standards, Git policies, search rules, and verification workflo
   - Before finalizing non-trivial code changes, delegate architectural convention checks and ESLint verification to the `rule-reviewer` subagent (`TypeName: "rule-reviewer"`).
   - Use its contract in [.agents/agents/rule-reviewer.md](.agents/agents/rule-reviewer.md): pass `Prompt: "Scope: diff; Lint: true"`.
   - Fix any naming, async suffix, theme token, or ESLint violations returned by `rule-reviewer`.
+- **Subagent Session Retention & Reuse (`send_message` vs `invoke_subagent`)**:
+  - Retain the `conversationId` returned from `invoke_subagent` for both `validator` and `rule-reviewer`.
+  - When fixing review violations or compilation errors, NEVER invoke a new subagent instance for re-verification. Send follow-up messages to the existing subagent via:
+    `send_message(recipient: conversationId, message: "Recheck: Fixed <issue>.\nTouched: <path/to/file>")`
+  - Do NOT paste raw diffs in chat; the subagent directly inspects `git diff -- <file>` using its conversational memory.
+  - This preserves subagent conversation context, avoids cold starts, and prevents redundant re-inspection.
 - **User Confirmation for Test Suites**: Once builds succeed, ask the user before requesting long test suites (`Tests: all`), unless explicitly requested upfront.
