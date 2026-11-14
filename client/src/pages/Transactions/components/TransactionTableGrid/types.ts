@@ -61,7 +61,7 @@ export const computeRowDiff = (
     };
 };
 
-export interface OutOfMonthItem {
+export interface OutOfPeriodItem {
     name: string;
     dateStr: string;
 }
@@ -77,15 +77,29 @@ export interface TransactionTableGridProps {
     onViewDisplayModeChange: (mode: ViewDisplayMode) => void;
 }
 
-export const hasOutOfPeriodTransactions = (
+export const getOutOfPeriodItems = (
     diff: EditableGridDiff<TransactionEntity>,
-    month?: number,
-    year?: number
-): boolean => {
-    if (!month || !year) return false;
-    return [...diff.added, ...diff.updated].some((item) => {
-        const d = new Date(item.date);
-        return d.getMonth() + 1 !== month || d.getFullYear() !== year;
+    month: number | null | undefined,
+    year: number,
+    i18n: I18nType
+): OutOfPeriodItem[] => {
+    const outOfPeriodItems: OutOfPeriodItem[] = [];
+
+    [...diff.added, ...diff.updated].forEach((transactionItem) => {
+        const itemDate = new Date(transactionItem.date);
+        const isOutOfPeriod = month !== undefined && month !== null
+            ? itemDate.getMonth() + 1 !== month || itemDate.getFullYear() !== year
+            : itemDate.getFullYear() !== year;
+
+        if (isOutOfPeriod) {
+            const displayName = transactionItem.name || transactionItem.transactionType?.name || transactionItem.account?.name || '—';
+            outOfPeriodItems.push({
+                name: displayName,
+                dateStr: formatDate(itemDate, i18n, false),
+            });
+        }
     });
+
+    return outOfPeriodItems;
 };
 

@@ -1,29 +1,22 @@
-import { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Button, HStack, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import BaseModal from '@/shared/modals/BaseModal/BaseModal';
 import { BaseModalRef } from '@/shared/utilities/modalUtilities';
-import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
-import { EditableGridDiff } from '@/shared/hooks/useEditableGrid';
-import { TransactionEntity } from '@/models/transactions/TransactionEntity';
-import { OutOfMonthItem } from '@/pages/Transactions/components/TransactionTableGrid/types';
+import { OutOfPeriodItem } from '@/pages/Transactions/components/TransactionTableGrid/types';
 
-interface OutOfMonthWarningModalProps {
-    diff: EditableGridDiff<TransactionEntity> | null;
-    selectedMonth?: number;
-    selectedYear?: number;
+interface OutOfPeriodWarningModalProps {
+    items: OutOfPeriodItem[];
     isSaving: boolean;
     onConfirm: () => void;
 }
 
-export const OutOfMonthWarningModal = forwardRef<BaseModalRef, OutOfMonthWarningModalProps>(({
-    diff,
-    selectedMonth,
-    selectedYear,
+export const OutOfPeriodWarningModal = forwardRef<BaseModalRef, OutOfPeriodWarningModalProps>(({
+    items,
     isSaving,
     onConfirm,
 }, ref) => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const modalRef = useRef<BaseModalRef>(null);
 
     useImperativeHandle(ref, () => ({
@@ -31,25 +24,10 @@ export const OutOfMonthWarningModal = forwardRef<BaseModalRef, OutOfMonthWarning
         closeModal: () => modalRef.current?.closeModal(),
     }));
 
-    const items = useMemo(() => {
-        if (!diff || !selectedMonth || !selectedYear) return [];
-
-        const outOfPeriod: OutOfMonthItem[] = [];
-        [...diff.added, ...diff.updated].forEach((item) => {
-            const itemDate = new Date(item.date);
-            const itemMonth = itemDate.getMonth() + 1;
-            const itemYear = itemDate.getFullYear();
-            if (itemMonth !== selectedMonth || itemYear !== selectedYear) {
-                const displayName = item.name || item.transactionType?.name || item.account?.name || '—';
-                outOfPeriod.push({
-                    name: displayName,
-                    dateStr: formatDate(itemDate, i18n, false),
-                });
-            }
-        });
-
-        return outOfPeriod;
-    }, [diff, selectedMonth, selectedYear, i18n]);
+    const handleConfirm = () => {
+        onConfirm();
+        modalRef.current?.closeModal();
+    };
 
     return (
         <BaseModal
@@ -61,7 +39,7 @@ export const OutOfMonthWarningModal = forwardRef<BaseModalRef, OutOfMonthWarning
                     <Button
                         colorPalette="yellow"
                         loading={isSaving}
-                        onClick={onConfirm}
+                        onClick={handleConfirm}
                     >
                         {t('table_date_warning_confirm')}
                     </Button>
@@ -83,8 +61,8 @@ export const OutOfMonthWarningModal = forwardRef<BaseModalRef, OutOfMonthWarning
                 borderLeftWidth="3px"
                 borderColor="status_warning"
             >
-                {items.map((item, idx) => (
-                    <HStack key={idx} justify="space-between" fontSize="xs">
+                {items.map((item, index) => (
+                    <HStack key={index} justify="space-between" fontSize="xs">
                         <Text fontWeight={600} color="text_primary">
                             • {item.name}
                         </Text>
@@ -98,4 +76,5 @@ export const OutOfMonthWarningModal = forwardRef<BaseModalRef, OutOfMonthWarning
     );
 });
 
-OutOfMonthWarningModal.displayName = 'OutOfMonthWarningModal';
+OutOfPeriodWarningModal.displayName = 'OutOfPeriodWarningModal';
+

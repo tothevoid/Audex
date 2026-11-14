@@ -28,8 +28,8 @@ import PageContainer from "@/shared/components/PageContainer/PageContainer";
 import { createCurrencyTransaction } from "@/api/transactions/currencyTransactionApi";
 import { createTransaction, updateTransaction, deleteTransaction } from "@/api/transactions/transactionApi";
 import { EditableGridDiff } from "@/shared/hooks/useEditableGrid";
-import { OutOfMonthWarningModal } from "./components/TransactionTableGrid/components/OutOfMonthWarningModal";
-import { hasOutOfPeriodTransactions } from "./components/TransactionTableGrid/types";
+import { OutOfPeriodWarningModal } from "./components/TransactionTableGrid/components/OutOfPeriodWarningModal";
+import { getOutOfPeriodItems, OutOfPeriodItem } from "./components/TransactionTableGrid/types";
 
 interface State {
     accounts: AccountEntity[];
@@ -37,7 +37,7 @@ interface State {
 }
 
 const TransactionsPage: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [state, setState] = useState<State>({ accounts: [], transactionTypes: [] });
 
     // Display & Filtering states
@@ -49,6 +49,7 @@ const TransactionsPage: React.FC = () => {
     const [selectedAccountId, setSelectedAccountId] = useState('');
     const [selectedCategoryId, setSelectedCategoryId] = useState('');
     const [pendingTableDiff, setPendingTableDiff] = useState<EditableGridDiff<TransactionEntity> | null>(null);
+    const [pendingOutOfPeriodItems, setPendingOutOfPeriodItems] = useState<OutOfPeriodItem[]>([]);
     const [isTableSaving, setIsTableSaving] = useState(false);
     const tableWarningModalRef = useRef<BaseModalRef>(null);
 
@@ -197,14 +198,17 @@ const TransactionsPage: React.FC = () => {
     }, [refetch]);
 
     const handleCommitTableDiff = useCallback(async (diff: EditableGridDiff<TransactionEntity>) => {
-        if (hasOutOfPeriodTransactions(diff, params.month, params.year)) {
+        const outOfPeriodItems = getOutOfPeriodItems(diff, params.month, params.year, i18n);
+
+        if (outOfPeriodItems.length > 0) {
             setPendingTableDiff(diff);
+            setPendingOutOfPeriodItems(outOfPeriodItems);
             tableWarningModalRef.current?.openModal();
             return;
         }
 
         await executeTableCommit(diff);
-    }, [params.month, params.year, executeTableCommit]);
+    }, [params.month, params.year, i18n, executeTableCommit]);
 
     return (
         <PageContainer color="text_primary">
@@ -307,12 +311,10 @@ const TransactionsPage: React.FC = () => {
                 onCurrencyTransactionSaved={onCreateCurrencyTransaction}
             />
 
-            {/* Out of Month Warning Modal for Table Grid Mode */}
-            <OutOfMonthWarningModal
+            {/* Out of Period Warning Modal for Table Grid Mode */}
+            <OutOfPeriodWarningModal
                 ref={tableWarningModalRef}
-                diff={pendingTableDiff}
-                selectedMonth={params.month}
-                selectedYear={params.year}
+                items={pendingOutOfPeriodItems}
                 isSaving={isTableSaving}
                 onConfirm={() => pendingTableDiff && executeTableCommit(pendingTableDiff)}
             />
