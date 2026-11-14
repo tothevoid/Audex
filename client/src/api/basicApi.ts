@@ -80,8 +80,8 @@ export const deleteEntity = async (basicUrl: string, recordId: string): Promise<
     return true;
 };
 
-export const getEntity = async <T>(basicUrl: string): Promise<T | void> => {
-    const response = await httpClient.get<T>(basicUrl);
+export const getEntity = async <T, TParams = unknown>(basicUrl: string, params?: TParams): Promise<T | void> => {
+    const response = await httpClient.get<T>(basicUrl, { params });
     return response.data;
 };
 
