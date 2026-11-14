@@ -47,8 +47,8 @@ Core engineering standards, Git policies, search rules, and verification workflo
 ### 10. Git & Version Control Policy
 - **Commit Prohibition in Main Repo (`Audex`)**: The agent MUST NEVER run `git commit`, `git amend`, or `git push` in `Audex`. All commits/pushes in the main repository are handled exclusively by the user.
 - **Documentation Repo (`Audex.Docs`) Policy**:
-  - The agent is ONLY permitted to commit in `*.Docs`.
-  - **No Autonomous Commits**: Never commit docs immediately after implementing a feature; wait for user review and explicit approval (e.g. `"коммитим"`, `"закоммить документацию"`).
+  - The main agent delegates all documentation modifications and commits to the `audex-docs` subagent.
+  - **No Autonomous Commits**: Never commit docs immediately after implementing a feature; wait for user review and explicit approval (e.g. `"commit docs"`, `"ready to commit"`).
 
 ### 11. No Over-Defensive Nullability
 - **Reflect Domain Guarantees**: Never spray unnecessary `?`, `| null`, `?.`, `?? null`, or `?? ""` on fields guaranteed by design across backend DTOs and frontend models. Reserve `null`/`undefined` strictly for genuine domain absence (e.g. "All Accounts" filter where `brokerAccountId` is null).
@@ -59,6 +59,14 @@ Core engineering standards, Git policies, search rules, and verification workflo
 - **File Lookup (`git ls-files`)**: Always use `git ls-files "*<pattern>*"` (~50–70 ms).
 - **Scoped Subdirectory Search**: For untracked/newly created files, target `client/src` or `server/src` directly—never the root.
 - **Ripgrep (`rg`)**: When available, scope explicitly (`rg "<pattern>" client/src server/src`).
+
+---
+
+## 📚 Documentation Delegation via `audex-docs` Subagent
+- **Strict Delegation of All Documentation Work**:
+  - The main agent MUST NEVER author, edit, or commit documentation files directly in `Audex.Docs`.
+  - ALL documentation workflows (feature specifications, architecture decisions, roadmap tracking, lifecycle transitions, and documentation Git operations) MUST be delegated exclusively to the `audex-docs` subagent (`TypeName: "audex-docs"`).
+  - Derive capabilities, task lifecycle workflows, and interaction protocols directly from the `audex-docs` subagent definition.
 
 ---
 
