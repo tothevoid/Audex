@@ -38,7 +38,7 @@ export const TransactionTableActionBar: React.FC<TransactionTableActionBarProps>
         <Button
             size="sm"
             colorPalette="blue"
-            onClick={onAddRow}
+            onClick={() => onAddRow()}
             px={3}
             borderRadius="lg"
         >
