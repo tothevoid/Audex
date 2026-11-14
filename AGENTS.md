@@ -62,16 +62,13 @@ Core engineering standards, Git policies, search rules, and verification workflo
 
 ---
 
-## 🔄 Verification Commands & Workflow
-- **Scope-Dependent Pre-Verification Build Check**: Before reporting completion or asking about tests, verify builds strictly matching modified scopes:
-  - **Documentation / Markdown Only (`Audex.Docs/`, `docs/`, `*.md`)**: NEVER run `dotnet build`, `npm run build`, or test suites. Report completion immediately.
-  - **Server Changes Only (`server/`)**: Run `cd server && dotnet build`. Do NOT build the client.
-  - **Client Changes Only (`client/`)**: Run `cd client && npm run build`. Do NOT build the server.
-  - **Full-Stack Changes (`server/` AND `client/`)**: Run both builds (`dotnet build` and `npm run build`).
-  Fix any compilation errors before reporting back.
-- **Strict Verification Scope Isolation**: Never build or test an untouched component.
-- **Confirmation Before Long Test Suites**: Once the build succeeds, ask the user before running long test suites (`dotnet test`), unless already requested.
-- **Selective Test Execution** (in `server/`):
-  - Application/Server changes: `dotnet test`
-  - S3 / File Storage changes: `dotnet test --filter-trait "Category=S3"`
-  - Auth changes: `dotnet test --filter-trait "Category=Auth"`
+## 🔄 Verification & Quality Gate
+- **Strict Prohibition on Direct Execution in Main Context**:
+  The main agent MUST NEVER run `dotnet build`, `npm run build`, or `dotnet test` directly in its own session via `run_command`. ALL compilation, builds, and test executions MUST be delegated exclusively to the `validator` subagent.
+- **Verification Delegation via `validator`**:
+  - **Documentation / Markdown only**: Never run builds or tests. Report completion immediately.
+  - **Code Changes**: Always delegate build verification and test execution to the `validator` subagent (`TypeName: "validator"`).
+  - Pass the target scope per [.agents/agents/validator.md](.agents/agents/validator.md):
+    `Prompt: "Scope: server | client | full; Tests: none | all | auth | s3"`
+  - Fix any compilation or test diagnostics returned by `validator` before reporting back.
+- **User Confirmation for Test Suites**: Once builds succeed, ask the user before requesting long test suites (`Tests: all`), unless explicitly requested upfront.
