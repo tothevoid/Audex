@@ -8,6 +8,7 @@ export interface MoneyCardProps {
     value: number;
     currency?: string;
     color?: Nullable<string>;
+    subtitle?: React.ReactNode;
     icon?: React.ReactNode;
     iconBg?: string;
     iconColor?: string;
@@ -20,6 +21,7 @@ const MoneyCard: React.FC<MoneyCardProps> = ({
     value,
     currency = "",
     color,
+    subtitle,
     icon,
     iconBg,
     iconColor,
@@ -33,6 +35,7 @@ const MoneyCard: React.FC<MoneyCardProps> = ({
         <StatsCard
             title={title}
             value={displayValue}
+            subtitle={subtitle}
             color={color}
             icon={icon}
             iconBg={iconBg}

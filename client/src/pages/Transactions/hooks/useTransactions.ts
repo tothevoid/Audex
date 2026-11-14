@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { TransactionEntity } from "@/models/transactions/TransactionEntity";
-import { createTransaction, getTransactions, updateTransaction, deleteTransaction } from "@/api/transactions/transactionApi";
+import { createTransaction, getTransactions, getTransactionSummary, updateTransaction, deleteTransaction } from "@/api/transactions/transactionApi";
 import { GetTransactionsQuery } from "@/models/transactions/GetTransactionsQuery";
+import { TransactionSummary } from "@/models/transactions/TransactionSummary";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 import { notify } from "@/shared/components/Toaster";
 
@@ -15,7 +16,9 @@ export interface TransactionsQuery {
 export const useTransactions = (initialQueryParameters: TransactionsQuery) => {
 	const { t } = useTranslation();
 	const [transactions, setTransactions] = useState<TransactionEntity[]>([]);
+	const [summary, setSummary] = useState<TransactionSummary | null>(null);
 	const [isTransactionsLoading, setLoading] = useState(false);
+	const [isSummaryLoading, setSummaryLoading] = useState(false);
 
 	const [error, setError] = useState<string | null>(null);
 	const [queryParameters, setQueryParameters] = useState<TransactionsQuery>(initialQueryParameters);
@@ -30,15 +33,20 @@ export const useTransactions = (initialQueryParameters: TransactionsQuery) => {
 		let isMounted = true;
 		const load = async () => {
 			setLoading(true);
+			setSummaryLoading(true);
 			try {
 				const query: GetTransactionsQuery = {
 					month: queryParameters.month,
 					year: queryParameters.year,
 					showSystem: queryParameters.showSystem,
 				};
-				const fetchedTransactions = await getTransactions(query);
+				const [fetchedTransactions, fetchedSummary] = await Promise.all([
+					getTransactions(query),
+					getTransactionSummary(query),
+				]);
 				if (isMounted) {
 					setTransactions(fetchedTransactions);
+					setSummary(fetchedSummary);
 					setError(null);
 				}
 			} catch (error: unknown) {
@@ -48,6 +56,7 @@ export const useTransactions = (initialQueryParameters: TransactionsQuery) => {
 			} finally {
 				if (isMounted) {
 					setLoading(false);
+					setSummaryLoading(false);
 				}
 			}
 		};
@@ -154,7 +163,9 @@ export const useTransactions = (initialQueryParameters: TransactionsQuery) => {
 
 	return {
 		transactions,
+		summary,
 		isTransactionsLoading,
+		isSummaryLoading,
 		error,
 		createTransactionEntity,
 		updateTransactionEntity,

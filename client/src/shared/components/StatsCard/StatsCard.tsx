@@ -6,6 +6,7 @@ export interface StatsCardProps {
     title: string;
     color?: Nullable<string>;
     value: number | string;
+    subtitle?: React.ReactNode;
     icon?: React.ReactNode;
     iconBg?: string;
     iconColor?: string;
@@ -15,6 +16,7 @@ export interface StatsCardProps {
 const StatsCard: React.FC<StatsCardProps> = ({
     title,
     value,
+    subtitle,
     color,
     icon,
     iconBg = "background_secondary",
@@ -40,6 +42,11 @@ const StatsCard: React.FC<StatsCardProps> = ({
                             <Text fontSize="xl" fontWeight={700} color={color || "text_primary"} mt={1}>
                                 {value}
                             </Text>
+                            {subtitle && (
+                                <Text fontSize="2xs" color="text_secondary" mt={0.5}>
+                                    {subtitle}
+                                </Text>
+                            )}
                         </Box>
                         <Flex
                             w={10}

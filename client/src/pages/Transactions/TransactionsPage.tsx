@@ -64,6 +64,7 @@ const TransactionsPage: React.FC = () => {
 
     const {
         transactions,
+        summary,
         createTransactionEntity,
         updateTransactionEntity,
         deleteTransactionEntity,
@@ -97,7 +98,7 @@ const TransactionsPage: React.FC = () => {
         localStorage.setItem('audex_transactions_view_mode', mode);
     }, []);
 
-    const onPageSwitched = useCallback((month: number, year: number) => {
+    const onPageSwitched = useCallback((month: number | null, year: number) => {
         setParams((previousParams) => ({ ...previousParams, month, year }));
     }, [setParams]);
 
@@ -205,8 +206,6 @@ const TransactionsPage: React.FC = () => {
         await executeTableCommit(diff);
     }, [params.month, params.year, executeTableCommit]);
 
-    const daysInMonth = new Date(params.year, params.month, 0).getDate();
-
     return (
         <PageContainer color="text_primary">
             {/* Page Header */}
@@ -234,7 +233,7 @@ const TransactionsPage: React.FC = () => {
             />
 
             {/* Monthly KPI Metrics Header (corresponds to selected month) */}
-            <TransactionSummaryHeader transactions={transactions} daysInMonth={daysInMonth} />
+            <TransactionSummaryHeader summary={summary} />
 
             {/* View Action Bar (Always visible: Refresh + View Switcher) */}
             {viewDisplayMode === 'cards' && (

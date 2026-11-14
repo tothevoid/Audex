@@ -1,40 +1,29 @@
 import React from 'react';
 import { SimpleGrid } from '@chakra-ui/react';
-import { MdTrendingUp, MdTrendingDown, MdAccountBalanceWallet, MdCalendarToday } from 'react-icons/md';
+import { MdTrendingUp, MdTrendingDown, MdAccountBalanceWallet, MdCalendarToday, MdSavings } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import { TransactionEntity } from '@/models/transactions/TransactionEntity';
+import { TransactionSummary } from '@/models/transactions/TransactionSummary';
 import { useUserProfile } from '@/features/UserProfileSettingsModal/hooks/UserProfileContext';
 import MoneyCard from '@/shared/components/MoneyCard/MoneyCard';
 
 interface Props {
-    transactions: TransactionEntity[];
-    daysInMonth?: number;
+    summary: TransactionSummary | null;
 }
 
-export const TransactionSummaryHeader: React.FC<Props> = ({ transactions, daysInMonth = 30 }) => {
+export const TransactionSummaryHeader: React.FC<Props> = ({ summary }) => {
     const { t } = useTranslation();
     const { user } = useUserProfile();
-    const currencyName = user?.currency.name;
+    const currencyName = summary?.currencyName || user?.currency.name;
 
-    // Calculate income, expense, net balance in user's rate
-    let totalIncome = 0;
-    let totalExpenses = 0;
-
-    transactions.forEach(t => {
-        const rate = t.account.currency.rate || 1;
-        const converted = t.amount * rate;
-        if (t.amount > 0) {
-            totalIncome += converted;
-        } else {
-            totalExpenses += Math.abs(converted);
-        }
-    });
-
-    const netBalance = totalIncome - totalExpenses;
-    const dailyAvgExpense = daysInMonth > 0 ? totalExpenses / daysInMonth : 0;
+    const totalIncome = summary?.totalIncome ?? 0;
+    const totalExpenses = summary?.totalExpenses ?? 0;
+    const totalCashback = summary?.totalCashback ?? 0;
+    const netExpenses = summary?.netExpenses ?? 0;
+    const netBalance = summary?.netBalance ?? 0;
+    const dailyAverageExpense = summary?.dailyAverageExpense ?? 0;
 
     return (
-        <SimpleGrid columns={{ base: 1, sm: 2, lg: 4 }} gap={4} mb={6}>
+        <SimpleGrid columns={{ base: 1, sm: 2, lg: 5 }} gap={4} mb={6}>
             <MoneyCard
                 title={t('summary_total_income')}
                 value={totalIncome}
@@ -49,6 +38,7 @@ export const TransactionSummaryHeader: React.FC<Props> = ({ transactions, daysIn
                 value={totalExpenses}
                 currency={currencyName}
                 color="loss"
+                subtitle={totalCashback > 0 ? `${t('summary_net_expenses')}: ${netExpenses.toLocaleString()} ${currencyName || ''}` : undefined}
                 icon={<MdTrendingDown size={22} />}
                 iconBg="status_danger_bg"
                 iconColor="loss"
@@ -65,12 +55,21 @@ export const TransactionSummaryHeader: React.FC<Props> = ({ transactions, daysIn
             />
             <MoneyCard
                 title={t('summary_daily_avg')}
-                value={dailyAvgExpense}
+                value={dailyAverageExpense}
                 currency={currencyName}
                 color="text_primary"
                 icon={<MdCalendarToday size={20} />}
                 iconBg="background_secondary"
                 iconColor="text_secondary"
+            />
+            <MoneyCard
+                title={t('summary_total_cashback')}
+                value={totalCashback}
+                currency={currencyName}
+                color="gain"
+                icon={<MdSavings size={20} />}
+                iconBg="status_success_bg"
+                iconColor="gain"
             />
         </SimpleGrid>
     );
