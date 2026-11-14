@@ -79,4 +79,8 @@ Core engineering standards, Git policies, search rules, and verification workflo
   - Pass the target scope per [.agents/agents/validator.md](.agents/agents/validator.md):
     `Prompt: "Scope: server | client | full; Tests: none | all | auth | s3"`
   - Fix any compilation or test diagnostics returned by `validator` before reporting back.
+- **Code Review & Linting Delegation via `rule-reviewer`**:
+  - Before finalizing non-trivial code changes, delegate architectural convention checks and ESLint verification to the `rule-reviewer` subagent (`TypeName: "rule-reviewer"`).
+  - Use its contract in [.agents/agents/rule-reviewer.md](.agents/agents/rule-reviewer.md): pass `Prompt: "Scope: diff; Lint: true"`.
+  - Fix any naming, async suffix, theme token, or ESLint violations returned by `rule-reviewer`.
 - **User Confirmation for Test Suites**: Once builds succeed, ask the user before requesting long test suites (`Tests: all`), unless explicitly requested upfront.
