@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Box, Flex, Grid, GridItem, Skeleton, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { TransactionEntity } from '@/models/transactions/TransactionEntity';
@@ -9,6 +9,7 @@ import TransactionStats from '@/pages/Transactions/components/TransactionStats/T
 import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
 import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
 import { groupByKey, sumEntities } from '@/shared/utilities/arrayUtilities';
+import { getMonthByIndex } from '@/shared/utilities/dateUtils';
 import { useUserProfile } from '@/features/UserProfileSettingsModal/hooks/UserProfileContext';
 
 export interface TransactionCardsViewProps {
@@ -17,7 +18,7 @@ export interface TransactionCardsViewProps {
     accounts: AccountEntity[];
     isLoading: boolean;
     year: number;
-    month: number;
+    month?: number | null;
     typeFilter: TypeFilterMode;
     selectedCategoryId?: string;
     onCategoryClick?: (categoryId: string) => void;
@@ -47,14 +48,30 @@ const TransactionCardsView: React.FC<TransactionCardsViewProps> = ({
     const { t, i18n } = useTranslation();
     const { user } = useUserProfile();
 
-    const groupedTransactions = useMemo(() => {
-        return groupByKey(transactions, (transaction) => transaction.date.getDate());
-    }, [transactions]);
+    const isYearMode = month === null || month === undefined;
 
-    const calculateSummary = (dayTransactions: TransactionEntity[]) => {
-        const sum = sumEntities(dayTransactions, (t) => t.amount * (t.account.currency.rate || 1));
+    const groupedTransactions = useMemo(() => {
+        return groupByKey(transactions, (transaction) => {
+            const transactionDate = new Date(transaction.date);
+            if (isYearMode) {
+                return (transactionDate.getMonth() + 1).toString();
+            }
+            return transactionDate.getDate().toString();
+        });
+    }, [transactions, isYearMode]);
+
+    const calculateSummary = useCallback((groupTransactions: TransactionEntity[]) => {
+        const sum = sumEntities(groupTransactions, (transactionItem) => transactionItem.amount * (transactionItem.account.currency.rate || 1));
         return formatMoneyByCurrencyCulture(sum, user?.currency.name);
-    };
+    }, [user?.currency.name]);
+
+    const getGroupHeaderTitle = useCallback((groupKey: string, groupTransactions: TransactionEntity[]): string => {
+        if (isYearMode) {
+            return `${getMonthByIndex(Number(groupKey), i18n)} ${year}`;
+        }
+
+        return formatDate(new Date(groupTransactions[0].date), i18n, false);
+    }, [isYearMode, i18n, year]);
 
     return (
         <Grid templateColumns={{ base: '1fr', lg: '7fr 5fr' }} gap={8}>
@@ -71,8 +88,8 @@ const TransactionCardsView: React.FC<TransactionCardsViewProps> = ({
                     )}
 
                     {!isLoading &&
-                        [...groupedTransactions.entries()].map(([transactionDay, dayTransactions]) => (
-                            <Box key={transactionDay} mb={6}>
+                        [...groupedTransactions.entries()].map(([groupKey, groupTransactions]) => (
+                            <Box key={groupKey} mb={6}>
                                 <Flex
                                     justify="space-between"
                                     align="center"
@@ -81,15 +98,15 @@ const TransactionCardsView: React.FC<TransactionCardsViewProps> = ({
                                     borderColor="border_primary"
                                     borderBottomWidth="1px"
                                 >
-                                    <Text fontWeight={600} fontSize="xs" color="text_secondary">
-                                        {formatDate(new Date(year, month - 1, transactionDay), i18n, false)}
+                                    <Text fontWeight={600} fontSize={isYearMode ? 'sm' : 'xs'} color="text_secondary">
+                                        {getGroupHeaderTitle(groupKey, groupTransactions)}
                                     </Text>
-                                    <Text fontWeight={600} fontSize="xs" color="text_secondary">
-                                        {calculateSummary(dayTransactions)}
+                                    <Text fontWeight={600} fontSize={isYearMode ? 'sm' : 'xs'} color="text_secondary">
+                                        {calculateSummary(groupTransactions)}
                                     </Text>
                                 </Flex>
 
-                                {dayTransactions.map((transaction: TransactionEntity) => (
+                                {groupTransactions.map((transaction: TransactionEntity) => (
                                     <Transaction
                                         key={transaction.id}
                                         transaction={transaction}

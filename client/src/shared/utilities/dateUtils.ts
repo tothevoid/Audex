@@ -12,11 +12,11 @@ export const getDateParts = (date: Date = new Date()) => ({
     seconds: pad(date.getSeconds()),
 });
 
-export const getMonthByIndex = (index?: number | null, i18n?: i18n): string => {
+export const getMonthByIndex = (index?: number | null, i18n?: i18n, isShort = false): string => {
     if (!index || index < 1 || index > 12 || !i18n) {
         return "";
     }
-    return getMonthsNames(i18n)[index - 1];
+    return getMonthsNames(i18n, isShort)[index - 1];
 };
 
 export const convertToDateOnly = (date: Date | string): string => {
@@ -45,12 +45,14 @@ export const parseIsoDateOnly = (dateString?: string | null): Date | null => {
     return new Date(year, month - 1, day);
 };
 
-export const getMonthsNames = (i18n: i18n) => {
+export const getMonthsNames = (i18n: i18n, isShort = true): string[] => {
     const formatter = new Intl.DateTimeFormat(i18n.language, { month: 'long' });
 
-    return Array.from({ length: 12 }, (_, i) => 
-        formatter.format(new Date(2000, i, 1)).slice(0, 3)
-    );
+    return Array.from({ length: 12 }, (_, monthIndex) => {
+        const fullMonthName = formatter.format(new Date(2000, monthIndex, 1));
+        const capitalizedMonthName = fullMonthName.charAt(0).toUpperCase() + fullMonthName.slice(1);
+        return isShort ? capitalizedMonthName.slice(0, 3) : capitalizedMonthName;
+    });
 };
 
 export const getCurrentDate = (): string => {

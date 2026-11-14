@@ -47,6 +47,8 @@
 
     "summary_total_income": "Total Income",
     "summary_total_expenses": "Total Expenses",
+    "summary_net_expenses": "Net Expenses",
+    "summary_total_cashback": "Cashback",
     "summary_net_balance": "Net Cashflow",
     "summary_daily_avg": "Daily Average",
 
@@ -57,6 +59,8 @@
     "filter_all_accounts": "All accounts",
     "filter_active": "Active",
     "filter_no_category": "No category",
+    "filter_whole_year": "Whole year {{year}}",
+    "filter_year_label": "Year {{year}}",
 
     "stats_total_spent": "Total Expenses",
     "stats_total_income": "Total Income",
