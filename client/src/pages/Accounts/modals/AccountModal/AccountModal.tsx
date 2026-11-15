@@ -1,14 +1,13 @@
-import { Field, Input} from "@chakra-ui/react";
+import { Field, Input } from "@chakra-ui/react";
 import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountFormInput, getAccountValidationSchema } from "./AccountValidationSchema";
 import { useTranslation } from "react-i18next";
 import { getAccountTypes } from "@/api/accounts/accountTypeApi";
-import { getCurrencies } from "@/api/currencies/currencyApi";
+import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 import { AccountEntity } from "@/models/accounts/AccountEntity";
 import { AccountTypeEntity } from "@/models/accounts/AccountTypeEntity";
-import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
 import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import DateSelect from "@/shared/components/DateSelect/DateSelect";
@@ -28,7 +27,6 @@ interface ModalProps {
 };
 
 interface State {
-	currencies: CurrencyEntity[]
 	accountTypes: AccountTypeEntity[],
 	banks: BankEntity[]
 }
@@ -38,18 +36,18 @@ const AccountModal: React.FC<ModalProps> = ({
 	account,
 	onSaved
 }: ModalProps) => {
-  	const [state, setState] = useState<State>({currencies: [], accountTypes: [], banks: []});
+	const { data: currencies = [] } = useCurrencies();
+	const [state, setState] = useState<State>({ accountTypes: [], banks: [] });
 
 	useEffect(() => {
 		let isMounted = true;
 		const initData = async () => {
-			const [currencies, accountTypes, banks] = await Promise.all([
-				getCurrencies(),
+			const [accountTypes, banks] = await Promise.all([
 				getAccountTypes(),
 				getBanks()
 			]);
 			if (isMounted) {
-				setState({ currencies, accountTypes, banks });
+				setState({ accountTypes, banks });
 			}
 		};
 		initData();
@@ -83,7 +81,7 @@ const AccountModal: React.FC<ModalProps> = ({
 	const accountType = useWatch({ control, name: "accountType" });
 	const selectedCurrency = useWatch({ control, name: "currency" });
 	const currentCurrency = selectedCurrency?.name ?? '';
-	const bankFieldVisible = accountType?.id === ACCOUNT_TYPE.DEBIT_CARD || 
+	const bankFieldVisible = accountType?.id === ACCOUNT_TYPE.DEBIT_CARD ||
 		accountType?.id === ACCOUNT_TYPE.CREDIT_CARD;
 
 	useEffect(() => {
@@ -114,27 +112,27 @@ const AccountModal: React.FC<ModalProps> = ({
 		<Field.Root mt={4} invalid={!!errors.accountType}>
 			<Field.Label>{t("entity_transaction_type")}</Field.Label>
 			<CollectionSelect name="accountType" control={control} placeholder="Select account type"
-				collection={state.accountTypes} 
-				labelSelector={(accountType => accountType.name)} 
-				valueSelector={(accountType => accountType.id)}/>
+				collection={state.accountTypes}
+				labelSelector={(accountType => accountType.name)}
+				valueSelector={(accountType => accountType.id)} />
 			<Field.ErrorText>{errors.accountType?.message}</Field.ErrorText>
 		</Field.Root>
 		{
 			bankFieldVisible && <Field.Root mt={4} invalid={!!errors.bank}>
 				<Field.Label>{t("entity_transaction_bank")}</Field.Label>
 				<CollectionSelect name="bank" control={control} placeholder="Select bank"
-					collection={state.banks} 
-					labelSelector={(bank => bank.name)} 
-					valueSelector={(bank => bank.id)}/>
+					collection={state.banks}
+					labelSelector={(bank => bank.name)}
+					valueSelector={(bank => bank.id)} />
 				<Field.ErrorText>{errors.bank?.message}</Field.ErrorText>
 			</Field.Root>
 		}
 		<Field.Root mt={4} invalid={!!errors.currency}>
 			<Field.Label>{t("entity_transaction_currency")}</Field.Label>
 			<CollectionSelect name="currency" control={control} placeholder="Select currency"
-				collection={state.currencies} 
-				labelSelector={(currency => currency.name)} 
-				valueSelector={(currency => currency.id)}/>
+				collection={currencies}
+				labelSelector={(currency => currency.name)}
+				valueSelector={(currency => currency.id)} />
 			<Field.ErrorText>{errors.currency?.message}</Field.ErrorText>
 		</Field.Root>
 		<Field.Root invalid={!!errors.balance} mt={4}>
@@ -144,11 +142,11 @@ const AccountModal: React.FC<ModalProps> = ({
 		</Field.Root>
 		<Field.Root invalid={!!errors.createdOn} mt={4}>
 			<Field.Label>{t("entity_account_created_on")}</Field.Label>
-			<DateSelect name="createdOn" control={control}/>
+			<DateSelect name="createdOn" control={control} />
 			<Field.ErrorText>{errors.createdOn?.message}</Field.ErrorText>
 		</Field.Root>
 		<Field.Root invalid={!!errors.active} mt={4}>
-			<CheckboxInput name="active" control={control} title={t("entity_account_active")}/>
+			<CheckboxInput name="active" control={control} title={t("entity_account_active")} />
 			<Field.ErrorText>{errors.active?.message}</Field.ErrorText>
 		</Field.Root>
 	</BaseFormModal>;

@@ -1,54 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Box, SimpleGrid, Skeleton, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { WidgetComponentProps } from "../types";
-import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
-import { getCurrencies } from "@/api/currencies/currencyApi";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { CurrencyRateCard } from "./CurrencyRateCard";
+import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 
 export const CurrencyRatesWidget: React.FC<WidgetComponentProps<Record<string, unknown>>> = ({
     widget,
     refreshSignal,
-    onFetched
+    onFetched,
 }) => {
     const { t } = useTranslation();
     const { user } = useUserProfile();
-    const [currencies, setCurrencies] = useState<CurrencyEntity[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const { data: currencies = [], isLoading, isError, dataUpdatedAt, refetch } = useCurrencies();
 
     useEffect(() => {
-        let isMounted = true;
-        const load = async () => {
-            const isSilent = Boolean(refreshSignal && refreshSignal > 0);
-            if (!isSilent) {
-                setIsLoading(true);
-            }
-            try {
-                const result = await getCurrencies();
-                if (result && isMounted) {
-                    setCurrencies(result);
-                    setError(null);
-                    onFetched?.(new Date());
-                }
-            } catch {
-                if (isMounted) {
-                    setError(t("error_data_load"));
-                }
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            }
-        };
+        if (refreshSignal && refreshSignal > 0) {
+            const reloadCurrenciesAsync = async () => {
+                await refetch();
+            };
 
-        load();
+            reloadCurrenciesAsync();
+        }
+    }, [refreshSignal, refetch]);
 
-        return () => {
-            isMounted = false;
-        };
-    }, [refreshSignal, onFetched, t]);
+    useEffect(() => {
+        if (dataUpdatedAt) {
+            onFetched?.(new Date(dataUpdatedAt));
+        }
+    }, [dataUpdatedAt, onFetched]);
 
     if (isLoading && currencies.length === 0) {
         return (
@@ -61,11 +42,11 @@ export const CurrencyRatesWidget: React.FC<WidgetComponentProps<Record<string, u
         );
     }
 
-    if (error && currencies.length === 0) {
+    if (isError && currencies.length === 0) {
         return (
             <Box p={4} textAlign="center" m="auto">
                 <Text fontSize="xs" color="loss">
-                    {error}
+                    {t("error_data_load")}
                 </Text>
             </Box>
         );

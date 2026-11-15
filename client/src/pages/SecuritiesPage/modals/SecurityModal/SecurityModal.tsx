@@ -2,11 +2,10 @@ import React, { RefObject, useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MarketSecurityInfoEntity, SecurityEntity } from "@/models/securities/SecurityEntity";
 import { SecurityTypeEntity } from "@/models/securities/SecurityTypeEntity";
-import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseModal from "@/shared/modals/BaseModal/BaseModal";
 import { getSecurityTypes } from "@/api/securities/securityTypeApi";
-import { getCurrencies } from "@/api/currencies/currencyApi";
+import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 import { SecurityFormInput } from "./SecurityValidationSchema";
 import SecuritySearchForm from "./components/SecuritySearchForm";
 import SecurityDetailsForm from "./components/SecurityDetailsForm";
@@ -21,7 +20,6 @@ interface ModalProps {
 
 interface State {
     securityTypes: SecurityTypeEntity[];
-    currencies: CurrencyEntity[];
 }
 
 const getInitialFormData = (targetSecurity?: SecurityEntity | null): Partial<SecurityFormInput> => {
@@ -53,19 +51,17 @@ const SecurityModal: React.FC<ModalProps> = ({
     const { t } = useTranslation();
     const isEditMode = !!security;
 
+    const { data: currencies = [] } = useCurrencies();
     const [step, setStep] = useState<"search" | "details">(isEditMode ? "details" : "search");
     const [initialFormData, setInitialFormData] = useState<Partial<SecurityFormInput>>(() => getInitialFormData(security));
-    const [state, setState] = useState<State>({ securityTypes: [], currencies: [] });
+    const [state, setState] = useState<State>({ securityTypes: [] });
 
     useEffect(() => {
         let isMounted = true;
         const initData = async () => {
-            const [securityTypes, currencies] = await Promise.all([
-                getSecurityTypes(),
-                getCurrencies()
-            ]);
+            const securityTypes = await getSecurityTypes();
             if (isMounted) {
-                setState({ securityTypes, currencies });
+                setState({ securityTypes });
             }
         };
         initData();
@@ -95,8 +91,8 @@ const SecurityModal: React.FC<ModalProps> = ({
         const matchedType = state.securityTypes.find(type => type.id === marketInfo.typeId)
             ?? state.securityTypes[0];
 
-        const matchedCurrency = state.currencies.find(currencyItem => currencyItem.id === marketInfo.currencyId)
-            ?? state.currencies[0];
+        const matchedCurrency = currencies.find(currencyItem => currencyItem.id === marketInfo.currencyId)
+            ?? currencies[0];
 
         setInitialFormData({
             id: generateGuid(),
@@ -117,7 +113,7 @@ const SecurityModal: React.FC<ModalProps> = ({
             name: tickerValue,
             isin: "",
             type: state.securityTypes[0],
-            currency: state.currencies[0]
+            currency: currencies[0]
         });
         setStep("details");
     };
@@ -152,7 +148,7 @@ const SecurityModal: React.FC<ModalProps> = ({
                     initialValues={initialFormData}
                     security={security}
                     securityTypes={state.securityTypes}
-                    currencies={state.currencies}
+                    currencies={currencies}
                     onSave={handleSave}
                     onCancel={handleClose}
                     onBackToSearch={!isEditMode ? () => setStep("search") : undefined}

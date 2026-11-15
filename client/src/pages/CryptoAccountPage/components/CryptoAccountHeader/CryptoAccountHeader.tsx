@@ -9,7 +9,7 @@ import { getCryptoProviderIconUrl } from "@/api/crypto/cryptoProviderApi";
 import StoredIcon from "@/shared/components/StoredIcon/StoredIcon";
 import SectionHeader from "@/shared/components/SectionHeader";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
-import { getCurrencies } from "@/api/currencies/currencyApi";
+import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 
 interface CryptoAccountHeaderProps {
     cryptoAccount?: CryptoAccountEntity | null;
@@ -26,18 +26,12 @@ export const CryptoAccountHeader: React.FC<CryptoAccountHeaderProps> = ({
 }) => {
     const { t } = useTranslation();
     const { user } = useUserProfile();
-    const [usdRate, setUsdRate] = React.useState<number | null>(null);
+    const { data: currencies = [] } = useCurrencies();
 
-    React.useEffect(() => {
-        const fetchCurrencies = async () => {
-            const currencies = await getCurrencies();
-            const usdCurrency = currencies.find(c => c.name.toUpperCase() === "USD");
-            if (usdCurrency && usdCurrency.rate > 0) {
-                setUsdRate(usdCurrency.rate);
-            }
-        };
-        fetchCurrencies();
-    }, []);
+    const usdRate = React.useMemo(() => {
+        const usdCurrency = currencies.find((currency) => currency.name.toUpperCase() === "USD");
+        return usdCurrency && usdCurrency.rate > 0 ? usdCurrency.rate : null;
+    }, [currencies]);
 
     const mainCurrency = user?.currency?.name;
     const isConvertedVisible = !!mainCurrency && mainCurrency.toUpperCase() !== "USD" && usdRate !== null;

@@ -1,10 +1,9 @@
 import { Box, Button, Checkbox, Icon, Text } from "@chakra-ui/react";
 import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
-import { getCurrencies, updateCurrency, createCurrency, deleteCurrency, syncRates } from "@/api/currencies/currencyApi";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import CurrencyModal from "@/pages/Data/modals/CurrencyModal/CurrencyModal";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
@@ -13,102 +12,47 @@ import RefreshButton from "@/shared/components/RefreshButton/RefreshButton";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import { notify } from "@/shared/components/Toaster";
+import {
+    useCurrencies,
+    useCreateCurrencyMutation,
+    useDeleteCurrencyMutation,
+    useSyncCurrencyRatesMutation,
+    useUpdateCurrencyMutation,
+} from "@/shared/hooks/queries/useCurrencies";
 
 const CurrenciesTable: React.FC = () => {
-    const [currencies, setCurrencies] = useState<CurrencyEntity[]>([]);
-    const [hasChanges, setHasChanges] = useState(false);
-    const [currencyToDelete, setCurrencyToDelete] = useState<CurrencyEntity | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const { t } = useTranslation();
-    
-    const { user } = useUserProfile();
+    const { data: currencies = [], isLoading } = useCurrencies();
+    const createCurrencyMutation = useCreateCurrencyMutation();
+    const updateCurrencyMutation = useUpdateCurrencyMutation();
+    const deleteCurrencyMutation = useDeleteCurrencyMutation();
+    const syncRatesMutation = useSyncCurrencyRatesMutation();
 
-    const [isSyncing, setSyncing] = useState(false);
+    const [currencyToDelete, setCurrencyToDelete] = useState<CurrencyEntity | null>(null);
+    const { t } = useTranslation();
+    const { user } = useUserProfile();
 
     const modalRef = useRef<BaseModalRef>(null);
     const confirmModalRef = useRef<BaseModalRef>(null);
 
-    const fetchCurrencies = useCallback(async () => { 
-        setIsLoading(true);
-        try {
-            const fetchedCurrencies = await getCurrencies();
-            setCurrencies(fetchedCurrencies);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        let isMounted = true;
-        const load = async () => {
-            setIsLoading(true);
-            try {
-                const fetchedCurrencies = await getCurrencies();
-                if (isMounted) {
-                    setCurrencies(fetchedCurrencies);
-                }
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            }
-        };
-        load();
-        return () => {
-            isMounted = false;
-        };
-    }, []);
-
-    const onActiveChanged = useCallback((currencyId: string, newValue: boolean) => {
-        setCurrencies((currentCurrencies) => {
-            let hasNewChanges = false;
-            const updatedCurrencies = currentCurrencies.map((currencyItem: CurrencyEntity) => {
-                if (currencyItem.id !== currencyId || currencyItem.active === newValue) {
-                    return currencyItem;
-                }
-
-                hasNewChanges = true;
-                return { ...currencyItem, active: newValue };
-            });
-
-            if (!hasNewChanges) {
-                return currentCurrencies;
-            }
-
-            setHasChanges(true);
-            return updatedCurrencies;
-        });
-    }, []);
-
-    const onCellBlur = useCallback(async (currencyId: string) => {
-        if (!hasChanges) {
+    const onActiveChanged = useCallback(async (currency: CurrencyEntity, isChecked: boolean) => {
+        if (currency.active === isChecked) {
             return;
         }
 
-        const currency = currencies.find((currencyItem: CurrencyEntity) => currencyItem.id === currencyId);
-        if (!currency) {
-            return;
-        }
+        await updateCurrencyMutation.mutateAsync({ ...currency, active: isChecked });
+    }, [updateCurrencyMutation]);
 
-        await updateCurrency({ ...currency });
-        setHasChanges(false);
-    }, [currencies, hasChanges]);
-    
     const onAdd = () => {
         modalRef.current?.openModal();
     };
 
     const onCurrencyAdded = async (currency: CurrencyEntity) => {
-        const createdCurrencyId = await createCurrency(currency);
+        const createdCurrencyId = await createCurrencyMutation.mutateAsync(currency);
         if (!createdCurrencyId) {
             return;
         }
 
-        currency.id = createdCurrencyId;
-
         notify.success(t("currency_toast_created_title"), t("currency_toast_created_desc", { name: currency.name }));
-
-        setCurrencies((currentCurrencies) => [...currentCurrencies, currency]);
     };
 
     const onDeleteClicked = (currency: CurrencyEntity) => {
@@ -121,82 +65,89 @@ const CurrenciesTable: React.FC = () => {
             return;
         }
 
-        const isDeleted = await deleteCurrency(currencyToDelete.id);
-        
+        const isDeleted = await deleteCurrencyMutation.mutateAsync(currencyToDelete.id);
         if (!isDeleted) {
             return;
         }
 
         notify.success(t("currency_toast_deleted_title"), t("currency_toast_deleted_desc", { name: currencyToDelete.name }));
-
-        setCurrencies((currentCurrencies) => currentCurrencies.filter((currencyItem: CurrencyEntity) => currencyItem.id !== currencyToDelete.id));
         setCurrencyToDelete(null);
     };
 
     const onSyncRates = async () => {
-        setSyncing(true);
-        await syncRates();
-        await fetchCurrencies();
-        setSyncing(false);
+        await syncRatesMutation.mutateAsync();
     };
 
     const columns: ColumnDef<CurrencyEntity>[] = useMemo(() => [
         {
             header: t("entity_currency_name"),
-            render: (currency) => <Text>{currency.name}</Text>
+            render: (currency) => <Text>{currency.name}</Text>,
         },
         {
             header: t("entity_currency_rate"),
             render: (currency) => (
                 <Text>{formatMoneyByCurrencyCulture(1, currency.name)} = {formatMoneyByCurrencyCulture(currency.rate, user?.currency.name, 3)}</Text>
-            )
+            ),
         },
         {
             header: t("entity_currency_active"),
             width: 10,
             render: (currency) => (
-                <Checkbox.Root onBlur={() => onCellBlur(currency.id)} checked={currency.active} variant="subtle"
-                    onCheckedChange={(data) => {onActiveChanged(currency.id, !!data.checked);}}>
+                <Checkbox.Root
+                    checked={currency.active}
+                    variant="subtle"
+                    onCheckedChange={(eventDetails) => {
+                        onActiveChanged(currency, Boolean(eventDetails.checked));
+                    }}
+                >
                     <Checkbox.HiddenInput />
                     <Checkbox.Control />
                 </Checkbox.Root>
-            )
+            ),
         },
         {
             width: 10,
             render: (currency) => (
-                <Button borderColor="background_secondary" background="button_background_secondary" size={'sm'} onClick={() => onDeleteClicked(currency)}>
+                <Button borderColor="background_secondary" background="button_background_secondary" size="sm" onClick={() => onDeleteClicked(currency)}>
                     <Icon color="card_action_icon_danger">
-                        <MdDelete/>
+                        <MdDelete />
                     </Icon>
                 </Button>
-            )
-        }
-    ], [t, user, onActiveChanged, onCellBlur]);
+            ),
+        },
+    ], [t, user, onActiveChanged]);
 
-    return <Box color="text_primary">
-        <SectionHeader
-            title={t("data_tab_currencies")}
-            onAdd={onAdd}
-            addButtonTitle={t("currencies_data_add")}
-            extra={
-                <RefreshButton isRefreshing={isSyncing} title={t("currencies_data_sync_rates")} onClick={onSyncRates} />
-            }
-        />
-        <DataTable
-            data={currencies}
-            columns={columns}
-            keyExtractor={(item) => item.id}
-            isLoading={isLoading}
-            skeletonRows={5}
-        />
-        <CurrencyModal modalRef={modalRef} onSaved={onCurrencyAdded}/>
-        <ConfirmModal onConfirmed={onDeleteConfirmed}
-            title={t("currencies_delete_title")}
-            message={t("modals_delete_message")}
-            confirmActionName={t("modals_delete_button")}
-            ref={confirmModalRef}/>
-    </Box>;
+    return (
+        <Box color="text_primary">
+            <SectionHeader
+                title={t("data_tab_currencies")}
+                onAdd={onAdd}
+                addButtonTitle={t("currencies_data_add")}
+                extra={
+                    <RefreshButton
+                        isRefreshing={syncRatesMutation.isPending}
+                        title={t("currencies_data_sync_rates")}
+                        onClick={onSyncRates}
+                    />
+                }
+            />
+            <DataTable
+                data={currencies}
+                columns={columns}
+                keyExtractor={(item) => item.id}
+                isLoading={isLoading}
+                skeletonRows={5}
+            />
+            <CurrencyModal modalRef={modalRef} onSaved={onCurrencyAdded} />
+            <ConfirmModal
+                onConfirmed={onDeleteConfirmed}
+                title={t("currencies_delete_title")}
+                message={t("modals_delete_message")}
+                confirmActionName={t("modals_delete_button")}
+                ref={confirmModalRef}
+            />
+        </Box>
+    );
 };
 
 export default CurrenciesTable;

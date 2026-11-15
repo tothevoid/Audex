@@ -1,12 +1,11 @@
 import { Field, Input, Stack } from "@chakra-ui/react";
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
+import React, { RefObject, useCallback, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
-import { getCurrencies } from "@/api/currencies/currencyApi";
-import { getUserProfile } from "@/api/user/userProfileApi";
-import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
+import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
+import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import { DebtFormInput, getDebtValidationSchema } from "./DebtValidationSchema";
 import { DebtEntity } from "@/models/debts/DebtEntity";
 import DateSelect from "@/shared/components/DateSelect/DateSelect";
@@ -22,42 +21,21 @@ interface Props {
 	onSaved: (debt: DebtEntity) => void
 };
 
-interface State {
-	currencies: CurrencyEntity[],
-	profileCurrency?: CurrencyEntity
-}
-
 const DebtModal: React.FC<Props> = ({
 	debt,
 	modalRef,
 	onSaved,
 }: Props) => {
-	const [state, setState] = useState<State>({ currencies: [] });
-
-	useEffect(() => {
-		let isMounted = true;
-		const loadData = async () => {
-			const [currencies, userProfile] = await Promise.all([
-				getCurrencies(),
-				getUserProfile()
-			]);
-			if (isMounted) {
-				const profileCurrency = userProfile ? userProfile.currency : currencies[0];
-				setState({ currencies, profileCurrency });
-			}
-		};
-		loadData();
-		return () => {
-			isMounted = false;
-		};
-	}, []);
+	const { data: currencies = [] } = useCurrencies();
+	const { user } = useUserProfile();
+	const profileCurrency = user?.currency ?? currencies[0];
 
 	const getDefaultFormState = useCallback(() => {
 		const matchedCurrency = findEntityById(
-			state.currencies,
+			currencies,
 			debt?.currency?.id,
 			debt?.currency
-		) ?? state.profileCurrency ?? state.currencies[0];
+		) ?? profileCurrency ?? currencies[0];
 
 		return {
 			id: debt?.id ?? generateGuid(),
@@ -66,7 +44,7 @@ const DebtModal: React.FC<Props> = ({
 			currency: matchedCurrency,
 			date: debt?.date ?? new Date()
 		};
-	}, [debt, state.profileCurrency, state.currencies]);
+	}, [debt, profileCurrency, currencies]);
 
 	const { t } = useTranslation();
 	const validationSchema = useMemo(() => getDebtValidationSchema(t), [t]);
@@ -112,8 +90,8 @@ const DebtModal: React.FC<Props> = ({
 				<Field.Root invalid={!!errors.currency}>
 					<Field.Label>{t("entity_debt_currency")}</Field.Label>
 					<CollectionSelect name="currency" control={control} placeholder="Select type"
-						collection={state.currencies} 
-						labelSelector={(currency => currency.name)} 
+						collection={currencies}
+						labelSelector={(currency => currency.name)}
 						valueSelector={(currency => currency.id)} />
 					<Field.ErrorText>{errors.currency?.message}</Field.ErrorText>
 				</Field.Root>

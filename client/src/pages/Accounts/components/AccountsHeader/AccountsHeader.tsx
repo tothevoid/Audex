@@ -7,9 +7,8 @@ import { getCurrencyColor, getCurrencyIcon } from "@/shared/utilities/currencyUt
 import { useColorMode } from "@/shared/context/useColorMode";
 import SectionHeader from "@/shared/components/SectionHeader";
 import FilterBlock, { FilterBlockDivider } from "@/shared/components/FilterBlock";
-import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
 import { AccountTypeEntity } from "@/models/accounts/AccountTypeEntity";
-import { getCurrencies } from "@/api/currencies/currencyApi";
+import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 import { getAccountTypes } from "@/api/accounts/accountTypeApi";
 
 interface Props {
@@ -35,17 +34,13 @@ export const AccountsHeader: React.FC<Props> = ({
 }) => {
     const { t, i18n } = useTranslation();
     const { resolvedColorMode } = useColorMode();
-    const [currencies, setCurrencies] = useState<CurrencyEntity[]>([]);
+    const { data: currencies = [] } = useCurrencies();
     const [accountTypes, setAccountTypes] = useState<AccountTypeEntity[]>([]);
 
     useEffect(() => {
         const loadFilterData = async () => {
             try {
-                const [currenciesData, accountTypesData] = await Promise.all([
-                    getCurrencies(),
-                    getAccountTypes(),
-                ]);
-                setCurrencies(currenciesData);
+                const accountTypesData = await getAccountTypes();
                 setAccountTypes(accountTypesData);
             } catch (error) {
                 console.error("Failed to load filter data for accounts", error);

@@ -5,10 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { getBrokers } from "@/api/brokers/brokerApi";
 import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
-import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
 import { BrokerAccountTypeEntity } from "@/models/brokers/BrokerAccountTypeEntity";
 import { BrokerEntity } from "@/models/brokers/BrokerEntity";
-import { getCurrencies } from "@/api/currencies/currencyApi";
+import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 import { BrokerAccountFormInput, getBrokerAccountValidationSchema } from "./BrokerAccountValidationSchema";
@@ -26,7 +25,6 @@ interface ModalProps {
 }
 
 interface State {
-    currencies: CurrencyEntity[]
     accountTypes: BrokerAccountTypeEntity[]
     brokers: BrokerEntity[]
     banks: BankEntity[]
@@ -37,17 +35,17 @@ const BrokerAccountModal: React.FC<ModalProps> = ({
     brokerAccount,
     onSaved
 }: ModalProps) => {
-    const [state, setState] = useState<State>({ currencies: [], accountTypes: [], brokers: [], banks: [] });
+    const { data: currencies = [] } = useCurrencies();
+    const [state, setState] = useState<State>({ accountTypes: [], brokers: [], banks: [] });
 
     useEffect(() => {
         const loadData = async () => {
-            const currencies = await getCurrencies();
             const accountTypes = await getBrokerAccountTypes();
             const brokers = await getBrokers();
             const banks = await getBanks();
 
             setState((currentState) => {
-                return { ...currentState, currencies, accountTypes, brokers, banks };
+                return { ...currentState, accountTypes, brokers, banks };
             });
         };
         loadData();
@@ -108,7 +106,7 @@ const BrokerAccountModal: React.FC<ModalProps> = ({
             <Field.Root mt={4} invalid={!!errors.currency}>
                 <Field.Label>{t("entity_broker_account_currency")}</Field.Label>
                 <CollectionSelect name="currency" control={control} placeholder="Select currency"
-                    collection={state.currencies}
+                    collection={currencies}
                     labelSelector={(currency => currency.name)}
                     valueSelector={(currency => currency.id)} />
                 <Field.ErrorText>{errors.currency?.message}</Field.ErrorText>

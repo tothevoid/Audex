@@ -12,7 +12,7 @@ import {
 } from "@/api/transactions/currencyTransactionApi";
 import { CurrencyTransactionEntity } from "@/models/transactions/CurrencyTransactionEntity";
 import { useTranslation } from "react-i18next";
-import { getCurrenciesMap } from "@/api/currencies/currencyApi";
+import { useCurrenciesMap } from "@/shared/hooks/queries/useCurrencies";
 import { AccountEntity } from "@/models/accounts/AccountEntity";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import CurrencyTransactionModal from "@/pages/Transactions/modals/CurrencyTransactionModal/CurrencyTransactionModal";
@@ -32,7 +32,7 @@ const CashAccountPage: React.FC = () => {
 
     const { user } = useUserProfile();
 
-    const [currenciesMap, setCurrenciesMap] = useState<Record<string, number>>({});
+    const { data: currenciesMap = {} } = useCurrenciesMap();
     const [account, setAccount] = useState<AccountEntity | null>(null);
     const [isHeaderLoading, setIsHeaderLoading] = useState<boolean>(true);
     const [totalPnl, setTotalPnl] = useState<number>(0);
@@ -70,13 +70,11 @@ const CashAccountPage: React.FC = () => {
         if (!cashAccountId) return;
         setIsHeaderLoading(true);
         try {
-            const [accountData, map, summary] = await Promise.all([
+            const [accountData, summary] = await Promise.all([
                 getAccountById(cashAccountId),
-                getCurrenciesMap(),
                 getCurrencyAccountSummary(cashAccountId)
             ]);
             setAccount(accountData);
-            setCurrenciesMap(map);
             setTotalPnl(summary?.totalPnl ?? 0);
             setTransactionsCount(summary?.transactionsCount ?? 0);
         } finally {
@@ -92,14 +90,12 @@ const CashAccountPage: React.FC = () => {
         const load = async () => {
             setIsHeaderLoading(true);
             try {
-                const [accountData, map, summary] = await Promise.all([
+                const [accountData, summary] = await Promise.all([
                     getAccountById(cashAccountId),
-                    getCurrenciesMap(),
                     getCurrencyAccountSummary(cashAccountId)
                 ]);
                 if (isMounted) {
                     setAccount(accountData);
-                    setCurrenciesMap(map);
                     setTotalPnl(summary?.totalPnl ?? 0);
                     setTransactionsCount(summary?.transactionsCount ?? 0);
                 }
