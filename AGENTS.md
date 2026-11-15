@@ -60,6 +60,12 @@ Core engineering standards, Git policies, search rules, and verification workflo
 - **Scoped Subdirectory Search**: For untracked/newly created files, target `client/src` or `server/src` directly—never the root.
 - **Ripgrep (`rg`)**: When available, scope explicitly (`rg "<pattern>" client/src server/src`).
 
+### 13. Platform-First & Native Web/Runtime Standards
+- **Leverage Standard Runtimes Before Custom Data/Utilities**: NEVER hardcode static dictionaries, registries, or enums for standardized domain entities (currencies, countries, locales, timezones, units of measure, plural rules) without first checking standard platform APIs.
+- **Modern ECMAScript / Browser First**: Always prefer native `Intl` APIs (`Intl.supportedValuesOf('currency' | 'calendar' | 'timeZone' | ...)`, `Intl.DisplayNames`, `Intl.NumberFormat`, `Intl.DateTimeFormat`, `Intl.RelativeTimeFormat`, `Intl.Segmenter`), `structuredClone`, `URL`, `FormData`.
+- **Augment, Don't Reimplement**: If feature requirements demand priority ordering, filtering, or custom metadata (e.g. popular currencies or timezones on top), build a lightweight projection/decorator *on top of* the native runtime registry rather than creating an isolated hardcoded array from scratch.
+- **Zero Redundant Data Bundling**: Do not bloat client bundles with static dictionaries or polyfills that the JavaScript engine already provides natively with full localization.
+
 ---
 
 ## 📚 Documentation Delegation via `audex-docs` Subagent
