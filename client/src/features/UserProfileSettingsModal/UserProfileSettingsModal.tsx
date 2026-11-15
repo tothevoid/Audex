@@ -3,8 +3,10 @@ import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState }
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 import { UserProfileFormInput, getUserProfileValidationSchema } from "./UserProfileValidationSchema";
 import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
+import { queryKeys } from "@/shared/constants/queryKeys";
 import { getTimeZones } from "@/api/common/timeZoneApi";
 import { updateUserProfile } from "@/api/user/userProfileApi";
 import { UserProfileEntity } from "@/models/user/UserProfileEntity";
@@ -29,18 +31,19 @@ const langMapping = new Map<string, string>([
 const languages = [...langMapping.entries()].map(([key, value]) => { return { key, value }; });
 
 const convertToSchemaValues = (userProfile: UserProfileEntity | null, timeZones: TimeZoneEntity[] = []) => {
-	const userTzId = userProfile?.timeZoneId || Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Moscow";
-	const matchedTz = timeZones.find(tz => tz.id === userTzId);
+	const userTimeZoneId = userProfile?.timeZoneId || Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Moscow";
+	const matchedTimeZone = timeZones.find(timeZone => timeZone.id === userTimeZoneId);
 	return {
 		id: userProfile?.id ?? "",
 		languageCode: languages.find((lang) => lang.value === userProfile?.languageCode) ?? languages[0],
 		currency: userProfile?.currency,
-		timeZone: matchedTz ?? (timeZones.length > 0 ? timeZones[0] : { id: userTzId, displayName: userTzId, baseUtcOffsetMinutes: 0 })
+		timeZone: matchedTimeZone ?? (timeZones.length > 0 ? timeZones[0] : { id: userTimeZoneId, displayName: userTimeZoneId, baseUtcOffsetMinutes: 0 })
 	};
 };
 
 const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 	const { data: currencies = [] } = useCurrencies();
 	const [state, setState] = useState<State>({ languages: languages, timeZones: [] });
 	const { user, updateUser } = useUserProfile();
@@ -79,11 +82,12 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 	const onVisibilityChanged = (open: boolean) => {
 		if (open && user) {
 			reset(convertToSchemaValues(user, state.timeZones));
-			setSelectedTheme(themeOptions.find(opt => opt.value === colorMode) ?? themeOptions[0]);
+			setSelectedTheme(themeOptions.find(option => option.value === colorMode) ?? themeOptions[0]);
 		}
 	};
 
 	const onSubmit = async (userProfileForm: UserProfileFormInput) => {
+		const isCurrencyChanged = user?.currency.id !== userProfileForm.currency.id;
 		const userProfile: UserProfileEntity = {
 			id: userProfileForm.id,
 			userName: user?.userName ?? "",
@@ -95,6 +99,10 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 		await updateUserProfile(userProfile);
 		updateUser(userProfile);
 		setColorMode(selectedTheme.value);
+
+		if (isCurrencyChanged) {
+			await queryClient.invalidateQueries({ queryKey: queryKeys.currencies.all });
+		}
 		modalRef.current?.closeModal();
 	};
 
@@ -106,11 +114,11 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 
 	const { colorMode, setColorMode } = useColorMode();
 	const [selectedTheme, setSelectedTheme] = useState(
-		themeOptions.find(opt => opt.value === colorMode) ?? themeOptions[0]
+		themeOptions.find(option => option.value === colorMode) ?? themeOptions[0]
 	);
 
 	useEffect(() => {
-		setSelectedTheme(themeOptions.find(opt => opt.value === colorMode) ?? themeOptions[0]);
+		setSelectedTheme(themeOptions.find(option => option.value === colorMode) ?? themeOptions[0]);
 	}, [colorMode, themeOptions]);
 
 	return (
@@ -151,8 +159,8 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 					control={control}
 					placeholder={t("user_profile_settings_timezone_placeholder")}
 					collection={state.timeZones}
-					labelSelector={(tz => tz.displayName)}
-					valueSelector={(tz => tz.id)}
+					labelSelector={(timeZone => timeZone.displayName)}
+					valueSelector={(timeZone => timeZone.id)}
 				/>
 				<Field.ErrorText>{errors.timeZone?.message}</Field.ErrorText>
 			</Field.Root>
