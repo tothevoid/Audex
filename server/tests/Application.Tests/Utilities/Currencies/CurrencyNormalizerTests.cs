@@ -12,6 +12,7 @@ namespace Audex.Application.Tests.Utilities.Currencies
         [InlineData("USD", "USD")]
         [InlineData("EUR", "EUR")]
         [InlineData("CNY", "CNY")]
+        [InlineData("aud", "AUD")]
         [InlineData("  RUB  ", "RUB")]
         [InlineData("  USD  ", "USD")]
         public void Normalize_Should_Map_Aliases_And_Trim_Currency(string inputCurrency, string expectedCurrency)

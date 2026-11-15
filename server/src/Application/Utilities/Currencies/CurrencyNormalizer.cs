@@ -15,16 +15,16 @@ namespace Audex.Application.Utilities.Currencies
         {
             if (string.IsNullOrWhiteSpace(currencyText))
             {
-                return defaultCurrency;
+                return defaultCurrency.ToUpperInvariant();
             }
 
             var trimmedCurrency = currencyText.Trim();
             if (CurrencyAliases.TryGetValue(trimmedCurrency, out var mappedCurrency))
             {
-                return mappedCurrency;
+                return mappedCurrency.ToUpperInvariant();
             }
 
-            return trimmedCurrency.Replace("RUR", "RUB", StringComparison.OrdinalIgnoreCase);
+            return trimmedCurrency.Replace("RUR", "RUB", StringComparison.OrdinalIgnoreCase).ToUpperInvariant();
         }
     }
 }

@@ -151,6 +151,12 @@ namespace Audex.Application.Constants
             public const string TickerAlreadyExists = "securities.ticker_already_exists";
         }
 
+        public static class Currencies
+        {
+            public const string CurrencyNameEmpty = "currencies.currency_name_empty";
+            public const string CurrencyAlreadyExists = "currencies.currency_already_exists";
+        }
+
         public static class Statements
         {
             public const string ImportSessionExpired = "statements.import_session_expired";

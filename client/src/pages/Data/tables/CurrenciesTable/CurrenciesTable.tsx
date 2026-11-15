@@ -39,16 +39,20 @@ const CurrenciesTable: React.FC = () => {
             return;
         }
 
-        await updateCurrencyMutation.mutateAsync({ ...currency, active: isChecked });
-    }, [updateCurrencyMutation]);
+        const result = await updateCurrencyMutation.mutateAsync({ ...currency, active: isChecked });
+        if (!result.isSuccess) {
+            notify.error(t("toast_error_title"), result.errorMessage);
+        }
+    }, [updateCurrencyMutation, t]);
 
     const onAdd = () => {
         modalRef.current?.openModal();
     };
 
     const onCurrencyAdded = async (currency: CurrencyEntity) => {
-        const createdCurrencyId = await createCurrencyMutation.mutateAsync(currency);
-        if (!createdCurrencyId) {
+        const result = await createCurrencyMutation.mutateAsync(currency);
+        if (!result.isSuccess) {
+            notify.error(t("toast_error_title"), result.errorMessage);
             return;
         }
 

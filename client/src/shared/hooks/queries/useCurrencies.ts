@@ -37,8 +37,10 @@ export const useCreateCurrencyMutation = () => {
 
     return useMutation({
         mutationFn: (newCurrency: CurrencyEntity) => createCurrency(newCurrency),
-        onSuccess: () => {
-            currentQueryClient.invalidateQueries({ queryKey: queryKeys.currencies.all });
+        onSuccess: (result) => {
+            if (result.isSuccess) {
+                currentQueryClient.invalidateQueries({ queryKey: queryKeys.currencies.all });
+            }
         },
     });
 };
@@ -48,8 +50,10 @@ export const useUpdateCurrencyMutation = () => {
 
     return useMutation({
         mutationFn: (modifiedCurrency: CurrencyEntity) => updateCurrency(modifiedCurrency),
-        onSuccess: () => {
-            currentQueryClient.invalidateQueries({ queryKey: queryKeys.currencies.all });
+        onSuccess: (result) => {
+            if (result.isSuccess) {
+                currentQueryClient.invalidateQueries({ queryKey: queryKeys.currencies.all });
+            }
         },
     });
 };

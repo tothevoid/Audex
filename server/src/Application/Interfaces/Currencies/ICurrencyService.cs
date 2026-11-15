@@ -1,3 +1,5 @@
+#nullable enable
+using Audex.Application.DTO.Common;
 using Audex.Application.DTO.Currencies;
 using System;
 using System.Collections.Generic;
@@ -11,8 +13,9 @@ namespace Audex.Application.Interfaces.Currencies
         Task<int> SyncRatesAsync(CurrencyDto mainCurrency, CancellationToken cancellationToken = default);
         Task<IEnumerable<CurrencyDto>> GetAllAsync();
         Task<CurrencyDto> GetByIdAsync(Guid id);
-        Task<Guid> AddAsync(CurrencyDto currency);
-        Task UpdateAsync(CurrencyDto currency);
+        Task<CurrencyDto?> GetByNameAsync(string name);
+        Task<OperationResultDto<Guid>> AddAsync(CurrencyDto currency);
+        Task<OperationResultDto<bool>> UpdateAsync(CurrencyDto currency);
         Task DeleteAsync(Guid id);
     }
 }

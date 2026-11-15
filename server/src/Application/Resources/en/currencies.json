@@ -1,0 +1,4 @@
+{
+  "currency_name_empty": "Currency name cannot be empty",
+  "currency_already_exists": "Currency with code '{0}' already exists"
+}
