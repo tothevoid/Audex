@@ -19,6 +19,7 @@ export interface BaseModalProps {
     onSubmit?: FormEventHandler;
     visibilityChanged?: (open: boolean) => void;
     bodyMaxH?: string;
+    bodyOverflowY?: "auto" | "visible" | "hidden";
     hasBody?: boolean;
 }
 
@@ -37,6 +38,7 @@ export const BaseModal = forwardRef<BaseModalRef, BaseModalProps>(
             onSubmit,
             visibilityChanged,
             bodyMaxH = "calc(75dvh - 100px)",
+            bodyOverflowY = "auto",
             hasBody = true,
         },
         ref
@@ -113,7 +115,7 @@ export const BaseModal = forwardRef<BaseModalRef, BaseModalProps>(
                             </Dialog.Header>
 
                             {hasBody ? (
-                                <Dialog.Body maxH={bodyMaxH} overflowY="auto" color="text_primary">
+                                <Dialog.Body maxH={bodyMaxH} overflowY={bodyOverflowY} color="text_primary">
                                     {children}
                                 </Dialog.Body>
                             ) : (

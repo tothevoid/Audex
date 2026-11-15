@@ -114,7 +114,7 @@ Always use these centralized utilities instead of reimplementing inline logic:
    - `dateFormatter.ts`: `formatDate`, `formatDateTime`, `formatShortDateTime`, `formatMonth`, `formatShortMonth`, `formatMonthYear`, `formatMonthYearByDate`, `formatChartAxisDate`, `formatChartTooltipDate`.
    - `moneyFormatter.ts` & `numberWordsFormatter.ts`: `formatMoneyByCurrencyCulture`, `formatAdaptiveNumber`, `formatNumberToWords`.
    - Domain formatters: `accountTypeFormatter.ts`, `securityTypeFormatter.ts`, `fileFormatter.ts`.
-4. **Currencies (`currencyUtils.tsx`)**: `getCurrencySymbol`, `getCurrencyColor`, `getCurrencyIcon`.
+4. **Currencies (`currencyUtils.tsx`)**: `getCurrencySymbol`, `getCurrencyColor`, `getCurrencyIcon`, `getCurrencyDisplayName`, `getAvailableWorldCurrencies` (powered natively by `Intl.supportedValuesOf('currency')` and `Intl.DisplayNames`).
 5. **IDs (`idUtilities.ts`)**: `generateGuid()` (always use for draft/join entity UUIDs; never raw `crypto.randomUUID()`).
 6. **Errors (`webApiUtilities.ts`)**: `parseErrorMessage(error: unknown, defaultMessage?)`, `parseErrorCode(error: unknown)`, `ApiException`.
 7. **Financial Diffs (`numericDiffsUtilities.ts`)**: `calculateDiff`, `getDiffColor`.

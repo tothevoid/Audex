@@ -9,6 +9,8 @@
     "currencies_data_add": "Add currency",
     "currencies_data_sync_rates": "Sync rates",
     "currencies_delete_title": "Delete currency",
+    "currencies_select_placeholder": "Select currency from list",
+    "currencies_no_available_to_add": "All available currencies have been added",
 
     "entity_currency_name_form_title": "Currency",
     "entity_currency_name": "Name",

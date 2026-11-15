@@ -12,6 +12,7 @@ export interface BaseFormModalProps {
     saveButtonTitle?: string;
     size?: "xs" | "sm" | "md" | "lg" | "xl" | "cover" | "full";
     maxW?: string;
+    bodyOverflowY?: "auto" | "visible" | "hidden";
 }
 
 export const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>(
@@ -24,6 +25,7 @@ export const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>(
             saveButtonTitle,
             size,
             maxW,
+            bodyOverflowY,
         },
         ref
     ) => {
@@ -38,6 +40,7 @@ export const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>(
                 visibilityChanged={visibilityChanged}
                 size={size}
                 maxW={maxW}
+                bodyOverflowY={bodyOverflowY}
                 footer={({ closeModal }) => (
                     <Flex gap={3} justify="flex-end" w="100%">
                         <Button colorPalette="blue" type="submit">

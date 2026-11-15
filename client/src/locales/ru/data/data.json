@@ -9,6 +9,8 @@
     "currencies_data_add": "Добавить валюту",
     "currencies_data_sync_rates": "Синхронизировать курсы",
     "currencies_delete_title": "Удалить валюту",
+    "currencies_select_placeholder": "Выберите валюту из списка",
+    "currencies_no_available_to_add": "Все доступные валюты уже добавлены",
 
     "entity_currency_name_form_title": "Валюта",
     "entity_currency_name": "Название",

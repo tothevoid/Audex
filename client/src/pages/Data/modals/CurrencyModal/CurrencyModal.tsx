@@ -1,63 +1,105 @@
-import { Field, Input } from "@chakra-ui/react";
-import React, { RefObject, useCallback, useMemo } from "react";
+import { Field } from "@chakra-ui/react";
+import React, { RefObject, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { getCurrencyModalValidationSchema, CurrencyFormInput } from "./CurrencyValidationSchema";
 import { useTranslation } from "react-i18next";
 import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
+import { WorldCurrencyDescriptor } from "@/models/currencies/WorldCurrencyDescriptor";
 import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
+import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import { generateGuid } from "@/shared/utilities/idUtilities";
+import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
+import { getAvailableWorldCurrencies } from "@/shared/utilities/currencyUtils";
 
 interface ModalProps {
-	modalRef: RefObject<BaseModalRef | null>;
-	currency?: CurrencyEntity | null;
-	onSaved: (account: CurrencyEntity) => void;
+    modalRef: RefObject<BaseModalRef | null>;
+    onSaved: (currency: CurrencyEntity) => void;
 }
 
 const CurrencyModal: React.FC<ModalProps> = ({
-	modalRef,
-	currency,
-	onSaved,
+    modalRef,
+    onSaved,
 }: ModalProps) => {
-	const { t } = useTranslation();
-	const validationSchema = useMemo(() => getCurrencyModalValidationSchema(t), [t]);
+    const { t, i18n } = useTranslation();
+    const { data: existingCurrencies = [] } = useCurrencies();
 
-	const getDefaultValues = useCallback(() => ({
-		id: currency?.id ?? generateGuid(),
-		name: currency?.name ?? "",
-		active: currency?.active ?? true,
-	}), [currency]);
+    const availableCurrencies = useMemo(() => {
+        const existingCurrencyCodes = new Set(
+            existingCurrencies.map((existingCurrency) => existingCurrency.name.toUpperCase())
+        );
 
-	const { register, handleSubmit, control, formState: { errors } } = useForm<CurrencyFormInput>({
-		resolver: zodResolver(validationSchema),
-		mode: "onBlur",
-		defaultValues: getDefaultValues(),
-	});
+        const allWorldCurrencies = getAvailableWorldCurrencies(i18n.language);
 
-	const onSubmit = (formData: CurrencyFormInput) => {
-		onSaved(formData as CurrencyEntity);
-		modalRef?.current?.closeModal();
-	};
+        return allWorldCurrencies.filter(
+            (worldCurrency) => !existingCurrencyCodes.has(worldCurrency.code.toUpperCase())
+        );
+    }, [existingCurrencies, i18n.language]);
 
-	const handleFormSubmit: React.FormEventHandler = (event) => {
-		handleSubmit(onSubmit)(event);
-	};
+    const validationSchema = useMemo(() => getCurrencyModalValidationSchema(t), [t]);
 
-	return (
-		<BaseFormModal ref={modalRef} title={t("entity_currency_name_form_title")} submitHandler={handleFormSubmit}>
-			<Field.Root invalid={!!errors.name}>
-				<Field.Label>{t("entity_currency_name")}</Field.Label>
-				<Input {...register("name")} autoComplete="off" placeholder='USD' />
-				<Field.ErrorText>{errors.name?.message}</Field.ErrorText>
-			</Field.Root>
-			<Field.Root invalid={!!errors.active} mt={4}>
-				<CheckboxInput name="active" control={control} title={t("entity_currency_active")} />
-				<Field.ErrorText>{errors.active?.message}</Field.ErrorText>
-			</Field.Root>
-		</BaseFormModal>
-	);
+    const createInitialFormValues = (): Partial<CurrencyFormInput> => ({
+        id: generateGuid(),
+        selectedCurrency: undefined,
+        active: true,
+    });
+
+    const { handleSubmit, control, formState: { errors }, reset } = useForm<CurrencyFormInput>({
+        resolver: zodResolver(validationSchema),
+        mode: "onBlur",
+        defaultValues: createInitialFormValues(),
+    });
+
+    const onVisibilityChanged = (isOpen: boolean) => {
+        if (isOpen) {
+            reset(createInitialFormValues());
+        }
+    };
+
+    const onSubmit = (formData: CurrencyFormInput) => {
+        onSaved({
+            id: formData.id ?? generateGuid(),
+            name: formData.selectedCurrency.code,
+            active: formData.active,
+            rate: 0,
+        });
+        modalRef?.current?.closeModal();
+    };
+
+    const handleFormSubmit: React.FormEventHandler = (event) => {
+        handleSubmit(onSubmit)(event);
+    };
+
+    return (
+        <BaseFormModal
+            ref={modalRef}
+            title={t("entity_currency_name_form_title")}
+            submitHandler={handleFormSubmit}
+            visibilityChanged={onVisibilityChanged}
+            maxW="480px"
+            bodyOverflowY="visible"
+        >
+            <Field.Root invalid={!!errors.selectedCurrency}>
+                <Field.Label>{t("entity_currency_name")}</Field.Label>
+                <CollectionSelect<WorldCurrencyDescriptor, CurrencyFormInput, false>
+                    name="selectedCurrency"
+                    control={control}
+                    placeholder={t("currencies_select_placeholder")}
+                    collection={availableCurrencies}
+                    labelSelector={(currencyOption) => currencyOption.label}
+                    valueSelector={(currencyOption) => currencyOption.code}
+                    isClearable={false}
+                />
+                <Field.ErrorText>{errors.selectedCurrency?.message}</Field.ErrorText>
+            </Field.Root>
+            <Field.Root invalid={!!errors.active} mt={4}>
+                <CheckboxInput name="active" control={control} title={t("entity_currency_active")} />
+                <Field.ErrorText>{errors.active?.message}</Field.ErrorText>
+            </Field.Root>
+        </BaseFormModal>
+    );
 };
 
 export default CurrencyModal;
