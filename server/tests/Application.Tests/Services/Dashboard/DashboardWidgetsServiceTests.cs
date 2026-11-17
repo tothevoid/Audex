@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Dashboard.Widgets;
@@ -18,6 +19,7 @@ namespace Audex.Application.Tests.Services.Dashboard
     {
         public DashboardWidgetsServiceTests(ServiceProviderFixture serviceProviderFixture) : base(serviceProviderFixture)
         {
+            CultureInfo.CurrentUICulture = new CultureInfo("ru");
         }
 
         [Fact]

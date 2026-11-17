@@ -73,6 +73,8 @@ app.UseMiddleware<DatabaseMaintenanceMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseMiddleware<UserCultureMiddleware>();
+
 app.UseAudexRequestLogging();
 
 app.MapControllers();

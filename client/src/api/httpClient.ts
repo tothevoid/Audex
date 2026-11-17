@@ -35,6 +35,7 @@ httpClient.interceptors.request.use((requestConfig: InternalAxiosRequestConfig) 
     customConfig._requestId = requestId;
     customConfig._startTime = performance.now();
     requestConfig.headers["X-Request-Id"] = requestId;
+    requestConfig.headers["Accept-Language"] = i18n.language || "en";
 
     if (import.meta.env.DEV) {
         const httpMethod = requestConfig.method?.toUpperCase() ?? "GET";

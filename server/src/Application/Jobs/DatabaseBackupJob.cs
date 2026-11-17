@@ -11,6 +11,7 @@ using Audex.Application.Interfaces.FileStorage;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Notifications;
 using Audex.Application.Interfaces.Scheduler;
+using Audex.Application.Interfaces.User;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Entities.Notifications;
 using Audex.Infrastructure.Entities.Scheduler;
@@ -40,8 +41,9 @@ namespace Audex.Application.Jobs
             ILocalizationService localizer,
             IDatabaseStateService databaseStateService,
             ISchedulerAttachmentService attachmentService,
-            IServerNotifier serverNotifier)
-            : base(databaseStateService, attachmentService, serverNotifier)
+            IServerNotifier serverNotifier,
+            IUserProfileService userProfileService)
+            : base(databaseStateService, attachmentService, serverNotifier, userProfileService)
         {
             _backupService = backupService;
             _fileStorageService = fileStorageService;
@@ -103,8 +105,8 @@ namespace Audex.Application.Jobs
             };
 
             var titleKey = backup.IsEncrypted ? LocalizationKeys.Notifications.BackupReadyEncryptedTitle : LocalizationKeys.Notifications.BackupReadyTitle;
-            var title = await _localizer.GetForUserAsync(titleKey, UserProfileConstants.UserProfileId);
-            var message = await _localizer.GetForUserAsync(LocalizationKeys.Notifications.BackupReadyMessage, UserProfileConstants.UserProfileId, backup.FileName);
+            var title = _localizer.Get(titleKey);
+            var message = _localizer.Get(LocalizationKeys.Notifications.BackupReadyMessage, backup.FileName);
 
             await _notificationService.CreateAsync(
                 title: title,
@@ -115,7 +117,7 @@ namespace Audex.Application.Jobs
                 userProfileId: UserProfileConstants.UserProfileId);
 
             var encryptedPrefix = backup.IsEncrypted ? "encrypted " : "";
-            var logMessage = await _localizer.GetForUserAsync(LocalizationKeys.Scheduler.BackupSuccess, UserProfileConstants.UserProfileId, encryptedPrefix, backup.FileSizeBytes / 1024.0);
+            var logMessage = _localizer.Get(LocalizationKeys.Scheduler.BackupSuccess, encryptedPrefix, backup.FileSizeBytes / 1024.0);
 
             return JobExecutionResult.Success(
                 logMessage: logMessage,
@@ -127,8 +129,8 @@ namespace Audex.Application.Jobs
             Exception exception,
             CancellationToken cancellationToken)
         {
-            var title = await _localizer.GetForUserAsync(LocalizationKeys.Notifications.BackupFailedTitle, UserProfileConstants.UserProfileId);
-            var message = await _localizer.GetForUserAsync(LocalizationKeys.Notifications.BackupFailedMessage, UserProfileConstants.UserProfileId, exception.Message);
+            var title = _localizer.Get(LocalizationKeys.Notifications.BackupFailedTitle);
+            var message = _localizer.Get(LocalizationKeys.Notifications.BackupFailedMessage, exception.Message);
 
             await _notificationService.CreateAsync(
                 title: title,

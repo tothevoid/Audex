@@ -12,6 +12,7 @@ using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Notifications;
 using Audex.Application.Interfaces.Reports;
 using Audex.Application.Interfaces.Scheduler;
+using Audex.Application.Interfaces.User;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Entities.Notifications;
 using Audex.Infrastructure.Entities.Scheduler;
@@ -40,8 +41,9 @@ namespace Audex.Application.Jobs
             ILocalizationService localizer,
             IDatabaseStateService databaseStateService,
             ISchedulerAttachmentService attachmentService,
-            IServerNotifier serverNotifier)
-            : base(databaseStateService, attachmentService, serverNotifier)
+            IServerNotifier serverNotifier,
+            IUserProfileService userProfileService)
+            : base(databaseStateService, attachmentService, serverNotifier, userProfileService)
         {
             _reportService = reportService;
             _fileStorageService = fileStorageService;
@@ -91,8 +93,8 @@ namespace Audex.Application.Jobs
                 CreatedAt = DateTime.UtcNow
             };
 
-            var title = await _localizer.GetForUserAsync(LocalizationKeys.Notifications.ReportGeneratedTitle, UserProfileConstants.UserProfileId);
-            var message = await _localizer.GetForUserAsync(LocalizationKeys.Notifications.ReportGeneratedMessage, UserProfileConstants.UserProfileId, report.FileName);
+            var title = _localizer.Get(LocalizationKeys.Notifications.ReportGeneratedTitle);
+            var message = _localizer.Get(LocalizationKeys.Notifications.ReportGeneratedMessage, report.FileName);
 
             await _notificationService.CreateAsync(
                 title: title,
@@ -101,7 +103,7 @@ namespace Audex.Application.Jobs
                 category: "Reports",
                 userProfileId: UserProfileConstants.UserProfileId);
 
-            var logMessage = await _localizer.GetForUserAsync(LocalizationKeys.Scheduler.AssetReportSuccess, UserProfileConstants.UserProfileId, report.FileName, report.FileSizeBytes / 1024);
+            var logMessage = _localizer.Get(LocalizationKeys.Scheduler.AssetReportSuccess, report.FileName, report.FileSizeBytes / 1024);
 
             return JobExecutionResult.Success(
                 logMessage: logMessage,
@@ -113,8 +115,8 @@ namespace Audex.Application.Jobs
             Exception exception,
             CancellationToken cancellationToken)
         {
-            var title = await _localizer.GetForUserAsync(LocalizationKeys.Notifications.ReportGenerationFailedTitle, UserProfileConstants.UserProfileId);
-            var message = await _localizer.GetForUserAsync(LocalizationKeys.Notifications.ReportGenerationFailedMessage, UserProfileConstants.UserProfileId, exception.Message);
+            var title = _localizer.Get(LocalizationKeys.Notifications.ReportGenerationFailedTitle);
+            var message = _localizer.Get(LocalizationKeys.Notifications.ReportGenerationFailedMessage, exception.Message);
 
             await _notificationService.CreateAsync(
                 title: title,

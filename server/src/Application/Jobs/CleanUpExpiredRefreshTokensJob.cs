@@ -11,6 +11,7 @@ using Audex.Application.Interfaces.DatabaseBackup;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Notifications;
 using Audex.Application.Interfaces.Scheduler;
+using Audex.Application.Interfaces.User;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Entities.Notifications;
 using Audex.Infrastructure.Interfaces.Messages;
@@ -36,8 +37,9 @@ namespace Audex.Application.Jobs
             ILocalizationService localizer,
             IDatabaseStateService databaseStateService,
             ISchedulerAttachmentService attachmentService,
-            IServerNotifier serverNotifier)
-            : base(databaseStateService, attachmentService, serverNotifier)
+            IServerNotifier serverNotifier,
+            IUserProfileService userProfileService)
+            : base(databaseStateService, attachmentService, serverNotifier, userProfileService)
         {
             _authService = authService;
             _notificationService = notificationService;
@@ -65,8 +67,8 @@ namespace Audex.Application.Jobs
             if (deletedCount > 0)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var title = await _localizer.GetForUserAsync(LocalizationKeys.Notifications.SessionCleanupTitle, UserProfileConstants.UserProfileId);
-                var message = await _localizer.GetForUserAsync(LocalizationKeys.Notifications.SessionCleanupMessage, UserProfileConstants.UserProfileId, deletedCount);
+                var title = _localizer.Get(LocalizationKeys.Notifications.SessionCleanupTitle);
+                var message = _localizer.Get(LocalizationKeys.Notifications.SessionCleanupMessage, deletedCount);
 
                 await _notificationService.CreateAsync(
                     title: title,
@@ -76,7 +78,7 @@ namespace Audex.Application.Jobs
                     userProfileId: UserProfileConstants.UserProfileId);
             }
 
-            var logMessage = await _localizer.GetForUserAsync(LocalizationKeys.Scheduler.CleanUpSessionsSuccess, UserProfileConstants.UserProfileId, deletedCount);
+            var logMessage = _localizer.Get(LocalizationKeys.Scheduler.CleanUpSessionsSuccess, deletedCount);
             return JobExecutionResult.Success(logMessage);
         }
     }

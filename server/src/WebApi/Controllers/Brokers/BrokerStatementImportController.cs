@@ -50,7 +50,7 @@ namespace Audex.WebApi.Controllers.Brokers
                 {
                     Status = StatusCodes.Status400BadRequest,
                     Title = "Bad Request",
-                    Detail = await _localizer.GetForUserAsync(LocalizationKeys.Errors.ValidationError)
+                    Detail = _localizer.Get(LocalizationKeys.Errors.ValidationError)
                 });
             }
 

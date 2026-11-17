@@ -197,9 +197,7 @@ namespace Audex.Application.Services.Crypto
             var pullResponse = await _cryptoConnector.GetPricesAsync(dtos, cancellationToken);
             if (!pullResponse.IsSuccess || pullResponse.Data == null)
             {
-                var errorMessage = await _localizer.GetForUserAsync(
-                    LocalizationKeys.Crypto.Errors.ProviderUnavailable,
-                    UserProfileConstants.UserProfileId);
+                var errorMessage = _localizer.Get(LocalizationKeys.Crypto.Errors.ProviderUnavailable);
 
                 return OperationResultDto<PullCryptoPricesResultDto>.Failure(
                     errorMessage,
@@ -208,9 +206,7 @@ namespace Audex.Application.Services.Crypto
 
             if (pullResponse.Data.Count == 0)
             {
-                var errorMessage = await _localizer.GetForUserAsync(
-                    LocalizationKeys.Crypto.Errors.NoMatchingPricesFound,
-                    UserProfileConstants.UserProfileId);
+                var errorMessage = _localizer.Get(LocalizationKeys.Crypto.Errors.NoMatchingPricesFound);
 
                 return OperationResultDto<PullCryptoPricesResultDto>.Failure(
                     errorMessage,

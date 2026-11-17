@@ -13,19 +13,19 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			if (!userProfile) return;
 
 			setUser(userProfile);
-			changeLanguage(userProfile.languageCode);
+			changeLanguage(userProfile.language.code);
 		};
 		fetchUser();
 	}, []);
 
 	const updateUser = useCallback((updatedUser: UserProfileEntity) => {
-		const isLanguageChanged = user?.languageCode !== updatedUser.languageCode;
+		const isLanguageChanged = user?.language.code !== updatedUser.language.code;
 		setUser(updatedUser);
 		if (isLanguageChanged) {
-			changeLanguage(updatedUser.languageCode);
-			localStorage.setItem("lang", updatedUser.languageCode);
+			changeLanguage(updatedUser.language.code);
+			localStorage.setItem("lang", updatedUser.language.code);
 		}
-	}, [user?.languageCode]);
+	}, [user?.language.code]);
 
 	return (
 		<UserContext.Provider value={{ user, updateUser }}>

@@ -1,38 +1,40 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Globalization;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Audex.Application.Enums.Localization;
 using Audex.Application.Interfaces.Localization;
-using Audex.Application.Interfaces.User;
 
 namespace Audex.Application.Services.Localization
 {
     public class LocalizationService : ILocalizationService
     {
-        private const string DefaultLanguage = "en";
         private readonly ITranslationProvider _translationProvider;
-        private readonly IUserProfileService _userProfileService;
         private readonly ILogger<LocalizationService> _logger;
 
         public LocalizationService(
             ITranslationProvider translationProvider,
-            IUserProfileService userProfileService,
             ILogger<LocalizationService> logger)
         {
             _translationProvider = translationProvider;
-            _userProfileService = userProfileService;
             _logger = logger;
         }
 
-        public string Get(string key, string? languageCode = null, params object[] args)
+        public string Get(string key, params object[] args)
         {
             if (string.IsNullOrWhiteSpace(key))
             {
                 return string.Empty;
             }
 
-            var template = _translationProvider.GetTranslation(languageCode, key);
+            var currentCultureName = CultureInfo.CurrentUICulture.Name;
+            if (!AppLanguageExtensions.TryParse(currentCultureName, out var appLanguage))
+            {
+                throw new InvalidOperationException(
+                    $"Localization culture has not been initialized for key '{key}'. CurrentUICulture is '{currentCultureName}'. Ensure the request runs through UserCultureMiddleware or ScheduledJobBase.");
+            }
+
+            var template = _translationProvider.GetTranslation(appLanguage, key);
 
             if (args != null && args.Length > 0)
             {
@@ -40,34 +42,14 @@ namespace Audex.Application.Services.Localization
                 {
                     return string.Format(CultureInfo.InvariantCulture, template, args);
                 }
-                catch (FormatException ex)
+                catch (FormatException exception)
                 {
-                    _logger.LogWarning(ex, "Failed to format localized template for key '{Key}' with language '{Language}'", key, languageCode);
+                    _logger.LogWarning(exception, "Failed to format localized template for key '{Key}' with language '{Language}'", key, appLanguage.ToCode());
                     return template;
                 }
             }
 
             return template;
-        }
-
-        public async Task<string> GetUserLanguageAsync(Guid? userProfileId = null)
-        {
-            try
-            {
-                var user = await _userProfileService.GetAsync();
-                return _translationProvider.NormalizeLanguageCode(user?.LanguageCode);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Failed to resolve user language profile. Falling back to default language '{DefaultLanguage}'", DefaultLanguage);
-                return DefaultLanguage;
-            }
-        }
-
-        public async Task<string> GetForUserAsync(string key, Guid? userProfileId = null, params object[] args)
-        {
-            var userLang = await GetUserLanguageAsync(userProfileId);
-            return Get(key, userLang, args);
         }
     }
 }

@@ -297,12 +297,12 @@ namespace Audex.Application.Services.Securities
             var existingSecurity = await _securityRepo.GetByIdAsync(securityDto.Id);
             if (existingSecurity == null)
             {
-                return OperationResultDto<SecurityDto>.Failure(await _localizer.GetForUserAsync(LocalizationKeys.Errors.EntityNotFound));
+                return OperationResultDto<SecurityDto>.Failure(_localizer.Get(LocalizationKeys.Errors.EntityNotFound));
             }
 
             if (string.IsNullOrWhiteSpace(securityDto.Ticker))
             {
-                return OperationResultDto<SecurityDto>.Failure(await _localizer.GetForUserAsync(LocalizationKeys.Errors.ValidationError));
+                return OperationResultDto<SecurityDto>.Failure(_localizer.Get(LocalizationKeys.Errors.ValidationError));
             }
 
             if (!string.Equals(securityDto.Ticker, existingSecurity.Ticker, StringComparison.OrdinalIgnoreCase))
@@ -366,7 +366,7 @@ namespace Audex.Application.Services.Securities
         {
             if (string.IsNullOrWhiteSpace(ticker))
             {
-                return await _localizer.GetForUserAsync(LocalizationKeys.Errors.ValidationError);
+                return _localizer.Get(LocalizationKeys.Errors.ValidationError);
             }
 
             var upperTicker = ticker.ToUpper();
@@ -375,7 +375,7 @@ namespace Audex.Application.Services.Securities
 
             if (duplicate != null)
             {
-                return await _localizer.GetForUserAsync(LocalizationKeys.Securities.TickerAlreadyExists, null, ticker);
+                return _localizer.Get(LocalizationKeys.Securities.TickerAlreadyExists, ticker);
             }
 
             return null;

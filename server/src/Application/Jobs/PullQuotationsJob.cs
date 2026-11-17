@@ -10,6 +10,7 @@ using Audex.Application.Interfaces.Brokers;
 using Audex.Application.Interfaces.DatabaseBackup;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Scheduler;
+using Audex.Application.Interfaces.User;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Interfaces.Messages;
 using TickerQ.Utilities.Base;
@@ -32,8 +33,9 @@ namespace Audex.Application.Jobs
             ILocalizationService localizer,
             IDatabaseStateService databaseStateService,
             ISchedulerAttachmentService attachmentService,
-            IServerNotifier serverNotifier)
-            : base(databaseStateService, attachmentService, serverNotifier)
+            IServerNotifier serverNotifier,
+            IUserProfileService userProfileService)
+            : base(databaseStateService, attachmentService, serverNotifier, userProfileService)
         {
             _brokerAccountSecurityService = brokerAccountSecurityService;
             _localizer = localizer;
@@ -56,7 +58,7 @@ namespace Audex.Application.Jobs
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _brokerAccountSecurityService.PullQuotationsAsync(cancellationToken);
-            var logMessage = await _localizer.GetForUserAsync(LocalizationKeys.Scheduler.PullQuotationsSuccess, UserProfileConstants.UserProfileId);
+            var logMessage = _localizer.Get(LocalizationKeys.Scheduler.PullQuotationsSuccess);
             return JobExecutionResult.Success(logMessage);
         }
     }

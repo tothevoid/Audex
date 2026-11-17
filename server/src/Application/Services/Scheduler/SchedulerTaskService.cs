@@ -43,8 +43,6 @@ namespace Audex.Application.Services.Scheduler
 
         public async Task<IEnumerable<ScheduledTaskDefinitionDto>> GetNotScheduledTasksAsync()
         {
-            var lang = await _localizer.GetUserLanguageAsync();
-
             var tickers = await _tickerRepo.GetAllAsync(disableTracking: true);
             var configuredNames = tickers
                 .Select(ticker => ticker.Function)
@@ -57,9 +55,9 @@ namespace Audex.Application.Services.Scheduler
                 .Select(descriptor => new ScheduledTaskDefinitionDto
                 {
                     TaskName = descriptor.TaskName,
-                    DisplayName = !string.IsNullOrWhiteSpace(descriptor.DisplayNameKey) ? _localizer.Get(descriptor.DisplayNameKey, lang) : descriptor.TaskName,
-                    Description = !string.IsNullOrWhiteSpace(descriptor.DescriptionKey) ? _localizer.Get(descriptor.DescriptionKey, lang) : string.Empty,
-                    Category = !string.IsNullOrWhiteSpace(descriptor.CategoryKey) ? _localizer.Get(descriptor.CategoryKey, lang) : "General",
+                    DisplayName = !string.IsNullOrWhiteSpace(descriptor.DisplayNameKey) ? _localizer.Get(descriptor.DisplayNameKey) : descriptor.TaskName,
+                    Description = !string.IsNullOrWhiteSpace(descriptor.DescriptionKey) ? _localizer.Get(descriptor.DescriptionKey) : string.Empty,
+                    Category = !string.IsNullOrWhiteSpace(descriptor.CategoryKey) ? _localizer.Get(descriptor.CategoryKey) : "General",
                     DefaultCronExpression = descriptor.DefaultCronExpression
                 }).ToList();
         }
@@ -76,8 +74,6 @@ namespace Audex.Application.Services.Scheduler
 
         private async Task<IEnumerable<ScheduledTaskDto>> GetTasksInternalAsync(Expression<Func<ScheduledCronTicker, bool>> filter = null)
         {
-            var language = await _localizer.GetUserLanguageAsync();
-
             var tickers = await _tickerRepo.GetAllAsync(
                 filter: filter,
                 include: GetFullHierarchyColumns,
@@ -90,7 +86,7 @@ namespace Audex.Application.Services.Scheduler
                 {
                     var descriptor = _jobRegistry.TryGetDescriptor(ticker.Function, out var jobDescriptor) ? jobDescriptor : null;
                     var latestOccurrence = ticker.Occurrences.FirstOrDefault();
-                    return MapToDto(ticker, descriptor, latestOccurrence, currentUtcTime, language);
+                    return MapToDto(ticker, descriptor, latestOccurrence, currentUtcTime);
                 })
                 .ToList();
         }
@@ -101,8 +97,6 @@ namespace Audex.Application.Services.Scheduler
             {
                 return null;
             }
-
-            var lang = await _localizer.GetUserLanguageAsync();
 
             var tickers = await _tickerRepo.GetAllAsync(
                 filter: ticker => ticker.Function == taskName,
@@ -117,7 +111,7 @@ namespace Audex.Application.Services.Scheduler
 
             var descriptor = _jobRegistry.TryGetDescriptor(taskName, out var jobDescriptor) ? jobDescriptor : null;
             var latestOccurrence = ticker.Occurrences.FirstOrDefault();
-            return MapToDto(ticker, descriptor, latestOccurrence, DateTime.UtcNow, lang);
+            return MapToDto(ticker, descriptor, latestOccurrence, DateTime.UtcNow);
         }
 
         public async Task<ScheduledTaskDto> CreateTaskAsync(CreateScheduledTaskDto dto)
@@ -150,12 +144,10 @@ namespace Audex.Application.Services.Scheduler
                 throw new InvalidOperationException($"Task '{dto.TaskName}' is already created. Only one schedule per task is allowed.");
             }
 
-            var lang = await _localizer.GetUserLanguageAsync();
-
             var newTicker = new ScheduledCronTicker
             {
                 Id = Guid.NewGuid(),
-                Description = !string.IsNullOrWhiteSpace(descriptor.DisplayNameKey) ? _localizer.Get(descriptor.DisplayNameKey, lang) : descriptor.TaskName,
+                Description = !string.IsNullOrWhiteSpace(descriptor.DisplayNameKey) ? _localizer.Get(descriptor.DisplayNameKey) : descriptor.TaskName,
                 Function = descriptor.TaskName,
                 Expression = tickerCronExpression,
                 IsEnabled = dto.IsEnabled
@@ -164,7 +156,7 @@ namespace Audex.Application.Services.Scheduler
             await _tickerRepo.AddAsync(newTicker);
             await _db.CommitAsync();
 
-            return MapToDto(newTicker, descriptor, null, DateTime.UtcNow, lang);
+            return MapToDto(newTicker, descriptor, null, DateTime.UtcNow);
         }
 
         public async Task<bool> UpdateScheduleAsync(string taskName, UpdateScheduleDto dto)
@@ -280,18 +272,17 @@ namespace Audex.Application.Services.Scheduler
             ScheduledCronTicker ticker,
             ScheduledJobDescriptor descriptor,
             CronTickerOccurrenceEntity<ScheduledCronTicker> latestOccurrence,
-            DateTime currentUtcTime,
-            string lang)
+            DateTime currentUtcTime)
         {
             var taskName = descriptor?.TaskName ?? ticker.Function;
             var displayName = !string.IsNullOrWhiteSpace(descriptor?.DisplayNameKey)
-                ? _localizer.Get(descriptor.DisplayNameKey, lang)
+                ? _localizer.Get(descriptor.DisplayNameKey)
                 : taskName;
             var description = !string.IsNullOrWhiteSpace(descriptor?.DescriptionKey)
-                ? _localizer.Get(descriptor.DescriptionKey, lang)
+                ? _localizer.Get(descriptor.DescriptionKey)
                 : ticker.Description ?? string.Empty;
             var category = !string.IsNullOrWhiteSpace(descriptor?.CategoryKey)
-                ? _localizer.Get(descriptor.CategoryKey, lang)
+                ? _localizer.Get(descriptor.CategoryKey)
                 : "General";
             var clientCronExpression = CronExpressionHelper.ToStandardCron(ticker.Expression);
 

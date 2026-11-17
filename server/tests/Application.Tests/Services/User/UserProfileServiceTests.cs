@@ -23,6 +23,9 @@ namespace Audex.Application.Tests.Services.User
 
             Assert.NotNull(user);
             Assert.NotEqual(Guid.Empty, user.Id);
+            Assert.NotNull(user.Language);
+            Assert.NotEmpty(user.Language.Code);
+            Assert.NotEmpty(user.Language.Name);
         }
 
         [Fact]

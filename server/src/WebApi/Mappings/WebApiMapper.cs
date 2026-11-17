@@ -129,6 +129,9 @@ namespace Audex.WebApi.Mappings
         public partial UserProfileDto Map(UserProfileModel model);
         public partial UserProfileModel Map(UserProfileDto dto);
 
+        public partial LanguageModel Map(LanguageDto dto);
+        public partial LanguageDto Map(LanguageModel model);
+
         public partial GlobalDashboardModel Map(GlobalDashboardDto dto);
         public partial TransactionsGlobalDashboardModel Map(TransactionsGlobalDashboardDto dto);
         public partial BrokerAccountsGlobalDashboardModel Map(BrokerAccountsGlobalDashboardDto dto);

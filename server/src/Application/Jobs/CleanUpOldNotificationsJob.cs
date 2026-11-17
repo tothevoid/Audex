@@ -10,6 +10,7 @@ using Audex.Application.Interfaces.DatabaseBackup;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Notifications;
 using Audex.Application.Interfaces.Scheduler;
+using Audex.Application.Interfaces.User;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Interfaces.Messages;
 using TickerQ.Utilities.Base;
@@ -32,8 +33,9 @@ namespace Audex.Application.Jobs
             ILocalizationService localizer,
             IDatabaseStateService databaseStateService,
             ISchedulerAttachmentService attachmentService,
-            IServerNotifier serverNotifier)
-            : base(databaseStateService, attachmentService, serverNotifier)
+            IServerNotifier serverNotifier,
+            IUserProfileService userProfileService)
+            : base(databaseStateService, attachmentService, serverNotifier, userProfileService)
         {
             _notificationService = notificationService;
             _localizer = localizer;
@@ -56,7 +58,7 @@ namespace Audex.Application.Jobs
         {
             cancellationToken.ThrowIfCancellationRequested();
             await _notificationService.CleanUpOldNotificationsAsync(olderThanDays: 90, cancellationToken: cancellationToken);
-            var logMessage = await _localizer.GetForUserAsync(LocalizationKeys.Scheduler.CleanUpNotificationsSuccess, UserProfileConstants.UserProfileId, 90);
+            var logMessage = _localizer.Get(LocalizationKeys.Scheduler.CleanUpNotificationsSuccess, 90);
             return JobExecutionResult.Success(logMessage);
         }
     }

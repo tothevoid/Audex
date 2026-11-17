@@ -1,4 +1,5 @@
-﻿using System.IO;
+using System.Globalization;
+using System.IO;
 using ClosedXML.Excel;
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO;
@@ -21,6 +22,7 @@ namespace Audex.Application.Tests.Services.Reports
             var report = await ExecuteScopeAsync(async sp =>
             {
                 var service = sp.GetRequiredService<IAllAssetsReportService>();
+                CultureInfo.CurrentUICulture = new CultureInfo("ru");
                 return await service.CreateReportAsync();
             });
 
@@ -43,8 +45,9 @@ namespace Audex.Application.Tests.Services.Reports
                 await userService.UpdateAsync(new UserProfileDto
                 {
                     Id = UserProfileConstants.UserProfileId,
-                    LanguageCode = "ru-RU"
+                    LanguageCode = "ru"
                 });
+                CultureInfo.CurrentUICulture = new CultureInfo("ru");
 
                 var ruReport = await service.CreateReportAsync();
                 using (var stream = new MemoryStream(ruReport.Data))
@@ -59,8 +62,9 @@ namespace Audex.Application.Tests.Services.Reports
                 await userService.UpdateAsync(new UserProfileDto
                 {
                     Id = UserProfileConstants.UserProfileId,
-                    LanguageCode = "en-US"
+                    LanguageCode = "en"
                 });
+                CultureInfo.CurrentUICulture = new CultureInfo("en");
 
                 var enReport = await service.CreateReportAsync();
                 using (var stream = new MemoryStream(enReport.Data))

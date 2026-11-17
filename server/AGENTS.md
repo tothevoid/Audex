@@ -55,7 +55,7 @@ These guidelines apply to all backend code under `server/` and extend the root [
 - **No Unused Parameters**: Controller signatures MUST NOT accept parameters not forwarded to services.
 - **Dual Endpoints**: When `brokerAccountId` is optional/nullable, provide both `GetAll(...)` (aggregate) and `GetByBrokerAccount(..., Guid brokerAccountId)` (single account).
 - **Error Responses**: Exceptions return RFC 7807 `ProblemDetails`.
-- **Operation Result Pattern (`OperationResultDto<T>`)**: For mutations with business validation or domain conflicts (e.g. ticker uniqueness), return `OperationResultDto<T>` (`IsSuccess`, `Data`, `ErrorMessage`) instead of throwing raw exceptions, retrieving localized messages via `await _localizer.GetForUserAsync(...)`.
+- **Operation Result Pattern (`OperationResultDto<T>`)**: For mutations with business validation or domain conflicts (e.g. ticker uniqueness), return `OperationResultDto<T>` (`IsSuccess`, `Data`, `ErrorMessage`) instead of throwing raw exceptions, retrieving localized messages via `_localizer.Get(...)`.
 
 ---
 
@@ -64,9 +64,7 @@ These guidelines apply to all backend code under `server/` and extend the root [
 - **Resource Dictionaries**: Stored as embedded resources (`<EmbeddedResource Include="Resources\**\*.json" />`) in `server/src/Application/Resources/{lang}/{category}.json` (`jobs.json`, `notifications.json`, `scheduler.json`, `report.json`, `auth.json`, `errors.json`).
 - **Strongly-Typed Keys (`LocalizationKeys`)**: Declare all keys as constants in `Audex.Application.Constants.LocalizationKeys`.
 - **Service Methods**:
-  - `localizer.Get(key, lang, args)`: Resolves string with format args and English fallback.
-  - `await localizer.GetForUserAsync(key, userId, args)`: Uses target user's `UserProfile.LanguageCode`.
-  - `await localizer.GetUserLanguageAsync(userId)`: Returns normalized language code (`"en"` or `"ru"`).
+  - `localizer.Get(key, args)`: Resolves string using ambient `CultureInfo.CurrentUICulture` (set by `UserCultureMiddleware` in HTTP or `ScheduledJobBase` in background jobs).
 - **Scheduled Jobs**: Declare keys via `[ScheduledJob(..., displayNameKey: ..., descriptionKey: ..., categoryKey: ...)]`.
 - **CI Gate (`LocalizationIntegrityTests`)**: All keys across EN/RU dictionaries and `LocalizationKeys` are validated automatically; missing keys fail tests.
 

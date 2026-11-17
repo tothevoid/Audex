@@ -90,13 +90,13 @@ namespace Audex.Application.Services.Brokers.Statements
             if (request == null || request.SessionId == Guid.Empty)
             {
                 return OperationResultDto<ApplyStatementDiffsSummaryDto>.Failure(
-                    await _localizer.GetForUserAsync(LocalizationKeys.Errors.ValidationError));
+                    _localizer.Get(LocalizationKeys.Errors.ValidationError));
             }
 
             if (!_sessionCache.TryGetSession(request.SessionId, out BrokerStatementAnalysisResultDto? session) || session == null)
             {
                 return OperationResultDto<ApplyStatementDiffsSummaryDto>.Failure(
-                    await _localizer.GetForUserAsync(LocalizationKeys.Statements.ImportSessionExpired),
+                    _localizer.Get(LocalizationKeys.Statements.ImportSessionExpired),
                     "SESSION_EXPIRED");
             }
 

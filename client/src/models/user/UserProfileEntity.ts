@@ -1,20 +1,18 @@
 import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
+import { LanguageEntity } from "@/models/common/LanguageEntity";
 
 export interface CommonUserProfileEntity {
-    id: string,
-    userName: string,
-    languageCode: string,
-    timeZoneId?: string
-}
-
-export interface UserProfileEntityRequest extends CommonUserProfileEntity {
-    currencyId: string,
+    id: string;
+    userName: string;
+    timeZoneId?: string;
 }
 
 export interface UserProfileEntity extends CommonUserProfileEntity {
-    currency: CurrencyEntity,
+    currency: CurrencyEntity;
+    language: LanguageEntity;
 }
 
-export interface UserProfileEntityResponse extends CommonUserProfileEntity {
-    currency: CurrencyEntity,
+export interface UserProfileEntityRequest extends CommonUserProfileEntity {
+    currencyId: string;
+    languageCode: string;
 }

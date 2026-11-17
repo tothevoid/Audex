@@ -175,7 +175,6 @@ namespace Audex.Application.Services.Dashboard
         {
             var userProfile = await _userProfileService.GetAsync();
             var currencyName = userProfile?.Currency?.Name ?? string.Empty;
-            var userLanguage = await _localizationService.GetUserLanguageAsync();
 
             var cashData = await GetCashDistributionWidgetDataAsync();
             var securitiesData = await GetSecuritiesDistributionWidgetDataAsync();
@@ -192,7 +191,7 @@ namespace Audex.Application.Services.Dashboard
                 var cashTotal = cashData.Total.Value;
                 totals.Add(new DistributionDto
                 {
-                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceCash, userLanguage),
+                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceCash),
                     Currency = currencyName,
                     Amount = cashTotal,
                     ConvertedAmount = cashTotal
@@ -204,7 +203,7 @@ namespace Audex.Application.Services.Dashboard
                 var securitiesTotal = securitiesData.Total.Value;
                 totals.Add(new DistributionDto
                 {
-                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceSecurities, userLanguage),
+                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceSecurities),
                     Currency = currencyName,
                     Amount = securitiesTotal,
                     ConvertedAmount = securitiesTotal
@@ -216,7 +215,7 @@ namespace Audex.Application.Services.Dashboard
                 var depositsTotal = depositsData.Total.Value;
                 totals.Add(new DistributionDto
                 {
-                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceDeposits, userLanguage),
+                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceDeposits),
                     Currency = currencyName,
                     Amount = depositsTotal,
                     ConvertedAmount = depositsTotal
@@ -228,7 +227,7 @@ namespace Audex.Application.Services.Dashboard
                 var depositIncomesTotal = depositIncomesData.Total.Value;
                 totals.Add(new DistributionDto
                 {
-                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceDepositIncomes, userLanguage),
+                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceDepositIncomes),
                     Currency = currencyName,
                     Amount = depositIncomesTotal,
                     ConvertedAmount = depositIncomesTotal
@@ -240,7 +239,7 @@ namespace Audex.Application.Services.Dashboard
                 var bankAccountsTotal = bankAccountsData.Total.Value;
                 totals.Add(new DistributionDto
                 {
-                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceBankAccounts, userLanguage),
+                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceBankAccounts),
                     Currency = currencyName,
                     Amount = bankAccountsTotal,
                     ConvertedAmount = bankAccountsTotal
@@ -252,7 +251,7 @@ namespace Audex.Application.Services.Dashboard
                 var debtsTotal = debtsData.Total.Value;
                 totals.Add(new DistributionDto
                 {
-                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceDebts, userLanguage),
+                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceDebts),
                     Currency = currencyName,
                     Amount = debtsTotal,
                     ConvertedAmount = debtsTotal
@@ -264,7 +263,7 @@ namespace Audex.Application.Services.Dashboard
                 var cryptoTotal = cryptoData.Total.Value;
                 totals.Add(new DistributionDto
                 {
-                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceCrypto, userLanguage),
+                    Name = _localizationService.Get(LocalizationKeys.Dashboard.TotalBalanceCrypto),
                     Currency = currencyName,
                     Amount = cryptoTotal,
                     ConvertedAmount = cryptoTotal

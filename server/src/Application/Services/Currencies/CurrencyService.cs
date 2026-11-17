@@ -130,7 +130,7 @@ namespace Audex.Application.Services.Currencies
         {
             if (string.IsNullOrWhiteSpace(name))
             {
-                return await _localizer.GetForUserAsync(LocalizationKeys.Currencies.CurrencyNameEmpty);
+                return _localizer.Get(LocalizationKeys.Currencies.CurrencyNameEmpty);
             }
 
             var normalizedName = CurrencyNormalizer.Normalize(name);
@@ -139,9 +139,8 @@ namespace Audex.Application.Services.Currencies
 
             if (existingCurrency != null && existingCurrency.Id != currentId)
             {
-                return await _localizer.GetForUserAsync(
+                return _localizer.Get(
                     LocalizationKeys.Currencies.CurrencyAlreadyExists,
-                    null,
                     normalizedName);
             }
 

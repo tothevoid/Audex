@@ -62,13 +62,12 @@ namespace Audex.Application.Services.Reports
         public async Task<GeneratedReportDto> CreateReportAsync(CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var lang = await _localizer.GetUserLanguageAsync();
 
             using var workbook = new XLWorkbook();
 
             cancellationToken.ThrowIfCancellationRequested();
-            var totalsSheet = workbook.Worksheets.Add(_localizer.Get(LocalizationKeys.Reports.SheetTotals, lang));
-            await CreateTotalsWorksheet(totalsSheet, lang);
+            var totalsSheet = workbook.Worksheets.Add(_localizer.Get(LocalizationKeys.Reports.SheetTotals));
+            await CreateTotalsWorksheet(totalsSheet);
             totalsSheet.Columns().AdjustToContents();
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -76,7 +75,7 @@ namespace Audex.Application.Services.Reports
             foreach (var bank in bankAccounts)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                await CreateBankAccountWorksheet(workbook, bank, lang);
+                await CreateBankAccountWorksheet(workbook, bank);
             }
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -84,20 +83,20 @@ namespace Audex.Application.Services.Reports
             foreach (var cashAccount in cashAccountsSheet)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var sheetName = _localizer.Get(LocalizationKeys.Reports.SheetCash, lang, cashAccount.Name);
+                var sheetName = _localizer.Get(LocalizationKeys.Reports.SheetCash, cashAccount.Name);
                 var accountWorksheet = workbook.Worksheets.Add(sheetName);
-                await CreateCashAccountsWorksheet(accountWorksheet, cashAccount, lang);
+                await CreateCashAccountsWorksheet(accountWorksheet, cashAccount);
                 accountWorksheet.Columns().AdjustToContents();
             }
 
             cancellationToken.ThrowIfCancellationRequested();
-            var brokerSheet = workbook.Worksheets.Add(_localizer.Get(LocalizationKeys.Reports.SheetInvestments, lang));
-            await CreateBrokerAccountWorksheet(brokerSheet, lang);
+            var brokerSheet = workbook.Worksheets.Add(_localizer.Get(LocalizationKeys.Reports.SheetInvestments));
+            await CreateBrokerAccountWorksheet(brokerSheet);
             brokerSheet.Columns().AdjustToContents();
 
             cancellationToken.ThrowIfCancellationRequested();
-            var debtorsSheet = workbook.Worksheets.Add(_localizer.Get(LocalizationKeys.Reports.SheetDebtors, lang));
-            await CreateDebtorsWorksheet(debtorsSheet, lang);
+            var debtorsSheet = workbook.Worksheets.Add(_localizer.Get(LocalizationKeys.Reports.SheetDebtors));
+            await CreateDebtorsWorksheet(debtorsSheet);
             debtorsSheet.Columns().AdjustToContents();
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -115,7 +114,7 @@ namespace Audex.Application.Services.Reports
             };
         }
 
-        private async Task CreateBankAccountWorksheet(IXLWorkbook workbook, BankDto bank, string lang)
+        private async Task CreateBankAccountWorksheet(IXLWorkbook workbook, BankDto bank)
         {
             var accounts = (await _accountService.GetAllAsync(true))
                 .Where(account => account.BankId == bank.Id).ToList();
@@ -130,13 +129,13 @@ namespace Audex.Application.Services.Reports
 
             var worksheet = workbook.Worksheets.Add(bank.Name);
 
-            worksheet.Cell("A1").Value = _localizer.Get(LocalizationKeys.Reports.BankAccountHeader, lang, bank.Name);
-            worksheet.Cell("B1").Value = _localizer.Get(LocalizationKeys.Reports.ColQuantity, lang);
-            worksheet.Cell("C1").Value = _localizer.Get(LocalizationKeys.Reports.ColRateToMainCurrency, lang);
-            worksheet.Cell("D1").Value = _localizer.Get(LocalizationKeys.Reports.ColPercentage, lang);
-            worksheet.Cell("E1").Value = _localizer.Get(LocalizationKeys.Reports.ColStartDate, lang);
-            worksheet.Cell("F1").Value = _localizer.Get(LocalizationKeys.Reports.ColDaysQuantity, lang);
-            worksheet.Cell("G1").Value = _localizer.Get(LocalizationKeys.Reports.ColIncome, lang);
+            worksheet.Cell("A1").Value = _localizer.Get(LocalizationKeys.Reports.BankAccountHeader, bank.Name);
+            worksheet.Cell("B1").Value = _localizer.Get(LocalizationKeys.Reports.ColQuantity);
+            worksheet.Cell("C1").Value = _localizer.Get(LocalizationKeys.Reports.ColRateToMainCurrency);
+            worksheet.Cell("D1").Value = _localizer.Get(LocalizationKeys.Reports.ColPercentage);
+            worksheet.Cell("E1").Value = _localizer.Get(LocalizationKeys.Reports.ColStartDate);
+            worksheet.Cell("F1").Value = _localizer.Get(LocalizationKeys.Reports.ColDaysQuantity);
+            worksheet.Cell("G1").Value = _localizer.Get(LocalizationKeys.Reports.ColIncome);
 
             int reservedRowsBeforeSummaries = 20;
 
@@ -186,32 +185,32 @@ namespace Audex.Application.Services.Reports
                 currentRow++;
             }
 
-            worksheet.Cell($"A{reservedRowsBeforeSummaries}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotal, lang);
+            worksheet.Cell($"A{reservedRowsBeforeSummaries}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotal);
             SetFinanceValue(worksheet.Cell($"B{reservedRowsBeforeSummaries++}"), total);
 
-            worksheet.Cell($"A{reservedRowsBeforeSummaries}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotalDynamic, lang);
+            worksheet.Cell($"A{reservedRowsBeforeSummaries}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotalDynamic);
             SetFinanceValue(worksheet.Cell($"B{reservedRowsBeforeSummaries++}"), totalDynamic);
 
-            worksheet.Cell($"A{reservedRowsBeforeSummaries}").Value = _localizer.Get(LocalizationKeys.Reports.RowPerMonth, lang);
+            worksheet.Cell($"A{reservedRowsBeforeSummaries}").Value = _localizer.Get(LocalizationKeys.Reports.RowPerMonth);
             SetFinanceValue(worksheet.Cell($"B{reservedRowsBeforeSummaries++}"), incomeInMonth);
 
-            worksheet.Cell($"A{reservedRowsBeforeSummaries}").Value = _localizer.Get(LocalizationKeys.Reports.RowOnlyAfterCompletion, lang);
+            worksheet.Cell($"A{reservedRowsBeforeSummaries}").Value = _localizer.Get(LocalizationKeys.Reports.RowOnlyAfterCompletion);
             SetFinanceValue(worksheet.Cell($"B{reservedRowsBeforeSummaries++}"), notConfirmedIncomes);
 
-            worksheet.Cell($"A{reservedRowsBeforeSummaries}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotalStatic, lang);
+            worksheet.Cell($"A{reservedRowsBeforeSummaries}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotalStatic);
             SetFinanceValue(worksheet.Cell($"B{reservedRowsBeforeSummaries}"), totalStatic);
 
             worksheet.Columns().AdjustToContents();
         }
 
-        private async Task CreateBrokerAccountWorksheet(IXLWorksheet worksheet, string lang)
+        private async Task CreateBrokerAccountWorksheet(IXLWorksheet worksheet)
         {
             var accounts = await _brokerAccountService.GetAllAsync();
 
-            worksheet.Cell("A1").Value = _localizer.Get(LocalizationKeys.Reports.ColTicker, lang);
-            worksheet.Cell("B1").Value = _localizer.Get(LocalizationKeys.Reports.ColQuantity, lang);
-            worksheet.Cell("C1").Value = _localizer.Get(LocalizationKeys.Reports.ColPrice, lang);
-            worksheet.Cell("D1").Value = _localizer.Get(LocalizationKeys.Reports.ColTotal, lang);
+            worksheet.Cell("A1").Value = _localizer.Get(LocalizationKeys.Reports.ColTicker);
+            worksheet.Cell("B1").Value = _localizer.Get(LocalizationKeys.Reports.ColQuantity);
+            worksheet.Cell("C1").Value = _localizer.Get(LocalizationKeys.Reports.ColPrice);
+            worksheet.Cell("D1").Value = _localizer.Get(LocalizationKeys.Reports.ColTotal);
 
             var currentRow = 2;
 
@@ -244,11 +243,11 @@ namespace Audex.Application.Services.Reports
             }
         }
 
-        private async Task CreateDebtorsWorksheet(IXLWorksheet worksheet, string lang)
+        private async Task CreateDebtorsWorksheet(IXLWorksheet worksheet)
         {
-            worksheet.Cell("A1").Value = _localizer.Get(LocalizationKeys.Reports.ColName, lang);
-            worksheet.Cell("B1").Value = _localizer.Get(LocalizationKeys.Reports.ColQuantity, lang);
-            worksheet.Cell("C1").Value = _localizer.Get(LocalizationKeys.Reports.ColRateToMainCurrency, lang);
+            worksheet.Cell("A1").Value = _localizer.Get(LocalizationKeys.Reports.ColName);
+            worksheet.Cell("B1").Value = _localizer.Get(LocalizationKeys.Reports.ColQuantity);
+            worksheet.Cell("C1").Value = _localizer.Get(LocalizationKeys.Reports.ColRateToMainCurrency);
 
             var activeDebtors = await _debtService.GetAllAsync(true);
 
@@ -267,11 +266,11 @@ namespace Audex.Application.Services.Reports
             }
 
             int totalsRow = 20;
-            worksheet.Cell($"A{totalsRow}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotalColon, lang);
+            worksheet.Cell($"A{totalsRow}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotalColon);
             SetFinanceValue(worksheet.Cell($"B{totalsRow}"), total);
         }
 
-        private async Task CreateTotalsWorksheet(IXLWorksheet worksheet, string lang)
+        private async Task CreateTotalsWorksheet(IXLWorksheet worksheet)
         {
             var dashboard = await _dashboardService.GetDashboardAsync();
 
@@ -279,48 +278,48 @@ namespace Audex.Application.Services.Reports
 
             foreach (var cash in dashboard.AccountsGlobalDashboard.CashDistribution)
             {
-                worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsPhysicalCash, lang, cash.Name);
+                worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsPhysicalCash, cash.Name);
                 SetFinanceValue(worksheet.Cell($"B{currentRow}"), cash.ConvertedAmount);
                 SetPercentValue(worksheet.Cell($"C{currentRow}"), dashboard.Total == 0 ? 0 : cash.ConvertedAmount / dashboard.Total);
                 currentRow++;
             }
 
-            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsBankAccounts, lang);
+            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsBankAccounts);
             SetFinanceValue(worksheet.Cell($"B{currentRow}"), dashboard.AccountsGlobalDashboard.TotalBankAccount);
             SetPercentValue(worksheet.Cell($"C{currentRow}"), dashboard.Total == 0 ? 0 : dashboard.AccountsGlobalDashboard.TotalBankAccount / dashboard.Total);
             currentRow++;
 
-            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsCrypto, lang);
+            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsCrypto);
             SetFinanceValue(worksheet.Cell($"B{currentRow}"), dashboard.CryptoAccountsGlobalDashboard.Total);
             SetPercentValue(worksheet.Cell($"C{currentRow}"), dashboard.Total == 0 ? 0 : dashboard.CryptoAccountsGlobalDashboard.Total / dashboard.Total);
             currentRow++;
 
-            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsDebts, lang);
+            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsDebts);
             SetFinanceValue(worksheet.Cell($"B{currentRow}"), dashboard.DebtsGlobalDashboard.Total);
             SetPercentValue(worksheet.Cell($"C{currentRow}"), dashboard.Total == 0 ? 0 : dashboard.DebtsGlobalDashboard.Total / dashboard.Total);
             currentRow++;
 
-            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsInvestments, lang);
+            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsInvestments);
             SetFinanceValue(worksheet.Cell($"B{currentRow}"), dashboard.BrokerAccountsGlobalDashboard.Total);
             SetPercentValue(worksheet.Cell($"C{currentRow}"), dashboard.Total == 0 ? 0 : dashboard.BrokerAccountsGlobalDashboard.Total / dashboard.Total);
             currentRow++;
 
-            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsDeposits, lang);
+            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsDeposits);
             SetFinanceValue(worksheet.Cell($"B{currentRow}"), dashboard.DepositsGlobalDashboard.TotalStartedAmount);
             SetPercentValue(worksheet.Cell($"C{currentRow}"), dashboard.Total == 0 ? 0 : dashboard.DepositsGlobalDashboard.TotalStartedAmount / dashboard.Total);
             currentRow++;
 
-            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsDepositsEarned, lang);
+            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsDepositsEarned);
             SetFinanceValue(worksheet.Cell($"B{currentRow}"), dashboard.DepositsGlobalDashboard.TotalEarned);
             SetPercentValue(worksheet.Cell($"C{currentRow}"), dashboard.Total == 0 ? 0 : dashboard.DepositsGlobalDashboard.TotalEarned / dashboard.Total);
             currentRow++;
 
-            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsTotal, lang);
+            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsTotal);
             SetFinanceValue(worksheet.Cell($"B{currentRow}"), dashboard.Total);
 
             currentRow += 2;
 
-            worksheet.Cell($"A{currentRow++}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsInCurrency, lang);
+            worksheet.Cell($"A{currentRow++}").Value = _localizer.Get(LocalizationKeys.Reports.TotalsInCurrency);
 
             var currencyDistributions = GetCurrencyDistributions(dashboard);
 
@@ -332,15 +331,15 @@ namespace Audex.Application.Services.Reports
             }
         }
 
-        public async Task CreateCashAccountsWorksheet(IXLWorksheet worksheet, AccountDto cashAccount, string lang)
+        public async Task CreateCashAccountsWorksheet(IXLWorksheet worksheet, AccountDto cashAccount)
         {
-            worksheet.Cell("A1").Value = _localizer.Get(LocalizationKeys.Reports.ColName, lang);
-            worksheet.Cell("B1").Value = _localizer.Get(LocalizationKeys.Reports.ColQuantity, lang);
-            worksheet.Cell("C1").Value = _localizer.Get(LocalizationKeys.Reports.ColRateToMainCurrency, lang);
-            worksheet.Cell("D1").Value = _localizer.Get(LocalizationKeys.Reports.ColPurchaseDate, lang);
-            worksheet.Cell("E1").Value = _localizer.Get(LocalizationKeys.Reports.ColPurchaseRate, lang);
-            worksheet.Cell("F1").Value = _localizer.Get(LocalizationKeys.Reports.ColPnl, lang);
-            worksheet.Cell("G1").Value = _localizer.Get(LocalizationKeys.Reports.ColAmount, lang);
+            worksheet.Cell("A1").Value = _localizer.Get(LocalizationKeys.Reports.ColName);
+            worksheet.Cell("B1").Value = _localizer.Get(LocalizationKeys.Reports.ColQuantity);
+            worksheet.Cell("C1").Value = _localizer.Get(LocalizationKeys.Reports.ColRateToMainCurrency);
+            worksheet.Cell("D1").Value = _localizer.Get(LocalizationKeys.Reports.ColPurchaseDate);
+            worksheet.Cell("E1").Value = _localizer.Get(LocalizationKeys.Reports.ColPurchaseRate);
+            worksheet.Cell("F1").Value = _localizer.Get(LocalizationKeys.Reports.ColPnl);
+            worksheet.Cell("G1").Value = _localizer.Get(LocalizationKeys.Reports.ColAmount);
 
             int currentRow = 2;
             decimal totalInMainCurrency = 0;
@@ -375,13 +374,13 @@ namespace Audex.Application.Services.Reports
 
             currentRow += 2;
 
-            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotalMainCurrency, lang);
+            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotalMainCurrency);
             SetFinanceValue(worksheet.Cell($"B{currentRow++}"), totalInMainCurrency);
 
-            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotalInCurrency, lang, cashAccount.Currency.Name);
+            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.RowTotalInCurrency, cashAccount.Currency.Name);
             SetFinanceValue(worksheet.Cell($"B{currentRow++}"), total);
 
-            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.RowPnlColon, lang);
+            worksheet.Cell($"A{currentRow}").Value = _localizer.Get(LocalizationKeys.Reports.RowPnlColon);
             SetFinanceValue(worksheet.Cell($"B{currentRow}"), totalPnL);
         }
 

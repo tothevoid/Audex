@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,7 @@ namespace Audex.Application.Tests.Services.Scheduler
     {
         public SchedulerTaskServiceTests(ServiceProviderFixture serviceProviderFixture) : base(serviceProviderFixture)
         {
+            CultureInfo.CurrentUICulture = new CultureInfo("ru");
         }
 
         [Fact]
@@ -232,8 +234,9 @@ namespace Audex.Application.Tests.Services.Scheduler
                 await userService.UpdateAsync(new Audex.Application.DTO.User.UserProfileDto
                 {
                     Id = Audex.Infrastructure.Constants.UserProfileConstants.UserProfileId,
-                    LanguageCode = "ru-RU"
+                    LanguageCode = "ru"
                 });
+                CultureInfo.CurrentUICulture = new CultureInfo("ru");
 
                 var ruTasks = await service.GetNotScheduledTasksAsync();
                 var ruReport = ruTasks.FirstOrDefault(t => t.TaskName == "GenerateAllAssetsReport");
@@ -246,8 +249,9 @@ namespace Audex.Application.Tests.Services.Scheduler
                 await userService.UpdateAsync(new Audex.Application.DTO.User.UserProfileDto
                 {
                     Id = Audex.Infrastructure.Constants.UserProfileConstants.UserProfileId,
-                    LanguageCode = "en-US"
+                    LanguageCode = "en"
                 });
+                CultureInfo.CurrentUICulture = new CultureInfo("en");
 
                 var enTasks = await service.GetNotScheduledTasksAsync();
                 var enReport = enTasks.FirstOrDefault(t => t.TaskName == "GenerateAllAssetsReport");

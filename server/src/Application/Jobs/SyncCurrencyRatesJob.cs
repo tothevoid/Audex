@@ -37,7 +37,7 @@ namespace Audex.Application.Jobs
             IDatabaseStateService databaseStateService,
             ISchedulerAttachmentService attachmentService,
             IServerNotifier serverNotifier)
-            : base(databaseStateService, attachmentService, serverNotifier)
+            : base(databaseStateService, attachmentService, serverNotifier, userProfileService)
         {
             _currencyService = currencyService;
             _userProfileService = userProfileService;
@@ -78,9 +78,8 @@ namespace Audex.Application.Jobs
             cancellationToken.ThrowIfCancellationRequested();
             var updatedCount = await _currencyService.SyncRatesAsync(mainCurrency, cancellationToken);
 
-            var logMessage = await _localizer.GetForUserAsync(
+            var logMessage = _localizer.Get(
                 LocalizationKeys.Scheduler.SyncCurrencyRatesSuccess,
-                UserProfileConstants.UserProfileId,
                 updatedCount);
 
             return JobExecutionResult.Success(logMessage);

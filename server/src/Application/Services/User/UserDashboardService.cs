@@ -72,7 +72,7 @@ namespace Audex.Application.Services.User
             var currentTimestamp = DateTime.UtcNow;
 
             var resolvedTitle = string.IsNullOrWhiteSpace(title)
-                ? await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.DefaultTitle, userId)
+                ? _localizationService.Get(LocalizationKeys.Dashboard.DefaultTitle)
                 : title.Trim();
 
             if (!string.IsNullOrWhiteSpace(initialLayoutJson))
@@ -216,22 +216,22 @@ namespace Audex.Application.Services.User
                 return _applicationMapper.Map(defaultDashboard);
             }
 
-            var defaultTitle = await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.DefaultTitle, userId);
-            var defaultLayoutJson = await GetDefaultLayoutJsonAsync(userId);
+            var defaultTitle = _localizationService.Get(LocalizationKeys.Dashboard.DefaultTitle);
+            var defaultLayoutJson = GetDefaultLayoutJson();
             return await CreateAsync(userId, defaultTitle, defaultLayoutJson);
         }
 
-        private async Task<string> GetDefaultLayoutJsonAsync(Guid userId)
+        private string GetDefaultLayoutJson()
         {
-            var totalBalanceTitle = await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.WidgetTotalBalanceTitle, userId);
-            var cashTitle = await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.WidgetCashTitle, userId);
-            var securitiesTitle = await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.WidgetSecuritiesTitle, userId);
-            var depositsTitle = await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.WidgetDepositsTitle, userId);
-            var depositIncomesTitle = await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.WidgetDepositIncomesTitle, userId);
-            var bankAccountsTitle = await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.WidgetBankAccountsTitle, userId);
-            var debtsTitle = await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.WidgetDebtsTitle, userId);
-            var cryptoTitle = await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.WidgetCryptoTitle, userId);
-            var banksTitle = await _localizationService.GetForUserAsync(LocalizationKeys.Dashboard.WidgetBanksTitle, userId);
+            var totalBalanceTitle = _localizationService.Get(LocalizationKeys.Dashboard.WidgetTotalBalanceTitle);
+            var cashTitle = _localizationService.Get(LocalizationKeys.Dashboard.WidgetCashTitle);
+            var securitiesTitle = _localizationService.Get(LocalizationKeys.Dashboard.WidgetSecuritiesTitle);
+            var depositsTitle = _localizationService.Get(LocalizationKeys.Dashboard.WidgetDepositsTitle);
+            var depositIncomesTitle = _localizationService.Get(LocalizationKeys.Dashboard.WidgetDepositIncomesTitle);
+            var bankAccountsTitle = _localizationService.Get(LocalizationKeys.Dashboard.WidgetBankAccountsTitle);
+            var debtsTitle = _localizationService.Get(LocalizationKeys.Dashboard.WidgetDebtsTitle);
+            var cryptoTitle = _localizationService.Get(LocalizationKeys.Dashboard.WidgetCryptoTitle);
+            var banksTitle = _localizationService.Get(LocalizationKeys.Dashboard.WidgetBanksTitle);
 
             var defaultWidgets = new[]
             {

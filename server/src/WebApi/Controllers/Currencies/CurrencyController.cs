@@ -81,13 +81,13 @@ namespace Audex.WebApi.Controllers.Currencies
         {
             if (currency == null)
             {
-                var validationError = await _localizer.GetForUserAsync(LocalizationKeys.Errors.ValidationError);
+                var validationError = _localizer.Get(LocalizationKeys.Errors.ValidationError);
                 return OperationResultDto<Guid>.Failure(validationError);
             }
 
             if (string.IsNullOrWhiteSpace(currency.Name))
             {
-                var emptyNameError = await _localizer.GetForUserAsync(LocalizationKeys.Currencies.CurrencyNameEmpty);
+                var emptyNameError = _localizer.Get(LocalizationKeys.Currencies.CurrencyNameEmpty);
                 return OperationResultDto<Guid>.Failure(emptyNameError);
             }
 
@@ -100,13 +100,13 @@ namespace Audex.WebApi.Controllers.Currencies
         {
             if (currency == null || currency.Id == Guid.Empty)
             {
-                var validationError = await _localizer.GetForUserAsync(LocalizationKeys.Errors.ValidationError);
+                var validationError = _localizer.Get(LocalizationKeys.Errors.ValidationError);
                 return OperationResultDto<bool>.Failure(validationError);
             }
 
             if (string.IsNullOrWhiteSpace(currency.Name))
             {
-                var emptyNameError = await _localizer.GetForUserAsync(LocalizationKeys.Currencies.CurrencyNameEmpty);
+                var emptyNameError = _localizer.Get(LocalizationKeys.Currencies.CurrencyNameEmpty);
                 return OperationResultDto<bool>.Failure(emptyNameError);
             }
 

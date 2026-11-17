@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Audex.Application.Constants;
@@ -14,6 +15,7 @@ namespace Audex.Application.Tests.Services.User
     {
         public UserDashboardServiceTests(ServiceProviderFixture serviceProviderFixture) : base(serviceProviderFixture)
         {
+            CultureInfo.CurrentUICulture = new CultureInfo("ru");
         }
 
         [Fact]
@@ -202,7 +204,7 @@ namespace Audex.Application.Tests.Services.User
             {
                 var dashboardService = serviceProvider.GetRequiredService<IUserDashboardService>();
                 var localizationService = serviceProvider.GetRequiredService<ILocalizationService>();
-                var expected = await localizationService.GetForUserAsync(LocalizationKeys.Dashboard.DefaultTitle, userId);
+                var expected = localizationService.Get(LocalizationKeys.Dashboard.DefaultTitle);
                 var dashboard = await dashboardService.GetOrCreateDefaultDashboardAsync(userId);
                 return (dashboard, expected);
             });

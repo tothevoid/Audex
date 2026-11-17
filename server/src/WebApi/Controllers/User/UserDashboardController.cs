@@ -74,7 +74,7 @@ namespace Audex.WebApi.Controllers.User
             }
             catch (ArgumentException argumentException)
             {
-                var title = await _localizer.GetForUserAsync(LocalizationKeys.Dashboard.InvalidLayoutTitle, userId);
+                var title = _localizer.Get(LocalizationKeys.Dashboard.InvalidLayoutTitle);
                 return BadRequest(new ProblemDetails
                 {
                     Title = title,
@@ -100,7 +100,7 @@ namespace Audex.WebApi.Controllers.User
             }
             catch (ArgumentException argumentException)
             {
-                var title = await _localizer.GetForUserAsync(LocalizationKeys.Dashboard.InvalidLayoutTitle, userId);
+                var title = _localizer.Get(LocalizationKeys.Dashboard.InvalidLayoutTitle);
                 return BadRequest(new ProblemDetails
                 {
                     Title = title,

@@ -42,8 +42,6 @@ namespace Audex.Application.Services.Scheduler
 
         public async Task<PagedResult<ScheduledTaskJournalDto>> GetJournalAsync(SchedulerJournalFilterDto filter)
         {
-            var language = await _localizer.GetUserLanguageAsync();
-
             var builder = new ComplexQueryBuilder<CronTickerOccurrenceEntity<ScheduledCronTicker>>()
                 .AddJoins(query => query.Include(occurrence => occurrence.CronTicker))
                 .AddFilter(GetFilter(filter.TaskName, filter.Status))
@@ -65,7 +63,7 @@ namespace Audex.Application.Services.Scheduler
             {
                 var functionName = occurrence.CronTicker?.Function ?? "ScheduledTask";
                 var displayName = _jobRegistry.TryGetDescriptor(functionName, out var jobDescriptor) && !string.IsNullOrWhiteSpace(jobDescriptor.DisplayNameKey)
-                    ? _localizer.Get(jobDescriptor.DisplayNameKey, language)
+                    ? _localizer.Get(jobDescriptor.DisplayNameKey)
                     : functionName;
 
                 return new ScheduledTaskJournalDto

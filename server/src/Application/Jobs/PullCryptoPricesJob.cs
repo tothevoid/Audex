@@ -9,6 +9,7 @@ using Audex.Application.Interfaces.Crypto;
 using Audex.Application.Interfaces.DatabaseBackup;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.Scheduler;
+using Audex.Application.Interfaces.User;
 using Audex.Infrastructure.Constants;
 using Audex.Infrastructure.Interfaces.Messages;
 using TickerQ.Utilities.Base;
@@ -31,8 +32,9 @@ namespace Audex.Application.Jobs
             ILocalizationService localizer,
             IDatabaseStateService databaseStateService,
             ISchedulerAttachmentService attachmentService,
-            IServerNotifier serverNotifier)
-            : base(databaseStateService, attachmentService, serverNotifier)
+            IServerNotifier serverNotifier,
+            IUserProfileService userProfileService)
+            : base(databaseStateService, attachmentService, serverNotifier, userProfileService)
         {
             _cryptocurrencyService = cryptocurrencyService;
             _localizer = localizer;
@@ -60,9 +62,8 @@ namespace Audex.Application.Jobs
                 throw new InvalidOperationException(pullResult.ErrorMessage);
             }
 
-            var logMessage = await _localizer.GetForUserAsync(
+            var logMessage = _localizer.Get(
                 LocalizationKeys.Scheduler.PullCryptoPricesSuccess,
-                UserProfileConstants.UserProfileId,
                 pullResult.Data!.UpdatedCount);
 
             return JobExecutionResult.Success(logMessage);

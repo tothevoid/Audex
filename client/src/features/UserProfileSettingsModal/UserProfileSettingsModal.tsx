@@ -8,9 +8,11 @@ import { UserProfileFormInput, getUserProfileValidationSchema } from "./UserProf
 import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 import { queryKeys } from "@/shared/constants/queryKeys";
 import { getTimeZones } from "@/api/common/timeZoneApi";
+import { getLanguages } from "@/api/common/languageApi";
 import { updateUserProfile } from "@/api/user/userProfileApi";
 import { UserProfileEntity } from "@/models/user/UserProfileEntity";
 import { TimeZoneEntity } from "@/models/common/TimeZoneEntity";
+import { LanguageEntity } from "@/models/common/LanguageEntity";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
@@ -19,25 +21,21 @@ import { useUserProfile } from "./hooks/UserProfileContext";
 import { useColorMode } from "@/shared/context/useColorMode";
 
 interface State {
-	languages: { key: string, value: string }[]
-	timeZones: TimeZoneEntity[]
+	languages: LanguageEntity[];
+	timeZones: TimeZoneEntity[];
 }
 
-const langMapping = new Map<string, string>([
-	["English", "en-US"],
-	["Русский", "ru-RU"],
-]);
+const getFormDefaultValues = (
+	userProfile: UserProfileEntity | null,
+	timeZones: TimeZoneEntity[] = []
+) => {
+	const matchedTimeZone = timeZones.find(timeZone => timeZone.id === userProfile?.timeZoneId) ?? timeZones[0];
 
-const languages = [...langMapping.entries()].map(([key, value]) => { return { key, value }; });
-
-const convertToSchemaValues = (userProfile: UserProfileEntity | null, timeZones: TimeZoneEntity[] = []) => {
-	const userTimeZoneId = userProfile?.timeZoneId || Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Moscow";
-	const matchedTimeZone = timeZones.find(timeZone => timeZone.id === userTimeZoneId);
 	return {
 		id: userProfile?.id ?? "",
-		languageCode: languages.find((lang) => lang.value === userProfile?.languageCode) ?? languages[0],
+		language: userProfile?.language,
 		currency: userProfile?.currency,
-		timeZone: matchedTimeZone ?? (timeZones.length > 0 ? timeZones[0] : { id: userTimeZoneId, displayName: userTimeZoneId, baseUtcOffsetMinutes: 0 })
+		timeZone: matchedTimeZone
 	};
 };
 
@@ -45,7 +43,7 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 	const { t } = useTranslation();
 	const queryClient = useQueryClient();
 	const { data: currencies = [] } = useCurrencies();
-	const [state, setState] = useState<State>({ languages: languages, timeZones: [] });
+	const [state, setState] = useState<State>({ languages: [], timeZones: [] });
 	const { user, updateUser } = useUserProfile();
 	const modalRef = useRef<BaseModalRef>(null);
 
@@ -56,11 +54,14 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 
 	useEffect(() => {
 		const initData = async () => {
-			const timeZones = await getTimeZones();
-			setState(currentState => ({
-				...currentState,
-				timeZones: timeZones ?? []
-			}));
+			const [timeZones, loadedLanguages] = await Promise.all([
+				getTimeZones(),
+				getLanguages()
+			]);
+			setState({
+				timeZones: timeZones ?? [],
+				languages: loadedLanguages ?? []
+			});
 		};
 		initData();
 	}, []);
@@ -70,18 +71,18 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 	const { reset, handleSubmit, control, formState: { errors } } = useForm<UserProfileFormInput>({
 		resolver: zodResolver(validationSchema),
 		mode: "onBlur",
-		defaultValues: convertToSchemaValues(user, state.timeZones)
+		defaultValues: getFormDefaultValues(user, state.timeZones)
 	});
 
 	useEffect(() => {
 		if (user && state.timeZones.length > 0) {
-			reset(convertToSchemaValues(user, state.timeZones));
+			reset(getFormDefaultValues(user, state.timeZones));
 		}
 	}, [user, state.timeZones, reset]);
 
 	const onVisibilityChanged = (open: boolean) => {
 		if (open && user) {
-			reset(convertToSchemaValues(user, state.timeZones));
+			reset(getFormDefaultValues(user, state.timeZones));
 			setSelectedTheme(themeOptions.find(option => option.value === colorMode) ?? themeOptions[0]);
 		}
 	};
@@ -92,8 +93,8 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 			id: userProfileForm.id,
 			userName: user?.userName ?? "",
 			currency: currencies.find(currency => userProfileForm.currency.id === currency.id)!,
-			languageCode: userProfileForm.languageCode.value,
-			timeZoneId: userProfileForm.timeZone?.id || user?.timeZoneId || "Europe/Moscow"
+			language: userProfileForm.language,
+			timeZoneId: userProfileForm.timeZone?.id
 		};
 
 		await updateUserProfile(userProfile);
@@ -140,17 +141,17 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 				/>
 				<Field.ErrorText>{errors.currency?.message}</Field.ErrorText>
 			</Field.Root>
-			<Field.Root mt={4} invalid={!!errors.languageCode}>
+			<Field.Root mt={4} invalid={!!errors.language}>
 				<Field.Label>{t("user_profile_settings_language")}</Field.Label>
 				<CollectionSelect
-					name="languageCode"
+					name="language"
 					control={control}
 					placeholder={t("user_profile_settings_language_placeholder")}
 					collection={state.languages}
-					labelSelector={(language => language.key)}
-					valueSelector={(language => language.value)}
+					labelSelector={(language => language.name)}
+					valueSelector={(language => language.code)}
 				/>
-				<Field.ErrorText>{errors.languageCode?.message}</Field.ErrorText>
+				<Field.ErrorText>{errors.language?.message}</Field.ErrorText>
 			</Field.Root>
 			<Field.Root mt={4} invalid={!!errors.timeZone}>
 				<Field.Label>{t("user_profile_settings_timezone")}</Field.Label>

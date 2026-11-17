@@ -304,13 +304,11 @@ namespace Audex.Application.Services.Securities
         {
             try
             {
-                var title = await localizer.GetForUserAsync(
-                    LocalizationKeys.Notifications.MissingSecurityQuotesTitle,
-                    UserProfileConstants.UserProfileId);
+                var title = localizer.Get(
+                    LocalizationKeys.Notifications.MissingSecurityQuotesTitle);
 
-                var message = await localizer.GetForUserAsync(
+                var message = localizer.Get(
                     LocalizationKeys.Notifications.MissingSecurityQuotesMessage,
-                    UserProfileConstants.UserProfileId,
                     security.Ticker,
                     beforeDate.ToString("yyyy-MM-dd"));
 

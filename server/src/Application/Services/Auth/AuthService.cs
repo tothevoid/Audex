@@ -73,7 +73,7 @@ namespace Audex.Application.Services.Auth
         {
             if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
             {
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Errors.ValidationError);
+                var errorMessage = _localizer.Get(LocalizationKeys.Errors.ValidationError);
                 return LoginResultDto.Failure(errorMessage);
             }
 
@@ -81,13 +81,13 @@ namespace Audex.Application.Services.Auth
 
             if (user == null)
             {
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.UserNotFound);
+                var errorMessage = _localizer.Get(LocalizationKeys.Auth.UserNotFound);
                 return LoginResultDto.Failure(errorMessage);
             }
 
             if (!string.IsNullOrEmpty(user.Password))
             {
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.SetupAlreadyCompleted);
+                var errorMessage = _localizer.Get(LocalizationKeys.Auth.SetupAlreadyCompleted);
                 return LoginResultDto.Failure(errorMessage);
             }
 
@@ -111,7 +111,7 @@ namespace Audex.Application.Services.Auth
         {
             if (string.IsNullOrEmpty(password))
             {
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.InvalidCredentials);
+                var errorMessage = _localizer.Get(LocalizationKeys.Auth.InvalidCredentials);
                 return LoginResultDto.Failure(errorMessage);
             }
 
@@ -119,13 +119,13 @@ namespace Audex.Application.Services.Auth
 
             if (user == null)
             {
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.InvalidCredentials);
+                var errorMessage = _localizer.Get(LocalizationKeys.Auth.InvalidCredentials);
                 return LoginResultDto.Failure(errorMessage);
             }
 
             if (string.IsNullOrEmpty(user.Password))
             {
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.SetupRequired);
+                var errorMessage = _localizer.Get(LocalizationKeys.Auth.SetupRequired);
                 return LoginResultDto.Failure(errorMessage);
             }
 
@@ -149,14 +149,14 @@ namespace Audex.Application.Services.Auth
 
             if (storedToken == null)
             {
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.InvalidToken);
+                var errorMessage = _localizer.Get(LocalizationKeys.Auth.InvalidToken);
                 throw new SecurityException(errorMessage);
             }
 
             if (storedToken.IsRevoked)
             {
                 await RevokeAllUserTokensAsync(storedToken.UserProfileId);
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.TokenCompromised, storedToken.UserProfileId);
+                var errorMessage = _localizer.Get(LocalizationKeys.Auth.TokenCompromised, storedToken.UserProfileId);
                 throw new SecurityException(errorMessage);
             }
 
@@ -169,20 +169,20 @@ namespace Audex.Application.Services.Auth
                 }
 
                 await RevokeAllUserTokensAsync(storedToken.UserProfileId);
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.TokenCompromised, storedToken.UserProfileId);
+                var errorMessage = _localizer.Get(LocalizationKeys.Auth.TokenCompromised, storedToken.UserProfileId);
                 throw new SecurityException(errorMessage);
             }
 
             if (storedToken.ExpiresAt < DateTime.UtcNow)
             {
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.TokenExpired, storedToken.UserProfileId);
+                var errorMessage = _localizer.Get(LocalizationKeys.Auth.TokenExpired, storedToken.UserProfileId);
                 throw new SecurityException(errorMessage);
             }
 
             var user = await _userProfileRepo.GetByIdAsync(storedToken.UserProfileId);
             if (user == null)
             {
-                var errorMessage = await _localizer.GetForUserAsync(LocalizationKeys.Auth.UserNotFound);
+                var errorMessage = _localizer.Get(LocalizationKeys.Auth.UserNotFound);
                 throw new SecurityException(errorMessage);
             }
 

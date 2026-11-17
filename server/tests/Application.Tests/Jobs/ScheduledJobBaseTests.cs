@@ -6,6 +6,7 @@ using Audex.Application.DTO.Scheduler;
 using Audex.Application.Enums.Scheduler;
 using Audex.Application.Interfaces.DatabaseBackup;
 using Audex.Application.Interfaces.Scheduler;
+using Audex.Application.Interfaces.User;
 using Audex.Application.Jobs;
 using Audex.Application.Services.DatabaseBackup;
 using Audex.Infrastructure.Entities.Scheduler;
@@ -17,6 +18,22 @@ namespace Audex.Application.Tests.Jobs
 {
     public class ScheduledJobBaseTests
     {
+        private class FakeUserProfileService : IUserProfileService
+        {
+            public Task<Audex.Application.DTO.User.UserProfileDto?> GetAsync()
+            {
+                return Task.FromResult<Audex.Application.DTO.User.UserProfileDto?>(new Audex.Application.DTO.User.UserProfileDto
+                {
+                    LanguageCode = "ru"
+                });
+            }
+
+            public Task<Audex.Application.DTO.User.UserProfileDto?> GetByUserNameAsync(string userName) => Task.FromResult<Audex.Application.DTO.User.UserProfileDto?>(null);
+            public Task<Audex.Application.DTO.User.UserProfileDto?> GetByAuthAsync(string userName, string password) => Task.FromResult<Audex.Application.DTO.User.UserProfileDto?>(null);
+            public Task UpdateAsync(Audex.Application.DTO.User.UserProfileDto newUserStateDto) => Task.CompletedTask;
+            public Task UpdatePasswordAsync(Guid userId, string hashedPassword) => Task.CompletedTask;
+        }
+
         private class FakeSchedulerAttachmentService : ISchedulerAttachmentService
         {
             public ScheduledTaskAttachment? SavedAttachment { get; private set; }
@@ -47,8 +64,9 @@ namespace Audex.Application.Tests.Jobs
             public TestableJob(
                 IDatabaseStateService databaseStateService,
                 ISchedulerAttachmentService attachmentService,
-                IServerNotifier serverNotifier)
-                : base(databaseStateService, attachmentService, serverNotifier)
+                IServerNotifier serverNotifier,
+                IUserProfileService? userProfileService = null)
+                : base(databaseStateService, attachmentService, serverNotifier, userProfileService ?? new FakeUserProfileService())
             {
             }
 

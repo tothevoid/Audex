@@ -1,8 +1,10 @@
-﻿using System;
+using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Audex.Application.DTO;
 using Audex.Application.DTO.User;
+using Audex.Application.Enums.Localization;
 using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.User;
 using Audex.Application.Services.Localization;
@@ -24,11 +26,12 @@ namespace Audex.Application.Tests.Services.Localization
             await ExecuteScopeAsync(sp =>
             {
                 var localizer = sp.GetRequiredService<ILocalizationService>();
+                CultureInfo.CurrentUICulture = new CultureInfo("en");
 
-                var title = localizer.Get("session_cleanup_title", "en");
+                var title = localizer.Get("session_cleanup_title");
                 Assert.Equal("Session Tokens Clean Up", title);
 
-                var dottedTitle = localizer.Get("notifications.session_cleanup_title", "en");
+                var dottedTitle = localizer.Get("notifications.session_cleanup_title");
                 Assert.Equal("Session Tokens Clean Up", dottedTitle);
 
                 return Task.CompletedTask;
@@ -41,11 +44,12 @@ namespace Audex.Application.Tests.Services.Localization
             await ExecuteScopeAsync(sp =>
             {
                 var localizer = sp.GetRequiredService<ILocalizationService>();
+                CultureInfo.CurrentUICulture = new CultureInfo("ru");
 
-                var title = localizer.Get("session_cleanup_title", "ru");
+                var title = localizer.Get("session_cleanup_title");
                 Assert.Equal("Очистка сессионных токенов", title);
 
-                var dottedTitle = localizer.Get("notifications.session_cleanup_title", "ru-RU");
+                var dottedTitle = localizer.Get("notifications.session_cleanup_title");
                 Assert.Equal("Очистка сессионных токенов", dottedTitle);
 
                 return Task.CompletedTask;
@@ -53,20 +57,31 @@ namespace Audex.Application.Tests.Services.Localization
         }
 
         [Theory]
-        [InlineData("en-US", "en")]
-        [InlineData("EN", "en")]
-        [InlineData("en", "en")]
-        [InlineData("ru-RU", "ru")]
-        [InlineData("RU", "ru")]
-        [InlineData("ru", "ru")]
-        [InlineData(null, "en")]
-        [InlineData("", "en")]
-        [InlineData("   ", "en")]
-        public void TestLocalization_LanguageCodeNormalization(string? inputLang, string expectedNormalized)
+        [InlineData("en-US", true, AppLanguage.En)]
+        [InlineData("EN", true, AppLanguage.En)]
+        [InlineData("en", true, AppLanguage.En)]
+        [InlineData("ru-RU", true, AppLanguage.Ru)]
+        [InlineData("RU", true, AppLanguage.Ru)]
+        [InlineData("ru", true, AppLanguage.Ru)]
+        [InlineData("fr", false, default(AppLanguage))]
+        [InlineData("de-DE", false, default(AppLanguage))]
+        [InlineData("", false, default(AppLanguage))]
+        [InlineData("   ", false, default(AppLanguage))]
+        [InlineData(null, false, default(AppLanguage))]
+        public void TestLocalization_AppLanguageParsing(string? inputLanguage, bool expectedSuccess, AppLanguage expectedLanguage)
         {
-            var provider = new TranslationProvider();
-            var result = provider.NormalizeLanguageCode(inputLang);
-            Assert.Equal(expectedNormalized, result);
+            var success = AppLanguageExtensions.TryParse(inputLanguage, out var resolvedLanguage);
+
+            Assert.Equal(expectedSuccess, success);
+            Assert.Equal(expectedLanguage, resolvedLanguage);
+        }
+
+        [Theory]
+        [InlineData(AppLanguage.En, "en")]
+        [InlineData(AppLanguage.Ru, "ru")]
+        public void TestLocalization_AppLanguageToCode(AppLanguage language, string expectedCode)
+        {
+            Assert.Equal(expectedCode, language.ToCode());
         }
 
         [Fact]
@@ -76,10 +91,12 @@ namespace Audex.Application.Tests.Services.Localization
             {
                 var localizer = sp.GetRequiredService<ILocalizationService>();
 
-                var enMessage = localizer.Get("session_cleanup_message", "en", 42);
+                CultureInfo.CurrentUICulture = new CultureInfo("en");
+                var enMessage = localizer.Get("session_cleanup_message", 42);
                 Assert.Equal("Removed 42 expired or revoked tokens.", enMessage);
 
-                var ruMessage = localizer.Get("session_cleanup_message", "ru", 42);
+                CultureInfo.CurrentUICulture = new CultureInfo("ru");
+                var ruMessage = localizer.Get("session_cleanup_message", 42);
                 Assert.Equal("Удалено устаревших или отозванных токенов: 42.", ruMessage);
 
                 return Task.CompletedTask;
@@ -87,14 +104,15 @@ namespace Audex.Application.Tests.Services.Localization
         }
 
         [Fact]
-        public async Task TestLocalization_FallbackToEnglish_WhenKeyMissingInRussian()
+        public async Task TestLocalization_FallbackToEnglish_WhenCultureIsUnsupported()
         {
             await ExecuteScopeAsync(sp =>
             {
                 var localizer = sp.GetRequiredService<ILocalizationService>();
 
-                // A key that exists in English should fall back to English if requested in an unknown language
-                var text = localizer.Get("session_cleanup_title", "de-DE");
+                // A key that exists in English should fall back to English if current culture is unsupported
+                CultureInfo.CurrentUICulture = new CultureInfo("de-DE");
+                var text = localizer.Get("session_cleanup_title");
                 Assert.Equal("Session Tokens Clean Up", text);
 
                 return Task.CompletedTask;
@@ -109,7 +127,7 @@ namespace Audex.Application.Tests.Services.Localization
                 var localizer = sp.GetRequiredService<ILocalizationService>();
 
                 var missingKey = "non_existent_key_12345";
-                var result = localizer.Get(missingKey, "ru");
+                var result = localizer.Get(missingKey);
                 Assert.Equal(missingKey, result);
 
                 return Task.CompletedTask;
@@ -117,62 +135,17 @@ namespace Audex.Application.Tests.Services.Localization
         }
 
         [Fact]
-        public async Task TestLocalization_GetForUserAsync_ResolvesUserLanguage()
+        public async Task TestLocalization_UninitializedCulture_ThrowsInvalidOperationException()
         {
-            await ExecuteScopeAsync(async sp =>
+            await ExecuteScopeAsync(sp =>
             {
                 var localizer = sp.GetRequiredService<ILocalizationService>();
-                var userService = sp.GetRequiredService<IUserProfileService>();
+                CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
 
-                // Set user language to Russian
-                await userService.UpdateAsync(new UserProfileDto
-                {
-                    Id = UserProfileConstants.UserProfileId,
-                    LanguageCode = "ru-RU"
-                });
+                var exception = Assert.Throws<InvalidOperationException>(() => localizer.Get("notifications.session_cleanup_title"));
+                Assert.Contains("Localization culture has not been initialized", exception.Message);
 
-                var ruTitle = await localizer.GetForUserAsync("notifications.session_cleanup_title", UserProfileConstants.UserProfileId);
-                Assert.Equal("Очистка сессионных токенов", ruTitle);
-
-                // Set user language to English
-                await userService.UpdateAsync(new UserProfileDto
-                {
-                    Id = UserProfileConstants.UserProfileId,
-                    LanguageCode = "en-US"
-                });
-
-                var enTitle = await localizer.GetForUserAsync("notifications.session_cleanup_title", UserProfileConstants.UserProfileId);
-                Assert.Equal("Session Tokens Clean Up", enTitle);
-            });
-        }
-
-        [Fact]
-        public async Task TestLocalization_GetUserLanguageAsync_ResolvesNormalizedLanguage()
-        {
-            await ExecuteScopeAsync(async sp =>
-            {
-                var localizer = sp.GetRequiredService<ILocalizationService>();
-                var userService = sp.GetRequiredService<IUserProfileService>();
-
-                // Set user language to Russian
-                await userService.UpdateAsync(new UserProfileDto
-                {
-                    Id = UserProfileConstants.UserProfileId,
-                    LanguageCode = "ru-RU"
-                });
-
-                var ruLang = await localizer.GetUserLanguageAsync();
-                Assert.Equal("ru", ruLang);
-
-                // Set user language to English
-                await userService.UpdateAsync(new UserProfileDto
-                {
-                    Id = UserProfileConstants.UserProfileId,
-                    LanguageCode = "en-US"
-                });
-
-                var enLang = await localizer.GetUserLanguageAsync();
-                Assert.Equal("en", enLang);
+                return Task.CompletedTask;
             });
         }
     }

@@ -101,7 +101,10 @@ namespace Audex.Application.Mappings
         public partial SecurityTransactionDto Map(SecurityTransaction entity);
         public partial IEnumerable<SecurityTransactionDto> Map(IEnumerable<SecurityTransaction> entities);
 
+        [MapperIgnoreSource(nameof(UserProfileDto.Language))]
         public partial UserProfile Map(UserProfileDto dto);
+
+        [MapperIgnoreTarget(nameof(UserProfileDto.Language))]
         public partial UserProfileDto Map(UserProfile entity);
 
         [MapperIgnoreTarget(nameof(Debt.DebtTags))]

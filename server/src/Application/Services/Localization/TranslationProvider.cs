@@ -1,19 +1,29 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
+using Audex.Application.DTO.Common;
+using Audex.Application.Enums.Localization;
 using Audex.Application.Interfaces.Localization;
 
 namespace Audex.Application.Services.Localization
 {
     public class TranslationProvider : ITranslationProvider
     {
-        private const string DefaultLanguage = "en";
+        public const string DefaultLanguage = AppLanguageExtensions.DefaultLanguageCode;
+
+        private static readonly LanguageDto[] SupportedLanguageDtos =
+        [
+            new() { Code = "en", Name = "English" },
+            new() { Code = "ru", Name = "Русский" }
+        ];
+
         private static readonly Regex ResourceNamePattern = new(
             @"\.Resources\.(?<lang>[a-zA-Z0-9_-]+)\.(?<cat>[a-zA-Z0-9_-]+)\.json$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -27,71 +37,91 @@ namespace Audex.Application.Services.Localization
             LoadEmbeddedTranslations();
         }
 
-        public string GetTranslation(string? languageCode, string key)
+        public string GetDefaultLanguage() => DefaultLanguage;
+        public IReadOnlyList<LanguageDto> GetSupportedLanguages() => SupportedLanguageDtos;
+
+        public LanguageDto GetLanguage(AppLanguage language)
+        {
+            var languageCode = language.ToCode();
+            return SupportedLanguageDtos.First(languageItem => languageItem.Code == languageCode);
+        }
+
+        public LanguageDto GetLanguage(string languageCode)
+        {
+            var matchedLanguage = SupportedLanguageDtos.FirstOrDefault(languageItem =>
+                string.Equals(languageItem.Code, languageCode, StringComparison.OrdinalIgnoreCase));
+
+            if (matchedLanguage != null)
+            {
+                return matchedLanguage;
+            }
+
+            if (AppLanguageExtensions.TryParse(languageCode, out var language))
+            {
+                return GetLanguage(language);
+            }
+
+            return SupportedLanguageDtos[0];
+        }
+
+        public string GetTranslation(AppLanguage language, string key)
+        {
+            return GetTranslation(language.ToCode(), key);
+        }
+
+        public string GetTranslation(string languageCode, string key)
         {
             if (string.IsNullOrWhiteSpace(key))
             {
                 return string.Empty;
             }
 
-            var normalizedLang = NormalizeLanguageCode(languageCode);
-
-            // 1. Try specified language
-            if (_translations.TryGetValue(normalizedLang, out var langDict) && langDict.TryGetValue(key, out var translation))
+            // 1. Direct O(1) dictionary lookup for exact code (e.g. "en", "ru")
+            if (_translations.TryGetValue(languageCode, out var languageDictionary) &&
+                languageDictionary.TryGetValue(key, out var translation))
             {
                 return translation;
             }
 
-            // 2. Fallback to English
-            if (!string.Equals(normalizedLang, DefaultLanguage, StringComparison.OrdinalIgnoreCase))
+            // 2. Fallback via AppLanguage resolution for external/regional codes (e.g. "en-US", "ru-RU")
+            if (AppLanguageExtensions.TryParse(languageCode, out var language))
             {
-                if (_translations.TryGetValue(DefaultLanguage, out var defaultDict) && defaultDict.TryGetValue(key, out var defaultTranslation))
+                var normalizedCode = language.ToCode();
+                if (_translations.TryGetValue(normalizedCode, out var resolvedDictionary) &&
+                    resolvedDictionary.TryGetValue(key, out var resolvedTranslation))
                 {
-                    return defaultTranslation;
+                    return resolvedTranslation;
                 }
             }
 
-            // 3. Fallback to key itself
+            // 3. Fallback to default language
+            if (!string.Equals(languageCode, DefaultLanguage, StringComparison.OrdinalIgnoreCase) &&
+                _translations.TryGetValue(DefaultLanguage, out var defaultDictionary) &&
+                defaultDictionary.TryGetValue(key, out var defaultTranslation))
+            {
+                return defaultTranslation;
+            }
+
+            // 4. Fallback to key itself
             return key;
-        }
-
-        public string NormalizeLanguageCode(string? languageCode)
-        {
-            if (string.IsNullOrWhiteSpace(languageCode))
-            {
-                return DefaultLanguage;
-            }
-
-            var clean = languageCode.Trim().ToLowerInvariant();
-
-            if (clean.StartsWith("ru", StringComparison.OrdinalIgnoreCase))
-            {
-                return "ru";
-            }
-
-            if (clean.StartsWith("en", StringComparison.OrdinalIgnoreCase))
-            {
-                return "en";
-            }
-
-            return DefaultLanguage;
         }
 
         public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> GetAllTranslations()
         {
             var result = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
-            foreach (var translation in _translations)
+            foreach (var kvp in _translations)
             {
-                result[translation.Key] = translation.Value;
+                result[kvp.Key] = kvp.Value;
             }
             return result;
         }
 
         private void LoadEmbeddedTranslations()
         {
-            var assembly = typeof(TranslationProvider).Assembly;
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceNames = assembly.GetManifestResourceNames();
 
-            foreach (var resourceName in assembly.GetManifestResourceNames())
+            foreach (var resourceName in resourceNames)
             {
                 var match = ResourceNamePattern.Match(resourceName);
                 if (!match.Success)
@@ -100,31 +130,34 @@ namespace Audex.Application.Services.Localization
                 }
 
                 var language = match.Groups["lang"].Value.ToLowerInvariant();
-                var category = match.Groups["cat"].Value.ToLowerInvariant();
+                var category = match.Groups["cat"].Value;
 
                 try
                 {
                     using var stream = assembly.GetManifestResourceStream(resourceName);
-                    if (stream == null) continue;
+                    if (stream == null)
+                    {
+                        continue;
+                    }
 
                     using var reader = new StreamReader(stream);
                     var jsonContent = reader.ReadToEnd();
 
                     using var doc = JsonDocument.Parse(jsonContent);
-                    var langDict = _translations.GetOrAdd(language, _ => new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
+                    var languageDictionary = _translations.GetOrAdd(language, _ => new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase));
 
                     foreach (var prop in doc.RootElement.EnumerateObject())
                     {
                         var value = prop.Value.GetString() ?? string.Empty;
 
                         var fullKey = $"{category}.{prop.Name}";
-                        langDict[fullKey] = value;
-                        langDict[prop.Name] = value;
+                        languageDictionary[fullKey] = value;
+                        languageDictionary[prop.Name] = value;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    _logger?.LogError(ex, "Failed to load embedded localization resource '{ResourceName}'", resourceName);
+                    _logger?.LogError(exception, "Failed to load embedded localization resource '{ResourceName}'", resourceName);
                 }
             }
         }
