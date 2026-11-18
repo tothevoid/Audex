@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Audex.Application.DTO.User;
 using Audex.Application.Enums.Auth;
 using Audex.Application.Interfaces.Auth;
+using Audex.Application.Interfaces.Localization;
 using Audex.Application.Interfaces.User;
 using Audex.Application.Mappings;
 using Audex.Infrastructure.Entities.User;
@@ -22,30 +23,33 @@ namespace Audex.Application.Services.User
         private readonly ApplicationMapper _mapper;
         private readonly ICurrencyService _currencyService;
         private readonly IPasswordHasherService _passwordHasher;
+        private readonly ITranslationProvider _translationProvider;
 
         public UserProfileService(
             IUnitOfWork uow,
             ApplicationMapper mapper,
             ICurrencyService currencyService,
-            IPasswordHasherService passwordHasher)
+            IPasswordHasherService passwordHasher,
+            ITranslationProvider translationProvider)
         {
             _db = uow;
             _mapper = mapper;
             _userProfileRepo = uow.CreateRepository<UserProfile>();
             _currencyService = currencyService;
             _passwordHasher = passwordHasher;
+            _translationProvider = translationProvider;
         }
 
         public async Task<UserProfileDto?> GetAsync()
         {
             var users = await _userProfileRepo.GetAllAsync(include: GetFullHierarchyColumns);
-            return _mapper.Map(users.FirstOrDefault());
+            return MapUserProfile(users.FirstOrDefault());
         }
 
         public async Task<UserProfileDto?> GetByUserNameAsync(string userName)
         {
             var user = await GetUserEntityByUserNameAsync(userName, disableTracking: true);
-            return _mapper.Map(user);
+            return MapUserProfile(user);
         }
 
         public async Task<UserProfileDto?> GetByAuthAsync(string userName, string password)
@@ -70,7 +74,7 @@ namespace Audex.Application.Services.User
                 await _db.CommitAsync();
             }
 
-            return _mapper.Map(user);
+            return MapUserProfile(user);
         }
 
         private async Task<UserProfile?> GetUserEntityByUserNameAsync(string userName, bool disableTracking = true)
@@ -140,6 +144,18 @@ namespace Audex.Application.Services.User
         private IQueryable<UserProfile> GetFullHierarchyColumns(IQueryable<UserProfile> userProfileQuery)
         {
             return userProfileQuery.Include(profile => profile.Currency);
+        }
+
+        private UserProfileDto? MapUserProfile(UserProfile? userProfile)
+        {
+            if (userProfile == null)
+            {
+                return null;
+            }
+
+            var userProfileDto = _mapper.Map(userProfile);
+            userProfileDto.Language = _translationProvider.GetLanguage(userProfile.LanguageCode);
+            return userProfileDto;
         }
     }
 }
