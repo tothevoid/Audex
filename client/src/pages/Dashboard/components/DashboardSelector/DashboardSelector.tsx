@@ -3,8 +3,7 @@ import { Button, HStack, Icon, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { MdAdd } from "react-icons/md";
 import { UserDashboardEntity } from "@/models/dashboard/UserDashboardEntity";
-import { BaseModalRef } from "@/shared/utilities/modalUtilities";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import { DashboardTabItem } from "./DashboardTabItem";
 import { DashboardTitleModal, DashboardTitleModalRef } from "./DashboardTitleModal";
 
@@ -28,10 +27,10 @@ export const DashboardSelector: React.FC<DashboardSelectorProps> = ({
     onDeleteDashboard
 }) => {
     const { t } = useTranslation();
+    const { confirmDelete } = useConfirm();
 
     const createModalRef = useRef<DashboardTitleModalRef>(null);
     const renameModalRef = useRef<DashboardTitleModalRef>(null);
-    const deleteConfirmRef = useRef<BaseModalRef>(null);
 
     const [targetDashboardId, setTargetDashboardId] = useState<string | null>(null);
 
@@ -42,15 +41,17 @@ export const DashboardSelector: React.FC<DashboardSelectorProps> = ({
         renameModalRef.current?.openWithTitle(dashboard.title);
     };
 
-    const handleOpenDelete = (dashboardId: string) => {
-        setTargetDashboardId(dashboardId);
-        deleteConfirmRef.current?.openModal();
-    };
+    const handleDelete = async (dashboardId: string) => {
+        const confirmed = await confirmDelete(
+            t("dashboard_delete"),
+            t("dashboard_delete_confirm"),
+            t("modals_delete_button")
+        );
+        if (!confirmed) {
+            return;
+        }
 
-    const handleDeleteConfirmed = async () => {
-        if (!targetDashboardId) return;
-        await onDeleteDashboard(targetDashboardId);
-        setTargetDashboardId(null);
+        await onDeleteDashboard(dashboardId);
     };
 
     return (
@@ -66,7 +67,7 @@ export const DashboardSelector: React.FC<DashboardSelectorProps> = ({
                         onSelect={() => onSelectDashboard(dashboard.id)}
                         onRename={() => handleOpenRename(dashboard)}
                         onSetDefault={() => onSetDefaultDashboard(dashboard.id)}
-                        onDelete={() => handleOpenDelete(dashboard.id)}
+                        onDelete={() => handleDelete(dashboard.id)}
                     />
                 ))}
             </HStack>
@@ -105,15 +106,6 @@ export const DashboardSelector: React.FC<DashboardSelectorProps> = ({
                         onRenameDashboard(targetDashboardId, newTitle);
                     }
                 }}
-            />
-
-            {/* Delete Confirmation Modal */}
-            <ConfirmModal
-                ref={deleteConfirmRef}
-                title={t("dashboard_delete")}
-                message={t("dashboard_delete_confirm")}
-                confirmActionName={t("modals_delete_button")}
-                onConfirmed={handleDeleteConfirmed}
             />
         </HStack>
     );

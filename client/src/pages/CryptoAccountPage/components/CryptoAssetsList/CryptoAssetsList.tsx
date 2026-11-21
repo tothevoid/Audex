@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useCallback, useMemo } from 'react';
 import CardsGrid from '@/shared/components/CardsGrid';
 import { useCryptoAssets } from '@/pages/CryptoAccountPage/hooks/useCryptoAssets';
 import { CryptoAccountEntity } from '@/models/crypto/CryptoAccountEntity';
@@ -7,7 +7,7 @@ import CryptoAsset from '@/pages/CryptoAccountPage/components/CryptoAsset/Crypto
 import CryptoAssetModal from '@/pages/CryptoAccountPage/modals/CryptoAssetModal';
 import CryptoAccountHeader from '@/pages/CryptoAccountPage/components/CryptoAccountHeader/CryptoAccountHeader';
 import { useEntityModal } from '@/shared/hooks/useEntityModal';
-import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { useConfirm } from '@/shared/hooks/useConfirm';
 import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 import AddButton from '@/shared/components/AddButton/AddButton';
 import { useTranslation } from 'react-i18next';
@@ -19,18 +19,19 @@ interface Props {
 }
 
 const CryptoAssetsList: React.FC<Props> = ({ cryptoAccount, onDataChanged }: Props) => {
-	const { 
+	const { t } = useTranslation();
+	const { confirmDelete } = useConfirm();
+
+	const {
 		activeEntity,
 		modalRef,
-		confirmModalRef,
 		onAddClicked,
 		onEditClicked,
-		onDeleteClicked,
 		mode,
 		onActionEnded,
 	} = useEntityModal<CryptoAssetEntity>();
-	
-	const { 
+
+	const {
 		cryptoAssets,
 		totalBalanceUsd,
 		addCryptoAssetEntity,
@@ -53,14 +54,15 @@ const CryptoAssetsList: React.FC<Props> = ({ cryptoAccount, onDataChanged }: Pro
 		onActionEnded();
 	};
 
-	const { t } = useTranslation();
+	const onDeleteClicked = useCallback(async (cryptoAsset: CryptoAssetEntity) => {
+		const confirmed = await confirmDelete(t("crypto_account_cryptocurrency_delete_title"));
+		if (!confirmed) {
+			return;
+		}
 
-	const onDeleteConfirmed = async () => {
-		if (!activeEntity) return;
-		await deleteCryptoAssetEntity(activeEntity);
+		await deleteCryptoAssetEntity(cryptoAsset);
 		onDataChanged();
-		onActionEnded();
-	};
+	}, [confirmDelete, deleteCryptoAssetEntity, onDataChanged, t]);
 
 	return (
 		<Fragment>
@@ -83,7 +85,7 @@ const CryptoAssetsList: React.FC<Props> = ({ cryptoAccount, onDataChanged }: Pro
 				</CardsGrid>
 			) : (
 				<Placeholder text={t("crypto_account_page_no_cryptocurrencies")}>
-					<AddButton onClick={onAddClicked} buttonTitle={t('add_crypto_account_cryptocurrency_title')}/>
+					<AddButton onClick={onAddClicked} buttonTitle={t('add_crypto_account_cryptocurrency_title')} />
 				</Placeholder>
 			)}
 
@@ -94,11 +96,6 @@ const CryptoAssetsList: React.FC<Props> = ({ cryptoAccount, onDataChanged }: Pro
 				existingCryptocurrencyIds={existingCryptocurrencyIds}
 				onSaved={onCryptoAssetSaved}
 			/>
-			<ConfirmModal onConfirmed={onDeleteConfirmed}
-				title={t("crypto_account_cryptocurrency_delete_title")}
-				message={t("modals_delete_message")}
-				confirmActionName={t("modals_delete_button")}
-				ref={confirmModalRef}/>
 		</Fragment>
 	);
 };

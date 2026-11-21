@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useCallback } from "react";
 import { Box, Flex, Badge, Button } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { DebtPaymentEntity } from "@/models/debts/DebtPaymentEntity";
@@ -6,7 +6,7 @@ import { useDebtPayments } from "@/pages/Debts/hooks/useDebtPayments";
 import DebtPaymentModal from "@/pages/Debts/modals/DebtPaymentModal/DebtPaymentModal";
 import DebtPayment from "@/pages/Debts/components/DebtPayment/DebtPayment";
 import { useEntityModal } from "@/shared/hooks/useEntityModal";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
 import AddButton from "@/shared/components/AddButton/AddButton";
 import SectionHeader from "@/shared/components/SectionHeader";
@@ -30,14 +30,13 @@ const DebtsPaymentsList: React.FC<Props> = ({
     onClearDebtFilter
 }) => {
     const { t } = useTranslation();
+    const { confirmDelete } = useConfirm();
 
-    const { 
+    const {
         activeEntity,
         modalRef,
-        confirmModalRef,
         onAddClicked,
         onEditClicked,
-        onDeleteClicked,
         mode,
         onActionEnded
     } = useEntityModal<DebtPaymentEntity>();
@@ -67,14 +66,14 @@ const DebtsPaymentsList: React.FC<Props> = ({
         onActionEnded();
     };
 
-    const onDeleteConfirmed = async () => {
-		if (!activeEntity) {
-            throw new Error("Deleted entity is not set");
+    const onDeleteClicked = useCallback(async (payment: DebtPaymentEntity) => {
+        const confirmed = await confirmDelete(t("debt_payment_modal_title"));
+        if (!confirmed) {
+            return;
         }
 
-        await deleteDebtPaymentEntity(activeEntity);
-		onActionEnded();
-    };
+        await deleteDebtPaymentEntity(payment);
+    }, [confirmDelete, deleteDebtPaymentEntity, t]);
 
     return (
         <Fragment>
@@ -131,13 +130,6 @@ const DebtsPaymentsList: React.FC<Props> = ({
                 onPageChange={loadPage}
             />
 
-            <ConfirmModal
-                onConfirmed={onDeleteConfirmed}
-                title={t("debt_payment_modal_title")}
-                message={t("modals_delete_message")}
-                confirmActionName={t("modals_delete_button")}
-                ref={confirmModalRef}
-            />
             <DebtPaymentModal
                 debtPayment={activeEntity}
                 selectedDebtId={selectedDebtId}

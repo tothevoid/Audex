@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useCallback } from 'react';
 import CardsGrid from '@/shared/components/CardsGrid';
 import { useTranslation } from 'react-i18next';
 import CryptoAccount from '@/pages/CryptoAccountsPage/components/CryptoAccount/CryptoAccount';
@@ -6,7 +6,7 @@ import { CryptoAccountEntity } from '@/models/crypto/CryptoAccountEntity';
 import CryptoAccountModal from '@/pages/CryptoAccountsPage/modals/CryptoAccountModal/CryptoAccountModal';
 import { useCryptoAccounts } from '@/pages/CryptoAccountsPage/hooks/useCryptoAccounts';
 import Placeholder from '@/shared/components/Placeholder/Placeholder';
-import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { useConfirm } from '@/shared/hooks/useConfirm';
 import { useEntityModal } from '@/shared/hooks/useEntityModal';
 import AddButton from '@/shared/components/AddButton/AddButton';
 import SectionHeader from '@/shared/components/SectionHeader/SectionHeader';
@@ -18,14 +18,13 @@ interface Props {
 
 const CryptoAccountsList: React.FC<Props> = (props: Props) => {
     const { t } = useTranslation();
+    const { confirmDelete } = useConfirm();
 
     const {
         activeEntity,
         modalRef,
-        confirmModalRef,
         onAddClicked,
         onEditClicked,
-        onDeleteClicked,
         mode,
         onActionEnded,
     } = useEntityModal<CryptoAccountEntity>();
@@ -47,12 +46,15 @@ const CryptoAccountsList: React.FC<Props> = (props: Props) => {
         onActionEnded();
     };
 
-    const onDeleteConfirmed = async () => {
-        if (!activeEntity) return;
-        await deleteCryptoAccountEntity(activeEntity);
+    const onDeleteClicked = useCallback(async (cryptoAccount: CryptoAccountEntity) => {
+        const confirmed = await confirmDelete(t("crypto_account_delete_title"));
+        if (!confirmed) {
+            return;
+        }
+
+        await deleteCryptoAccountEntity(cryptoAccount);
         props.onDataChanged();
-        onActionEnded();
-    };
+    }, [confirmDelete, deleteCryptoAccountEntity, props, t]);
 
     const getHeader = () => {
         const placeholderAddButton = (
@@ -88,13 +90,6 @@ const CryptoAccountsList: React.FC<Props> = (props: Props) => {
                     />
                 ))}
             </CardsGrid>
-            <ConfirmModal
-                onConfirmed={onDeleteConfirmed}
-                title={t("crypto_account_delete_title")}
-                message={t("modals_delete_message")}
-                confirmActionName={t("modals_delete_button")}
-                ref={confirmModalRef}
-            />
             <CryptoAccountModal
                 cryptoAccount={activeEntity}
                 modalRef={modalRef}

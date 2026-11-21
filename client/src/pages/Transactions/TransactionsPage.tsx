@@ -18,8 +18,8 @@ import { useTransactions } from "./hooks/useTransactions";
 import NewTransactionModal from "./modals/NewTransactionModal/NewTransactionModal";
 import { CurrencyTransactionEntity } from "@/models/transactions/CurrencyTransactionEntity";
 import { useEntityModal } from "@/shared/hooks/useEntityModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
 import TransactionModal from "./modals/TransactionModal/TransactionModal";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
@@ -38,6 +38,7 @@ interface State {
 
 const TransactionsPage: React.FC = () => {
     const { t, i18n } = useTranslation();
+    const { confirmDelete } = useConfirm();
     const [state, setState] = useState<State>({ accounts: [], transactionTypes: [] });
 
     // Display & Filtering states
@@ -56,9 +57,7 @@ const TransactionsPage: React.FC = () => {
     const {
         activeEntity,
         modalRef,
-        confirmModalRef,
         onEditClicked,
-        onDeleteClicked,
         mode,
         onActionEnded
     } = useEntityModal<TransactionEntity>();
@@ -172,14 +171,14 @@ const TransactionsPage: React.FC = () => {
         onActionEnded();
     }, [createTransactionEntity, mode, onActionEnded, updateTransactionEntity]);
 
-    const onDeleteConfirmed = useCallback(async () => {
-        if (!activeEntity) {
-            throw new Error("Deleted entity is not set");
+    const onDeleteClicked = useCallback(async (transaction: TransactionEntity) => {
+        const confirmed = await confirmDelete(t("transaction_delete_title"));
+        if (!confirmed) {
+            return;
         }
 
-        await deleteTransactionEntity(activeEntity);
-        onActionEnded();
-    }, [activeEntity, deleteTransactionEntity, onActionEnded]);
+        await deleteTransactionEntity(transaction);
+    }, [confirmDelete, deleteTransactionEntity, t]);
 
     const executeTableCommit = useCallback(async (diff: EditableGridDiff<TransactionEntity>) => {
         setIsTableSaving(true);
@@ -297,13 +296,6 @@ const TransactionsPage: React.FC = () => {
             )}
 
             {/* Modals for edit & advanced creation */}
-            <ConfirmModal
-                onConfirmed={onDeleteConfirmed}
-                title={t("transaction_delete_title")}
-                message={t("modals_delete_message")}
-                confirmActionName={t("modals_delete_button")}
-                ref={confirmModalRef}
-            />
             <TransactionModal transaction={activeEntity} modalRef={modalRef} onSaved={onTransactionSaved} />
             <NewTransactionModal
                 modalRef={addTransactionModalRef}

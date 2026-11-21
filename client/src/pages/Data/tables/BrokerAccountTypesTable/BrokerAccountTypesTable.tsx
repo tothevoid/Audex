@@ -2,7 +2,7 @@ import { Box, Button, Icon, Text } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import BrokerAccountTypeModal from "@/pages/Data/modals/BrokerAccountTypeModal/BrokerAccountTypeModal";
 import { createBrokerAccountType, deleteBrokerAccountType, getBrokerAccountTypes, updateBrokerAccountType } from "@/api/brokers/brokerAccountTypeApi";
 import { BrokerAccountTypeEntity } from "@/models/brokers/BrokerAccountTypeEntity";
@@ -13,13 +13,12 @@ import { notify } from "@/shared/components/Toaster";
 
 const BrokerAccountTypesTable: React.FC = () => {
     const [brokerAccountTypes, setBrokerAccountTypes] = useState<BrokerAccountTypeEntity[]>([]);
-    const [brokerAccountTypeToDelete, setBrokerAccountTypeToDelete] = useState<BrokerAccountTypeEntity | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [updatedBrokerAccountType, setUpdatedBrokerAccountType] = useState<BrokerAccountTypeEntity | null>(null);
     const { t } = useTranslation();
+    const { confirmDelete } = useConfirm();
 
     const modalRef = useRef<BaseModalRef>(null);
-    const confirmModalRef = useRef<BaseModalRef>(null);
 
     useEffect(() => {
         const initData = async () => { 
@@ -70,26 +69,20 @@ const BrokerAccountTypesTable: React.FC = () => {
         }
     };
 
-    const onDeleteClicked = (brokerAccountType: BrokerAccountTypeEntity) => {
-        setBrokerAccountTypeToDelete(brokerAccountType);
-        confirmModalRef.current?.openModal();
-    };
-
-    const onDeleteConfirmed = async () => {
-        if (!brokerAccountTypeToDelete){
+    const onDeleteClicked = async (brokerAccountType: BrokerAccountTypeEntity) => {
+        const confirmed = await confirmDelete(t("broker_account_types_delete_title"));
+        if (!confirmed) {
             return;
         }
 
-        const isDeleted = await deleteBrokerAccountType(brokerAccountTypeToDelete.id);
-        
+        const isDeleted = await deleteBrokerAccountType(brokerAccountType.id);
         if (!isDeleted) {
             return;
         }
 
-        notify.success(t("broker_account_type_toast_deleted_title"), t("broker_account_type_toast_deleted_desc", { name: brokerAccountTypeToDelete.name }));
+        notify.success(t("broker_account_type_toast_deleted_title"), t("broker_account_type_toast_deleted_desc", { name: brokerAccountType.name }));
 
-        setBrokerAccountTypes((currentTypes) => currentTypes.filter((typeItem: BrokerAccountTypeEntity) => typeItem.id !== brokerAccountTypeToDelete.id));
-        setBrokerAccountTypeToDelete(null);
+        setBrokerAccountTypes((currentTypes) => currentTypes.filter((typeItem: BrokerAccountTypeEntity) => typeItem.id !== brokerAccountType.id));
     };
 
     const columns: ColumnDef<BrokerAccountTypeEntity>[] = useMemo(() => [
@@ -148,11 +141,6 @@ const BrokerAccountTypesTable: React.FC = () => {
             modalRef={modalRef}
             onSaved={onBrokerAccountTypeSaved}
         />
-        <ConfirmModal onConfirmed={onDeleteConfirmed}
-            title={t("broker_account_types_delete_title")}
-            message={t("modals_delete_message")}
-            confirmActionName={t("modals_delete_button")}
-            ref={confirmModalRef}/>
     </Box>;
 };
 

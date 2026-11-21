@@ -1,11 +1,10 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import { Box, Icon, Text, VStack } from "@chakra-ui/react";
 import { MdNotifications } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { NotificationEntity } from "@/models/notifications/NotificationEntity";
 import { NotificationItem } from "./NotificationItem";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
-import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 
 interface NotificationsListProps {
     items: NotificationEntity[];
@@ -21,20 +20,20 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
     onDelete
 }) => {
     const { t } = useTranslation();
-    const confirmModalRef = useRef<BaseModalRef>(null);
-    const [selectedDeleteId, setSelectedDeleteId] = useState<string | null>(null);
+    const { confirmDelete } = useConfirm();
 
-    const handleDeleteClick = (id: string, e?: React.MouseEvent) => {
+    const handleDeleteClick = async (id: string, e?: React.MouseEvent) => {
         e?.stopPropagation();
-        setSelectedDeleteId(id);
-        confirmModalRef.current?.openModal();
-    };
-
-    const handleDeleteConfirmed = async () => {
-        if (selectedDeleteId) {
-            await onDelete(selectedDeleteId);
-            setSelectedDeleteId(null);
+        const confirmed = await confirmDelete(
+            t("notifications_delete_confirm_title"),
+            t("notifications_delete_confirm_message"),
+            t("notifications_delete")
+        );
+        if (!confirmed) {
+            return;
         }
+
+        await onDelete(id);
     };
 
     if (isLoading) {
@@ -77,14 +76,6 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
                     />
                 ))}
             </VStack>
-
-            <ConfirmModal
-                ref={confirmModalRef}
-                title={t("notifications_delete_confirm_title")}
-                message={t("notifications_delete_confirm_message")}
-                confirmActionName={t("notifications_delete")}
-                onConfirmed={handleDeleteConfirmed}
-            />
         </>
     );
 };

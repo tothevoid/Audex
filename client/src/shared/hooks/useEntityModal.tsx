@@ -7,7 +7,6 @@ export function useEntityModal<T>() {
     const [mode, setMode] = useState<ActiveEntityMode>(ActiveEntityMode.None);
 
     const modalRef = useRef<BaseModalRef>(null);
-    const confirmModalRef = useRef<BaseModalRef>(null);
 
     const onAddClicked = useCallback(() => {
         setActiveEntity(null);
@@ -21,12 +20,6 @@ export function useEntityModal<T>() {
         modalRef.current?.openModal();
     }, []);
 
-    const onDeleteClicked = useCallback((entity: T) => {
-        setActiveEntity(entity);
-        setMode(ActiveEntityMode.Delete);
-        confirmModalRef.current?.openModal();
-    }, []);
-
     const onActionEnded = useCallback(() => {
         setActiveEntity(null);
         setMode(ActiveEntityMode.None);
@@ -36,10 +29,8 @@ export function useEntityModal<T>() {
         activeEntity,
         mode,
         modalRef,
-        confirmModalRef,
         onAddClicked,
         onEditClicked,
-        onDeleteClicked,
         setActiveEntity,
         onActionEnded,
         setMode,

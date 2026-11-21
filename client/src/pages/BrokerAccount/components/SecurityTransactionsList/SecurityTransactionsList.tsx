@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Box } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { SecurityTransactionEntity, SecurityTransactionEntityRequest } from '@/models/securities/SecurityTransactionEntity';
@@ -6,7 +6,7 @@ import SecurityTransaction from '@/pages/BrokerAccount/components/SecurityTransa
 import SecurityTransactionModal, { CreateSecurityTransactionContext, EditSecurityTransactionContext } from '@/pages/BrokerAccount/modals/SecurityTransactionModal/SecurityTransactionModal';
 import { useSecurityTransactions } from '@/pages/BrokerAccount/hooks/useSecurityTransactions';
 import { useEntityModal } from '@/shared/hooks/useEntityModal';
-import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { useConfirm } from '@/shared/hooks/useConfirm';
 import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 import SectionHeader from '@/shared/components/SectionHeader/SectionHeader';
 import { Nullable } from '@/shared/utilities/nullable';
@@ -29,14 +29,13 @@ interface Props {
 
 const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransactionsChanged }) => {
 	const { t } = useTranslation();
+	const { confirmDelete } = useConfirm();
 
 	const {
 		activeEntity,
 		modalRef,
-		confirmModalRef,
 		onAddClicked,
 		onEditClicked,
-		onDeleteClicked,
 		mode,
 		onActionEnded
 	} = useEntityModal<SecurityTransactionEntity>();
@@ -94,15 +93,15 @@ const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransact
 		onTransactionsChanged();
 	};
 
-	const onDeleteConfirmed = async () => {
-		if (!activeEntity) {
-			throw new Error("Deleted entity is not set");
+	const onDeleteClicked = useCallback(async (transaction: SecurityTransactionEntity) => {
+		const confirmed = await confirmDelete(t("entity_securities_transaction_delete_title"));
+		if (!confirmed) {
+			return;
 		}
 
-		await deleteSecurityTransactionEntity(activeEntity);
-		onActionEnded();
+		await deleteSecurityTransactionEntity(transaction);
 		onTransactionsChanged();
-	};
+	}, [confirmDelete, deleteSecurityTransactionEntity, onTransactionsChanged, t]);
 
 	return (
 		<Box>
@@ -149,14 +148,6 @@ const SecurityTransactionsList: React.FC<Props> = ({ brokerAccountId, onTransact
 				page={queryParameters.pageIndex}
 				pageSize={queryParameters.recordsQuantity}
 				onPageChange={onPageChanged}
-			/>
-
-			<ConfirmModal
-				onConfirmed={onDeleteConfirmed}
-				title={t("entity_securities_transaction_delete_title")}
-				message={t("modals_delete_message")}
-				confirmActionName={t("modals_delete_button")}
-				ref={confirmModalRef}
 			/>
 
 			{context && (

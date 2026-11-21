@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Box } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { useDividendPayments } from '@/pages/BrokerAccount/hooks/useDividendPayments';
 import { DividendPaymentEntity } from '@/models/brokers/DividendPaymentEntity';
 import DividendPayment from '@/pages/BrokerAccount/components/DividendPayment/DividendPayment';
 import DividendPaymentModal, { CreateDividendPaymentContext, EditDividendPaymentContext } from '@/pages/BrokerAccount/modals/DividendPaymentModal/DividendPaymentModal';
-import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
 import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import { useConfirm } from '@/shared/hooks/useConfirm';
 import SectionHeader from '@/shared/components/SectionHeader/SectionHeader';
 import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 import { Nullable } from '@/shared/utilities/nullable';
@@ -20,14 +20,13 @@ interface Props {
 
 const DividendPaymentsList: React.FC<Props> = (props) => {
 	const { t } = useTranslation();
+	const { confirmDelete } = useConfirm();
 
-	const { 
+	const {
 		activeEntity,
 		modalRef,
-		confirmModalRef,
 		onAddClicked,
 		onEditClicked,
-		onDeleteClicked,
 		mode,
 		onActionEnded
 	} = useEntityModal<DividendPaymentEntity>();
@@ -64,14 +63,14 @@ const DividendPaymentsList: React.FC<Props> = (props) => {
 		onActionEnded();
 	};
 
-	const onDeleteConfirmed = async () => {
-		if (!activeEntity) {
-			throw new Error("Deleted entity is not set");
+	const onDeleteClicked = useCallback(async (payment: DividendPaymentEntity) => {
+		const confirmed = await confirmDelete(t("entity_securities_transaction_delete_title"));
+		if (!confirmed) {
+			return;
 		}
 
-		await deleteDividendPaymentEntity(activeEntity);
-		onActionEnded();
-	};
+		await deleteDividendPaymentEntity(payment);
+	}, [confirmDelete, deleteDividendPaymentEntity, t]);
 
 	const isGlobalBrokerAccount = !props.brokerAccountId;
 
@@ -104,13 +103,8 @@ const DividendPaymentsList: React.FC<Props> = (props) => {
 				pageSize={pageSize}
 				onPageChange={loadPage}
 			/>
-		<ConfirmModal onConfirmed={onDeleteConfirmed}
-			title={t("entity_securities_transaction_delete_title")}
-			message={t("modals_delete_message")}
-			confirmActionName={t("modals_delete_button")}
-			ref={confirmModalRef}/>
-		{context && <DividendPaymentModal isGlobalBrokerAccount={isGlobalBrokerAccount} context={context} modalRef={modalRef} onSaved={dividendPaymentSaved}/>}
-	</Box>
+			{context && <DividendPaymentModal isGlobalBrokerAccount={isGlobalBrokerAccount} context={context} modalRef={modalRef} onSaved={dividendPaymentSaved} />}
+		</Box>
 	);
 };
 

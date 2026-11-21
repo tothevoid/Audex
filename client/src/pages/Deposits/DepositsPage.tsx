@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { DepositEntity } from "@/models/deposits/DepositEntity";
 import { Box } from "@chakra-ui/react";
 import CardsGrid from "@/shared/components/CardsGrid";
@@ -10,7 +10,7 @@ import DepositModal from "./modals/DepositModal/DepositModal";
 import { useDeposits } from "./hooks/useDeposits";
 import Placeholder from "@/shared/components/Placeholder/Placeholder";
 import { useEntityModal } from "@/shared/hooks/useEntityModal";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import AddButton from "@/shared/components/AddButton/AddButton";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import FilterBlock from "@/shared/components/FilterBlock";
@@ -19,14 +19,13 @@ import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
 
 const DepositsPage: React.FC = () => {
 	const { t } = useTranslation();
+	const { confirmDelete } = useConfirm();
 
-	const { 
+	const {
 		activeEntity,
 		modalRef,
-		confirmModalRef,
 		onAddClicked,
 		onEditClicked,
-		onDeleteClicked,
 		mode,
 		onActionEnded
 	} = useEntityModal<DepositEntity>();
@@ -50,14 +49,14 @@ const DepositsPage: React.FC = () => {
 		onActionEnded();
 	};
 
-	const onDeleteConfirmed = async () => {
-		if (!activeEntity) {
-			throw new Error("Deleted entity is not set");
+	const onDeleteClicked = useCallback(async (deposit: DepositEntity) => {
+		const confirmed = await confirmDelete(t("deposit_delete_title"));
+		if (!confirmed) {
+			return;
 		}
 
-		await deleteDepositEntity(activeEntity);
-		onActionEnded();
-	};
+		await deleteDepositEntity(deposit);
+	}, [confirmDelete, deleteDepositEntity, t]);
 
 	const onCloneClicked = async (deposit: DepositEntity) => {
 		await createDepositEntity(deposit);
@@ -119,13 +118,6 @@ const DepositsPage: React.FC = () => {
 					/>
 				))}
 			</CardsGrid>
-			<ConfirmModal
-				onConfirmed={onDeleteConfirmed}
-				title={t("deposit_delete_title")}
-				message={t("modals_delete_message")}
-				confirmActionName={t("modals_delete_button")}
-				ref={confirmModalRef}
-			/>
 			<DepositModal deposit={activeEntity} modalRef={modalRef} onSaved={onDepositSaved} />
 		</PageContainer>
 	);

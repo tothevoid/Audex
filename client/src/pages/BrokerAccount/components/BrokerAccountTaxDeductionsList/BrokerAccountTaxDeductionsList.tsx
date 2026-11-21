@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Box } from '@chakra-ui/react';
 import { useBrokerAccountTaxDeductions } from '@/pages/BrokerAccount/hooks/useBrokerAccountTaxDeductions';
-import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
 import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import { useConfirm } from '@/shared/hooks/useConfirm';
 import { useTranslation } from 'react-i18next';
 import { Nullable } from '@/shared/utilities/nullable';
 import SectionHeader from '@/shared/components/SectionHeader';
@@ -24,26 +24,27 @@ const BrokerAccountTaxDeductionsList: React.FC<Props> = ({ brokerAccountId, onDa
         deleteTaxDeductionEntity,
     } = useBrokerAccountTaxDeductions({ brokerAccountId });
 
-    const { 
+    const { t } = useTranslation();
+    const { confirmDelete } = useConfirm();
+
+    const {
         modalRef,
         activeEntity,
-        confirmModalRef,
-        onDeleteClicked,
         onAddClicked,
         onEditClicked,
         onActionEnded,
         mode,
     } = useEntityModal<BrokerAccountTaxDeductionEntity>();
 
-    const onDeleteConfirmed = async () => {
-        if (!activeEntity) {
-            throw new Error("Deleted entity is not set");
+    const onDeleteClicked = useCallback(async (deduction: BrokerAccountTaxDeductionEntity) => {
+        const confirmed = await confirmDelete(t("entity_broker_account_tax_deduction_delete_title"));
+        if (!confirmed) {
+            return;
         }
 
-        await deleteTaxDeductionEntity(activeEntity);
-        onActionEnded();
+        await deleteTaxDeductionEntity(deduction);
         onDataChanged();
-    };
+    }, [confirmDelete, deleteTaxDeductionEntity, onDataChanged, t]);
 
     const onTaxDeductionSaved = async (deduction: BrokerAccountTaxDeductionEntity) => {
         if (mode === ActiveEntityMode.Add) {
@@ -63,7 +64,6 @@ const BrokerAccountTaxDeductionsList: React.FC<Props> = ({ brokerAccountId, onDa
         return { brokerAccountId };
     }, [brokerAccountId, activeEntity]);
 
-    const { t } = useTranslation();
     const isGlobalBrokerAccount = !brokerAccountId;
 
     return <Box>
@@ -75,22 +75,17 @@ const BrokerAccountTaxDeductionsList: React.FC<Props> = ({ brokerAccountId, onDa
             my={4}
         />
         <Box>
-        {
-            taxDeductions.map((taxDeduction: BrokerAccountTaxDeductionEntity) => 
-                <BrokerAccountTaxDeduction key={taxDeduction.id}
-                    isGlobalBrokerAccount={isGlobalBrokerAccount}
-                    onEditClicked={onEditClicked}
-                    onDeleteClicked={onDeleteClicked}
-                    taxDeduction={taxDeduction}
-                />)
-        }
+            {
+                taxDeductions.map((taxDeduction: BrokerAccountTaxDeductionEntity) =>
+                    <BrokerAccountTaxDeduction key={taxDeduction.id}
+                        isGlobalBrokerAccount={isGlobalBrokerAccount}
+                        onEditClicked={onEditClicked}
+                        onDeleteClicked={onDeleteClicked}
+                        taxDeduction={taxDeduction}
+                    />)
+            }
         </Box>
-        <ConfirmModal onConfirmed={onDeleteConfirmed}
-            title={t("entity_broker_account_tax_deduction_delete_title")}
-            message={t("modals_delete_message")}
-            confirmActionName={t("modals_delete_button")}
-            ref={confirmModalRef}/>
-        {context && <BrokerAccountTaxDeductionModal isGlobalBrokerAccount={isGlobalBrokerAccount} modalRef={modalRef} context={context} onSaved={onTaxDeductionSaved}  />}
+        {context && <BrokerAccountTaxDeductionModal isGlobalBrokerAccount={isGlobalBrokerAccount} modalRef={modalRef} context={context} onSaved={onTaxDeductionSaved} />}
     </Box>;
 };
 

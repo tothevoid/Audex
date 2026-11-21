@@ -1,9 +1,9 @@
 import { Box, Button, Checkbox, Icon, Text } from "@chakra-ui/react";
 import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { MdDelete } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import CurrencyModal from "@/pages/Data/modals/CurrencyModal/CurrencyModal";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
@@ -27,12 +27,11 @@ const CurrenciesTable: React.FC = () => {
     const deleteCurrencyMutation = useDeleteCurrencyMutation();
     const syncRatesMutation = useSyncCurrencyRatesMutation();
 
-    const [currencyToDelete, setCurrencyToDelete] = useState<CurrencyEntity | null>(null);
     const { t } = useTranslation();
     const { user } = useUserProfile();
+    const { confirmDelete } = useConfirm();
 
     const modalRef = useRef<BaseModalRef>(null);
-    const confirmModalRef = useRef<BaseModalRef>(null);
 
     const onActiveChanged = useCallback(async (currency: CurrencyEntity, isChecked: boolean) => {
         if (currency.active === isChecked) {
@@ -59,23 +58,18 @@ const CurrenciesTable: React.FC = () => {
         notify.success(t("currency_toast_created_title"), t("currency_toast_created_desc", { name: currency.name }));
     };
 
-    const onDeleteClicked = (currency: CurrencyEntity) => {
-        setCurrencyToDelete(currency);
-        confirmModalRef.current?.openModal();
-    };
-
-    const onDeleteConfirmed = async () => {
-        if (!currencyToDelete) {
+    const onDeleteClicked = async (currency: CurrencyEntity) => {
+        const confirmed = await confirmDelete(t("currencies_delete_title"));
+        if (!confirmed) {
             return;
         }
 
-        const isDeleted = await deleteCurrencyMutation.mutateAsync(currencyToDelete.id);
+        const isDeleted = await deleteCurrencyMutation.mutateAsync(currency.id);
         if (!isDeleted) {
             return;
         }
 
-        notify.success(t("currency_toast_deleted_title"), t("currency_toast_deleted_desc", { name: currencyToDelete.name }));
-        setCurrencyToDelete(null);
+        notify.success(t("currency_toast_deleted_title"), t("currency_toast_deleted_desc", { name: currency.name }));
     };
 
     const onSyncRates = async () => {
@@ -143,13 +137,6 @@ const CurrenciesTable: React.FC = () => {
                 skeletonRows={5}
             />
             <CurrencyModal modalRef={modalRef} onSaved={onCurrencyAdded} />
-            <ConfirmModal
-                onConfirmed={onDeleteConfirmed}
-                title={t("currencies_delete_title")}
-                message={t("modals_delete_message")}
-                confirmActionName={t("modals_delete_button")}
-                ref={confirmModalRef}
-            />
         </Box>
     );
 };

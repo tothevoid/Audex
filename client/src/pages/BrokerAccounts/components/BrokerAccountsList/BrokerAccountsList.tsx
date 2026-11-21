@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useCallback } from 'react';
 import CardsGrid from '@/shared/components/CardsGrid';
 import { useTranslation } from 'react-i18next';
 import BrokerAccount from '@/pages/BrokerAccounts/components/BrokerAccount/BrokerAccount';
@@ -6,7 +6,7 @@ import { BrokerAccountEntity } from '@/models/brokers/BrokerAccountEntity';
 import BrokerAccountModal from '@/pages/BrokerAccounts/modals/BrokerAccountModal/BrokerAccountModal';
 import { useBrokerAccounts } from '@/pages/BrokerAccounts/hooks/useBrokerAccounts';
 import Placeholder from '@/shared/components/Placeholder/Placeholder';
-import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { useConfirm } from '@/shared/hooks/useConfirm';
 import { useEntityModal } from '@/shared/hooks/useEntityModal';
 import AddButton from '@/shared/components/AddButton/AddButton';
 import SectionHeader from '@/shared/components/SectionHeader/SectionHeader';
@@ -14,14 +14,13 @@ import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 
 const BrokerAccountsList: React.FC = () => {
 	const { t } = useTranslation();
+	const { confirmDelete } = useConfirm();
 
 	const {
 		activeEntity,
 		modalRef,
-		confirmModalRef,
 		onAddClicked,
 		onEditClicked,
-		onDeleteClicked,
 		mode,
 		onActionEnded
 	} = useEntityModal<BrokerAccountEntity>();
@@ -42,14 +41,14 @@ const BrokerAccountsList: React.FC = () => {
 		onActionEnded();
 	};
 
-	const onDeleteConfirmed = async () => {
-		if (!activeEntity) {
-			throw new Error("Deleted entity is not set");
+	const onDeleteClicked = useCallback(async (brokerAccount: BrokerAccountEntity) => {
+		const confirmed = await confirmDelete(t("broker_account_delete_title"));
+		if (!confirmed) {
+			return;
 		}
 
-		await deleteBrokerAccountEntity(activeEntity);
-		onActionEnded();
-	};
+		await deleteBrokerAccountEntity(brokerAccount);
+	}, [confirmDelete, deleteBrokerAccountEntity, t]);
 
 	const getHeader = () => {
 		const placeholderAddButton = (
@@ -77,19 +76,14 @@ const BrokerAccountsList: React.FC = () => {
 			{getHeader()}
 			<CardsGrid>
 				{
-					brokerAccounts.map((brokerAccount: BrokerAccountEntity) => 
+					brokerAccounts.map((brokerAccount: BrokerAccountEntity) =>
 						<BrokerAccount brokerAccount={brokerAccount}
-							onEditClick={onEditClicked} 
-							onDeleteClick={onDeleteClicked} 
-							key={brokerAccount.id}/>)
+							onEditClick={onEditClicked}
+							onDeleteClick={onDeleteClicked}
+							key={brokerAccount.id} />)
 				}
 			</CardsGrid>
-			<ConfirmModal onConfirmed={onDeleteConfirmed}
-				title={t("broker_account_delete_title")}
-				message={t("modals_delete_message")}
-				confirmActionName={t("modals_delete_button")}
-				ref={confirmModalRef}/>
-			<BrokerAccountModal brokerAccount={activeEntity} modalRef={modalRef} onSaved={onBrokerAccountSaved}/>
+			<BrokerAccountModal brokerAccount={activeEntity} modalRef={modalRef} onSaved={onBrokerAccountSaved} />
 		</Fragment>
 	);
 };

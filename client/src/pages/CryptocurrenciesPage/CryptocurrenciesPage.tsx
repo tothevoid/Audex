@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import CardsGrid from "@/shared/components/CardsGrid";
 import { useCryptocurrencies } from "./hooks/useCryptocurrencies";
@@ -6,7 +6,7 @@ import { CryptocurrencyEntity } from "@/models/crypto/CryptocurrencyEntity";
 import Cryptocurrency from "./components/Cryptocurrency/Cryptocurrency";
 import CryptocurrencyModal from "./modals/CryptocurrencyModal";
 import Placeholder from "@/shared/components/Placeholder/Placeholder";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import AddButton from "@/shared/components/AddButton/AddButton";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
@@ -14,18 +14,17 @@ import { useEntityModal } from "@/shared/hooks/useEntityModal";
 
 const CryptocurrenciesPage: React.FC = () => {
     const { t } = useTranslation();
-    
-    const { 
+    const { confirmDelete } = useConfirm();
+
+    const {
         activeEntity,
         modalRef,
-        confirmModalRef,
         onAddClicked,
         onEditClicked,
-        onDeleteClicked,
         mode,
         onActionEnded
     } = useEntityModal<CryptocurrencyEntity>();
-    
+
 
     const {
         cryptocurrencies,
@@ -64,14 +63,14 @@ const CryptocurrenciesPage: React.FC = () => {
         );
     };
 
-    const onDeleteConfirmed = async () => {
-        if (!activeEntity) {
-            throw new Error("Deleted entity is not set");
+    const onDeleteClicked = useCallback(async (cryptocurrency: CryptocurrencyEntity) => {
+        const confirmed = await confirmDelete(t("cryptocurrency_delete_title"));
+        if (!confirmed) {
+            return;
         }
 
-        await deleteCryptocurrencyEntity(activeEntity);
-        onActionEnded();
-    };
+        await deleteCryptocurrencyEntity(cryptocurrency);
+    }, [confirmDelete, deleteCryptocurrencyEntity, t]);
 
     const onModalClosed = () => {
         onActionEnded();
@@ -81,19 +80,14 @@ const CryptocurrenciesPage: React.FC = () => {
         {getHeader()}
         <CardsGrid>
             {
-                cryptocurrencies.map((cryptocurrency: CryptocurrencyEntity) => 
-                    <Cryptocurrency key={cryptocurrency.id} 
-                        cryptocurrency={cryptocurrency} 
-                        onEditClicked={onEditClicked} 
-                        onDeletedClicked={onDeleteClicked}/>)
+                cryptocurrencies.map((cryptocurrency: CryptocurrencyEntity) =>
+                    <Cryptocurrency key={cryptocurrency.id}
+                        cryptocurrency={cryptocurrency}
+                        onEditClicked={onEditClicked}
+                        onDeletedClicked={onDeleteClicked} />)
             }
         </CardsGrid>
-        <ConfirmModal onConfirmed={onDeleteConfirmed}
-            title={t("cryptocurrency_delete_title")}
-            message={t("modals_delete_message")}
-            confirmActionName={t("modals_delete_button")}
-            ref={confirmModalRef}/>
-        <CryptocurrencyModal onModalClosed={onModalClosed} cryptocurrency={activeEntity} modalRef={modalRef} onSaved={onCryptocurrencySaved}/>
+        <CryptocurrencyModal onModalClosed={onModalClosed} cryptocurrency={activeEntity} modalRef={modalRef} onSaved={onCryptocurrencySaved} />
     </Fragment>;
 };
 

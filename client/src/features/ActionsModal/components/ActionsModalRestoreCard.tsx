@@ -12,14 +12,13 @@ import {
 import { useTranslation } from 'react-i18next';
 import { MdAttachFile, MdCheckCircle, MdError, MdLock, MdRestore } from 'react-icons/md';
 import { restoreDatabaseBackup, validateDatabaseBackup } from '@/api/system/databaseBackupApi';
-import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
-import { BaseModalRef } from '@/shared/utilities/modalUtilities';
+import { useConfirm } from '@/shared/hooks/useConfirm';
 import { PasswordInput } from '@/shared/components/PasswordInput/PasswordInput';
 
 export const ActionsModalRestoreCard: React.FC = () => {
     const { t } = useTranslation();
+    const { confirmAction } = useConfirm();
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const confirmModalRef = useRef<BaseModalRef>(null);
 
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isEncrypted, setIsEncrypted] = useState(false);
@@ -63,9 +62,18 @@ export const ActionsModalRestoreCard: React.FC = () => {
         }
     };
 
-    const handleRestoreClick = () => {
+    const handleRestoreClick = async () => {
         if (!selectedFile || !isValidFile) return;
-        confirmModalRef.current?.openModal();
+
+        const confirmed = await confirmAction(
+            t("action_restore_confirm_title"),
+            t("action_restore_confirm_desc"),
+            t("action_restore_btn"),
+            true
+        );
+        if (!confirmed) return;
+
+        await handleConfirmedRestore();
     };
 
     const handleConfirmedRestore = async () => {
@@ -245,14 +253,6 @@ export const ActionsModalRestoreCard: React.FC = () => {
                     </VStack>
                 </Card.Body>
             </Card.Root>
-
-            <ConfirmModal
-                ref={confirmModalRef}
-                title={t("action_restore_confirm_title")}
-                message={t("action_restore_confirm_desc")}
-                confirmActionName={t("action_restore_btn")}
-                onConfirmed={handleConfirmedRestore}
-            />
         </>
     );
 };

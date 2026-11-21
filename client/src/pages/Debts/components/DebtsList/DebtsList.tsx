@@ -7,8 +7,8 @@ import { DebtTagEntity } from "@/models/debts/DebtTagEntity";
 import { useDebts } from "@/pages/Debts/hooks/useDebts";
 import DebtModal from "@/pages/Debts/modals/DebtModal.tsx/DebtModal";
 import Debt from "@/pages/Debts/components/Debt/Debt";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
 import { useEntityModal } from "@/shared/hooks/useEntityModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
 import { DebtTagAssignModal } from "@/pages/Debts/modals/DebtTagAssignModal/DebtTagAssignModal";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
@@ -41,6 +41,7 @@ const DebtsList: React.FC<Props> = ({
     onOpenTagStatsModal
 }) => {
     const { t } = useTranslation();
+    const { confirmDelete } = useConfirm();
 
     const [onlyActive, setOnlyActive] = useState(true);
     const [internalTagFilter, setInternalTagFilter] = useState<string | null>(null);
@@ -53,10 +54,8 @@ const DebtsList: React.FC<Props> = ({
     const {
         activeEntity,
         modalRef,
-        confirmModalRef,
         onAddClicked,
         onEditClicked,
-        onDeleteClicked,
         mode,
         onActionEnded
     } = useEntityModal<DebtEntity>();
@@ -133,17 +132,17 @@ const DebtsList: React.FC<Props> = ({
         }
     };
 
-    const onDeleteConfirmed = async () => {
-        if (!activeEntity) {
-            throw new Error("Deleted entity is not set");
+    const onDelete = useCallback(async (debt: DebtEntity) => {
+        const confirmed = await confirmDelete(t("debts_delete_title"));
+        if (!confirmed) {
+            return;
         }
 
-        await deleteDebtEntity(activeEntity);
-        if (onSelectDebt && selectedDebtId === activeEntity.id) {
+        await deleteDebtEntity(debt);
+        if (onSelectDebt && selectedDebtId === debt.id) {
             onSelectDebt(null);
         }
-        onActionEnded();
-    };
+    }, [confirmDelete, deleteDebtEntity, onSelectDebt, selectedDebtId, t]);
 
     const handleDebtClick = (debt: DebtEntity) => {
         if (onSelectDebt) {
@@ -177,18 +176,11 @@ const DebtsList: React.FC<Props> = ({
                         isSelected={selectedDebtId === debt.id}
                         onSelect={handleDebtClick}
                         onEditClicked={onEditClicked}
-                        onDeleteClicked={onDeleteClicked}
+                        onDeleteClicked={onDelete}
                         onManageTagsClicked={handleManageTagsClicked}
                     />
                 ))}
             </CardsGrid>
-            <ConfirmModal
-                onConfirmed={onDeleteConfirmed}
-                title={t("debts_delete_title")}
-                message={t("modals_delete_message")}
-                confirmActionName={t("modals_delete_button")}
-                ref={confirmModalRef}
-            />
             <DebtModal debt={activeEntity} modalRef={modalRef} onSaved={onDebtSaved} />
             <DebtTagAssignModal
                 ref={tagAssignModalRef}

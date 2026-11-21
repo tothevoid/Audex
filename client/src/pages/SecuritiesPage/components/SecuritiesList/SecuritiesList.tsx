@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useCallback } from 'react';
 import CardsGrid from '@/shared/components/CardsGrid';
 import { useTranslation } from 'react-i18next';
 import Security from '@/pages/SecuritiesPage/components/Security/Security';
@@ -8,20 +8,19 @@ import { useSecurities } from '@/pages/SecuritiesPage/hooks/useSecurities';
 import Placeholder from '@/shared/components/Placeholder/Placeholder';
 import AddButton from '@/shared/components/AddButton/AddButton';
 import SectionHeader from '@/shared/components/SectionHeader/SectionHeader';
-import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
+import { useConfirm } from '@/shared/hooks/useConfirm';
 import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 import { useEntityModal } from '@/shared/hooks/useEntityModal';
 
 const SecuritiesList: React.FC = () => {
     const { t } = useTranslation();
+    const { confirmDelete } = useConfirm();
 
     const {
         activeEntity,
         modalRef,
-        confirmModalRef,
         onAddClicked,
         onEditClicked,
-        onDeleteClicked,
         mode,
         onActionEnded
     } = useEntityModal<SecurityEntity>();
@@ -72,14 +71,14 @@ const SecuritiesList: React.FC = () => {
         return result;
     };
 
-    const onDeleteConfirmed = async () => {
-        if (!activeEntity) {
-            throw new Error("Deleted entity is not set");
+    const onDeleteClicked = useCallback(async (security: SecurityEntity) => {
+        const confirmed = await confirmDelete(t("security_delete_title"));
+        if (!confirmed) {
+            return;
         }
 
-        await deleteSecurityEntity(activeEntity);
-        onActionEnded();
-    };
+        await deleteSecurityEntity(security);
+    }, [confirmDelete, deleteSecurityEntity, t]);
 
     return (
         <Fragment>
@@ -94,13 +93,6 @@ const SecuritiesList: React.FC = () => {
                     />
                 ))}
             </CardsGrid>
-            <ConfirmModal
-                onConfirmed={onDeleteConfirmed}
-                title={t("security_delete_title")}
-                message={t("modals_delete_message")}
-                confirmActionName={t("modals_delete_button")}
-                ref={confirmModalRef}
-            />
             <SecurityModal
                 security={activeEntity}
                 modalRef={modalRef}

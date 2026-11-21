@@ -2,7 +2,7 @@ import { Box, Button, Checkbox, Icon, Text } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete, MdEdit, MdOutlinePayment } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import { TransactionTypeEntity } from "@/models/transactions/TransactionTypeEntity";
 import { createTransactionType, deleteTransactionType, getTransactionTypeIconUrl, getTransactionTypes, updateTransactionType } from "@/api/transactions/transactionTypeApi";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
@@ -21,12 +21,11 @@ const TransactionTypesTable: React.FC = () => {
         transactionTypes: []});
     const [isLoading, setIsLoading] = useState(true);
 
-    const [transactionTypeToDelete, setTransactionTypeToDelete] = useState<TransactionTypeEntity | null>(null);
     const [updatedTransactionType, setUpdatedTransactionType] = useState<TransactionTypeEntity | null>();
 
     const { t } = useTranslation();
+    const { confirmDelete } = useConfirm();
     const modalRef = useRef<BaseModalRef>(null);
-    const confirmModalRef = useRef<BaseModalRef>(null);
 
     useEffect(() => {
         const initData = async () => { 
@@ -43,12 +42,6 @@ const TransactionTypesTable: React.FC = () => {
 
         initData();
     }, []);
-
-    useEffect(() => {
-        if (transactionTypeToDelete) {
-            confirmModalRef.current?.openModal();
-        }
-    }, [transactionTypeToDelete]);
 
     useEffect(() => {
         if (updatedTransactionType) {
@@ -105,31 +98,23 @@ const TransactionTypesTable: React.FC = () => {
         });
     };
 
-    const onDeleteClicked = (transactionType: TransactionTypeEntity) => {
-        setTransactionTypeToDelete(transactionType);
-    };
-
-    const onDeleteConfirmed = async () => {
-        if (!transactionTypeToDelete){
+    const onDeleteClicked = async (transactionType: TransactionTypeEntity) => {
+        const confirmed = await confirmDelete(t("transaction_type_delete_title"));
+        if (!confirmed) {
             return;
         }
 
-        const isDeleted = await deleteTransactionType(transactionTypeToDelete.id);
-        
+        const isDeleted = await deleteTransactionType(transactionType.id);
         if (!isDeleted) {
             return;
         }
 
-        notify.success(t("transaction_type_toast_deleted_title"), t("transaction_type_toast_deleted_desc", { name: transactionTypeToDelete.name }));
+        notify.success(t("transaction_type_toast_deleted_title"), t("transaction_type_toast_deleted_desc", { name: transactionType.name }));
 
-        const transactionTypes = state.transactionTypes.filter((transactionType: TransactionTypeEntity) => {
-            return transactionType.id !== transactionTypeToDelete.id;
-        });
-
-        setState((currentState) => {
-            return {...currentState, transactionTypes: transactionTypes};
-        });
-        setTransactionTypeToDelete(null);
+        setState((currentState) => ({
+            ...currentState,
+            transactionTypes: currentState.transactionTypes.filter((item: TransactionTypeEntity) => item.id !== transactionType.id),
+        }));
     };
 
     const onModalClosed = () => {
@@ -197,11 +182,6 @@ const TransactionTypesTable: React.FC = () => {
             skeletonRows={5}
         />
         <TransactionTypeModal onModalClosed={onModalClosed} transactionType={updatedTransactionType} modalRef={modalRef} onSaved={onTransactionTypeSaved}/>
-        <ConfirmModal onConfirmed={onDeleteConfirmed}
-            title={t("transaction_type_delete_title")}
-            message={t("modals_delete_message")}
-            confirmActionName={t("modals_delete_button")}
-            ref={confirmModalRef}/>
     </Box>;
 };
 

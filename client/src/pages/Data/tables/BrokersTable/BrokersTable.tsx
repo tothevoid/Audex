@@ -2,7 +2,7 @@ import { Box, Button, Icon, Text } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import { BrokerEntity } from "@/models/brokers/BrokerEntity";
 import { createBroker, deleteBroker, getBrokers, updateBroker } from "@/api/brokers/brokerApi";
 import BrokerModal from "@/pages/Data/modals/BrokerModal/BrokerModal";
@@ -13,13 +13,12 @@ import { notify } from "@/shared/components/Toaster";
 
 const BrokersTable: React.FC = () => {
     const [brokers, setBrokers] = useState<BrokerEntity[]>([]);
-    const [brokerToDelete, setBrokerToDelete] = useState<BrokerEntity | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [updatedBroker, setUpdatedBroker] = useState<BrokerEntity | null>(null);
     const { t } = useTranslation();
+    const { confirmDelete } = useConfirm();
 
     const modalRef = useRef<BaseModalRef>(null);
-    const confirmModalRef = useRef<BaseModalRef>(null);
 
     useEffect(() => {
         const initData = async () => { 
@@ -70,26 +69,20 @@ const BrokersTable: React.FC = () => {
         }
     };
 
-    const onDeleteClicked = (broker: BrokerEntity) => {
-        setBrokerToDelete(broker);
-        confirmModalRef.current?.openModal();
-    };
-
-    const onDeleteConfirmed = async () => {
-        if (!brokerToDelete) {
+    const onDeleteClicked = async (broker: BrokerEntity) => {
+        const confirmed = await confirmDelete(t("brokers_delete_title"));
+        if (!confirmed) {
             return;
         }
 
-        const isDeleted = await deleteBroker(brokerToDelete.id);
-        
+        const isDeleted = await deleteBroker(broker.id);
         if (!isDeleted) {
             return;
         }
 
-        notify.success(t("broker_toast_deleted_title"), t("broker_toast_deleted_desc", { name: brokerToDelete.name }));
+        notify.success(t("broker_toast_deleted_title"), t("broker_toast_deleted_desc", { name: broker.name }));
 
-        setBrokers((currentBrokers) => currentBrokers.filter((brokerItem: BrokerEntity) => brokerItem.id !== brokerToDelete.id));
-        setBrokerToDelete(null);
+        setBrokers((currentBrokers) => currentBrokers.filter((brokerItem: BrokerEntity) => brokerItem.id !== broker.id));
     };
 
     const columns: ColumnDef<BrokerEntity>[] = useMemo(() => [
@@ -148,11 +141,6 @@ const BrokersTable: React.FC = () => {
             modalRef={modalRef}
             onSaved={onBrokerSaved}
         />
-        <ConfirmModal onConfirmed={onDeleteConfirmed}
-            title={t("brokers_delete_title")}
-            message={t("modals_delete_message")}
-            confirmActionName={t("modals_delete_button")}
-            ref={confirmModalRef}/>
     </Box>;
 };
 

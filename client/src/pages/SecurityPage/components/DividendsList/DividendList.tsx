@@ -1,11 +1,11 @@
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useCallback, useMemo } from 'react';
 import Dividend from '@/pages/SecurityPage/components/Dividend/Dividend';
 import { useTranslation } from 'react-i18next';
 import { DividendEntity } from '@/models/securities/DividendEntity';
 import DividendModal, { CreateDividendContext, EditDividendContext } from '@/pages/SecurityPage/modals/DividendModal/DividendModal';
 import { useDividends } from '@/pages/SecurityPage/hooks/useDividends';
-import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
 import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import { useConfirm } from '@/shared/hooks/useConfirm';
 import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 import SectionHeader from '@/shared/components/SectionHeader';
 import { Nullable } from '@/shared/utilities/nullable';
@@ -18,13 +18,14 @@ interface Props {
 }
 
 const DividendList: React.FC<Props> = (props) => {
-	const { 
+	const { t } = useTranslation();
+	const { confirmDelete } = useConfirm();
+
+	const {
 		activeEntity,
 		modalRef,
-		confirmModalRef,
 		onAddClicked,
 		onEditClicked,
-		onDeleteClicked,
 		mode,
 		onActionEnded
 	} = useEntityModal<DividendEntity>();
@@ -41,7 +42,6 @@ const DividendList: React.FC<Props> = (props) => {
 		deleteDividendEntity
 	} = useDividends({ securityId: props.securityId, initialPageSize: 10 });
 
-	const { t } = useTranslation();
 	const context: Nullable<CreateDividendContext | EditDividendContext> = useMemo(() => {
 		return activeEntity
 			? ({ dividend: activeEntity } as EditDividendContext)
@@ -58,14 +58,14 @@ const DividendList: React.FC<Props> = (props) => {
 		onActionEnded();
 	};
 
-	const onDeleteConfirmed = async () => {
-		if (!activeEntity) {
-			throw new Error("Deleted entity is not set");
+	const onDeleteClicked = useCallback(async (dividend: DividendEntity) => {
+		const confirmed = await confirmDelete(t("entity_dividend_delete_title"));
+		if (!confirmed) {
+			return;
 		}
 
-		await deleteDividendEntity(activeEntity);
-		onActionEnded();
-	};
+		await deleteDividendEntity(dividend);
+	}, [confirmDelete, deleteDividendEntity, t]);
 
 	return (
 		<Fragment>
@@ -96,13 +96,6 @@ const DividendList: React.FC<Props> = (props) => {
 						onDeleteClicked={onDeleteClicked}
 					/>
 				)}
-			/>
-			<ConfirmModal
-				onConfirmed={onDeleteConfirmed}
-				title={t("entity_dividend_delete_title")}
-				message={t("modals_delete_message")}
-				confirmActionName={t("modals_delete_button")}
-				ref={confirmModalRef}
 			/>
 			{context && <DividendModal context={context} currencyName={props.currencyName} modalRef={modalRef} onSaved={onDividendSaved} />}
 		</Fragment>

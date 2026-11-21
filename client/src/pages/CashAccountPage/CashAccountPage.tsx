@@ -16,8 +16,8 @@ import { useCurrenciesMap } from "@/shared/hooks/queries/useCurrencies";
 import { AccountEntity } from "@/models/accounts/AccountEntity";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import CurrencyTransactionModal from "@/pages/Transactions/modals/CurrencyTransactionModal/CurrencyTransactionModal";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
 import { useEntityModal } from "@/shared/hooks/useEntityModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
 import Placeholder from "@/shared/components/Placeholder/Placeholder";
 import CashAccountHeader from "./components/CashAccountHeader";
@@ -37,14 +37,13 @@ const CashAccountPage: React.FC = () => {
     const [isHeaderLoading, setIsHeaderLoading] = useState<boolean>(true);
     const [totalPnl, setTotalPnl] = useState<number>(0);
     const [transactionsCount, setTransactionsCount] = useState<number>(0);
+    const { confirmDelete } = useConfirm();
 
-    const { 
+    const {
         activeEntity,
         modalRef,
-        confirmModalRef,
         onAddClicked,
         onEditClicked,
-        onDeleteClicked,
         mode,
         onActionEnded
     } = useEntityModal<CurrencyTransactionEntity>();
@@ -132,17 +131,20 @@ const CashAccountPage: React.FC = () => {
         loadAccountAndSummary();
     };
 
-    const onDeleteConfirmed = async () => {
-        if (!activeEntity) return;
-        await deleteCurrencyTransaction(activeEntity.id);
+    const onDeleteClicked = useCallback(async (transaction: CurrencyTransactionEntity) => {
+        const confirmed = await confirmDelete(t("currency_transactions_account_delete_title"));
+        if (!confirmed) {
+            return;
+        }
+
+        await deleteCurrencyTransaction(transaction.id);
         notify.success(
             t("currency_transaction_toast_deleted_title"),
-            t("currency_transaction_toast_deleted_desc", { name: activeEntity.name })
+            t("currency_transaction_toast_deleted_desc", { name: transaction.name })
         );
-        onActionEnded();
         refreshPage();
         loadAccountAndSummary();
-    };
+    }, [confirmDelete, loadAccountAndSummary, refreshPage, t]);
 
     const isLoading = isHeaderLoading || isTransactionsLoading;
 
@@ -176,18 +178,11 @@ const CashAccountPage: React.FC = () => {
                 </>
             )}
 
-            <CurrencyTransactionModal 
-                modalRef={modalRef} 
-                onSaved={onCurrencyTransactionSaved} 
-                currencyTransaction={activeEntity} 
+            <CurrencyTransactionModal
+                modalRef={modalRef}
+                onSaved={onCurrencyTransactionSaved}
+                currencyTransaction={activeEntity}
                 currentAccount={account}
-            />
-            <ConfirmModal 
-                onConfirmed={onDeleteConfirmed}
-                title={t("currency_transactions_account_delete_title")}
-                message={t("modals_delete_message")}
-                confirmActionName={t("modals_delete_button")}
-                ref={confirmModalRef}
             />
         </Stack>
     );

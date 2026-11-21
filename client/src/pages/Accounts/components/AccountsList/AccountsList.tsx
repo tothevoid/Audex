@@ -9,10 +9,10 @@ import AccountModal from '@/pages/Accounts/modals/AccountModal/AccountModal';
 import { useAccounts } from '@/pages/Accounts/hooks/useAccounts';
 import Placeholder from '@/shared/components/Placeholder/Placeholder';
 import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import { useConfirm } from '@/shared/hooks/useConfirm';
 import AddButton from '@/shared/components/AddButton/AddButton';
 import AccountsHeader from '@/pages/Accounts/components/AccountsHeader/AccountsHeader';
 import { AccountCurrencySummary } from '@/models/accounts/accountsSummary';
-import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
 import AccountBalanceTransferModal from '@/pages/Accounts/modals/AccountBalanceTransferModal/AccountBalanceTransferModal';
 import { ActiveEntityMode } from '@/shared/enums/activeEntityMode';
 
@@ -23,16 +23,15 @@ interface Props {
 
 const AccountsList: React.FC<Props> = ({ onAccountsChanged, accountCurrencySummaries }) => {
 	const { t } = useTranslation();
+	const { confirmDelete } = useConfirm();
 
 	const transferModalRef = useRef<BaseModalRef>(null);
 	
 	const { 
 		activeEntity,
 		modalRef,
-		confirmModalRef,
 		onAddClicked,
 		onEditClicked,
-		onDeleteClicked,
 		mode,
 		onActionEnded,
 		setActiveEntity
@@ -78,14 +77,14 @@ const AccountsList: React.FC<Props> = ({ onAccountsChanged, accountCurrencySumma
 		onActionEnded();
 	};
 
-	const onDeleteConfirmed = async () => {
-		if (!activeEntity) {
-            throw new Error("Deleted entity is not set");
-        }
+	const onDeleteClicked = async (account: AccountEntity) => {
+		const confirmed = await confirmDelete(t("account_delete_title"));
+		if (!confirmed) {
+			return;
+		}
 
-        await deleteAccountEntity(activeEntity);
-		onActionEnded();
-    };
+		await deleteAccountEntity(account);
+	};
 
 	const onTransferClicked = (account: AccountEntity) => {
 		setActiveEntity(account);
@@ -124,11 +123,6 @@ const AccountsList: React.FC<Props> = ({ onAccountsChanged, accountCurrencySumma
 					{getAddButton()}
 				</Placeholder>
 		}
-		<ConfirmModal onConfirmed={onDeleteConfirmed}
-            title={t("account_delete_title")}
-            message={t("modals_delete_message")}
-            confirmActionName={t("modals_delete_button")}
-            ref={confirmModalRef}/>
         <AccountBalanceTransferModal from={activeEntity} modalRef={transferModalRef} onTransferred={onTransferred}/>
         <AccountModal account={activeEntity} modalRef={modalRef} onSaved={onAccountSaved}/>
 	</Box>;

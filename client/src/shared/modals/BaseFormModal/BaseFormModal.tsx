@@ -1,8 +1,12 @@
 import { FormEventHandler, forwardRef, ReactNode } from "react";
-import { Button, Dialog, Flex } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseModal from "@/shared/modals/BaseModal/BaseModal";
+import {
+    ModalCancelButton,
+    ModalConfirmButton,
+    ModalFooterActions,
+} from "@/shared/modals/components/ModalButtons";
 
 export interface BaseFormModalProps {
     title: string;
@@ -42,16 +46,12 @@ export const BaseFormModal = forwardRef<BaseModalRef, BaseFormModalProps>(
                 maxW={maxW}
                 bodyOverflowY={bodyOverflowY}
                 footer={({ closeModal }) => (
-                    <Flex gap={3} justify="flex-end" w="100%">
-                        <Button colorPalette="blue" type="submit">
+                    <ModalFooterActions>
+                        <ModalConfirmButton type="submit">
                             {saveButtonTitle ?? t("modals_save_button")}
-                        </Button>
-                        <Dialog.ActionTrigger asChild>
-                            <Button onClick={closeModal} variant="outline">
-                                {t("modals_cancel_button")}
-                            </Button>
-                        </Dialog.ActionTrigger>
-                    </Flex>
+                        </ModalConfirmButton>
+                        <ModalCancelButton asActionTrigger onClick={closeModal} />
+                    </ModalFooterActions>
                 )}
             >
                 {children}

@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Box } from '@chakra-ui/react';
 import { useBrokerAccountFundTransfers } from '@/pages/BrokerAccount/hooks/useBrokerAccountFundTransfers';
 import BrokerAccountFundTransfer from '@/pages/BrokerAccount/components/BrokerAccountFundTransfer/BrokerAccountFundTransfer';
 import { BrokerAccountFundTransferEntity } from '@/models/brokers/BrokerAccountFundTransfer';
-import { ConfirmModal } from '@/shared/modals/ConfirmModal/ConfirmModal';
 import { useEntityModal } from '@/shared/hooks/useEntityModal';
+import { useConfirm } from '@/shared/hooks/useConfirm';
 import { useTranslation } from 'react-i18next';
 import BrokerAccountFundTransferModal, { CreateBrokerAccountFundTransferContext, EditBrokerAccountFundTransferContext } from '@/pages/BrokerAccounts/modals/BrokerAccountFundTransferModal/BrokerAccountFundTransferModal';
 import { Nullable } from '@/shared/utilities/nullable';
@@ -20,6 +20,7 @@ interface Props {
 
 const BrokerAccountFundTransfersList: React.FC<Props> = ({ brokerAccountId, onDataChanged }) => {
     const { t } = useTranslation();
+    const { confirmDelete } = useConfirm();
 
     const {
         fundTransfers,
@@ -32,26 +33,24 @@ const BrokerAccountFundTransfersList: React.FC<Props> = ({ brokerAccountId, onDa
         deleteFundTransferEntity
     } = useBrokerAccountFundTransfers({ brokerAccountId });
 
-    const { 
+    const {
         modalRef,
         activeEntity,
-        confirmModalRef,
-        onDeleteClicked,
         onAddClicked,
         onEditClicked,
         onActionEnded,
         mode,
     } = useEntityModal<BrokerAccountFundTransferEntity>();
 
-    const onDeleteConfirmed = async () => {
-       	if (!activeEntity) {
-			throw new Error("Deleted entity is not set");
-		}
+    const onDeleteClicked = useCallback(async (transfer: BrokerAccountFundTransferEntity) => {
+        const confirmed = await confirmDelete(t("entity_broker_account_fund_transfer_delete_title"));
+        if (!confirmed) {
+            return;
+        }
 
-		await deleteFundTransferEntity(activeEntity);
-		onActionEnded();
-		onDataChanged();
-    };
+        await deleteFundTransferEntity(transfer);
+        onDataChanged();
+    }, [confirmDelete, deleteFundTransferEntity, onDataChanged, t]);
 
     const onTransferSaved = async (transfer: BrokerAccountFundTransferEntity) => {
         if (mode === ActiveEntityMode.Add) {
@@ -61,7 +60,7 @@ const BrokerAccountFundTransfersList: React.FC<Props> = ({ brokerAccountId, onDa
         }
 
         onActionEnded();
-		onDataChanged();
+        onDataChanged();
     };
 
     const context = useMemo<CreateBrokerAccountFundTransferContext | EditBrokerAccountFundTransferContext>(() => {
@@ -102,13 +101,8 @@ const BrokerAccountFundTransfersList: React.FC<Props> = ({ brokerAccountId, onDa
                 pageSize={pageSize}
                 onPageChange={loadPage}
             />
-        <ConfirmModal onConfirmed={onDeleteConfirmed}
-            title={t("entity_broker_account_fund_transfer_delete_title")}
-            message={t("modals_delete_message")}
-            confirmActionName={t("modals_delete_button")}
-            ref={confirmModalRef}/>
-        {context && <BrokerAccountFundTransferModal isGlobalBrokerAccount={isGlobalBrokerAccount} modalRef={modalRef} context={context} onSaved={onTransferSaved}  />}
-    </Box>
+            {context && <BrokerAccountFundTransferModal isGlobalBrokerAccount={isGlobalBrokerAccount} modalRef={modalRef} context={context} onSaved={onTransferSaved} />}
+        </Box>
     );
 };
 

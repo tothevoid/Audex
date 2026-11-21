@@ -1,9 +1,9 @@
 import { Box, Button, Icon, Text } from "@chakra-ui/react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { SiBinance } from "react-icons/si";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import { Nullable } from "@/shared/utilities/nullable";
 import { CryptoProviderEntity } from "@/models/crypto/CryptoProviderEntity";
 import CryptoProviderModal from "@/pages/Data/modals/CryptoProviderModal/CryptoProviderModal";
@@ -16,13 +16,12 @@ import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 
 const CryptoProvidersTable: React.FC = () => {
 	const { t } = useTranslation();
+	const { confirmDelete } = useConfirm();
 	const {
 		activeEntity,
 		modalRef,
-		confirmModalRef,
 		onAddClicked,
 		onEditClicked,
-		onDeleteClicked,
 		onActionEnded,
 	} = useEntityModal<CryptoProviderEntity>();
 
@@ -45,11 +44,13 @@ const CryptoProvidersTable: React.FC = () => {
 		onActionEnded();
 	};
 
-	const onCryptoProviderDeleteConfirmed = async () => {
-		if (!activeEntity) return;
-		await deleteCryptoProviderEntity(activeEntity);
-		onActionEnded();
-	};
+	const onDeleteClicked = useCallback(async (cryptoProvider: CryptoProviderEntity) => {
+		const confirmed = await confirmDelete(t("crypto_providers_delete_title"));
+		if (!confirmed) {
+			return;
+		}
+		await deleteCryptoProviderEntity(cryptoProvider);
+	}, [confirmDelete, deleteCryptoProviderEntity, t]);
 
 	const columns: ColumnDef<CryptoProviderEntity>[] = useMemo(() => [
 		{
@@ -76,7 +77,7 @@ const CryptoProvidersTable: React.FC = () => {
 					onClick={() => onEditClicked(cryptoProvider)}
 				>
 					<Icon color="card_action_icon_primary">
-						<MdEdit/>
+						<MdEdit />
 					</Icon>
 				</Button>
 			)
@@ -91,7 +92,7 @@ const CryptoProvidersTable: React.FC = () => {
 					onClick={() => onDeleteClicked(cryptoProvider)}
 				>
 					<Icon color="card_action_icon_danger">
-						<MdDelete/>
+						<MdDelete />
 					</Icon>
 				</Button>
 			)
@@ -117,11 +118,6 @@ const CryptoProvidersTable: React.FC = () => {
 			modalRef={modalRef}
 			onSaved={onCryptoProviderSaved}
 		/>
-		<ConfirmModal onConfirmed={onCryptoProviderDeleteConfirmed}
-			title={t("crypto_providers_delete_title")}
-			message={t("modals_delete_message")}
-			confirmActionName={t("modals_delete_button")}
-			ref={confirmModalRef}/>
 	</Box>;
 };
 

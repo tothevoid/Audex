@@ -2,7 +2,7 @@ import { Box, Button, Icon, Text } from "@chakra-ui/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-import { ConfirmModal } from "@/shared/modals/ConfirmModal/ConfirmModal";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import { Nullable } from "@/shared/utilities/nullable";
 import { createBank, deleteBank, getBankIconUrl, getBanks, updateBank } from "@/api/banks/bankApi";
@@ -23,12 +23,11 @@ const BanksTable: React.FC = () => {
         banks: []});
     const [isLoading, setIsLoading] = useState(true);
 
-    const [bankToDelete, setBankToDelete] = useState<BankEntity | null>(null);
     const [updatedBank, setUpdatedBank] = useState<BankEntity | null>(null);
 
     const { t } = useTranslation();
+    const { confirmDelete } = useConfirm();
     const modalRef = useRef<BaseModalRef>(null);
-    const confirmModalRef = useRef<BaseModalRef>(null);
 
 
     useEffect(() => {
@@ -53,12 +52,6 @@ const BanksTable: React.FC = () => {
             isMounted = false;
         };
     }, []);
-
-    useEffect(() => {
-        if (bankToDelete) {
-            confirmModalRef.current?.openModal();
-        }
-    }, [bankToDelete]);
 
     useEffect(() => {
         if (updatedBank) {
@@ -119,31 +112,23 @@ const BanksTable: React.FC = () => {
         });
     };
 
-    const onDeleteClicked = (bank: BankEntity) => {
-        setBankToDelete(bank);
-    };
-
-    const onDeleteConfirmed = async () => {
-        if (!bankToDelete){
+    const onDeleteClicked = async (bank: BankEntity) => {
+        const confirmed = await confirmDelete(t("banks_delete_title"));
+        if (!confirmed) {
             return;
         }
 
-        const isDeleted = await deleteBank(bankToDelete.id);
-        
+        const isDeleted = await deleteBank(bank.id);
         if (!isDeleted) {
             return;
         }
 
-        notify.success(t("bank_toast_deleted_title"), t("bank_toast_deleted_desc", { name: bankToDelete.name }));
+        notify.success(t("bank_toast_deleted_title"), t("bank_toast_deleted_desc", { name: bank.name }));
 
-        const banks = state.banks.filter((bank: BankEntity) => {
-            return bank.id !== bankToDelete.id;
-        });
-
-        setState((currentState) => {
-            return {...currentState, banks: banks};
-        });
-        setBankToDelete(null);
+        setState((currentState) => ({
+            ...currentState,
+            banks: currentState.banks.filter((item: BankEntity) => item.id !== bank.id),
+        }));
     };
 
     const columns: ColumnDef<BankEntity>[] = useMemo(() => [
@@ -207,11 +192,6 @@ const BanksTable: React.FC = () => {
             skeletonRows={5}
         />
         <BankModal onModalClosed={onModalClosed} bank={updatedBank} modalRef={modalRef} onSaved={onBankSaved}/>
-        <ConfirmModal onConfirmed={onDeleteConfirmed}
-            title={t("banks_delete_title")}
-            message={t("modals_delete_message")}
-            confirmActionName={t("modals_delete_button")}
-            ref={confirmModalRef}/>
     </Box>;
 };
 
