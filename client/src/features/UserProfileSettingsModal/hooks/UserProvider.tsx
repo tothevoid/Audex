@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { UserProfileEntity } from '@/models/user/UserProfileEntity';
 import { getUserProfile } from '@/api/user/userProfileApi';
-import { changeLanguage } from 'i18next';
+import i18n from '@/i18n';
 import { UserContext } from './UserProfileContext';
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -13,7 +13,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 			if (!userProfile) return;
 
 			setUser(userProfile);
-			changeLanguage(userProfile.language.code);
+			i18n.changeLanguage(userProfile.language.code);
+			localStorage.setItem("lang", userProfile.language.code);
 		};
 		fetchUser();
 	}, []);
@@ -22,7 +23,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 		const isLanguageChanged = user?.language.code !== updatedUser.language.code;
 		setUser(updatedUser);
 		if (isLanguageChanged) {
-			changeLanguage(updatedUser.language.code);
+			i18n.changeLanguage(updatedUser.language.code);
 			localStorage.setItem("lang", updatedUser.language.code);
 		}
 	}, [user?.language.code]);

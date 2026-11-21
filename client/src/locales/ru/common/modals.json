@@ -3,5 +3,6 @@
     "modals_delete_message": "Вы уверены? Это действие невозможно отменить.",
     "modals_cancel_button": "Отмена",
     "modals_close_button": "Закрыть",
-    "modals_save_button": "Сохранить"
+    "modals_save_button": "Сохранить",
+    "modals_confirm_button": "Подтвердить"
 }

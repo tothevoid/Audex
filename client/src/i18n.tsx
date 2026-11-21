@@ -8,11 +8,11 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      "en-US": { translation: translationEN },
-      "ru-RU": { translation: translationRU },
+      ru: { translation: translationRU },
+      en: { translation: translationEN },
     },
-    fallbackLng: "en-US",
-    lng: localStorage.getItem("lang") ?? "en-US",
+    fallbackLng: "en",
+    lng: localStorage.getItem("lang") ?? "en",
     interpolation: { escapeValue: false }
   });
 

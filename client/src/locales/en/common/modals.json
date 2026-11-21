@@ -3,5 +3,6 @@
     "modals_delete_message": "Are you sure? You can't undo this action afterwards",
     "modals_cancel_button": "Cancel",
     "modals_close_button": "Close",
-    "modals_save_button": "Saves"
+    "modals_save_button": "Save",
+    "modals_confirm_button": "Confirm"
 }

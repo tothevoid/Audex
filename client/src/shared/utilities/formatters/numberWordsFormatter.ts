@@ -2,7 +2,7 @@ import i18n, { TFunction } from 'i18next';
 
 export const formatNumberToWords = (num: number, t: TFunction): string => {
     if (!num || isNaN(num)) return '';
-    const locale = i18n.language || 'en-US';
+    const locale = i18n.language || 'en';
 
     if (num >= 1_000_000_000) {
         const value = (num / 1_000_000_000).toLocaleString(locale, { maximumFractionDigits: 2 });
