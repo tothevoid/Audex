@@ -9,14 +9,14 @@ import { computeRowDiff, EditableTransactionRow, EMPTY_ROW_DIFF } from '@/pages/
 import TableDateCell from '@/shared/components/TableDateCell/TableDateCell';
 import BaseSelect from '@/shared/components/BaseSelect/BaseSelect';
 import { getCurrencySymbol } from '@/shared/utilities/currencyUtils';
+import { useAccounts } from '@/shared/hooks/queries/useAccounts';
+import { useTransactionTypes } from '@/shared/hooks/queries/useTransactionTypes';
 
 export interface TransactionTableRowProps {
     row: EditableTransactionRow;
     original?: EditableTransactionRow;
     isAdded: boolean;
     isDeleted: boolean;
-    accounts: AccountEntity[];
-    transactionTypes: TransactionTypeEntity[];
     onRowChange: (id: string, updatedRow: EditableTransactionRow) => void;
     onRowRevert: (id: string) => void;
     onDuplicateRow: (row: EditableTransactionRow) => void;
@@ -29,14 +29,14 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
         original,
         isAdded,
         isDeleted,
-        accounts,
-        transactionTypes,
         onRowChange,
         onRowRevert,
         onDuplicateRow,
         onDeleteRow,
     }) => {
         const { t, i18n } = useTranslation();
+        const { data: accounts = [] } = useAccounts();
+        const { data: transactionTypes = [] } = useTransactionTypes();
 
         // Compute diff against original for current row
         const diff = useMemo(() => {
@@ -325,9 +325,7 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
         prev.row === next.row &&
         prev.original === next.original &&
         prev.isAdded === next.isAdded &&
-        prev.isDeleted === next.isDeleted &&
-        prev.accounts === next.accounts &&
-        prev.transactionTypes === next.transactionTypes
+        prev.isDeleted === next.isDeleted
 );
 
 TransactionTableRow.displayName = 'TransactionTableRow';

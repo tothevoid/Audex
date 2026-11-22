@@ -88,7 +88,6 @@ export interface OutOfPeriodItem {
 
 export interface TransactionTableGridProps {
     transactions: TransactionEntity[];
-    transactionTypes: TransactionTypeEntity[];
     selectedAccountId?: string;
     selectedCategoryId?: string;
     onCommitDiff: (diff: EditableGridDiff<TransactionEntity>) => Promise<void>;

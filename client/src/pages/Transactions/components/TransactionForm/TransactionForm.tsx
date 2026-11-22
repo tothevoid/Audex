@@ -1,16 +1,15 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useMemo } from 'react';
 import { Field, Input } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { getTransactionValidationSchema, TransactionFormInput } from './TransactionValidationSchema';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { getTransactionTypes } from '@/api/transactions/transactionTypeApi';
 import { TransactionEntity } from '@/models/transactions/TransactionEntity';
-import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEntity';
 import CollectionSelect from '@/shared/components/CollectionSelect/CollectionSelect';
 import DateSelect from '@/shared/components/DateSelect/DateSelect';
 import MoneyInput from '@/shared/components/MoneyInput/MoneyInput';
 import { useAccounts } from '@/shared/hooks/queries/useAccounts';
+import { useTransactionTypes } from '@/shared/hooks/queries/useTransactionTypes';
 import { generateGuid } from '@/shared/utilities/idUtilities';
 import { findEntityById } from '@/shared/utilities/arrayUtilities';
 import { Nullable } from '@/shared/utilities/nullable';
@@ -30,8 +29,7 @@ enum TransactionDirection {
 const TransactionForm: React.FC<ModalProps> = ({ transaction, onTransactionSaved, setSubmitHandler }: ModalProps) => {
 	const { t } = useTranslation();
 	const { data: accounts = [] } = useAccounts();
-
-	const [transactionTypes, setTransactionTypes] = useState<TransactionTypeEntity[]>([]);
+	const { data: transactionTypes = [] } = useTransactionTypes();
 
 	const transactionOptions = useMemo(() => [
 		{ label: t("entity_transaction_direction_income"), value: TransactionDirection.Income },
@@ -94,21 +92,6 @@ const TransactionForm: React.FC<ModalProps> = ({ transaction, onTransactionSaved
 
 		await onTransactionSaved(transactionEntity);
 	}, [onTransactionSaved, accounts, transactionTypes]);
-
-	useEffect(() => {
-		let isMounted = true;
-		const loadData = async () => {
-			const loadedTransactionTypes = await getTransactionTypes(false);
-
-			if (isMounted) {
-				setTransactionTypes(loadedTransactionTypes);
-			}
-		};
-		loadData();
-		return () => {
-			isMounted = false;
-		};
-	}, []);
 
 	useEffect(() => {
 		setSubmitHandler(handleSubmit, onTransactionSaveClick);

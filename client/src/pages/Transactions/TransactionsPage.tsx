@@ -1,16 +1,14 @@
 import "./TransactionsPage.scss";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Grid, GridItem } from '@chakra-ui/react';
 import TransactionSummaryHeader from './components/TransactionSummaryHeader/TransactionSummaryHeader';
 import TransactionFilterBar, { TypeFilterMode, ViewDisplayMode } from './components/TransactionFilterBar/TransactionFilterBar';
 import TransactionCardsView, { TransactionCardsActionBar } from './components/TransactionCardsView';
 import TransactionTableGrid from './components/TransactionTableGrid/TransactionTableGrid';
 import TransactionStats from './components/TransactionStats/TransactionStats';
-import { getTransactionTypes } from '@/api/transactions/transactionTypeApi';
 import { useTranslation } from 'react-i18next';
 import { TransactionEntity } from "@/models/transactions/TransactionEntity";
-import { TransactionTypeEntity } from "@/models/transactions/TransactionTypeEntity";
 import { useTransactions } from "./hooks/useTransactions";
 import NewTransactionModal from "./modals/NewTransactionModal/NewTransactionModal";
 import { CurrencyTransactionEntity } from "@/models/transactions/CurrencyTransactionEntity";
@@ -58,7 +56,6 @@ const TransactionsPage: React.FC = () => {
         });
     }, []);
     const { confirmDelete } = useConfirm();
-    const [transactionTypes, setTransactionTypes] = useState<TransactionTypeEntity[]>([]);
 
     // Display & Filtering states
     const [viewDisplayMode, setViewDisplayMode] = useState<ViewDisplayMode>(() => {
@@ -92,20 +89,6 @@ const TransactionsPage: React.FC = () => {
         params,
         isTransactionsLoading
     } = useTransactions({ month: new Date().getMonth() + 1, year: new Date().getFullYear(), showSystem: false });
-
-    useEffect(() => {
-        let isMounted = true;
-        const initData = async () => {
-            const loadedTransactionTypes = await getTransactionTypes(false);
-            if (isMounted) {
-                setTransactionTypes(loadedTransactionTypes);
-            }
-        };
-        initData();
-        return () => {
-            isMounted = false;
-        };
-    }, []);
 
     const handleViewDisplayModeChange = useCallback((mode: ViewDisplayMode) => {
         setViewDisplayMode(mode);
@@ -287,7 +270,6 @@ const TransactionsPage: React.FC = () => {
                     {viewDisplayMode === 'table' && (
                         <TransactionTableGrid
                             transactions={filteredTransactions}
-                            transactionTypes={transactionTypes}
                             selectedAccountId={selectedAccountId}
                             selectedCategoryId={selectedCategoryId}
                             onCommitDiff={handleCommitTableDiff}

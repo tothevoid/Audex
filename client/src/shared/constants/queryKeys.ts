@@ -5,4 +5,7 @@ export const queryKeys = {
     accounts: {
         all: ['accounts'] as const,
     },
+    transactionTypes: {
+        all: ['transactionTypes'] as const,
+    },
 };

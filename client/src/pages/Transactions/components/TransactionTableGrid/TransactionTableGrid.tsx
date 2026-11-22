@@ -6,6 +6,7 @@ import { generateGuid } from '@/shared/utilities/idUtilities';
 import { findEntityById } from '@/shared/utilities/arrayUtilities';
 import { EditableGridDiff, useEditableGrid } from '@/shared/hooks/useEditableGrid';
 import { useAccounts } from '@/shared/hooks/queries/useAccounts';
+import { useTransactionTypes } from '@/shared/hooks/queries/useTransactionTypes';
 import { EditableTransactionRow, isTransactionRowValid, TransactionTableGridProps } from './types';
 import {
     TransactionTableActionBar,
@@ -14,7 +15,6 @@ import {
 
 export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
     transactions,
-    transactionTypes,
     selectedAccountId,
     selectedCategoryId,
     onCommitDiff,
@@ -27,6 +27,7 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
 }) => {
     const { t } = useTranslation();
     const { data: accounts = [] } = useAccounts();
+    const { data: transactionTypes = [] } = useTransactionTypes();
 
     const createTransactionRow = useCallback((): EditableTransactionRow => {
         const defaultAccount = selectedAccountId
@@ -184,8 +185,6 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
                                 original={original}
                                 isAdded={isAdded}
                                 isDeleted={isDeleted}
-                                accounts={accounts}
-                                transactionTypes={transactionTypes}
                                 onRowChange={handleRowChange}
                                 onRowRevert={handleRowRevert}
                                 onDuplicateRow={handleDuplicateRow}
