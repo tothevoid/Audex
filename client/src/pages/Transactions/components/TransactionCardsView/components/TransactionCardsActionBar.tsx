@@ -43,7 +43,7 @@ export const TransactionCardsActionBar: React.FC<TransactionCardsActionBarProps>
                     <AddButton
                         size="sm"
                         buttonTitle={t('manager_transactions_add_transaction')}
-                        onClick={onAddTransaction}
+                        onClick={() => onAddTransaction()}
                         borderRadius="lg"
                     />
 

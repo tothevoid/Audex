@@ -93,7 +93,7 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
                 addedCount={addedCount}
                 deletedCount={deletedCount}
                 isSaving={isSaving}
-                onAddRow={handleAddRow}
+                onAddRow={() => handleAddRow()}
                 onRefresh={onRefresh}
                 isRefreshing={isRefreshing}
                 onResetAll={handleResetAll}

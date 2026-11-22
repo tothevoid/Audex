@@ -61,7 +61,7 @@ export const TransactionTableActionBar: React.FC<TransactionTableActionBarProps>
                         <AddButton
                             size="sm"
                             buttonTitle={t('manager_transactions_add_transaction')}
-                            onClick={onAddRow}
+                            onClick={() => onAddRow()}
                             borderRadius="lg"
                         />
 

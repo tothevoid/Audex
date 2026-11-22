@@ -6,7 +6,7 @@ import { TransactionEntity } from '@/models/transactions/TransactionEntity';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
 import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEntity';
 import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
-import { computeRowDiff, EMPTY_ROW_DIFF, RowDiff } from '@/pages/Transactions/components/TransactionTableGrid/types';
+import { computeRowDiff, EMPTY_ROW_DIFF } from '@/pages/Transactions/components/TransactionTableGrid/types';
 import TableDateCell from '@/shared/components/TableDateCell/TableDateCell';
 import { getCurrencySymbol } from '@/shared/utilities/currencyUtils';
 
@@ -17,7 +17,7 @@ export interface TransactionTableRowProps {
     isDeleted: boolean;
     accounts: AccountEntity[];
     transactionTypes: TransactionTypeEntity[];
-    onRowChange: (id: string, updatedRow: TransactionEntity, diff: RowDiff) => void;
+    onRowChange: (id: string, updatedRow: TransactionEntity) => void;
     onRowRevert: (id: string) => void;
     onDuplicateRow: (row: TransactionEntity) => void;
     onDeleteRow: (id: string) => void;
@@ -51,13 +51,13 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
         const handleFieldChange = (updates: Partial<TransactionEntity>) => {
             const updatedRow: TransactionEntity = { ...row, ...updates };
             if (isAdded || !original) {
-                onRowChange(row.id, updatedRow, EMPTY_ROW_DIFF);
+                onRowChange(row.id, updatedRow);
                 return;
             }
 
             const nextDiff = computeRowDiff(updatedRow, original, i18n);
             if (nextDiff.isModified) {
-                onRowChange(row.id, updatedRow, nextDiff);
+                onRowChange(row.id, updatedRow);
             } else {
                 onRowRevert(row.id);
             }
