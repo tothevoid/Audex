@@ -54,6 +54,10 @@
     "pagination_page_size_item": "{{size}}",
     "pagination_page_size_label": "Per page:",
 
-    "error_data_load": "Error loading data"
+    "error_data_load": "Error loading data",
+
+    "user_profile_load_error_title": "Failed to load user profile",
+    "user_profile_load_error_desc": "Check your connection to the server and try again",
+    "user_profile_load_retry": "Retry"
 }
 

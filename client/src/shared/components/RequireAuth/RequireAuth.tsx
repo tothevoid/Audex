@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { getAccessToken } from '@/api/tokenStorage';
 import { refreshToken } from '@/api/auth/authApi';
+import { AppLoader } from '@/shared/components/AppLoader';
 
 type AuthStatus = 'checking' | 'authenticated' | 'unauthenticated';
 
@@ -37,7 +38,7 @@ export const RequireAuth: React.FC = () => {
 	}, [authStatus]);
 
 	if (authStatus === 'checking') {
-		return null;
+		return <AppLoader />;
 	}
 
 	return authStatus === 'authenticated' ? (

@@ -54,6 +54,10 @@
     "pagination_page_size_item": "{{size}}",
     "pagination_page_size_label": "На странице:",
 
-    "error_data_load": "Ошибка загрузки данных"
+    "error_data_load": "Ошибка загрузки данных",
+
+    "user_profile_load_error_title": "Не удалось загрузить профиль",
+    "user_profile_load_error_desc": "Проверьте подключение к серверу и попробуйте снова",
+    "user_profile_load_retry": "Повторить попытку"
 }
 

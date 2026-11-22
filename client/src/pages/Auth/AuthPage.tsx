@@ -84,7 +84,7 @@ const AuthPage: React.FC = () => {
             >
                 <VStack gap={4} align="stretch">
                     <Flex direction="column" align="center" justify="center" gap={2} mb={1}>
-                        <AppIcon size="48px" color="action_primary" />
+                        <AppIcon size="48px" color="text_primary" />
                         <Text fontSize="2xl" fontWeight="bold" color="text_primary" letterSpacing="0.05em">
                             Audex
                         </Text>

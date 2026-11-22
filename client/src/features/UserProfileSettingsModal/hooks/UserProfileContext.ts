@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react';
 import { UserProfileEntity } from '@/models/user/UserProfileEntity';
 
 export type UserContextType = {
-	user: UserProfileEntity | null;
+	user: UserProfileEntity;
 	updateUser: (updatedUser: UserProfileEntity) => void;
 };
 
