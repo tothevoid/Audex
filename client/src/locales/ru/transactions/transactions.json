@@ -28,6 +28,8 @@
     "view_mode_cards": "Карточки",
     "view_mode_table": "Таблица",
     "table_add_row": "Добавить строку",
+    "table_show_analytics": "Показать график",
+    "table_hide_analytics": "Скрыть график",
     "table_commit_changes": "Сохранить изменения",
     "table_reset_changes": "Сбросить изменения",
     "table_was": "Было:",

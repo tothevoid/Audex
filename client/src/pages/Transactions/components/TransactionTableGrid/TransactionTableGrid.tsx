@@ -18,8 +18,11 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
     selectedAccountId,
     onCommitDiff,
     onRefresh,
+    isRefreshing = false,
     viewDisplayMode,
     onViewDisplayModeChange,
+    isAnalyticsOpen,
+    onToggleAnalytics,
 }) => {
     const { t } = useTranslation();
 
@@ -83,7 +86,7 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
 
     return (
         <Box>
-            {/* Action Bar with controls and diff counters */}
+            {/* Table Action Bar */}
             <TransactionTableActionBar
                 hasChanges={hasChanges}
                 modifiedCount={modifiedCount}
@@ -92,8 +95,11 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
                 isSaving={isSaving}
                 onAddRow={handleAddRow}
                 onRefresh={onRefresh}
+                isRefreshing={isRefreshing}
                 onResetAll={handleResetAll}
                 onCommit={handleCommit}
+                isAnalyticsOpen={isAnalyticsOpen}
+                onToggleAnalytics={onToggleAnalytics}
                 viewDisplayMode={viewDisplayMode}
                 onViewDisplayModeChange={onViewDisplayModeChange}
             />
@@ -101,6 +107,8 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
             {/* Interactive Spreadsheet Grid */}
             <Box
                 overflowX="auto"
+                overflowY="auto"
+                maxH="calc(100vh - 280px)"
                 bg="background_primary"
                 borderRadius="xl"
                 borderWidth="1px"
@@ -108,27 +116,27 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
                 boxShadow="sm"
             >
                 <Table.Root size="sm" variant="line">
-                    <Table.Header>
+                    <Table.Header position="sticky" top={0} zIndex={2} bg="background_secondary">
                         <Table.Row backgroundColor="background_secondary">
-                            <Table.ColumnHeader color="text_secondary" fontSize="2xs" w="105px">
+                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="105px">
                                 {t('entity_transaction_date')}
                             </Table.ColumnHeader>
-                            <Table.ColumnHeader color="text_secondary" fontSize="2xs" w="160px">
+                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="160px">
                                 {t('entity_transaction_name')}
                             </Table.ColumnHeader>
-                            <Table.ColumnHeader color="text_secondary" fontSize="2xs" w="155px">
+                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="155px">
                                 {t('entity_transaction_money_quantity')}
                             </Table.ColumnHeader>
-                            <Table.ColumnHeader color="text_secondary" fontSize="2xs" w="120px">
+                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="120px">
                                 {t('entity_transaction_cashback')}
                             </Table.ColumnHeader>
-                            <Table.ColumnHeader color="text_secondary" fontSize="2xs" w="155px">
+                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="155px">
                                 {t('entity_transaction_transaction_type')}
                             </Table.ColumnHeader>
-                            <Table.ColumnHeader color="text_secondary" fontSize="2xs" w="180px">
+                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="180px">
                                 {t('entity_transaction_account')}
                             </Table.ColumnHeader>
-                            <Table.ColumnHeader textAlign="right" color="text_secondary" fontSize="2xs" w="110px">
+                            <Table.ColumnHeader bg="background_secondary" textAlign="right" color="text_secondary" fontSize="2xs" w="110px">
                                 {t('table_actions_header')}
                             </Table.ColumnHeader>
                         </Table.Row>

@@ -179,7 +179,7 @@ const TransactionStats: React.FC<TransactionStatsProps> = ({
                                         itemStyle={{ color: 'var(--chakra-colors-text_primary)' }}
                                         contentStyle={getChartLabelConfig()}
                                         formatter={(value: TooltipValueType | undefined, name: TooltipValueType | undefined) => [
-                                            formatMoneyByCurrencyCulture(Number(value ?? 0), user?.currency.name),
+                                            formatMoneyByCurrencyCulture(Number(value ?? 0), user.currency.name),
                                             String(name ?? ''),
                                         ]}
                                     />
@@ -201,7 +201,7 @@ const TransactionStats: React.FC<TransactionStatsProps> = ({
                                     {isIncomeMode ? t('stats_total_income') : t('stats_total_spent')}
                                 </Text>
                                 <Text fontSize="md" fontWeight={700} color="text_primary">
-                                    {formatMoneyByCurrencyCulture(totalSum, user?.currency.name)}
+                                    {formatMoneyByCurrencyCulture(totalSum, user.currency.name)}
                                 </Text>
                             </Flex>
                         </Box>
@@ -236,7 +236,7 @@ const TransactionStats: React.FC<TransactionStatsProps> = ({
                                                     {percent.toFixed(1)}%
                                                 </Text>
                                                 <Text fontSize="xs" fontWeight={700} color="text_primary">
-                                                    {formatMoneyByCurrencyCulture(item.value, user?.currency.name)}
+                                                    {formatMoneyByCurrencyCulture(item.value, user.currency.name)}
                                                 </Text>
                                             </Flex>
                                         </Flex>

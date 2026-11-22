@@ -13,7 +13,7 @@ interface Props {
 export const TransactionSummaryHeader: React.FC<Props> = ({ summary }) => {
     const { t } = useTranslation();
     const { user } = useUserProfile();
-    const currencyName = summary?.currencyName || user?.currency.name;
+    const currencyName = summary?.currencyName || user.currency.name;
 
     const totalIncome = summary?.totalIncome ?? 0;
     const totalExpenses = summary?.totalExpenses ?? 0;

@@ -1,3 +1,3 @@
 export * from './TransactionTableRow';
-export * from './TransactionTableActionBar';
 export * from './OutOfPeriodWarningModal';
+export * from './TransactionTableActionBar';

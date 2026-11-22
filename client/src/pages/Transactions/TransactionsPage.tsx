@@ -1,14 +1,13 @@
 import "./TransactionsPage.scss";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Icon } from '@chakra-ui/react';
-import { MdAdd } from 'react-icons/md';
+import { Grid, GridItem } from '@chakra-ui/react';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
 import TransactionSummaryHeader from './components/TransactionSummaryHeader/TransactionSummaryHeader';
-import TransactionsListHeader from './components/TransactionsListHeader/TransactionsListHeader';
 import TransactionFilterBar, { TypeFilterMode, ViewDisplayMode } from './components/TransactionFilterBar/TransactionFilterBar';
-import TransactionCardsView from './components/TransactionCardsView';
+import TransactionCardsView, { TransactionCardsActionBar } from './components/TransactionCardsView';
 import TransactionTableGrid from './components/TransactionTableGrid/TransactionTableGrid';
+import TransactionStats from './components/TransactionStats/TransactionStats';
 import { getAccountsByTypes } from '@/api/accounts/accountApi';
 import { getTransactionTypes } from '@/api/transactions/transactionTypeApi';
 import { useTranslation } from 'react-i18next';
@@ -31,6 +30,9 @@ import { EditableGridDiff } from "@/shared/hooks/useEditableGrid";
 import { OutOfPeriodWarningModal } from "./components/TransactionTableGrid/components/OutOfPeriodWarningModal";
 import { getOutOfPeriodItems, OutOfPeriodItem } from "./components/TransactionTableGrid/types";
 
+const STORAGE_KEY_TRANSACTIONS_ANALYTICS_OPEN = 'audex_transactions_analytics_open';
+const STORAGE_KEY_TABLE_ANALYTICS_LEGACY = 'audex_transactions_table_analytics_open';
+
 interface State {
     accounts: AccountEntity[];
     transactionTypes: TransactionTypeEntity[];
@@ -38,6 +40,29 @@ interface State {
 
 const TransactionsPage: React.FC = () => {
     const { t, i18n } = useTranslation();
+
+    const [isAnalyticsOpen, setIsAnalyticsOpen] = useState<boolean>(() => {
+        try {
+            const storedValue = localStorage.getItem(STORAGE_KEY_TRANSACTIONS_ANALYTICS_OPEN)
+                ?? localStorage.getItem(STORAGE_KEY_TABLE_ANALYTICS_LEGACY);
+            return storedValue !== null ? storedValue === 'true' : true;
+        } catch {
+            return true;
+        }
+    });
+
+    const handleToggleAnalytics = useCallback(() => {
+        setIsAnalyticsOpen((previousState) => {
+            const nextState = !previousState;
+            try {
+                localStorage.setItem(STORAGE_KEY_TRANSACTIONS_ANALYTICS_OPEN, String(nextState));
+                localStorage.setItem(STORAGE_KEY_TABLE_ANALYTICS_LEGACY, String(nextState));
+            } catch {
+                // Ignore storage write errors in restricted environments
+            }
+            return nextState;
+        });
+    }, []);
     const { confirmDelete } = useConfirm();
     const [state, setState] = useState<State>({ accounts: [], transactionTypes: [] });
 
@@ -121,18 +146,18 @@ const TransactionsPage: React.FC = () => {
 
     // Base filtered transactions (by type, account, search) used for stats chart
     const statsTransactions = useMemo(() => {
-        return transactions.filter((t) => {
+        return transactions.filter((transactionItem) => {
             // Type filter
-            if (typeFilter === 'income' && t.amount <= 0) return false;
-            if (typeFilter === 'expense' && t.amount >= 0) return false;
+            if (typeFilter === 'income' && transactionItem.amount <= 0) return false;
+            if (typeFilter === 'expense' && transactionItem.amount >= 0) return false;
 
             // Account filter
-            if (selectedAccountId && t.account.id !== selectedAccountId) return false;
+            if (selectedAccountId && transactionItem.account.id !== selectedAccountId) return false;
 
             // Search query filter (by transaction name)
             if (searchQuery.trim()) {
                 const query = searchQuery.toLowerCase().trim();
-                if (!t.name?.toLowerCase().includes(query)) return false;
+                if (!transactionItem.name?.toLowerCase().includes(query)) return false;
             }
 
             return true;
@@ -143,11 +168,11 @@ const TransactionsPage: React.FC = () => {
     const filteredTransactions = useMemo(() => {
         if (!selectedCategoryId) return statsTransactions;
 
-        return statsTransactions.filter((t) => {
+        return statsTransactions.filter((transactionItem) => {
             if (selectedCategoryId === 'none') {
-                return !t.transactionType;
+                return !transactionItem.transactionType;
             }
-            return t.transactionType?.id === selectedCategoryId;
+            return transactionItem.transactionType?.id === selectedCategoryId;
         });
     }, [statsTransactions, selectedCategoryId]);
 
@@ -238,62 +263,71 @@ const TransactionsPage: React.FC = () => {
             {/* Monthly KPI Metrics Header (corresponds to selected month) */}
             <TransactionSummaryHeader summary={summary} />
 
-            {/* View Action Bar (Always visible: Refresh + View Switcher) */}
-            {viewDisplayMode === 'cards' && (
-                <TransactionsListHeader
-                    viewDisplayMode={viewDisplayMode}
-                    onViewDisplayModeChange={handleViewDisplayModeChange}
-                    onRefresh={refetch}
-                    leftExtra={
-                        <Button
-                            size="sm"
-                            colorPalette="blue"
-                            onClick={onAddTransactionClick}
-                            px={3}
-                            borderRadius="lg"
-                        >
-                            <Icon mr={1}>
-                                <MdAdd size={18} />
-                            </Icon>
-                            {t('manager_transactions_add_transaction')}
-                        </Button>
-                    }
-                />
-            )}
+            {/* Split Layout: Interactive View (Cards or Spreadsheet Grid) + Collapsible Analytics Sidebar */}
+            <Grid
+                templateColumns={isAnalyticsOpen ? { base: '1fr', xl: '7fr 3fr' } : '1fr'}
+                gap={6}
+                alignItems="start"
+            >
+                <GridItem minW={0}>
+                    {/* MODE 1: CARDS VIEW MODE */}
+                    {viewDisplayMode === 'cards' && (
+                        <>
+                            <TransactionCardsActionBar
+                                viewDisplayMode={viewDisplayMode}
+                                onViewDisplayModeChange={handleViewDisplayModeChange}
+                                isAnalyticsOpen={isAnalyticsOpen}
+                                onToggleAnalytics={handleToggleAnalytics}
+                                onRefresh={refetch}
+                                isRefreshing={isTransactionsLoading}
+                                onAddTransaction={onAddTransactionClick}
+                            />
+                            <TransactionCardsView
+                                transactions={filteredTransactions}
+                                accounts={state.accounts}
+                                isLoading={isTransactionsLoading}
+                                year={params.year}
+                                month={params.month}
+                                onEditClicked={onEditClicked}
+                                onDeleteClicked={onDeleteClicked}
+                                onDuplicateClicked={handleDuplicateFromList}
+                            />
+                        </>
+                    )}
 
-            {/* MODE 1: CARDS VIEW MODE */}
-            {viewDisplayMode === 'cards' && (
-                <TransactionCardsView
-                    transactions={filteredTransactions}
-                    statsTransactions={statsTransactions}
-                    accounts={state.accounts}
-                    isLoading={isTransactionsLoading}
-                    year={params.year}
-                    month={params.month}
-                    typeFilter={typeFilter}
-                    selectedCategoryId={selectedCategoryId}
-                    onCategoryClick={handleCategoryClick}
-                    selectedAccountId={selectedAccountId}
-                    onAccountClick={handleAccountClick}
-                    onEditClicked={onEditClicked}
-                    onDeleteClicked={onDeleteClicked}
-                    onDuplicateClicked={handleDuplicateFromList}
-                />
-            )}
+                    {/* MODE 2: UNIFIED INTERACTIVE SPREADSHEET TABLE MODE */}
+                    {viewDisplayMode === 'table' && (
+                        <TransactionTableGrid
+                            transactions={filteredTransactions}
+                            accounts={state.accounts}
+                            transactionTypes={state.transactionTypes}
+                            selectedAccountId={selectedAccountId}
+                            onCommitDiff={handleCommitTableDiff}
+                            onRefresh={refetch}
+                            isRefreshing={isTransactionsLoading || isTableSaving}
+                            viewDisplayMode={viewDisplayMode}
+                            onViewDisplayModeChange={handleViewDisplayModeChange}
+                            isAnalyticsOpen={isAnalyticsOpen}
+                            onToggleAnalytics={handleToggleAnalytics}
+                        />
+                    )}
+                </GridItem>
 
-            {/* MODE 2: UNIFIED INTERACTIVE SPREADSHEET TABLE MODE */}
-            {viewDisplayMode === 'table' && (
-                <TransactionTableGrid
-                    transactions={filteredTransactions}
-                    accounts={state.accounts}
-                    transactionTypes={state.transactionTypes}
-                    selectedAccountId={selectedAccountId}
-                    onCommitDiff={handleCommitTableDiff}
-                    onRefresh={refetch}
-                    viewDisplayMode={viewDisplayMode}
-                    onViewDisplayModeChange={handleViewDisplayModeChange}
-                />
-            )}
+                {/* Donut Analytics Sidebar */}
+                {isAnalyticsOpen && (
+                    <GridItem minW={0} position="sticky" top="84px">
+                        <TransactionStats
+                            accounts={state.accounts}
+                            transactions={statsTransactions}
+                            typeFilter={typeFilter}
+                            selectedCategoryId={selectedCategoryId}
+                            onCategoryClick={handleCategoryClick}
+                            selectedAccountId={selectedAccountId}
+                            onAccountClick={handleAccountClick}
+                        />
+                    </GridItem>
+                )}
+            </Grid>
 
             {/* Modals for edit & advanced creation */}
             <TransactionModal transaction={activeEntity} modalRef={modalRef} onSaved={onTransactionSaved} />

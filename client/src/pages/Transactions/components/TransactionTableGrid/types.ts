@@ -4,8 +4,8 @@ import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEnti
 import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
 import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
 import { i18n as I18nType } from 'i18next';
-import { ViewDisplayMode } from '@/pages/Transactions/components/TransactionFilterBar/TransactionFilterBar';
 import { EditableGridDiff } from '@/shared/hooks/useEditableGrid';
+import { ViewDisplayMode } from '@/pages/Transactions/components/TransactionFilterBar/TransactionFilterBar';
 
 export interface FieldDiff {
     isModified: boolean;
@@ -73,8 +73,11 @@ export interface TransactionTableGridProps {
     selectedAccountId?: string;
     onCommitDiff: (diff: EditableGridDiff<TransactionEntity>) => Promise<void>;
     onRefresh: () => void;
+    isRefreshing?: boolean;
     viewDisplayMode: ViewDisplayMode;
     onViewDisplayModeChange: (mode: ViewDisplayMode) => void;
+    isAnalyticsOpen?: boolean;
+    onToggleAnalytics?: () => void;
 }
 
 export const getOutOfPeriodItems = (
@@ -102,4 +105,3 @@ export const getOutOfPeriodItems = (
 
     return outOfPeriodItems;
 };
-

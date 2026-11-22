@@ -28,6 +28,8 @@
     "view_mode_cards": "Cards",
     "view_mode_table": "Table",
     "table_add_row": "Add new row",
+    "table_show_analytics": "Show chart",
+    "table_hide_analytics": "Hide chart",
     "table_commit_changes": "Commit changes",
     "table_reset_changes": "Reset changes",
     "table_was": "Was:",
