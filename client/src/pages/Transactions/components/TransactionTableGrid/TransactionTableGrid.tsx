@@ -156,13 +156,13 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
                             <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="105px">
                                 {t('entity_transaction_date')}
                             </Table.ColumnHeader>
-                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="160px">
+                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" minW="220px">
                                 {t('entity_transaction_name')}
                             </Table.ColumnHeader>
-                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="155px">
+                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="150px">
                                 {t('entity_transaction_money_quantity')}
                             </Table.ColumnHeader>
-                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="120px">
+                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="110px">
                                 {t('entity_transaction_cashback')}
                             </Table.ColumnHeader>
                             <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="170px">
