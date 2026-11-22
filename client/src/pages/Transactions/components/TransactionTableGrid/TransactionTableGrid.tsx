@@ -1,11 +1,11 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Box, Table } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { TransactionEntity } from '@/models/transactions/TransactionEntity';
 import { generateGuid } from '@/shared/utilities/idUtilities';
 import { findEntityById } from '@/shared/utilities/arrayUtilities';
-import { useEditableGrid } from '@/shared/hooks/useEditableGrid';
-import { TransactionTableGridProps } from './types';
+import { EditableGridDiff, useEditableGrid } from '@/shared/hooks/useEditableGrid';
+import { EditableTransactionRow, isTransactionRowValid, TransactionTableGridProps } from './types';
 import {
     TransactionTableActionBar,
     TransactionTableRow,
@@ -16,6 +16,7 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
     accounts,
     transactionTypes,
     selectedAccountId,
+    selectedCategoryId,
     onCommitDiff,
     onRefresh,
     isRefreshing = false,
@@ -26,13 +27,13 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
 }) => {
     const { t } = useTranslation();
 
-    const createTransactionRow = useCallback((): TransactionEntity | null => {
-        const defaultAccount = findEntityById(accounts, selectedAccountId, accounts[0]);
-        const defaultType = transactionTypes[0];
-
-        if (!defaultAccount || !defaultType) {
-            return null;
-        }
+    const createTransactionRow = useCallback((): EditableTransactionRow => {
+        const defaultAccount = selectedAccountId
+            ? findEntityById(accounts, selectedAccountId)
+            : undefined;
+        const defaultType = selectedCategoryId && selectedCategoryId !== 'none'
+            ? findEntityById(transactionTypes, selectedCategoryId)
+            : undefined;
 
         return {
             id: generateGuid(),
@@ -44,15 +45,40 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
             transactionType: defaultType,
             isSystem: false,
         };
-    }, [accounts, selectedAccountId, transactionTypes]);
+    }, [accounts, selectedAccountId, transactionTypes, selectedCategoryId]);
 
     const cloneTransactionRow = useCallback(
-        (sourceRow: TransactionEntity): TransactionEntity => ({
+        (sourceRow: EditableTransactionRow): EditableTransactionRow => ({
             ...sourceRow,
             id: generateGuid(),
             date: new Date(sourceRow.date),
         }),
         []
+    );
+
+    const handleCommitEditableDiff = useCallback(
+        async (diff: EditableGridDiff<EditableTransactionRow>) => {
+            const toTransactionEntity = (item: EditableTransactionRow): TransactionEntity => {
+                if (!item.account || !item.transactionType || !item.name.trim() || item.amount === 0) {
+                    throw new Error('Cannot commit invalid transaction row');
+                }
+                return {
+                    ...item,
+                    name: item.name.trim(),
+                    account: item.account,
+                    transactionType: item.transactionType,
+                };
+            };
+
+            const commitDiff: EditableGridDiff<TransactionEntity> = {
+                added: diff.added.map(toTransactionEntity),
+                updated: diff.updated.map(toTransactionEntity),
+                deletedIds: diff.deletedIds,
+            };
+
+            await onCommitDiff(commitDiff);
+        },
+        [onCommitDiff]
     );
 
     const {
@@ -69,20 +95,26 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
         handleDuplicateRow,
         handleDeleteRow,
         handleResetAll,
-    } = useEditableGrid<TransactionEntity>({
+    } = useEditableGrid<EditableTransactionRow>({
         items: transactions,
         createRow: createTransactionRow,
         cloneRow: cloneTransactionRow,
-        onCommit: onCommitDiff,
+        onCommit: handleCommitEditableDiff,
     });
 
+    const hasInvalidRows = useMemo(() => {
+        return rows.some(
+            (gridItem) => !gridItem.isDeleted && !isTransactionRowValid(gridItem.row)
+        );
+    }, [rows]);
+
     const handleCommit = useCallback(async () => {
-        if (!hasChanges) {
+        if (!hasChanges || hasInvalidRows) {
             return;
         }
 
         await commit();
-    }, [hasChanges, commit]);
+    }, [hasChanges, hasInvalidRows, commit]);
 
     return (
         <Box>
@@ -93,6 +125,7 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
                 addedCount={addedCount}
                 deletedCount={deletedCount}
                 isSaving={isSaving}
+                isCommitDisabled={hasInvalidRows}
                 onAddRow={() => handleAddRow()}
                 onRefresh={onRefresh}
                 isRefreshing={isRefreshing}
@@ -130,10 +163,10 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
                             <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="120px">
                                 {t('entity_transaction_cashback')}
                             </Table.ColumnHeader>
-                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="155px">
+                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="170px">
                                 {t('entity_transaction_transaction_type')}
                             </Table.ColumnHeader>
-                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="180px">
+                            <Table.ColumnHeader bg="background_secondary" color="text_secondary" fontSize="2xs" w="190px">
                                 {t('entity_transaction_account')}
                             </Table.ColumnHeader>
                             <Table.ColumnHeader bg="background_secondary" textAlign="right" color="text_secondary" fontSize="2xs" w="110px">

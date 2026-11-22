@@ -1,25 +1,26 @@
 import React, { useMemo } from 'react';
-import { Box, Button, Flex, HStack, Input, NativeSelect, Table, Tooltip } from '@chakra-ui/react';
+import { Box, Button, Flex, HStack, Input, Table, Tooltip } from '@chakra-ui/react';
+import { ChakraStylesConfig } from 'chakra-react-select';
 import { NumericFormat } from 'react-number-format';
 import { useTranslation } from 'react-i18next';
-import { TransactionEntity } from '@/models/transactions/TransactionEntity';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
 import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEntity';
 import CardActionButtons from '@/shared/components/CardActionButtons/CardActionButtons';
-import { computeRowDiff, EMPTY_ROW_DIFF } from '@/pages/Transactions/components/TransactionTableGrid/types';
+import { computeRowDiff, EditableTransactionRow, EMPTY_ROW_DIFF } from '@/pages/Transactions/components/TransactionTableGrid/types';
 import TableDateCell from '@/shared/components/TableDateCell/TableDateCell';
+import BaseSelect from '@/shared/components/BaseSelect/BaseSelect';
 import { getCurrencySymbol } from '@/shared/utilities/currencyUtils';
 
 export interface TransactionTableRowProps {
-    row: TransactionEntity;
-    original?: TransactionEntity;
+    row: EditableTransactionRow;
+    original?: EditableTransactionRow;
     isAdded: boolean;
     isDeleted: boolean;
     accounts: AccountEntity[];
     transactionTypes: TransactionTypeEntity[];
-    onRowChange: (id: string, updatedRow: TransactionEntity) => void;
+    onRowChange: (id: string, updatedRow: EditableTransactionRow) => void;
     onRowRevert: (id: string) => void;
-    onDuplicateRow: (row: TransactionEntity) => void;
+    onDuplicateRow: (row: EditableTransactionRow) => void;
     onDeleteRow: (id: string) => void;
 }
 
@@ -46,10 +47,14 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
 
         const isIncome = row.amount > 0;
         const isRowModified = isAdded || diff.isModified;
-        const currencySymbol = getCurrencySymbol(row.account?.currency?.name || '', i18n.language);
+        const currencySymbol = row.account ? getCurrencySymbol(row.account.currency.name, i18n.language) : '';
+        const isNameInvalid = !isDeleted && !row.name.trim();
+        const isAmountInvalid = !isDeleted && row.amount === 0;
+        const isTypeInvalid = !isDeleted && !row.transactionType?.id;
+        const isAccountInvalid = !isDeleted && !row.account?.id;
 
-        const handleFieldChange = (updates: Partial<TransactionEntity>) => {
-            const updatedRow: TransactionEntity = { ...row, ...updates };
+        const handleFieldChange = (updates: Partial<EditableTransactionRow>) => {
+            const updatedRow: EditableTransactionRow = { ...row, ...updates };
             if (isAdded || !original) {
                 onRowChange(row.id, updatedRow);
                 return;
@@ -94,16 +99,16 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
 
                 {/* Name Cell */}
                 <Table.Cell
-                    bg={diff.name.isModified ? 'status_warning_bg' : undefined}
-                    borderColor={diff.name.isModified ? 'status_warning_border' : undefined}
+                    bg={isNameInvalid ? 'status_danger_bg' : diff.name.isModified ? 'status_warning_bg' : undefined}
+                    borderColor={isNameInvalid ? 'status_danger_border' : diff.name.isModified ? 'status_warning_border' : undefined}
                 >
-                    <Tooltip.Root disabled={!diff.name.isModified}>
+                    <Tooltip.Root disabled={!isNameInvalid && !diff.name.isModified}>
                         <Tooltip.Trigger asChild>
                             <Input
                                 size="xs"
                                 disabled={isDeleted}
                                 value={row.name || ''}
-                                onChange={(e) => handleFieldChange({ name: e.target.value })}
+                                onChange={(event) => handleFieldChange({ name: event.target.value })}
                                 backgroundColor="transparent"
                                 borderColor="transparent"
                                 color="text_primary"
@@ -112,7 +117,7 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
                         </Tooltip.Trigger>
                         <Tooltip.Positioner>
                             <Tooltip.Content bg="background_primary" color="text_primary" borderColor="border_primary" borderWidth="1px" fontSize="2xs">
-                                {t('table_was')} {diff.name.wasText}
+                                {isNameInvalid ? t('validation_field_required') : `${t('table_was')} ${diff.name.wasText}`}
                             </Tooltip.Content>
                         </Tooltip.Positioner>
                     </Tooltip.Root>
@@ -120,10 +125,10 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
 
                 {/* Amount Cell */}
                 <Table.Cell
-                    bg={diff.amount.isModified ? 'status_warning_bg' : undefined}
-                    borderColor={diff.amount.isModified ? 'status_warning_border' : undefined}
+                    bg={isAmountInvalid ? 'status_danger_bg' : diff.amount.isModified ? 'status_warning_bg' : undefined}
+                    borderColor={isAmountInvalid ? 'status_danger_border' : diff.amount.isModified ? 'status_warning_border' : undefined}
                 >
-                    <Tooltip.Root disabled={!diff.amount.isModified}>
+                    <Tooltip.Root disabled={!isAmountInvalid && !diff.amount.isModified}>
                         <Tooltip.Trigger asChild>
                             <Flex align="center" gap={1}>
                                 <Button
@@ -144,8 +149,8 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
                                     disabled={isDeleted}
                                     value={Math.abs(row.amount)}
                                     onValueChange={(values) => {
-                                        const val = values.floatValue ?? 0;
-                                        handleFieldChange({ amount: isIncome ? val : -val });
+                                        const parsedValue = values.floatValue ?? 0;
+                                        handleFieldChange({ amount: isIncome ? parsedValue : -parsedValue });
                                     }}
                                     thousandSeparator=" "
                                     decimalSeparator=","
@@ -167,7 +172,7 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
                         </Tooltip.Trigger>
                         <Tooltip.Positioner>
                             <Tooltip.Content bg="background_primary" color="text_primary" borderColor="border_primary" borderWidth="1px" fontSize="2xs">
-                                {t('table_was')} {diff.amount.wasText}
+                                {isAmountInvalid ? t('validation_amount_non_zero') : `${t('table_was')} ${diff.amount.wasText}`}
                             </Tooltip.Content>
                         </Tooltip.Positioner>
                     </Tooltip.Root>
@@ -216,34 +221,36 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
 
                 {/* Category Dropdown Cell */}
                 <Table.Cell
-                    bg={diff.transactionType.isModified ? 'status_warning_bg' : undefined}
-                    borderColor={diff.transactionType.isModified ? 'status_warning_border' : undefined}
+                    bg={isTypeInvalid ? 'status_danger_bg' : diff.transactionType.isModified ? 'status_warning_bg' : undefined}
+                    borderColor={isTypeInvalid ? 'status_danger_border' : diff.transactionType.isModified ? 'status_warning_border' : undefined}
+                    p={1}
                 >
-                    <Tooltip.Root disabled={!diff.transactionType.isModified}>
+                    <Tooltip.Root disabled={!isTypeInvalid && !diff.transactionType.isModified}>
                         <Tooltip.Trigger asChild>
-                            <NativeSelect.Root size="xs" disabled={isDeleted}>
-                                <NativeSelect.Field
-                                    value={row.transactionType?.id || ''}
-                                    onChange={(e) => {
-                                        const newType = transactionTypes.find((t) => t.id === e.target.value);
-                                        if (newType) handleFieldChange({ transactionType: newType });
+                            <Box minW="155px">
+                                <BaseSelect<TransactionTypeEntity>
+                                    size="sm"
+                                    menuPosition="fixed"
+                                    menuPortalTarget={typeof document !== 'undefined' ? document.body : undefined}
+                                    collection={transactionTypes}
+                                    selectedValue={row.transactionType}
+                                    labelSelector={(transactionTypeItem) => transactionTypeItem.name}
+                                    valueSelector={(transactionTypeItem) => transactionTypeItem.id}
+                                    onSelected={(newType) => {
+                                        if (newType) {
+                                            handleFieldChange({ transactionType: newType });
+                                        }
                                     }}
-                                    backgroundColor="transparent"
-                                    borderColor="transparent"
-                                    color="text_primary"
-                                >
-                                    {transactionTypes.map((t) => (
-                                        <option key={t.id} value={t.id}>
-                                            {t.name}
-                                        </option>
-                                    ))}
-                                </NativeSelect.Field>
-                                <NativeSelect.Indicator />
-                            </NativeSelect.Root>
+                                    isDisabled={isDeleted}
+                                    isSearchable={true}
+                                    isClearable={false}
+                                    placeholder="—"
+                                />
+                            </Box>
                         </Tooltip.Trigger>
                         <Tooltip.Positioner>
                             <Tooltip.Content bg="background_primary" color="text_primary" borderColor="border_primary" borderWidth="1px" fontSize="2xs">
-                                {t('table_was')} {diff.transactionType.wasText}
+                                {isTypeInvalid ? t('validation_transaction_type_required') : `${t('table_was')} ${diff.transactionType.wasText}`}
                             </Tooltip.Content>
                         </Tooltip.Positioner>
                     </Tooltip.Root>
@@ -251,34 +258,36 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
 
                 {/* Account Dropdown Cell */}
                 <Table.Cell
-                    bg={diff.account.isModified ? 'status_warning_bg' : undefined}
-                    borderColor={diff.account.isModified ? 'status_warning_border' : undefined}
+                    bg={isAccountInvalid ? 'status_danger_bg' : diff.account.isModified ? 'status_warning_bg' : undefined}
+                    borderColor={isAccountInvalid ? 'status_danger_border' : diff.account.isModified ? 'status_warning_border' : undefined}
+                    p={1}
                 >
-                    <Tooltip.Root disabled={!diff.account.isModified}>
+                    <Tooltip.Root disabled={!isAccountInvalid && !diff.account.isModified}>
                         <Tooltip.Trigger asChild>
-                            <NativeSelect.Root size="xs" disabled={isDeleted}>
-                                <NativeSelect.Field
-                                    value={row.account?.id || ''}
-                                    onChange={(e) => {
-                                        const newAcc = accounts.find((a) => a.id === e.target.value);
-                                        if (newAcc) handleFieldChange({ account: newAcc });
+                            <Box minW="175px">
+                                <BaseSelect<AccountEntity>
+                                    size="sm"
+                                    menuPosition="fixed"
+                                    menuPortalTarget={typeof document !== 'undefined' ? document.body : undefined}
+                                    collection={accounts}
+                                    selectedValue={row.account}
+                                    labelSelector={(accountItem) => `${accountItem.name} (${accountItem.currency.name})`}
+                                    valueSelector={(accountItem) => accountItem.id}
+                                    onSelected={(newAccount) => {
+                                        if (newAccount) {
+                                            handleFieldChange({ account: newAccount });
+                                        }
                                     }}
-                                    backgroundColor="transparent"
-                                    borderColor="transparent"
-                                    color="text_primary"
-                                >
-                                    {accounts.map((acc) => (
-                                        <option key={acc.id} value={acc.id}>
-                                            {acc.name} ({acc.currency?.name})
-                                        </option>
-                                    ))}
-                                </NativeSelect.Field>
-                                <NativeSelect.Indicator />
-                            </NativeSelect.Root>
+                                    isDisabled={isDeleted}
+                                    isSearchable={true}
+                                    isClearable={false}
+                                    placeholder="—"
+                                />
+                            </Box>
                         </Tooltip.Trigger>
                         <Tooltip.Positioner>
                             <Tooltip.Content bg="background_primary" color="text_primary" borderColor="border_primary" borderWidth="1px" fontSize="2xs">
-                                {t('table_was')} {diff.account.wasText}
+                                {isAccountInvalid ? t('validation_account_required') : `${t('table_was')} ${diff.account.wasText}`}
                             </Tooltip.Content>
                         </Tooltip.Positioner>
                     </Tooltip.Root>

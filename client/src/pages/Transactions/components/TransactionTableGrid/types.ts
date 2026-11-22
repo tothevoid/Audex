@@ -22,6 +22,26 @@ export interface RowDiff {
     account: FieldDiff;
 }
 
+export interface EditableTransactionRow {
+    id: string;
+    name: string;
+    amount: number;
+    cashback: number;
+    date: Date;
+    account?: AccountEntity;
+    transactionType?: TransactionTypeEntity;
+    isSystem: boolean;
+}
+
+export const isTransactionRowValid = (row: EditableTransactionRow): boolean => {
+    const hasValidName = row.name.trim().length > 0;
+    const hasValidAmount = row.amount !== 0;
+    const hasValidAccount = Boolean(row.account?.id);
+    const hasValidTransactionType = Boolean(row.transactionType?.id);
+
+    return hasValidName && hasValidAmount && hasValidAccount && hasValidTransactionType;
+};
+
 export const EMPTY_FIELD_DIFF: FieldDiff = { isModified: false, wasText: '' };
 
 export const EMPTY_ROW_DIFF: RowDiff = {
@@ -35,29 +55,29 @@ export const EMPTY_ROW_DIFF: RowDiff = {
 };
 
 export const computeRowDiff = (
-    current: TransactionEntity,
-    orig: TransactionEntity | undefined,
+    current: EditableTransactionRow,
+    original: EditableTransactionRow | undefined,
     i18n: I18nType
 ): RowDiff => {
-    if (!orig) return EMPTY_ROW_DIFF;
+    if (!original) return EMPTY_ROW_DIFF;
 
-    const dateModified = new Date(orig.date).toDateString() !== new Date(current.date).toDateString();
-    const nameModified = (orig.name || '') !== (current.name || '');
-    const amountModified = orig.amount !== current.amount;
-    const cashbackModified = (orig.cashback || 0) !== (current.cashback || 0);
-    const typeModified = orig.transactionType?.id !== current.transactionType?.id;
-    const accountModified = orig.account?.id !== current.account?.id;
+    const dateModified = new Date(original.date).toDateString() !== new Date(current.date).toDateString();
+    const nameModified = (original.name || '') !== (current.name || '');
+    const amountModified = original.amount !== current.amount;
+    const cashbackModified = (original.cashback || 0) !== (current.cashback || 0);
+    const typeModified = original.transactionType?.id !== current.transactionType?.id;
+    const accountModified = original.account?.id !== current.account?.id;
 
     const isModified = dateModified || nameModified || amountModified || cashbackModified || typeModified || accountModified;
 
     return {
         isModified,
-        date: { isModified: dateModified, wasText: dateModified ? formatDate(orig.date, i18n, false) : '' },
-        name: { isModified: nameModified, wasText: nameModified ? (orig.name || '—') : '' },
-        amount: { isModified: amountModified, wasText: amountModified ? formatMoneyByCurrencyCulture(orig.amount, orig.account?.currency?.name) : '' },
-        cashback: { isModified: cashbackModified, wasText: cashbackModified ? formatMoneyByCurrencyCulture(orig.cashback || 0, orig.account?.currency?.name) : '' },
-        transactionType: { isModified: typeModified, wasText: typeModified ? (orig.transactionType?.name || '—') : '' },
-        account: { isModified: accountModified, wasText: accountModified ? (orig.account?.name || '—') : '' },
+        date: { isModified: dateModified, wasText: dateModified ? formatDate(original.date, i18n, false) : '' },
+        name: { isModified: nameModified, wasText: nameModified ? (original.name || '—') : '' },
+        amount: { isModified: amountModified, wasText: amountModified && original.account ? formatMoneyByCurrencyCulture(original.amount, original.account.currency.name) : '' },
+        cashback: { isModified: cashbackModified, wasText: cashbackModified && original.account ? formatMoneyByCurrencyCulture(original.cashback, original.account.currency.name) : '' },
+        transactionType: { isModified: typeModified, wasText: typeModified ? (original.transactionType?.name || '—') : '' },
+        account: { isModified: accountModified, wasText: accountModified ? (original.account?.name || '—') : '' },
     };
 };
 
@@ -71,6 +91,7 @@ export interface TransactionTableGridProps {
     accounts: AccountEntity[];
     transactionTypes: TransactionTypeEntity[];
     selectedAccountId?: string;
+    selectedCategoryId?: string;
     onCommitDiff: (diff: EditableGridDiff<TransactionEntity>) => Promise<void>;
     onRefresh: () => void;
     isRefreshing?: boolean;

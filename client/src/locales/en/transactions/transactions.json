@@ -7,11 +7,9 @@
     "manager_stats_by_source": "By account",
     "manager_stats_by_type": "By category",
     "manager_transactions_show_system": "Show system",
-
     "new_transaction_form_title": "Add transaction",
     "new_transaction_account_transaction_title": "Account transaction",
     "new_transaction_account_currency_title": "Currency transaction",
-
     "entity_transaction_name_form_title": "Transaction",
     "entity_transaction_name": "Name",
     "entity_transaction_date": "Date",
@@ -22,9 +20,7 @@
     "entity_transaction_cashback": "Cashback",
     "entity_transaction_direction_income": "Income",
     "entity_transaction_direction_outcome": "Expense",
-
     "transaction_delete_title": "Delete transaction",
-
     "view_mode_cards": "Cards",
     "view_mode_table": "Table",
     "table_add_row": "Add new row",
@@ -32,6 +28,7 @@
     "table_hide_analytics": "Hide chart",
     "table_commit_changes": "Commit changes",
     "table_reset_changes": "Reset changes",
+    "table_fill_required_fields": "Fill in all fields",
     "table_was": "Was:",
     "table_changes_modified": "Modified",
     "table_changes_added": "Added",
@@ -46,14 +43,12 @@
     "table_restore_row": "Restore row",
     "table_reset_row_tooltip": "Reset changes for this row",
     "quick_add_name_placeholder": "Transaction name...",
-
     "summary_total_income": "Total Income",
     "summary_total_expenses": "Total Expenses",
     "summary_net_expenses": "Net Expenses",
     "summary_total_cashback": "Cashback",
     "summary_net_balance": "Net Cashflow",
     "summary_daily_avg": "Daily Average",
-
     "filter_search_placeholder": "Search by name...",
     "filter_all_types": "All types",
     "filter_income_only": "Income only",
@@ -63,11 +58,9 @@
     "filter_no_category": "No category",
     "filter_whole_year": "Whole year {{year}}",
     "filter_year_label": "Year {{year}}",
-
     "stats_total_spent": "Total Expenses",
     "stats_total_income": "Total Income",
     "stats_no_data": "No expense data for chart",
-
     "transactions_toast_created_title": "Transaction created",
     "transactions_toast_created_desc": "Transaction \"{{name}}\" created successfully",
     "transactions_toast_updated_title": "Transaction updated",

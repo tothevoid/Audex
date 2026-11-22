@@ -302,6 +302,7 @@ const TransactionsPage: React.FC = () => {
                             accounts={state.accounts}
                             transactionTypes={state.transactionTypes}
                             selectedAccountId={selectedAccountId}
+                            selectedCategoryId={selectedCategoryId}
                             onCommitDiff={handleCommitTableDiff}
                             onRefresh={refetch}
                             isRefreshing={isTransactionsLoading || isTableSaving}

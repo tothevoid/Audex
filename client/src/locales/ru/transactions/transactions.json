@@ -7,11 +7,9 @@
     "manager_stats_by_source": "По счёту",
     "manager_stats_by_type": "По категории",
     "manager_transactions_show_system": "Показывать системные",
-
     "new_transaction_form_title": "Добавить транзакцию",
     "new_transaction_account_transaction_title": "Транзакция по счёту",
     "new_transaction_account_currency_title": "Валютная операция",
-
     "entity_transaction_name_form_title": "Транзакция",
     "entity_transaction_name": "Название",
     "entity_transaction_date": "Дата",
@@ -22,9 +20,7 @@
     "entity_transaction_cashback": "Кэшбэк",
     "entity_transaction_direction_income": "Доход",
     "entity_transaction_direction_outcome": "Расход",
-
     "transaction_delete_title": "Удалить транзакцию",
-
     "view_mode_cards": "Карточки",
     "view_mode_table": "Таблица",
     "table_add_row": "Добавить строку",
@@ -32,6 +28,7 @@
     "table_hide_analytics": "Скрыть график",
     "table_commit_changes": "Сохранить изменения",
     "table_reset_changes": "Сбросить изменения",
+    "table_fill_required_fields": "Заполните все поля",
     "table_was": "Было:",
     "table_changes_modified": "Изменено",
     "table_changes_added": "Добавлено",
@@ -46,14 +43,12 @@
     "table_restore_row": "Восстановить строку",
     "table_reset_row_tooltip": "Сбросить изменения этой строки",
     "quick_add_name_placeholder": "Название операции...",
-
     "summary_total_income": "Доходы",
     "summary_total_expenses": "Расходы",
     "summary_net_expenses": "Чистые расходы",
     "summary_total_cashback": "Кешбэк",
     "summary_net_balance": "Чистый результат",
     "summary_daily_avg": "Средний расход в день",
-
     "filter_search_placeholder": "Поиск по названию...",
     "filter_all_types": "Все операции",
     "filter_income_only": "Только доходы",
@@ -63,11 +58,9 @@
     "filter_no_category": "Без категории",
     "filter_whole_year": "Весь {{year}} год",
     "filter_year_label": "{{year}} год",
-
     "stats_total_spent": "Всего расходов",
     "stats_total_income": "Всего доходов",
     "stats_no_data": "Нет данных по расходам для графика",
-
     "transactions_toast_created_title": "Транзакция создана",
     "transactions_toast_created_desc": "Транзакция «{{name}}» успешно сохранена",
     "transactions_toast_updated_title": "Транзакция обновлена",

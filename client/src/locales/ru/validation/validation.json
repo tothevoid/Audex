@@ -1,6 +1,7 @@
 {
     "validation_field_required": "Поле обязательно для заполнения",
     "validation_positive_number": "Значение должно быть больше 0",
+    "validation_amount_non_zero": "Сумма не может быть равна 0",
     "validation_non_negative_number": "Значение не может быть отрицательным",
     "validation_date_required": "Выберите дату",
     "validation_end_date_after_start": "Дата окончания должна быть позже даты начала",

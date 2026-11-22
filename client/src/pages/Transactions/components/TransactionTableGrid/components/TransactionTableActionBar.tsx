@@ -15,6 +15,7 @@ export interface TransactionTableActionBarProps {
     addedCount: number;
     deletedCount: number;
     isSaving: boolean;
+    isCommitDisabled?: boolean;
     isRefreshing?: boolean;
     onAddRow: () => void;
     onRefresh: () => void;
@@ -32,6 +33,7 @@ export const TransactionTableActionBar: React.FC<TransactionTableActionBarProps>
     addedCount,
     deletedCount,
     isSaving,
+    isCommitDisabled = false,
     isRefreshing = false,
     onAddRow,
     onRefresh,
@@ -100,10 +102,16 @@ export const TransactionTableActionBar: React.FC<TransactionTableActionBarProps>
                         gap={3}
                     >
                         <Text fontSize="xs" fontWeight={600} color="text_primary">
-                            💡 {t('table_changes_modified')}: {modifiedCount} • {t('table_changes_added')}: {addedCount} • {t('table_changes_deleted')}: {deletedCount}
+                            {t('table_changes_modified')}: {modifiedCount} • {t('table_changes_added')}: {addedCount} • {t('table_changes_deleted')}: {deletedCount}
                         </Text>
 
-                        <HStack gap={2}>
+                        <HStack gap={3}>
+                            {isCommitDisabled && (
+                                <Text fontSize="xs" color="status_danger" fontWeight={500}>
+                                    {t('table_fill_required_fields')}
+                                </Text>
+                            )}
+
                             <Button
                                 size="sm"
                                 variant="ghost"
@@ -119,6 +127,7 @@ export const TransactionTableActionBar: React.FC<TransactionTableActionBarProps>
                                 size="sm"
                                 colorPalette="green"
                                 loading={isSaving}
+                                disabled={isCommitDisabled}
                                 onClick={onCommit}
                                 px={4}
                                 borderRadius="lg"

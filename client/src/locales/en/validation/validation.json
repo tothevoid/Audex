@@ -1,6 +1,7 @@
 {
     "validation_field_required": "This field is required",
     "validation_positive_number": "Value must be greater than 0",
+    "validation_amount_non_zero": "Amount cannot be 0",
     "validation_non_negative_number": "Value cannot be negative",
     "validation_date_required": "Date is required",
     "validation_end_date_after_start": "End date must be later than start date",

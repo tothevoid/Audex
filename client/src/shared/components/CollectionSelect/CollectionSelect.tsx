@@ -34,28 +34,20 @@ const CollectionSelect = <
         <Controller
             name={name}
             control={control}
-            render={({ field }) => {
-                const normalizedValue = (() => {
-                    if (!field.value) return null;
-                    const targetVal = typeof field.value === "object" ? String(valueSelector(field.value)) : String(field.value);
-                    return collection.find((item) => String(valueSelector(item)) === targetVal) || field.value;
-                })();
-
-                return (
-                    <BaseSelect<T, IsClearable>
-                        placeholder={placeholder}
-                        collection={collection}
-                        selectedValue={normalizedValue}
-                        labelSelector={labelSelector}
-                        valueSelector={valueSelector}
-                        onSelected={(value) => field.onChange(value)}
-                        isDisabled={isDisabled}
-                        isClearable={isClearable}
-                        isSearchable={isSearchable}
-                        maxRows={maxRows}
-                    />
-                );
-            }}
+            render={({ field }) => (
+                <BaseSelect<T, IsClearable>
+                    placeholder={placeholder}
+                    collection={collection}
+                    selectedValue={field.value}
+                    labelSelector={labelSelector}
+                    valueSelector={valueSelector}
+                    onSelected={(value) => field.onChange(value)}
+                    isDisabled={isDisabled}
+                    isClearable={isClearable}
+                    isSearchable={isSearchable}
+                    maxRows={maxRows}
+                />
+            )}
         />
     );
 };
