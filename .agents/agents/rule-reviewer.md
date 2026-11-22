@@ -4,7 +4,7 @@ description: >
   Audex code style and engineering convention gatekeeper.
   Audits git diff and touched files against clean code standards
   (no abbreviations, mandatory *Async, *Dto naming, semantic theme tokens,
-  Zod factories, localization rules) and runs ESLint on client code.
+  Zod factories, localization rules, no over-defensive nullability) and runs ESLint on client code.
   Input contract: "Scope: diff | client | server | <file>; Lint: true | false".
   Returns concise, high-signal violations without log noise.
 tools:
@@ -46,7 +46,16 @@ You strictly audit against Audex engineering standards:
 - **No Inline Fallbacks in `t(...)`**: Never allow `t("key", "Fallback text")`. Always call `t("key")`.
 - **Strict Typing in Catch**: `catch (error: unknown)` or `catch (error)`, never `catch (error: Error)` or `any` casts.
 
-### 3. UI Pattern Matching & Shared Component Reuse (No Reinventing the Wheel)
+### 3. Strict Domain Integrity & No Over-Defensive Nullability (Rules 6 & 11)
+- **Reflect Domain Guarantees**: Reviewers MUST check entity definitions (`client/src/models/<domain>/*Entity.ts` or backend DTOs) when inspecting diffs.
+- **Flag Defensive Spraying**: Flag any unnecessary `?.`, `?? null`, `?? ""`, `|| 1`, or `typeof x === '...'` on fields guaranteed non-nullable by domain contracts.
+  - *Example violation*: `transactionType?.name` or `transactionType?.iconKey` when `transactionType` is a mandatory property of `TransactionEntity`.
+  - *Example violation*: `typeof cashback === 'number'` when `cashback` is typed as `number`.
+  - *Example violation*: `rate || 1` when `rate` is guaranteed by `CurrencyEntity`.
+  - *Example violation*: `name || transactionType?.name || t(...)` when `transactionType.name` is guaranteed to be a non-empty string.
+- **No Weakening Types for Compiler**: Flag any mandatory fields made optional (`?:`) or nullable to satisfy compiler variance.
+
+### 4. UI Pattern Matching & Shared Component Reuse (No Reinventing the Wheel)
 Inspect frontend diffs for ad-hoc markup that replicates existing components in `client/src/shared/components/`. Flag violations when custom markup is written instead of importing the standard component:
 - **Metrics & Stats**:
   - *Ad-hoc Pattern*: Custom `Flex`/`Box` displaying a stat label + value + currency/delta.
@@ -70,12 +79,12 @@ Inspect frontend diffs for ad-hoc markup that replicates existing components in 
 **Violation format for duplicates**:
 - Issue: "Reinventing existing UI component: ad-hoc <description> used instead of shared `<Component />` from `@/shared/components/`."
 
-### 4. Backend Guidelines (.NET 10 / EF Core)
+### 5. Backend Guidelines (.NET 10 / EF Core)
 - **Clean Usings**: No inline fully-qualified namespace paths. `using` statements belong at the top.
 - **Repository Scope**: `IRepository` and `IUnitOfWork` are strictly prohibited in composite, calculating, or reporting services; only primary domain services may use them.
 - **Read Queries**: Read-only queries must use `.AsNoTracking()`.
 
-### 5. ESLint Execution
+### 6. ESLint Execution
 - When client changes are present and linting is requested:
   - **NEVER run full `npm run lint` (which runs `eslint .`) for `Scope: diff`** — scanning the entire repository wastes minutes.
   - **Always run targeted/scoped ESLint**:
