@@ -2,6 +2,8 @@ import React from 'react';
 import { Box, Flex, NativeSelect } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
+import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEntity';
+import BaseSelect from '@/shared/components/BaseSelect/BaseSelect';
 import { FilterBarSearch } from '@/shared/components/FilterBar';
 import PeriodPicker from '@/pages/Transactions/components/PeriodPicker/PeriodPicker';
 import SwitchButton from '@/shared/components/SwitchButton/SwitchButton';
@@ -16,9 +18,12 @@ interface Props {
     onTypeFilterChange: (mode: TypeFilterMode) => void;
     selectedAccountId: string;
     onAccountFilterChange: (accountId: string) => void;
+    selectedTransactionTypeId: string;
+    onTransactionTypeFilterChange: (transactionTypeId: string) => void;
     showSystem: boolean;
     onShowSystemChange: (show: boolean) => void;
     accounts: AccountEntity[];
+    transactionTypes: TransactionTypeEntity[];
     year: number;
     month?: number | null;
     onPageSwitched: (month: number | null, year: number) => void;
@@ -31,14 +36,25 @@ export const TransactionFilterBar: React.FC<Props> = ({
     onTypeFilterChange,
     selectedAccountId,
     onAccountFilterChange,
+    selectedTransactionTypeId,
+    onTransactionTypeFilterChange,
     showSystem,
     onShowSystemChange,
     accounts,
+    transactionTypes,
     year,
     month,
     onPageSwitched,
 }) => {
     const { t } = useTranslation();
+
+    const selectedAccount = React.useMemo(() => {
+        return accounts.find((account) => account.id === selectedAccountId) ?? null;
+    }, [accounts, selectedAccountId]);
+
+    const selectedTransactionType = React.useMemo(() => {
+        return transactionTypes.find((typeItem) => typeItem.id === selectedTransactionTypeId) ?? null;
+    }, [transactionTypes, selectedTransactionTypeId]);
 
     return (
         <Box
@@ -84,28 +100,39 @@ export const TransactionFilterBar: React.FC<Props> = ({
                     </NativeSelect.Root>
                 </Box>
 
-                {/* 4. Account Select Filter */}
-                <Box minW="150px">
-                    <NativeSelect.Root size="sm">
-                        <NativeSelect.Field
-                            value={selectedAccountId}
-                            onChange={(event) => onAccountFilterChange(event.target.value)}
-                            backgroundColor="background_primary"
-                            borderColor="border_primary"
-                            color="text_primary"
-                        >
-                            <option value="">{t('filter_all_accounts')}</option>
-                            {accounts.map((account) => (
-                                <option key={account.id} value={account.id}>
-                                    {account.name}
-                                </option>
-                            ))}
-                        </NativeSelect.Field>
-                        <NativeSelect.Indicator />
-                    </NativeSelect.Root>
+                {/* 4. Account Select Filter with Search */}
+                <Box minW="180px" maxW="240px">
+                    <BaseSelect<AccountEntity, true>
+                        size="sm"
+                        placeholder={t('filter_all_accounts')}
+                        collection={accounts}
+                        selectedValue={selectedAccount}
+                        labelSelector={(account) => `${account.name} (${account.currency.name})`}
+                        valueSelector={(account) => account.id}
+                        isOptionVisible={(account) => account.active}
+                        isClearable={true}
+                        isSearchable={true}
+                        onSelected={(account) => onAccountFilterChange(account?.id ?? '')}
+                    />
                 </Box>
 
-                {/* 5. Show System Switch */}
+                {/* 5. Transaction Type Filter with Search */}
+                <Box minW="180px" maxW="240px">
+                    <BaseSelect<TransactionTypeEntity, true>
+                        size="sm"
+                        placeholder={t('filter_all_transaction_types')}
+                        collection={transactionTypes}
+                        selectedValue={selectedTransactionType}
+                        labelSelector={(typeItem) => typeItem.name}
+                        valueSelector={(typeItem) => typeItem.id}
+                        isOptionVisible={(typeItem) => typeItem.active}
+                        isClearable={true}
+                        isSearchable={true}
+                        onSelected={(typeItem) => onTransactionTypeFilterChange(typeItem?.id ?? '')}
+                    />
+                </Box>
+
+                {/* 6. Show System Switch */}
                 <SwitchButton
                     active={showSystem}
                     onSwitch={onShowSystemChange}

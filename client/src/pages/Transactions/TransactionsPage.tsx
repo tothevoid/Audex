@@ -25,6 +25,7 @@ import { EditableGridDiff } from "@/shared/hooks/useEditableGrid";
 import { OutOfPeriodWarningModal } from "./components/TransactionTableGrid/components/OutOfPeriodWarningModal";
 import { getOutOfPeriodItems, OutOfPeriodItem } from "./components/TransactionTableGrid/types";
 import { useAccounts } from "@/shared/hooks/queries/useAccounts";
+import { useTransactionTypes } from "@/shared/hooks/queries/useTransactionTypes";
 
 const STORAGE_KEY_TRANSACTIONS_ANALYTICS_OPEN = 'audex_transactions_analytics_open';
 const STORAGE_KEY_TABLE_ANALYTICS_LEGACY = 'audex_transactions_table_analytics_open';
@@ -32,6 +33,7 @@ const STORAGE_KEY_TABLE_ANALYTICS_LEGACY = 'audex_transactions_table_analytics_o
 const TransactionsPage: React.FC = () => {
     const { t, i18n } = useTranslation();
     const { data: accounts = [] } = useAccounts();
+    const { data: transactionTypes = [] } = useTransactionTypes();
 
     const [isAnalyticsOpen, setIsAnalyticsOpen] = useState<boolean>(() => {
         try {
@@ -227,9 +229,12 @@ const TransactionsPage: React.FC = () => {
                 onTypeFilterChange={setTypeFilter}
                 selectedAccountId={selectedAccountId}
                 onAccountFilterChange={setSelectedAccountId}
+                selectedTransactionTypeId={selectedCategoryId}
+                onTransactionTypeFilterChange={setSelectedCategoryId}
                 showSystem={params.showSystem}
                 onShowSystemChange={onShowSystemSwitched}
                 accounts={accounts}
+                transactionTypes={transactionTypes}
             />
 
             {/* Monthly KPI Metrics Header (corresponds to selected month) */}

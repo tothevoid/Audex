@@ -54,6 +54,7 @@
     "filter_income_only": "Только доходы",
     "filter_expense_only": "Только расходы",
     "filter_all_accounts": "Все счета",
+    "filter_all_transaction_types": "Все типы транзакций",
     "filter_active": "Активно",
     "filter_no_category": "Без категории",
     "filter_whole_year": "Весь {{year}} год",

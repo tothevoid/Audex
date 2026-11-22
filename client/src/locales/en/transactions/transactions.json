@@ -54,6 +54,7 @@
     "filter_income_only": "Income only",
     "filter_expense_only": "Expenses only",
     "filter_all_accounts": "All accounts",
+    "filter_all_transaction_types": "All transaction types",
     "filter_active": "Active",
     "filter_no_category": "No category",
     "filter_whole_year": "Whole year {{year}}",
