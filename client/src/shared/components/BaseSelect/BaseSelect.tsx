@@ -1,6 +1,8 @@
 import { ChakraStylesConfig, Select, SizeProp } from "chakra-react-select";
+import { createFilter } from "react-select";
 import { SystemStyleObject } from "@chakra-ui/react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 const DEFAULT_MAX_VISIBLE_ROWS = 7;
 const OPTION_ROW_HEIGHT = 36;
@@ -16,6 +18,7 @@ export interface BaseSelectProps<T, IsClearable extends boolean = false> {
     valueSelector: (item: T) => string | number;
     onSelected: (item: ValueType<T, IsClearable>) => void;
     isDisabled?: boolean;
+    isOptionVisible?: (item: T) => boolean;
     isClearable?: IsClearable;
     isSearchable?: boolean;
     maxRows?: number;
@@ -46,13 +49,20 @@ const defaultSelectChakraStyles: ChakraStylesConfig = {
         minHeight: `${OPTION_ROW_HEIGHT}px`,
         display: "flex",
         alignItems: "center",
-        cursor: "pointer",
-        color: state.isSelected ? "white" : "text_primary",
-        backgroundColor: state.isSelected
-            ? "action_primary"
-            : state.isFocused
-                ? "background_secondary"
-                : "background_primary",
+        cursor: state.isDisabled ? "not-allowed" : "pointer",
+        opacity: state.isDisabled ? 0.45 : 1,
+        color: state.isDisabled
+            ? "text_secondary"
+            : state.isSelected
+                ? "white"
+                : "text_primary",
+        backgroundColor: state.isDisabled
+            ? "transparent"
+            : state.isSelected
+                ? "action_primary"
+                : state.isFocused
+                    ? "background_secondary"
+                    : "background_primary",
     }),
     singleValue: (provided, state) => ({
         ...provided,
@@ -85,6 +95,7 @@ const BaseSelect = <T, IsClearable extends boolean = false>({
     labelSelector,
     valueSelector,
     isDisabled,
+    isOptionVisible,
     isClearable = false as IsClearable,
     isSearchable = true,
     maxRows = DEFAULT_MAX_VISIBLE_ROWS,
@@ -93,6 +104,8 @@ const BaseSelect = <T, IsClearable extends boolean = false>({
     menuPortalTarget,
     chakraStyles: customChakraStyles,
 }: BaseSelectProps<T, IsClearable>) => {
+    const { t } = useTranslation();
+
     const chakraStyles = useMemo(() => {
         const baseMenuListHeight = `${maxRows * OPTION_ROW_HEIGHT + MENU_VERTICAL_PADDING}px`;
 
@@ -128,13 +141,33 @@ const BaseSelect = <T, IsClearable extends boolean = false>({
         return collection.find((item) => String(valueSelector(item)) === targetValue) ?? null;
     }, [collection, selectedValue, valueSelector]);
 
+    const reactSelectFilter = useMemo(() => {
+        const defaultFilter = createFilter<T>();
+
+        return (candidate: { data: T; label: string; value: string }, rawInput: string) => {
+            if (isOptionVisible && !isOptionVisible(candidate.data)) {
+                return false;
+            }
+            return defaultFilter(candidate, rawInput);
+        };
+    }, [isOptionVisible]);
+
+    const resolvedLabelSelector = useCallback((item: T): string => {
+        const baseLabel = labelSelector(item);
+        if (isOptionVisible && !isOptionVisible(item)) {
+            return `${baseLabel} (${t("entity_account_inactive_suffix")})`;
+        }
+        return baseLabel;
+    }, [labelSelector, isOptionVisible, t]);
+
     return (
         <Select<T, false>
             size={size}
             isDisabled={isDisabled}
+            filterOption={reactSelectFilter}
             isSearchable={isSearchable}
             chakraStyles={chakraStyles as ChakraStylesConfig<T, false>}
-            getOptionLabel={labelSelector}
+            getOptionLabel={resolvedLabelSelector}
             getOptionValue={(item) => String(valueSelector(item))}
             options={collection as T[]}
             value={resolvedSelectedValue}

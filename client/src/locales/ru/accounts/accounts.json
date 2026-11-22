@@ -10,6 +10,7 @@
     "entity_account_name": "Название",
     "entity_account_balance": "Баланс",
     "entity_account_active": "Активен",
+    "entity_account_inactive_suffix": "архив",
     "entity_account_created_on": "Дата создания",
     "account_delete_title": "Удалить счёт",
 

@@ -17,12 +17,6 @@ export const getAccounts = async (config: AccountGetAllConfig = {}): Promise<Acc
 		.then((accountResponses: AccountEntityResponse[]) => accountResponses.map(prepareAccount));
 };
 
-export const getAccountsByTypes = async (typesIds: string[], onlyActive: boolean = false): Promise<AccountEntity[]> =>  {
-	return await getAllEntitiesByConfig<unknown, AccountEntityResponse>(`${basicUrl}/GetAllByTypes`, 
-		{onlyActive, typesIds})
-		.then((accountResponses: AccountEntityResponse[]) => accountResponses.map(prepareAccount));
-};
-
 export const createAccount = async (newAccount: AccountEntity): Promise<string | void> => {
 	const createdEntity = await createEntity<AccountEntityRequest, AccountEntityResponse>(basicUrl, prepareAccountRequest(newAccount));
 	return createdEntity?.id;

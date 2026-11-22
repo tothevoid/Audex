@@ -31,13 +31,6 @@ namespace Audex.WebApi.Controllers.Accounts
             return _mapper.Map(accounts);
         }
 
-        [HttpPost("GetAllByTypes")]
-        public async Task<IEnumerable<AccountModel>> GetAllByTypes(AccountGetAllByTypesConfig getAllConfig)
-        {
-            var accounts = await _accountService.GetAllByTypesAsync(getAllConfig.TypesIds, getAllConfig.OnlyActive);
-            return _mapper.Map(accounts);
-        }
-
         [HttpPut]
         public async Task<Guid> Add(AccountModel account)
         {

@@ -9,7 +9,7 @@ import CollectionSelect from '@/shared/components/CollectionSelect/CollectionSel
 import DateSelect from '@/shared/components/DateSelect/DateSelect';
 import MoneyInput from '@/shared/components/MoneyInput/MoneyInput';
 import { CurrencyTransactionFormInput, getCurrencyTransactionValidationSchema } from './CurrencyTransactionValidationSchema';
-import { getAccounts } from '@/api/accounts/accountApi';
+import { useAccounts } from '@/shared/hooks/queries/useAccounts';
 import { CurrencyTransactionEntity } from '@/models/transactions/CurrencyTransactionEntity';
 import { generateGuid } from '@/shared/utilities/idUtilities';
 import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
@@ -31,6 +31,7 @@ const CurrencyTransactionForm: React.FC<Props> = ({
     onCurrencyTransactionSaved
 }: Props) => {
     const { t } = useTranslation();
+    const { data: accounts = [] } = useAccounts();
 
     const getDefaultTransactionFormState = useCallback(() => {
         const initialAmount = currencyTransaction?.amount ?? 0;
@@ -64,7 +65,6 @@ const CurrencyTransactionForm: React.FC<Props> = ({
 
     const [previousTransactionId, setPreviousTransactionId] = useState(currencyTransaction?.id);
     const [isCustomName, setIsCustomName] = useState<boolean>(Boolean(currencyTransaction?.name));
-    const [accounts, setAccounts] = useState<AccountEntity[]>([]);
 
     if (currencyTransaction?.id !== previousTransactionId) {
         setPreviousTransactionId(currencyTransaction?.id);
@@ -74,20 +74,6 @@ const CurrencyTransactionForm: React.FC<Props> = ({
     useEffect(() => {
         reset(getDefaultTransactionFormState());
     }, [currencyTransaction, reset, getDefaultTransactionFormState]);
-
-    useEffect(() => {
-        let isMounted = true;
-        const fetchAccounts = async () => {
-            const activeAccounts = await getAccounts({ onlyActive: true });
-            if (isMounted) {
-                setAccounts(activeAccounts);
-            }
-        };
-        fetchAccounts();
-        return () => {
-            isMounted = false;
-        };
-    }, []);
 
     const onCurrencyTransactionSaveClick = useCallback(async (formInput: CurrencyTransactionFormInput) => {
         const formData: CurrencyTransactionEntity = {
@@ -207,8 +193,9 @@ const CurrencyTransactionForm: React.FC<Props> = ({
                                 control={control}
                                 placeholder={t("entity_currency_transaction_source_account_placeholder")}
                                 collection={isCurrentAccountSource ? accounts : (currentAccount ? availableLinkedAccounts : availableSourceAccounts)}
-                                labelSelector={(account => account.name)}
-                                valueSelector={(account => account.id)}
+                                labelSelector={(accountItem) => accountItem.name}
+                                valueSelector={(accountItem => accountItem.id)}
+                                isOptionVisible={(accountItem) => accountItem.active}
                                 isDisabled={isCurrentAccountSource}
                             />
                             <Field.ErrorText>{errors.sourceAccount?.message}</Field.ErrorText>
@@ -248,8 +235,9 @@ const CurrencyTransactionForm: React.FC<Props> = ({
                                 control={control}
                                 placeholder={t("entity_currency_transaction_destination_account_placeholder")}
                                 collection={isCurrentAccountDest ? accounts : (currentAccount ? availableLinkedAccounts : availableDestAccounts)}
-                                labelSelector={(account => account.name)}
-                                valueSelector={(account => account.id)}
+                                labelSelector={(accountItem) => accountItem.name}
+                                valueSelector={(accountItem => accountItem.id)}
+                                isOptionVisible={(accountItem) => accountItem.active}
                                 isDisabled={isCurrentAccountDest}
                             />
                             <Field.ErrorText>{errors.destinationAccount?.message}</Field.ErrorText>

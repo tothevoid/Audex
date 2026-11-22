@@ -2,7 +2,6 @@ import React, { useCallback, useMemo } from 'react';
 import { Box, Flex, Skeleton, Text, VStack } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { TransactionEntity } from '@/models/transactions/TransactionEntity';
-import { AccountEntity } from '@/models/accounts/AccountEntity';
 import Transaction from '@/pages/Transactions/components/Transaction/Transaction';
 import { formatDate } from '@/shared/utilities/formatters/dateFormatter';
 import { formatMoneyByCurrencyCulture } from '@/shared/utilities/formatters/moneyFormatter';
@@ -12,7 +11,6 @@ import { useUserProfile } from '@/features/UserProfileSettingsModal/hooks/UserPr
 
 export interface TransactionCardsViewProps {
     transactions: TransactionEntity[];
-    accounts: AccountEntity[];
     isLoading: boolean;
     year: number;
     month?: number | null;
@@ -23,7 +21,6 @@ export interface TransactionCardsViewProps {
 
 const TransactionCardsView: React.FC<TransactionCardsViewProps> = ({
     transactions,
-    accounts,
     isLoading,
     year,
     month,
@@ -96,7 +93,6 @@ const TransactionCardsView: React.FC<TransactionCardsViewProps> = ({
                                 onUpdateClicked={onEditClicked}
                                 onDeleteClicked={onDeleteClicked}
                                 onDuplicateClicked={onDuplicateClicked}
-                                accounts={accounts}
                             />
                         ))}
                     </Box>

@@ -1,10 +1,8 @@
-import React, { RefObject, useEffect, useState } from 'react';
+import React, { RefObject, useState } from 'react';
 import { Tabs } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
-import { AccountEntity } from '@/models/accounts/AccountEntity';
 import BaseFormModal from '@/shared/modals/BaseFormModal/BaseFormModal';
 import { BaseModalRef } from '@/shared/utilities/modalUtilities';
-import { getAccounts } from '@/api/accounts/accountApi';
 import CurrencyTransactionForm from '@/pages/Transactions/components/CurrencyTransactionForm/CurrencyTransactionForm';
 import TransactionForm from '@/pages/Transactions/components/TransactionForm/TransactionForm';
 import { TransactionEntity } from '@/models/transactions/TransactionEntity';
@@ -22,7 +20,6 @@ interface ModalProps {
 }
 
 interface State {
-    accounts: AccountEntity[],
     activeFormHandler?: React.FormEventHandler
 }
 
@@ -33,21 +30,7 @@ const NewTransactionModal: React.FC<ModalProps> = ({
 }: ModalProps) => {
     const { t } = useTranslation();
 
-    const [state, setState] = useState<State>({ accounts: [] });
-
-    useEffect(() => {
-        let isMounted = true;
-        const initAccounts = async () => {
-            const accounts = await getAccounts({ onlyActive: true });
-            if (isMounted) {
-                setState((currentState) => ({ ...currentState, accounts }));
-            }
-        };
-        initAccounts();
-        return () => {
-            isMounted = false;
-        };
-    }, []);
+    const [state, setState] = useState<State>({});
 
     const setSubmitHandler: SetSubmitHandler = <T extends FieldValues>(submit: UseFormHandleSubmit<T>, handler: (data: T) => Promise<void>) => {
         const wrappedHandler = async (data: T) => {

@@ -5,6 +5,7 @@ import { TransactionEntity } from '@/models/transactions/TransactionEntity';
 import { generateGuid } from '@/shared/utilities/idUtilities';
 import { findEntityById } from '@/shared/utilities/arrayUtilities';
 import { EditableGridDiff, useEditableGrid } from '@/shared/hooks/useEditableGrid';
+import { useAccounts } from '@/shared/hooks/queries/useAccounts';
 import { EditableTransactionRow, isTransactionRowValid, TransactionTableGridProps } from './types';
 import {
     TransactionTableActionBar,
@@ -13,7 +14,6 @@ import {
 
 export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
     transactions,
-    accounts,
     transactionTypes,
     selectedAccountId,
     selectedCategoryId,
@@ -26,6 +26,7 @@ export const TransactionTableGrid: React.FC<TransactionTableGridProps> = ({
     onToggleAnalytics,
 }) => {
     const { t } = useTranslation();
+    const { data: accounts = [] } = useAccounts();
 
     const createTransactionRow = useCallback((): EditableTransactionRow => {
         const defaultAccount = selectedAccountId

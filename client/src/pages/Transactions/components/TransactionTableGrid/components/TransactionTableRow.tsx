@@ -235,6 +235,7 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
                                     selectedValue={row.transactionType}
                                     labelSelector={(transactionTypeItem) => transactionTypeItem.name}
                                     valueSelector={(transactionTypeItem) => transactionTypeItem.id}
+                                    isOptionVisible={(transactionTypeItem) => transactionTypeItem.active}
                                     onSelected={(newType) => {
                                         if (newType) {
                                             handleFieldChange({ transactionType: newType });
@@ -272,6 +273,7 @@ export const TransactionTableRow: React.FC<TransactionTableRowProps> = React.mem
                                     selectedValue={row.account}
                                     labelSelector={(accountItem) => `${accountItem.name} (${accountItem.currency.name})`}
                                     valueSelector={(accountItem) => accountItem.id}
+                                    isOptionVisible={(accountItem) => accountItem.active}
                                     onSelected={(newAccount) => {
                                         if (newAccount) {
                                             handleFieldChange({ account: newAccount });

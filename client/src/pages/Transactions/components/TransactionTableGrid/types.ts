@@ -88,7 +88,6 @@ export interface OutOfPeriodItem {
 
 export interface TransactionTableGridProps {
     transactions: TransactionEntity[];
-    accounts: AccountEntity[];
     transactionTypes: TransactionTypeEntity[];
     selectedAccountId?: string;
     selectedCategoryId?: string;

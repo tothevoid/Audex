@@ -4,8 +4,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
-import { getAccounts } from "@/api/accounts/accountApi";
-import { AccountEntity } from "@/models/accounts/AccountEntity";
+import { useActiveAccounts } from "@/shared/hooks/queries/useAccounts";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import { useTranslation } from "react-i18next";
 import { BrokerAccountFundTransferEntity } from "@/models/brokers/BrokerAccountFundTransfer";
@@ -44,7 +43,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = ({
     context,
     modalRef
 }: ModalProps) => {
-    const [accounts, setAccounts] = useState<AccountEntity[]>([]);
+    const { data: accounts = [] } = useActiveAccounts();
     const [brokerAccounts, setBrokerAccounts] = useState<BrokerAccountEntity[]>([]);
 
     const { t } = useTranslation();
@@ -56,7 +55,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = ({
         ],
         [t]
     );
-    
+
     const getDefaultValues = useCallback(() => {
         if ("brokerAccountFundTransfer" in context) {
             const transfer = context.brokerAccountFundTransfer;
@@ -85,20 +84,10 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = ({
         let isMounted = true;
         const fetchData = async () => {
             if (isGlobalBrokerAccount) {
-                const [fetchedAccounts, fetchedBrokerAccounts] = await Promise.all([
-                    getAccounts({ onlyActive: true }),
-                    getBrokerAccounts()
-                ]);
+                const fetchedBrokerAccounts = await getBrokerAccounts();
 
                 if (isMounted) {
-                    setAccounts(fetchedAccounts);
                     setBrokerAccounts(fetchedBrokerAccounts);
-                }
-            } else {
-                const fetchedAccounts = await getAccounts({ onlyActive: true });
-
-                if (isMounted) {
-                    setAccounts(fetchedAccounts);
                 }
             }
         };
@@ -116,7 +105,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = ({
         defaultValues: getDefaultValues()
     });
 
-    const incomeValue = useWatch({ control, name: "income" }); 
+    const incomeValue = useWatch({ control, name: "income" });
     const selectedBrokerAccount = useWatch({ control, name: "brokerAccount" });
     const selectedAccount = useWatch({ control, name: "account" });
     const transferCurrency = brokerAccounts.find(brokerAccount => brokerAccount.id === selectedBrokerAccount?.id)?.currency?.name ?? accounts.find(account => account.id === selectedAccount?.id)?.currency?.name ?? '';
@@ -127,7 +116,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = ({
     }, [reset, getDefaultValues, context]);
 
     const onSubmit = async (formData: BrokerAccountFundTransferFormInput) => {
-        const transfer = {...formData, income: formData.income.value} as BrokerAccountFundTransferEntity;
+        const transfer = { ...formData, income: formData.income.value } as BrokerAccountFundTransferEntity;
         await onSaved(transfer);
         modalRef.current?.closeModal();
     };
@@ -147,7 +136,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = ({
     return (
         <BaseFormModal ref={modalRef} title={t("broker_account_transfer_modal_title")}
             visibilityChanged={onModalVisibilityChanged}
-            submitHandler={handleFormSubmit} 
+            submitHandler={handleFormSubmit}
             saveButtonTitle={t("broker_account_transfer_modal_transfer_button")}>
             {
                 isGlobalBrokerAccount &&
@@ -178,7 +167,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = ({
             </Field.Root>
             <Field.Root invalid={!!errors.date} mt={4}>
                 <Field.Label>{t("broker_account_transfer_modal_date")}</Field.Label>
-                <DateSelect name="date" control={control} isDateTime={true}/>
+                <DateSelect name="date" control={control} isDateTime={true} />
                 <Field.ErrorText>{errors.date?.message}</Field.ErrorText>
             </Field.Root>
             <Field.Root mt={4} invalid={!!errors.amount}>

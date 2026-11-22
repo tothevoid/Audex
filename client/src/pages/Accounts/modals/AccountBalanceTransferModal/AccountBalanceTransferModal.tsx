@@ -1,25 +1,22 @@
 import { Field } from "@chakra-ui/react";
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
+import React, { RefObject, useCallback, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountBalanceTransferFormInput, getAccountBalanceTransferValidationSchema } from "./AccountBalanceTransferModalValidationSchema";
 import { useTranslation } from "react-i18next";
-import { getAccounts, transferBalance } from "@/api/accounts/accountApi";
+import { useActiveAccounts, useTransferBalanceMutation } from "@/shared/hooks/queries/useAccounts";
 import { AccountEntity } from "@/models/accounts/AccountEntity";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 
 interface ModalProps {
 	modalRef: RefObject<BaseModalRef | null>,
 	from?: AccountEntity | null,
 	onTransferred: () => void;
 };
-
-type State = {
-	accounts: AccountEntity[]
-}
 
 export type Transfer = {
 	from: AccountEntity,
@@ -33,21 +30,8 @@ const AccountBalanceTransferModal: React.FC<ModalProps> = ({
 	from,
 	onTransferred
 }: ModalProps) => {
-	const [state, setState] = useState<State>({accounts: []});
-	
-	useEffect(() => {
-		let isMounted = true;
-		const initData = async () => {
-			const accounts = await getAccounts();
-			if (isMounted) {
-				setState({ accounts });
-			}
-		};
-		initData();
-		return () => {
-			isMounted = false;
-		};
-	}, []);
+	const { data: accounts = [] } = useActiveAccounts();
+	const transferBalanceMutation = useTransferBalanceMutation();
 
 	const getFormDefaultValues = useCallback(() => {
 		return {
@@ -68,7 +52,8 @@ const AccountBalanceTransferModal: React.FC<ModalProps> = ({
 	});
 
 	const fromAccount = useWatch({ control, name: "from" });
-	const fromCurrency = state.accounts.find(account => account.id === fromAccount?.id)?.currency?.name ?? from?.currency?.name ?? '';
+	const selectedSourceAccount = findEntityById(accounts, fromAccount?.id, from);
+	const fromCurrency = selectedSourceAccount?.currency.name ?? "";
 
 	useEffect(() => {
 		reset(getFormDefaultValues());
@@ -76,7 +61,7 @@ const AccountBalanceTransferModal: React.FC<ModalProps> = ({
 
 	const onSubmit = async (transfer: AccountBalanceTransferFormInput) => {
 		const formData = transfer as unknown as Transfer;
-		await transferBalance(formData);
+		await transferBalanceMutation.mutateAsync(formData);
 		
 		onTransferred();
 		modalRef?.current?.closeModal();
@@ -90,7 +75,7 @@ const AccountBalanceTransferModal: React.FC<ModalProps> = ({
 		<Field.Root mt={4} invalid={!!errors.from}>
 			<Field.Label>{t("account_balance_transfer_modal_from")}</Field.Label>
 			<CollectionSelect name="from" control={control} placeholder="Select sender account"
-				collection={state.accounts} 
+				collection={accounts} 
 				labelSelector={(account => account.name)} 
 				valueSelector={(account => account.id)}/>
 			<Field.ErrorText>{errors.from?.message}</Field.ErrorText>
@@ -98,7 +83,7 @@ const AccountBalanceTransferModal: React.FC<ModalProps> = ({
 		<Field.Root mt={4} invalid={!!errors.to}>
 			<Field.Label>{t("account_balance_transfer_modal_to")}</Field.Label>
 			<CollectionSelect name="to" control={control} placeholder="Select recepient account"
-				collection={state.accounts} 
+				collection={accounts} 
 				labelSelector={(account => account.name)} 
 				valueSelector={(account => account.id)}/>
 			<Field.ErrorText>{errors.to?.message}</Field.ErrorText>

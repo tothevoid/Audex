@@ -1,5 +1,4 @@
 import React from 'react';
-import { AccountEntity } from '@/models/accounts/AccountEntity';
 import { MdOutlinePayment } from 'react-icons/md';
 import { Badge, Box, Flex, HStack, Text } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +12,6 @@ import { useUserProfile } from '@/features/UserProfileSettingsModal/hooks/UserPr
 
 interface Props {
     transaction: TransactionEntity;
-    accounts: AccountEntity[];
     onUpdateClicked: (updatedTransaction: TransactionEntity) => void;
     onDeleteClicked: (transaction: TransactionEntity) => void;
     onDuplicateClicked?: (transaction: TransactionEntity) => void;

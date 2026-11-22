@@ -9,6 +9,7 @@ interface Props<T, TFieldValues extends FieldValues = FieldValues, IsClearable e
     labelSelector: (item: T) => string;
     valueSelector: (item: T) => string | number;
     isDisabled?: boolean;
+    isOptionVisible?: (item: T) => boolean;
     isClearable?: IsClearable;
     isSearchable?: boolean;
     maxRows?: number;
@@ -26,6 +27,7 @@ const CollectionSelect = <
     labelSelector,
     valueSelector,
     isDisabled,
+    isOptionVisible,
     isClearable = true as IsClearable,
     isSearchable = true,
     maxRows,
@@ -43,6 +45,7 @@ const CollectionSelect = <
                     valueSelector={valueSelector}
                     onSelected={(value) => field.onChange(value)}
                     isDisabled={isDisabled}
+                    isOptionVisible={isOptionVisible}
                     isClearable={isClearable}
                     isSearchable={isSearchable}
                     maxRows={maxRows}

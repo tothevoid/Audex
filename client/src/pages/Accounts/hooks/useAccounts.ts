@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 import { AccountEntity } from "@/models/accounts/AccountEntity";
 import { createAccount, getAccounts, updateAccount, deleteAccount } from "@/api/accounts/accountApi";
 import { parseErrorMessage } from "@/shared/utilities/webApiUtilities";
 import { notify } from "@/shared/components/Toaster";
+import { queryKeys } from "@/shared/constants/queryKeys";
 
 export interface AccountsQuery {
 	onlyActive: boolean;
@@ -13,6 +15,7 @@ export interface AccountsQuery {
 
 export const useAccounts = (queryParameters: AccountsQuery) => {
 	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 	const [accounts, setAccounts] = useState<AccountEntity[]>([]);
 	const [isAccountsLoading, setLoading] = useState(false);
 
@@ -59,6 +62,7 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 			return;
 		}
 
+		queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
 		reloadAccounts();
 		notify.success(
 			t("accounts_toast_created_title"),
@@ -76,6 +80,7 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 			return;
 		}
 
+		queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
 		reloadAccounts();
 		notify.success(
 			t("accounts_toast_updated_title"),
@@ -93,6 +98,7 @@ export const useAccounts = (queryParameters: AccountsQuery) => {
 			return;
 		}
 
+		queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
 		reloadAccounts();
 		notify.success(
 			t("accounts_toast_deleted_title"),

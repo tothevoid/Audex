@@ -2,13 +2,11 @@ import "./TransactionsPage.scss";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Grid, GridItem } from '@chakra-ui/react';
-import { AccountEntity } from '@/models/accounts/AccountEntity';
 import TransactionSummaryHeader from './components/TransactionSummaryHeader/TransactionSummaryHeader';
 import TransactionFilterBar, { TypeFilterMode, ViewDisplayMode } from './components/TransactionFilterBar/TransactionFilterBar';
 import TransactionCardsView, { TransactionCardsActionBar } from './components/TransactionCardsView';
 import TransactionTableGrid from './components/TransactionTableGrid/TransactionTableGrid';
 import TransactionStats from './components/TransactionStats/TransactionStats';
-import { getAccountsByTypes } from '@/api/accounts/accountApi';
 import { getTransactionTypes } from '@/api/transactions/transactionTypeApi';
 import { useTranslation } from 'react-i18next';
 import { TransactionEntity } from "@/models/transactions/TransactionEntity";
@@ -22,24 +20,20 @@ import { ActiveEntityMode } from "@/shared/enums/activeEntityMode";
 import TransactionModal from "./modals/TransactionModal/TransactionModal";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
-import { ACCOUNT_TYPE } from "@/shared/constants/accountType";
 import PageContainer from "@/shared/components/PageContainer/PageContainer";
 import { createCurrencyTransaction } from "@/api/transactions/currencyTransactionApi";
 import { createTransaction, updateTransaction, deleteTransaction } from "@/api/transactions/transactionApi";
 import { EditableGridDiff } from "@/shared/hooks/useEditableGrid";
 import { OutOfPeriodWarningModal } from "./components/TransactionTableGrid/components/OutOfPeriodWarningModal";
 import { getOutOfPeriodItems, OutOfPeriodItem } from "./components/TransactionTableGrid/types";
+import { useAccounts } from "@/shared/hooks/queries/useAccounts";
 
 const STORAGE_KEY_TRANSACTIONS_ANALYTICS_OPEN = 'audex_transactions_analytics_open';
 const STORAGE_KEY_TABLE_ANALYTICS_LEGACY = 'audex_transactions_table_analytics_open';
 
-interface State {
-    accounts: AccountEntity[];
-    transactionTypes: TransactionTypeEntity[];
-}
-
 const TransactionsPage: React.FC = () => {
     const { t, i18n } = useTranslation();
+    const { data: accounts = [] } = useAccounts();
 
     const [isAnalyticsOpen, setIsAnalyticsOpen] = useState<boolean>(() => {
         try {
@@ -64,7 +58,7 @@ const TransactionsPage: React.FC = () => {
         });
     }, []);
     const { confirmDelete } = useConfirm();
-    const [state, setState] = useState<State>({ accounts: [], transactionTypes: [] });
+    const [transactionTypes, setTransactionTypes] = useState<TransactionTypeEntity[]>([]);
 
     // Display & Filtering states
     const [viewDisplayMode, setViewDisplayMode] = useState<ViewDisplayMode>(() => {
@@ -102,14 +96,9 @@ const TransactionsPage: React.FC = () => {
     useEffect(() => {
         let isMounted = true;
         const initData = async () => {
-            const accounts = await getAccountsByTypes([
-                ACCOUNT_TYPE.CASH,
-                ACCOUNT_TYPE.DEBIT_CARD,
-                ACCOUNT_TYPE.CREDIT_CARD
-            ], true);
-            const transactionTypes = await getTransactionTypes(true);
+            const loadedTransactionTypes = await getTransactionTypes(false);
             if (isMounted) {
-                setState({ accounts, transactionTypes });
+                setTransactionTypes(loadedTransactionTypes);
             }
         };
         initData();
@@ -257,7 +246,7 @@ const TransactionsPage: React.FC = () => {
                 onAccountFilterChange={setSelectedAccountId}
                 showSystem={params.showSystem}
                 onShowSystemChange={onShowSystemSwitched}
-                accounts={state.accounts}
+                accounts={accounts}
             />
 
             {/* Monthly KPI Metrics Header (corresponds to selected month) */}
@@ -284,7 +273,6 @@ const TransactionsPage: React.FC = () => {
                             />
                             <TransactionCardsView
                                 transactions={filteredTransactions}
-                                accounts={state.accounts}
                                 isLoading={isTransactionsLoading}
                                 year={params.year}
                                 month={params.month}
@@ -299,8 +287,7 @@ const TransactionsPage: React.FC = () => {
                     {viewDisplayMode === 'table' && (
                         <TransactionTableGrid
                             transactions={filteredTransactions}
-                            accounts={state.accounts}
-                            transactionTypes={state.transactionTypes}
+                            transactionTypes={transactionTypes}
                             selectedAccountId={selectedAccountId}
                             selectedCategoryId={selectedCategoryId}
                             onCommitDiff={handleCommitTableDiff}
@@ -318,7 +305,7 @@ const TransactionsPage: React.FC = () => {
                 {isAnalyticsOpen && (
                     <GridItem minW={0} position="sticky" top="84px">
                         <TransactionStats
-                            accounts={state.accounts}
+                            accounts={accounts}
                             transactions={statsTransactions}
                             typeFilter={typeFilter}
                             selectedCategoryId={selectedCategoryId}

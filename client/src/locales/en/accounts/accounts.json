@@ -10,6 +10,7 @@
     "entity_account_name": "Name",
     "entity_account_balance": "Balance",
     "entity_account_active": "Active",
+    "entity_account_inactive_suffix": "archived",
     "entity_account_created_on": "Created on",
     "account_delete_title": "Delete account",
 
