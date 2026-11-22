@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Box, Button, Flex, HStack, Input, Table, Tooltip } from '@chakra-ui/react';
-import { ChakraStylesConfig } from 'chakra-react-select';
 import { NumericFormat } from 'react-number-format';
 import { useTranslation } from 'react-i18next';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
