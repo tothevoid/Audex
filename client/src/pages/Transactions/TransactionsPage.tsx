@@ -214,8 +214,6 @@ const TransactionsPage: React.FC = () => {
             <SectionHeader
                 title={t("manager_transactions_title")}
                 size="2xl"
-                onAdd={onAddTransactionClick}
-                addButtonTitle={t("manager_transactions_add_transaction")}
             />
 
             {/* Filter & Search Bar with Month Picker */}
