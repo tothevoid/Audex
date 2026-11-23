@@ -8,4 +8,7 @@ export const queryKeys = {
     transactionTypes: {
         all: ['transactionTypes'] as const,
     },
+    banks: {
+        all: ['banks'] as const,
+    },
 };

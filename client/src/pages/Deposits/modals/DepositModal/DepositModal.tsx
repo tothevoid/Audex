@@ -1,18 +1,17 @@
-import { RefObject, useCallback, useEffect, useMemo, useState } from 'react';
+import { RefObject, useCallback, useEffect, useMemo } from 'react';
 import { Field, Input, Flex } from '@chakra-ui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from "react-hook-form";
 import { getDepositValidationSchema, DepositFormInput } from "./DepositValidationSchema";
 import { useTranslation } from "react-i18next";
 import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
+import { useBanks } from "@/shared/hooks/queries/useBanks";
 import { DepositEntity } from '@/models/deposits/DepositEntity';
 import CollectionSelect from '@/shared/components/CollectionSelect/CollectionSelect';
 import DateSelect from '@/shared/components/DateSelect/DateSelect';
 import BaseFormModal from '@/shared/modals/BaseFormModal/BaseFormModal';
 import { BaseModalRef } from '@/shared/utilities/modalUtilities';
 import { generateGuid } from '@/shared/utilities/idUtilities';
-import { BankEntity } from '@/models/banks/BankEntity';
-import { getBanks } from '@/api/banks/bankApi';
 import MoneyInput from '@/shared/components/MoneyInput/MoneyInput';
 
 interface ModalProps {
@@ -21,31 +20,13 @@ interface ModalProps {
 	onSaved: (deposit: DepositEntity) => void
 }
 
-interface State {
-	banks: BankEntity[]
-}
-
 const DepositModal: React.FC<ModalProps> = ({
 	modalRef,
 	deposit,
 	onSaved
 }: ModalProps) => {
 	const { data: currencies = [] } = useCurrencies();
-	const [state, setState] = useState<State>({ banks: [] });
-
-	const initBanks = async () => {
-		const banks = await getBanks();
-		setState((currentState) => {
-			return { ...currentState, banks };
-		});
-	};
-
-	useEffect(() => {
-		const initData = async () => {
-			await initBanks();
-		};
-		initData();
-	}, []);
+	const { data: banks = [] } = useBanks();
 
 	const getDefaultFormState = useCallback(() => {
 		return {
@@ -95,7 +76,7 @@ const DepositModal: React.FC<ModalProps> = ({
 		<Field.Root mt={4} invalid={!!errors.bank}>
 			<Field.Label>{t("entity_deposit_bank")}</Field.Label>
 			<CollectionSelect name="bank" control={control} placeholder="Select bank"
-				collection={state.banks}
+				collection={banks}
 				labelSelector={(bank => bank.name)}
 				valueSelector={(bank => bank.id)} />
 			<Field.ErrorText>{errors.bank?.message}</Field.ErrorText>
