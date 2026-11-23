@@ -11,4 +11,7 @@ export const queryKeys = {
     banks: {
         all: ['banks'] as const,
     },
+    accountTypes: {
+        all: ['accountTypes'] as const,
+    },
 };

@@ -1,14 +1,13 @@
 import { Field, Input } from "@chakra-ui/react";
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
+import React, { RefObject, useCallback, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountFormInput, getAccountValidationSchema } from "./AccountValidationSchema";
 import { useTranslation } from "react-i18next";
-import { getAccountTypes } from "@/api/accounts/accountTypeApi";
 import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 import { useBanks } from "@/shared/hooks/queries/useBanks";
+import { useAccountTypes } from "@/shared/hooks/queries/useAccountTypes";
 import { AccountEntity } from "@/models/accounts/AccountEntity";
-import { AccountTypeEntity } from "@/models/accounts/AccountTypeEntity";
 import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import DateSelect from "@/shared/components/DateSelect/DateSelect";
@@ -32,21 +31,7 @@ const AccountModal: React.FC<ModalProps> = ({
 }: ModalProps) => {
 	const { data: currencies = [] } = useCurrencies();
 	const { data: banks = [] } = useBanks();
-	const [accountTypes, setAccountTypes] = useState<AccountTypeEntity[]>([]);
-
-	useEffect(() => {
-		let isMounted = true;
-		const initData = async () => {
-			const fetchedAccountTypes = await getAccountTypes();
-			if (isMounted) {
-				setAccountTypes(fetchedAccountTypes);
-			}
-		};
-		initData();
-		return () => {
-			isMounted = false;
-		};
-	}, []);
+	const { data: accountTypes = [] } = useAccountTypes();
 
 	const getFormDefaultValues = useCallback(() => {
 		return {

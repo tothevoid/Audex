@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Box, Card, NativeSelect } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { AccountCurrencySummary } from "@/models/accounts/accountsSummary";
@@ -7,9 +7,8 @@ import { getCurrencyColor, getCurrencyIcon } from "@/shared/utilities/currencyUt
 import { useColorMode } from "@/shared/context/useColorMode";
 import SectionHeader from "@/shared/components/SectionHeader";
 import FilterBlock, { FilterBlockDivider } from "@/shared/components/FilterBlock";
-import { AccountTypeEntity } from "@/models/accounts/AccountTypeEntity";
 import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
-import { getAccountTypes } from "@/api/accounts/accountTypeApi";
+import { useAccountTypes } from "@/shared/hooks/queries/useAccountTypes";
 
 interface Props {
     accountCurrencySummaries: AccountCurrencySummary[];
@@ -35,19 +34,7 @@ export const AccountsHeader: React.FC<Props> = ({
     const { t, i18n } = useTranslation();
     const { resolvedColorMode } = useColorMode();
     const { data: currencies = [] } = useCurrencies();
-    const [accountTypes, setAccountTypes] = useState<AccountTypeEntity[]>([]);
-
-    useEffect(() => {
-        const loadFilterData = async () => {
-            try {
-                const accountTypesData = await getAccountTypes();
-                setAccountTypes(accountTypesData);
-            } catch (error) {
-                console.error("Failed to load filter data for accounts", error);
-            }
-        };
-        loadFilterData();
-    }, []);
+    const { data: accountTypes = [] } = useAccountTypes();
 
     return (
         <Box mb={3}>
