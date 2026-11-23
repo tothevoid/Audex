@@ -5,14 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
 import { getBrokers } from "@/api/brokers/brokerApi";
 import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
-import { BrokerAccountTypeEntity } from "@/models/brokers/BrokerAccountTypeEntity";
 import { BrokerEntity } from "@/models/brokers/BrokerEntity";
 import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 import { useBanks } from "@/shared/hooks/queries/useBanks";
+import { useBrokerAccountTypes } from "@/shared/hooks/queries/useBrokerAccountTypes";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 import { BrokerAccountFormInput, getBrokerAccountValidationSchema } from "./BrokerAccountValidationSchema";
-import { getBrokerAccountTypes } from "@/api/brokers/brokerAccountTypeApi";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { generateGuid } from "@/shared/utilities/idUtilities";
@@ -23,11 +22,6 @@ interface ModalProps {
     onSaved: (account: BrokerAccountEntity) => void
 }
 
-interface State {
-    accountTypes: BrokerAccountTypeEntity[]
-    brokers: BrokerEntity[]
-}
-
 const BrokerAccountModal: React.FC<ModalProps> = ({
     modalRef,
     brokerAccount,
@@ -35,16 +29,13 @@ const BrokerAccountModal: React.FC<ModalProps> = ({
 }: ModalProps) => {
     const { data: currencies = [] } = useCurrencies();
     const { data: banks = [] } = useBanks();
-    const [state, setState] = useState<State>({ accountTypes: [], brokers: [] });
+    const { data: brokerAccountTypes = [] } = useBrokerAccountTypes();
+    const [brokers, setBrokers] = useState<BrokerEntity[]>([]);
 
     useEffect(() => {
         const loadData = async () => {
-            const accountTypes = await getBrokerAccountTypes();
-            const brokers = await getBrokers();
-
-            setState((currentState) => {
-                return { ...currentState, accountTypes, brokers };
-            });
+            const fetchedBrokers = await getBrokers();
+            setBrokers(fetchedBrokers);
         };
         loadData();
     }, []);
@@ -96,7 +87,7 @@ const BrokerAccountModal: React.FC<ModalProps> = ({
             <Field.Root mt={4} invalid={!!errors.type}>
                 <Field.Label>{t("entity_broker_account_type")}</Field.Label>
                 <CollectionSelect name="type" control={control} placeholder="Select account type"
-                    collection={state.accountTypes}
+                    collection={brokerAccountTypes}
                     labelSelector={(accountType => accountType.name)}
                     valueSelector={(accountType => accountType.id)} />
                 <Field.ErrorText>{errors.type?.message}</Field.ErrorText>
@@ -125,7 +116,7 @@ const BrokerAccountModal: React.FC<ModalProps> = ({
             <Field.Root mt={4} invalid={!!errors.broker}>
                 <Field.Label>{t("entity_broker_account_broker")}</Field.Label>
                 <CollectionSelect name="broker" control={control} placeholder="Select broker"
-                    collection={state.brokers}
+                    collection={brokers}
                     labelSelector={(broker => broker.name)}
                     valueSelector={(broker => broker.id)} />
                 <Field.ErrorText>{errors.broker?.message}</Field.ErrorText>

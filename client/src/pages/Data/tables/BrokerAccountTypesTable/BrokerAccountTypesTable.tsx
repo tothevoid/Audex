@@ -1,38 +1,32 @@
 import { Box, Button, Icon, Text } from "@chakra-ui/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { useConfirm } from "@/shared/hooks/useConfirm";
 import BrokerAccountTypeModal from "@/pages/Data/modals/BrokerAccountTypeModal/BrokerAccountTypeModal";
-import { createBrokerAccountType, deleteBrokerAccountType, getBrokerAccountTypes, updateBrokerAccountType } from "@/api/brokers/brokerAccountTypeApi";
 import { BrokerAccountTypeEntity } from "@/models/brokers/BrokerAccountTypeEntity";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import { notify } from "@/shared/components/Toaster";
+import {
+    useBrokerAccountTypes,
+    useCreateBrokerAccountTypeMutation,
+    useDeleteBrokerAccountTypeMutation,
+    useUpdateBrokerAccountTypeMutation,
+} from "@/shared/hooks/queries/useBrokerAccountTypes";
 
 const BrokerAccountTypesTable: React.FC = () => {
-    const [brokerAccountTypes, setBrokerAccountTypes] = useState<BrokerAccountTypeEntity[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { data: brokerAccountTypes = [], isLoading } = useBrokerAccountTypes();
+    const createBrokerAccountTypeMutation = useCreateBrokerAccountTypeMutation();
+    const updateBrokerAccountTypeMutation = useUpdateBrokerAccountTypeMutation();
+    const deleteBrokerAccountTypeMutation = useDeleteBrokerAccountTypeMutation();
+
     const [updatedBrokerAccountType, setUpdatedBrokerAccountType] = useState<BrokerAccountTypeEntity | null>(null);
     const { t } = useTranslation();
     const { confirmDelete } = useConfirm();
 
     const modalRef = useRef<BaseModalRef>(null);
-
-    useEffect(() => {
-        const initData = async () => { 
-            setIsLoading(true);
-            try {
-                const fetchedBrokerAccountTypes = await getBrokerAccountTypes();
-                setBrokerAccountTypes(fetchedBrokerAccountTypes);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        initData();
-    }, []);
 
     useEffect(() => {
         if (updatedBrokerAccountType) {
@@ -44,9 +38,9 @@ const BrokerAccountTypesTable: React.FC = () => {
         modalRef.current?.openModal();
     };
 
-    const onEditClicked = (brokerAccountType: BrokerAccountTypeEntity) => {
+    const onEditClicked = useCallback((brokerAccountType: BrokerAccountTypeEntity) => {
         setUpdatedBrokerAccountType(brokerAccountType);
-    };
+    }, []);
 
     const onModalClosed = () => {
         setUpdatedBrokerAccountType(null);
@@ -56,34 +50,31 @@ const BrokerAccountTypesTable: React.FC = () => {
         const isModified = brokerAccountTypes.some((typeItem: BrokerAccountTypeEntity) => typeItem.id === savedAccountType.id);
 
         if (isModified) {
-            await updateBrokerAccountType(savedAccountType);
-            notify.success(t("broker_account_type_toast_updated_title"), t("broker_account_type_toast_updated_desc", { name: savedAccountType.name }));
-            setBrokerAccountTypes((currentTypes) => currentTypes.map((typeItem: BrokerAccountTypeEntity) => typeItem.id === savedAccountType.id ? savedAccountType : typeItem));
-        } else {
-            const createdBrokerAccountType = await createBrokerAccountType(savedAccountType);
-            if (!createdBrokerAccountType) {
-                return;
+            const isUpdated = await updateBrokerAccountTypeMutation.mutateAsync(savedAccountType);
+            if (isUpdated) {
+                notify.success(t("broker_account_type_toast_updated_title"), t("broker_account_type_toast_updated_desc", { name: savedAccountType.name }));
             }
-            notify.success(t("broker_account_type_toast_created_title"), t("broker_account_type_toast_created_desc", { name: createdBrokerAccountType.name }));
-            setBrokerAccountTypes((currentTypes) => [...currentTypes, createdBrokerAccountType]);
+        } else {
+            const createdBrokerAccountType = await createBrokerAccountTypeMutation.mutateAsync(savedAccountType);
+            if (createdBrokerAccountType) {
+                notify.success(t("broker_account_type_toast_created_title"), t("broker_account_type_toast_created_desc", { name: createdBrokerAccountType.name }));
+            }
         }
     };
 
-    const onDeleteClicked = async (brokerAccountType: BrokerAccountTypeEntity) => {
+    const onDeleteClicked = useCallback(async (brokerAccountType: BrokerAccountTypeEntity) => {
         const confirmed = await confirmDelete(t("broker_account_types_delete_title"));
         if (!confirmed) {
             return;
         }
 
-        const isDeleted = await deleteBrokerAccountType(brokerAccountType.id);
+        const isDeleted = await deleteBrokerAccountTypeMutation.mutateAsync(brokerAccountType.id);
         if (!isDeleted) {
             return;
         }
 
         notify.success(t("broker_account_type_toast_deleted_title"), t("broker_account_type_toast_deleted_desc", { name: brokerAccountType.name }));
-
-        setBrokerAccountTypes((currentTypes) => currentTypes.filter((typeItem: BrokerAccountTypeEntity) => typeItem.id !== brokerAccountType.id));
-    };
+    }, [confirmDelete, deleteBrokerAccountTypeMutation, t]);
 
     const columns: ColumnDef<BrokerAccountTypeEntity>[] = useMemo(() => [
         {
@@ -120,7 +111,7 @@ const BrokerAccountTypesTable: React.FC = () => {
                 </Button>
             )
         }
-    ], [t]);
+    ], [onDeleteClicked, onEditClicked, t]);
 
     return <Box color="text_primary">
         <SectionHeader
