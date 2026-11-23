@@ -1,14 +1,13 @@
 import { Field, Input } from "@chakra-ui/react";
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
+import React, { RefObject, useCallback, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { getBrokers } from "@/api/brokers/brokerApi";
 import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
-import { BrokerEntity } from "@/models/brokers/BrokerEntity";
 import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 import { useBanks } from "@/shared/hooks/queries/useBanks";
 import { useBrokerAccountTypes } from "@/shared/hooks/queries/useBrokerAccountTypes";
+import { useBrokers } from "@/shared/hooks/queries/useBrokers";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 import { BrokerAccountFormInput, getBrokerAccountValidationSchema } from "./BrokerAccountValidationSchema";
@@ -30,15 +29,7 @@ const BrokerAccountModal: React.FC<ModalProps> = ({
     const { data: currencies = [] } = useCurrencies();
     const { data: banks = [] } = useBanks();
     const { data: brokerAccountTypes = [] } = useBrokerAccountTypes();
-    const [brokers, setBrokers] = useState<BrokerEntity[]>([]);
-
-    useEffect(() => {
-        const loadData = async () => {
-            const fetchedBrokers = await getBrokers();
-            setBrokers(fetchedBrokers);
-        };
-        loadData();
-    }, []);
+    const { data: brokers = [] } = useBrokers();
 
     const getFormDefaultValues = useCallback(() => {
         return {

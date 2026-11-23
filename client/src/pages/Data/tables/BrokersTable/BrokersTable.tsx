@@ -1,38 +1,32 @@
 import { Box, Button, Icon, Text } from "@chakra-ui/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { useConfirm } from "@/shared/hooks/useConfirm";
 import { BrokerEntity } from "@/models/brokers/BrokerEntity";
-import { createBroker, deleteBroker, getBrokers, updateBroker } from "@/api/brokers/brokerApi";
 import BrokerModal from "@/pages/Data/modals/BrokerModal/BrokerModal";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import { notify } from "@/shared/components/Toaster";
+import {
+    useBrokers,
+    useCreateBrokerMutation,
+    useDeleteBrokerMutation,
+    useUpdateBrokerMutation,
+} from "@/shared/hooks/queries/useBrokers";
 
 const BrokersTable: React.FC = () => {
-    const [brokers, setBrokers] = useState<BrokerEntity[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { data: brokers = [], isLoading } = useBrokers();
+    const createBrokerMutation = useCreateBrokerMutation();
+    const updateBrokerMutation = useUpdateBrokerMutation();
+    const deleteBrokerMutation = useDeleteBrokerMutation();
+
     const [updatedBroker, setUpdatedBroker] = useState<BrokerEntity | null>(null);
     const { t } = useTranslation();
     const { confirmDelete } = useConfirm();
 
     const modalRef = useRef<BaseModalRef>(null);
-
-    useEffect(() => {
-        const initData = async () => { 
-            setIsLoading(true);
-            try {
-                const fetchedBrokers = await getBrokers();
-                setBrokers(fetchedBrokers);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        initData();
-    }, []);
 
     useEffect(() => {
         if (updatedBroker) {
@@ -44,9 +38,9 @@ const BrokersTable: React.FC = () => {
         modalRef.current?.openModal();
     };
 
-    const onEditClicked = (broker: BrokerEntity) => {
+    const onEditClicked = useCallback((broker: BrokerEntity) => {
         setUpdatedBroker(broker);
-    };
+    }, []);
 
     const onModalClosed = () => {
         setUpdatedBroker(null);
@@ -56,34 +50,31 @@ const BrokersTable: React.FC = () => {
         const isModified = brokers.some((brokerItem: BrokerEntity) => brokerItem.id === savedBroker.id);
 
         if (isModified) {
-            await updateBroker(savedBroker);
-            notify.success(t("broker_toast_updated_title"), t("broker_toast_updated_desc", { name: savedBroker.name }));
-            setBrokers((currentBrokers) => currentBrokers.map((brokerItem: BrokerEntity) => brokerItem.id === savedBroker.id ? savedBroker : brokerItem));
-        } else {
-            const createdBroker = await createBroker(savedBroker);
-            if (!createdBroker) {
-                return;
+            const isUpdated = await updateBrokerMutation.mutateAsync(savedBroker);
+            if (isUpdated) {
+                notify.success(t("broker_toast_updated_title"), t("broker_toast_updated_desc", { name: savedBroker.name }));
             }
-            notify.success(t("broker_toast_created_title"), t("broker_toast_created_desc", { name: createdBroker.name }));
-            setBrokers((currentBrokers) => [...currentBrokers, createdBroker]);
+        } else {
+            const createdBroker = await createBrokerMutation.mutateAsync(savedBroker);
+            if (createdBroker) {
+                notify.success(t("broker_toast_created_title"), t("broker_toast_created_desc", { name: createdBroker.name }));
+            }
         }
     };
 
-    const onDeleteClicked = async (broker: BrokerEntity) => {
+    const onDeleteClicked = useCallback(async (broker: BrokerEntity) => {
         const confirmed = await confirmDelete(t("brokers_delete_title"));
         if (!confirmed) {
             return;
         }
 
-        const isDeleted = await deleteBroker(broker.id);
+        const isDeleted = await deleteBrokerMutation.mutateAsync(broker.id);
         if (!isDeleted) {
             return;
         }
 
         notify.success(t("broker_toast_deleted_title"), t("broker_toast_deleted_desc", { name: broker.name }));
-
-        setBrokers((currentBrokers) => currentBrokers.filter((brokerItem: BrokerEntity) => brokerItem.id !== broker.id));
-    };
+    }, [confirmDelete, deleteBrokerMutation, t]);
 
     const columns: ColumnDef<BrokerEntity>[] = useMemo(() => [
         {
@@ -120,7 +111,7 @@ const BrokersTable: React.FC = () => {
                 </Button>
             )
         }
-    ], [t]);
+    ], [onDeleteClicked, onEditClicked, t]);
 
     return <Box color="text_primary">
         <SectionHeader
