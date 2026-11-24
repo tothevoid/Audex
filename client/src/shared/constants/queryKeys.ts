@@ -8,4 +8,16 @@ export const queryKeys = {
     transactionTypes: {
         all: ['transactionTypes'] as const,
     },
+    banks: {
+        all: ['banks'] as const,
+    },
+    accountTypes: {
+        all: ['accountTypes'] as const,
+    },
+    brokerAccountTypes: {
+        all: ['brokerAccountTypes'] as const,
+    },
+    brokers: {
+        all: ['brokers'] as const,
+    },
 };

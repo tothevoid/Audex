@@ -1,11 +1,11 @@
 import { Box, Button, Icon, Text } from "@chakra-ui/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { useConfirm } from "@/shared/hooks/useConfirm";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import { Nullable } from "@/shared/utilities/nullable";
-import { createBank, deleteBank, getBankIconUrl, getBanks, updateBank } from "@/api/banks/bankApi";
+import { getBankIconUrl } from "@/api/banks/bankApi";
 import { BankEntity } from "@/models/banks/BankEntity";
 import BankModal from "@/pages/Data/modals/BankModal/BankModal";
 import { BsBank } from "react-icons/bs";
@@ -13,15 +13,18 @@ import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
 import StoredIcon from "@/shared/components/StoredIcon";
 import { notify } from "@/shared/components/Toaster";
-
-interface State {
-    banks: BankEntity[]
-}
+import {
+    useBanks,
+    useCreateBankMutation,
+    useDeleteBankMutation,
+    useUpdateBankMutation,
+} from "@/shared/hooks/queries/useBanks";
 
 const BanksTable: React.FC = () => {
-    const [state, setState] = useState<State>({
-        banks: []});
-    const [isLoading, setIsLoading] = useState(true);
+    const { data: banks = [], isLoading } = useBanks();
+    const createBankMutation = useCreateBankMutation();
+    const updateBankMutation = useUpdateBankMutation();
+    const deleteBankMutation = useDeleteBankMutation();
 
     const [updatedBank, setUpdatedBank] = useState<BankEntity | null>(null);
 
@@ -29,51 +32,26 @@ const BanksTable: React.FC = () => {
     const { confirmDelete } = useConfirm();
     const modalRef = useRef<BaseModalRef>(null);
 
-
-    useEffect(() => {
-        let isMounted = true;
-        const load = async () => {
-            setIsLoading(true);
-            try {
-                const banks = await getBanks();
-                if (isMounted) {
-                    setState((currentState) => ({ ...currentState, banks }));
-                }
-            } finally {
-                if (isMounted) {
-                    setIsLoading(false);
-                }
-            }
-        };
-
-        load();
-
-        return () => {
-            isMounted = false;
-        };
-    }, []);
-
     useEffect(() => {
         if (updatedBank) {
-            modalRef.current?.openModal(); 
+            modalRef.current?.openModal();
         }
     }, [updatedBank]);
-    
+
     const onAdd = () => {
         modalRef.current?.openModal();
     };
 
-    const onEditClicked = (bank: BankEntity) => {
+    const onEditClicked = useCallback((bank: BankEntity) => {
         setUpdatedBank(bank);
-    };
+    }, []);
 
     const onModalClosed = () => {
         setUpdatedBank(null);
     };
 
     const onBankSaved = async (savedBank: BankEntity, icon: Nullable<File>) => {
-        const isModified = state.banks
-            .findIndex(bank => bank.id === savedBank.id) >= 0;
+        const isModified = banks.some((bank) => bank.id === savedBank.id);
 
         if (isModified) {
             await onBankUpdated(savedBank, icon);
@@ -83,53 +61,36 @@ const BanksTable: React.FC = () => {
     };
 
     const onBankAdded = async (bank: BankEntity, icon: Nullable<File>) => {
-        const addedBank = await createBank(bank, icon);
+        const addedBank = await createBankMutation.mutateAsync({ bank, icon });
         if (!addedBank) {
             return;
         }
 
         notify.success(t("bank_toast_created_title"), t("bank_toast_created_desc", { name: addedBank.name }));
-
-        setState((currentState) => {
-            return {...currentState, banks: [...currentState.banks, addedBank]};
-        });
     };
 
     const onBankUpdated = async (bankToUpdate: BankEntity, icon: Nullable<File>) => {
-        const updatedBank = await updateBank(bankToUpdate, icon);
-        if (!updatedBank) {
+        const updatedResult = await updateBankMutation.mutateAsync({ bank: bankToUpdate, icon });
+        if (!updatedResult) {
             return;
         }
 
-        notify.success(t("bank_toast_updated_title"), t("bank_toast_updated_desc", { name: updatedBank.name }));
-
-        setState((currentState) => {
-            return {...currentState, banks: currentState.banks.map(bank => 
-                bankToUpdate.id !== bank.id ?
-                    bank:
-                    updatedBank
-            )};
-        });
+        notify.success(t("bank_toast_updated_title"), t("bank_toast_updated_desc", { name: updatedResult.name }));
     };
 
-    const onDeleteClicked = async (bank: BankEntity) => {
+    const onDeleteClicked = useCallback(async (bank: BankEntity) => {
         const confirmed = await confirmDelete(t("banks_delete_title"));
         if (!confirmed) {
             return;
         }
 
-        const isDeleted = await deleteBank(bank.id);
+        const isDeleted = await deleteBankMutation.mutateAsync(bank.id);
         if (!isDeleted) {
             return;
         }
 
         notify.success(t("bank_toast_deleted_title"), t("bank_toast_deleted_desc", { name: bank.name }));
-
-        setState((currentState) => ({
-            ...currentState,
-            banks: currentState.banks.filter((item: BankEntity) => item.id !== bank.id),
-        }));
-    };
+    }, [confirmDelete, deleteBankMutation, t]);
 
     const columns: ColumnDef<BankEntity>[] = useMemo(() => [
         {
@@ -156,7 +117,7 @@ const BanksTable: React.FC = () => {
                     onClick={() => onEditClicked(bank)}
                 >
                     <Icon color="card_action_icon_primary">
-                        <MdEdit/>
+                        <MdEdit />
                     </Icon>
                 </Button>
             )
@@ -171,12 +132,12 @@ const BanksTable: React.FC = () => {
                     onClick={() => onDeleteClicked(bank)}
                 >
                     <Icon color="card_action_icon_danger">
-                        <MdDelete/>
+                        <MdDelete />
                     </Icon>
                 </Button>
             )
         }
-    ], [t]);
+    ], [onDeleteClicked, onEditClicked, t]);
 
     return <Box color="text_primary">
         <SectionHeader
@@ -185,13 +146,13 @@ const BanksTable: React.FC = () => {
             addButtonTitle={t("entity_bank_add")}
         />
         <DataTable
-            data={state.banks}
+            data={banks}
             columns={columns}
             keyExtractor={(item) => item.id}
             isLoading={isLoading}
             skeletonRows={5}
         />
-        <BankModal onModalClosed={onModalClosed} bank={updatedBank} modalRef={modalRef} onSaved={onBankSaved}/>
+        <BankModal onModalClosed={onModalClosed} bank={updatedBank} modalRef={modalRef} onSaved={onBankSaved} />
     </Box>;
 };
 

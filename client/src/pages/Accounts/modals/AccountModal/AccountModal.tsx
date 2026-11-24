@@ -1,13 +1,13 @@
 import { Field, Input } from "@chakra-ui/react";
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
+import React, { RefObject, useCallback, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AccountFormInput, getAccountValidationSchema } from "./AccountValidationSchema";
 import { useTranslation } from "react-i18next";
-import { getAccountTypes } from "@/api/accounts/accountTypeApi";
 import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
+import { useBanks } from "@/shared/hooks/queries/useBanks";
+import { useAccountTypes } from "@/shared/hooks/queries/useAccountTypes";
 import { AccountEntity } from "@/models/accounts/AccountEntity";
-import { AccountTypeEntity } from "@/models/accounts/AccountTypeEntity";
 import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import DateSelect from "@/shared/components/DateSelect/DateSelect";
@@ -15,8 +15,6 @@ import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import { generateGuid } from "@/shared/utilities/idUtilities";
-import { getBanks } from "@/api/banks/bankApi";
-import { BankEntity } from "@/models/banks/BankEntity";
 import { ACCOUNT_TYPE } from "@/shared/constants/accountType";
 
 
@@ -26,35 +24,14 @@ interface ModalProps {
 	onSaved: (account: AccountEntity) => void;
 };
 
-interface State {
-	accountTypes: AccountTypeEntity[],
-	banks: BankEntity[]
-}
-
 const AccountModal: React.FC<ModalProps> = ({
 	modalRef,
 	account,
 	onSaved
 }: ModalProps) => {
 	const { data: currencies = [] } = useCurrencies();
-	const [state, setState] = useState<State>({ accountTypes: [], banks: [] });
-
-	useEffect(() => {
-		let isMounted = true;
-		const initData = async () => {
-			const [accountTypes, banks] = await Promise.all([
-				getAccountTypes(),
-				getBanks()
-			]);
-			if (isMounted) {
-				setState({ accountTypes, banks });
-			}
-		};
-		initData();
-		return () => {
-			isMounted = false;
-		};
-	}, []);
+	const { data: banks = [] } = useBanks();
+	const { data: accountTypes = [] } = useAccountTypes();
 
 	const getFormDefaultValues = useCallback(() => {
 		return {
@@ -92,7 +69,7 @@ const AccountModal: React.FC<ModalProps> = ({
 		const accountEntity = savedAccount as AccountEntity;
 
 		if (savedAccount.bank?.id) {
-			accountEntity.bank = state.banks.find(bank => bank.id === savedAccount.bank?.id);
+			accountEntity.bank = banks.find(bank => bank.id === savedAccount.bank?.id);
 		}
 
 		await onSaved(accountEntity);
@@ -112,7 +89,7 @@ const AccountModal: React.FC<ModalProps> = ({
 		<Field.Root mt={4} invalid={!!errors.accountType}>
 			<Field.Label>{t("entity_transaction_type")}</Field.Label>
 			<CollectionSelect name="accountType" control={control} placeholder="Select account type"
-				collection={state.accountTypes}
+				collection={accountTypes}
 				labelSelector={(accountType => accountType.name)}
 				valueSelector={(accountType => accountType.id)} />
 			<Field.ErrorText>{errors.accountType?.message}</Field.ErrorText>
@@ -121,7 +98,7 @@ const AccountModal: React.FC<ModalProps> = ({
 			bankFieldVisible && <Field.Root mt={4} invalid={!!errors.bank}>
 				<Field.Label>{t("entity_transaction_bank")}</Field.Label>
 				<CollectionSelect name="bank" control={control} placeholder="Select bank"
-					collection={state.banks}
+					collection={banks}
 					labelSelector={(bank => bank.name)}
 					valueSelector={(bank => bank.id)} />
 				<Field.ErrorText>{errors.bank?.message}</Field.ErrorText>

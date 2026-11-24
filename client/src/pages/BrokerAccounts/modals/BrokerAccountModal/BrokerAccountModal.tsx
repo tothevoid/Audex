@@ -1,33 +1,24 @@
 import { Field, Input } from "@chakra-ui/react";
-import React, { RefObject, useCallback, useEffect, useMemo, useState } from "react";
+import React, { RefObject, useCallback, useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { getBrokers } from "@/api/brokers/brokerApi";
 import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
-import { BrokerAccountTypeEntity } from "@/models/brokers/BrokerAccountTypeEntity";
-import { BrokerEntity } from "@/models/brokers/BrokerEntity";
 import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
+import { useBanks } from "@/shared/hooks/queries/useBanks";
+import { useBrokerAccountTypes } from "@/shared/hooks/queries/useBrokerAccountTypes";
+import { useBrokers } from "@/shared/hooks/queries/useBrokers";
 import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSelect";
 import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 import { BrokerAccountFormInput, getBrokerAccountValidationSchema } from "./BrokerAccountValidationSchema";
-import { getBrokerAccountTypes } from "@/api/brokers/brokerAccountTypeApi";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { generateGuid } from "@/shared/utilities/idUtilities";
-import { getBanks } from "@/api/banks/bankApi";
-import { BankEntity } from "@/models/banks/BankEntity";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>
     brokerAccount?: BrokerAccountEntity | null
     onSaved: (account: BrokerAccountEntity) => void
-}
-
-interface State {
-    accountTypes: BrokerAccountTypeEntity[]
-    brokers: BrokerEntity[]
-    banks: BankEntity[]
 }
 
 const BrokerAccountModal: React.FC<ModalProps> = ({
@@ -36,20 +27,9 @@ const BrokerAccountModal: React.FC<ModalProps> = ({
     onSaved
 }: ModalProps) => {
     const { data: currencies = [] } = useCurrencies();
-    const [state, setState] = useState<State>({ accountTypes: [], brokers: [], banks: [] });
-
-    useEffect(() => {
-        const loadData = async () => {
-            const accountTypes = await getBrokerAccountTypes();
-            const brokers = await getBrokers();
-            const banks = await getBanks();
-
-            setState((currentState) => {
-                return { ...currentState, accountTypes, brokers, banks };
-            });
-        };
-        loadData();
-    }, []);
+    const { data: banks = [] } = useBanks();
+    const { data: brokerAccountTypes = [] } = useBrokerAccountTypes();
+    const { data: brokers = [] } = useBrokers();
 
     const getFormDefaultValues = useCallback(() => {
         return {
@@ -98,7 +78,7 @@ const BrokerAccountModal: React.FC<ModalProps> = ({
             <Field.Root mt={4} invalid={!!errors.type}>
                 <Field.Label>{t("entity_broker_account_type")}</Field.Label>
                 <CollectionSelect name="type" control={control} placeholder="Select account type"
-                    collection={state.accountTypes}
+                    collection={brokerAccountTypes}
                     labelSelector={(accountType => accountType.name)}
                     valueSelector={(accountType => accountType.id)} />
                 <Field.ErrorText>{errors.type?.message}</Field.ErrorText>
@@ -114,7 +94,7 @@ const BrokerAccountModal: React.FC<ModalProps> = ({
             <Field.Root mt={4} invalid={!!errors.bank}>
                 <Field.Label>{t("entity_broker_account_bank")}</Field.Label>
                 <CollectionSelect name="bank" control={control} placeholder="Select bank"
-                    collection={state.banks}
+                    collection={banks}
                     labelSelector={(bank => bank.name)}
                     valueSelector={(bank => bank.id)} />
                 <Field.ErrorText>{errors.bank?.message}</Field.ErrorText>
@@ -127,7 +107,7 @@ const BrokerAccountModal: React.FC<ModalProps> = ({
             <Field.Root mt={4} invalid={!!errors.broker}>
                 <Field.Label>{t("entity_broker_account_broker")}</Field.Label>
                 <CollectionSelect name="broker" control={control} placeholder="Select broker"
-                    collection={state.brokers}
+                    collection={brokers}
                     labelSelector={(broker => broker.name)}
                     valueSelector={(broker => broker.id)} />
                 <Field.ErrorText>{errors.broker?.message}</Field.ErrorText>
