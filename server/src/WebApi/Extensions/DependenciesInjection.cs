@@ -1,18 +1,19 @@
 using System;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
-using Minio;
+using System.Net.Http;
+using System.Net.Security;
+using System.Text;
 using Audex.Application.Extensions;
 using Audex.Infrastructure.Database;
 using Audex.Infrastructure.Interfaces.DatabaseBackup;
 using Audex.Infrastructure.Services.DatabaseBackup;
 using Audex.WebApi.Mappings;
 using Audex.WebApi.Models.Common;
-using System.Net.Http;
-using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using Minio;
 
 namespace Audex.WebApi.Extensions
 {
@@ -59,7 +60,39 @@ namespace Audex.WebApi.Extensions
                     PooledConnectionLifetime = TimeSpan.FromMinutes(15),
                     KeepAlivePingDelay = TimeSpan.FromSeconds(30),
                     KeepAlivePingTimeout = TimeSpan.FromSeconds(5),
-                    EnableMultipleHttp2Connections = true
+                    EnableMultipleHttp2Connections = true,
+                    SslOptions = new SslClientAuthenticationOptions
+                    {
+                        RemoteCertificateValidationCallback = (sender, certificate, chain, sslPolicyErrors) =>
+                        {
+                            if (sslPolicyErrors == SslPolicyErrors.None)
+                            {
+                                return true;
+                            }
+
+                            // Temporary workaround: trust Russian Trusted Root CA for MOEX and CBR
+                            var targetHost = sender switch
+                            {
+                                SslStream sslStream => sslStream.TargetHostName,
+                                HttpRequestMessage requestMessage => requestMessage.RequestUri?.Host,
+                                _ => null
+                            };
+
+                            if (targetHost != null && (
+                                targetHost.Equals("iss.moex.com", StringComparison.OrdinalIgnoreCase) ||
+                                targetHost.Equals("moex.com", StringComparison.OrdinalIgnoreCase) ||
+                                targetHost.EndsWith(".moex.com", StringComparison.OrdinalIgnoreCase) ||
+                                targetHost.Equals("cbr.ru", StringComparison.OrdinalIgnoreCase) ||
+                                targetHost.EndsWith(".cbr.ru", StringComparison.OrdinalIgnoreCase) ||
+                                targetHost.Equals("cbr-xml-daily.ru", StringComparison.OrdinalIgnoreCase) ||
+                                targetHost.EndsWith(".cbr-xml-daily.ru", StringComparison.OrdinalIgnoreCase)))
+                            {
+                                return true;
+                            }
+
+                            return false;
+                        }
+                    }
                 });
 
             return services;
