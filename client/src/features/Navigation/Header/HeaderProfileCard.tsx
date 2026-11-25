@@ -32,14 +32,15 @@ export const HeaderProfileCard: React.FC<HeaderProfileCardProps> = ({
     return (
         <Popover.Positioner>
             <Popover.Content
-                width="320px"
-                maxW="90vw"
+                width={{ base: "calc(100vw - 24px)", sm: "320px" }}
+                maxW={{ base: "calc(100vw - 24px)", sm: "320px" }}
+                maxH="calc(100dvh - 80px)"
                 backgroundColor="background_secondary"
                 borderColor="border_primary"
                 borderRadius="2xl"
                 boxShadow="0 20px 45px -10px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.08)"
                 p={0}
-                overflow="hidden"
+                overflowY="auto"
                 zIndex={1500}
             >
                 <Box

@@ -39,7 +39,9 @@ export const HeaderMobileNav: React.FC<HeaderMobileNavProps> = ({ navItems }) =>
                     aria-label="Open Navigation"
                     variant="ghost"
                     color="text_primary"
-                    size="sm"
+                    size={{ base: "md", md: "sm" }}
+                    minW={{ base: "42px", md: "36px" }}
+                    h={{ base: "42px", md: "36px" }}
                     display={{ base: 'inline-flex', lg: 'none' }}
                 >
                     <LuMenu />
@@ -55,6 +57,9 @@ export const HeaderMobileNav: React.FC<HeaderMobileNavProps> = ({ navItems }) =>
                         maxW="310px"
                         display="flex"
                         flexDirection="column"
+                        pt="env(safe-area-inset-top, 0px)"
+                        pb="env(safe-area-inset-bottom, 0px)"
+                        pl="env(safe-area-inset-left, 0px)"
                     >
                         <Drawer.Header
                             display="flex"

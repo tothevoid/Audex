@@ -27,7 +27,7 @@ export const MainLayout: React.FC = () => {
 
 	return (
 		<UserProvider>
-			<Flex direction="column" minH="100vh" boxSizing="border-box">
+			<Flex direction="column" minH="100dvh" boxSizing="border-box">
 				<Box
 					as="header"
 					position="sticky"

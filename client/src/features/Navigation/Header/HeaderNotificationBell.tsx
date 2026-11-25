@@ -124,8 +124,9 @@ export const HeaderNotificationBell: React.FC = () => {
 
             <Popover.Positioner>
                 <Popover.Content
-                    width="380px"
-                    maxW="90vw"
+                    width={{ base: "calc(100vw - 24px)", sm: "380px" }}
+                    maxW={{ base: "calc(100vw - 24px)", sm: "380px" }}
+                    maxH="calc(100dvh - 80px)"
                     backgroundColor="background_primary"
                     borderColor="border_primary"
                     borderRadius="xl"
@@ -178,7 +179,7 @@ export const HeaderNotificationBell: React.FC = () => {
                         </HStack>
                     </Box>
 
-                    <Popover.Body p={2} maxH="380px" overflowY="auto">
+                    <Popover.Body p={2} maxH={{ base: "55dvh", sm: "380px" }} overflowY="auto">
                         {filteredNotifications.length === 0 ? (
                             <Box p={6} textAlign="center" color="text_secondary">
                                 <Icon fontSize="32px" mb={2} color="text_secondary" opacity={0.6}>

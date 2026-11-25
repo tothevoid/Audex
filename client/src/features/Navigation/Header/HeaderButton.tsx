@@ -10,9 +10,9 @@ export const HeaderButton = forwardRef<HTMLButtonElement, HeaderButtonProps>(
     ({ icon, ...restButtonProps }, ref) => (
         <Button
             ref={ref}
-            h="38px"
-            w="38px"
-            minW="38px"
+            h={{ base: "42px", md: "38px" }}
+            w={{ base: "42px", md: "38px" }}
+            minW={{ base: "42px", md: "38px" }}
             p={0}
             borderWidth="1px"
             borderColor="border_primary"

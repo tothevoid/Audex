@@ -64,8 +64,8 @@ const AuthPage: React.FC = () => {
 
     return (
         <Flex
-            minH="100vh"
-            w="100vw"
+            minH="100dvh"
+            w="100%"
             align="center"
             justify="center"
             backgroundColor="background_main"

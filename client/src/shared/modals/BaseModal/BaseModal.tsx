@@ -123,7 +123,7 @@ export const BaseModal = forwardRef<BaseModalRef, BaseModalProps>(
                             )}
 
                             {footer && (
-                                <Dialog.Footer color="text_primary">
+                                <Dialog.Footer color="text_primary" flexWrap="wrap" gap={2}>
                                     {typeof footer === "function"
                                         ? footer({ closeModal: handleClose })
                                         : footer}

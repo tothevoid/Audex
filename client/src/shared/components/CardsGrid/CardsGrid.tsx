@@ -19,7 +19,7 @@ export const CardsGrid: React.FC<CardsGridProps> = ({
         <SimpleGrid
             pb={pb}
             gap={gap}
-            templateColumns={`repeat(auto-fill, minmax(${formattedMinWidth}, 1fr))`}
+            templateColumns={`repeat(auto-fill, minmax(min(100%, ${formattedMinWidth}), 1fr))`}
             {...restGridProps}
         >
             {children}
