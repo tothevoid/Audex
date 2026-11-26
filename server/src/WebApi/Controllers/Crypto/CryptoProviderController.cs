@@ -27,9 +27,9 @@ namespace Audex.WebApi.Controllers.Crypto
         }
 
         [HttpGet]
-        public async Task<IEnumerable<CryptoProviderModel>> GetAll()
+        public async Task<IEnumerable<CryptoProviderModel>> GetAll(bool onlyActive = false)
         {
-            var cryptoProviders = await _cryptoProviderService.GetAllAsync();
+            var cryptoProviders = await _cryptoProviderService.GetAllAsync(onlyActive);
             return _mapper.Map(cryptoProviders);
         }
 

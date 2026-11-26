@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System;
 using Audex.Application.DTO.Brokers;
@@ -21,10 +22,12 @@ namespace Audex.Application.Services.Brokers
             _brokerAccountTypeRepo = uow.CreateRepository<BrokerAccountType>();
         }
 
-        public async Task<IEnumerable<BrokerAccountTypeDto>> GetAllAsync()
+        public async Task<IEnumerable<BrokerAccountTypeDto>> GetAllAsync(bool onlyActive = false)
         {
-            var brokerAccountTypes = await _brokerAccountTypeRepo.GetAllAsync();
-            return _mapper.Map(brokerAccountTypes);
+            var brokerAccountTypes = onlyActive
+                ? await _brokerAccountTypeRepo.GetAllAsync(accountType => accountType.Active)
+                : await _brokerAccountTypeRepo.GetAllAsync();
+            return _mapper.Map(brokerAccountTypes.OrderBy(accountType => accountType.Name, StringComparer.OrdinalIgnoreCase));
         }
 
         public async Task<Guid> AddAsync(BrokerAccountTypeDto brokerAccountTypeDto)

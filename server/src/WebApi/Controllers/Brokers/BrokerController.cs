@@ -25,10 +25,10 @@ namespace Audex.WebApi.Controllers.Brokers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<BrokerModel>> GetAll()
+        public async Task<IEnumerable<BrokerModel>> GetAll(bool onlyActive = false)
         {
-            var securities = await _brokerService.GetAllAsync();
-            return _mapper.Map(securities);
+            var brokers = await _brokerService.GetAllAsync(onlyActive);
+            return _mapper.Map(brokers);
         }
 
         [HttpPut]

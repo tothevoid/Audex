@@ -28,9 +28,9 @@ namespace Audex.WebApi.Controllers.Banks
         }
 
         [HttpGet]
-        public async Task<IEnumerable<BankModel>> GetAll()
+        public async Task<IEnumerable<BankModel>> GetAll(bool onlyActive = false)
         {
-            var banks = await _bankService.GetAllAsync();
+            var banks = await _bankService.GetAllAsync(onlyActive);
             return _mapper.Map(banks);
         }
 

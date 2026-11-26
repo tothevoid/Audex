@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Audex.Application.DTO.Banks;
 using Audex.Application.DTO.FileStorage;
 using System;
@@ -9,7 +9,7 @@ namespace Audex.Application.Interfaces.Banks
 {
     public interface IBankService
     {
-        Task<IEnumerable<BankDto>> GetAllAsync();
+        Task<IEnumerable<BankDto>> GetAllAsync(bool onlyActive = false);
         Task<BankDto> GetByIdAsync(Guid id);
         Task<BankDto> AddAsync(BankDto bankDto, IFormFile bankIcon);
         Task<BankDto> UpdateAsync(BankDto bankDto, IFormFile bankIcon);

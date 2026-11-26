@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System;
@@ -25,9 +25,9 @@ namespace Audex.WebApi.Controllers.Brokers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<BrokerAccountTypeModel>> GetAll()
+        public async Task<IEnumerable<BrokerAccountTypeModel>> GetAll(bool onlyActive = false)
         {
-            var brokerAccountsTypes = await _brokerAccountTypeService.GetAllAsync();
+            var brokerAccountsTypes = await _brokerAccountTypeService.GetAllAsync(onlyActive);
             return _mapper.Map(brokerAccountsTypes);
         }
 

@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Audex.Application.DTO.Brokers;
 using Audex.Application.Interfaces.Brokers;
@@ -22,10 +23,12 @@ namespace Audex.Application.Services.Brokers
             _brokerRepo = uow.CreateRepository<Broker>();
         }
 
-        public async Task<IEnumerable<BrokerDto>> GetAllAsync()
+        public async Task<IEnumerable<BrokerDto>> GetAllAsync(bool onlyActive = false)
         {
-            var brokers = await _brokerRepo.GetAllAsync();
-            return _mapper.Map(brokers);
+            var brokers = onlyActive
+                ? await _brokerRepo.GetAllAsync(broker => broker.Active)
+                : await _brokerRepo.GetAllAsync();
+            return _mapper.Map(brokers.OrderBy(broker => broker.Name, StringComparer.OrdinalIgnoreCase));
         }
 
         public async Task<Guid> AddAsync(BrokerDto securityDto)

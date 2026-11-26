@@ -41,7 +41,7 @@ namespace Audex.Application.Services.Currencies
         public async Task<IEnumerable<CurrencyDto>> GetAllAsync()
         {
             var currencies = await _currencyRepository.GetAllAsync();
-            return _mapper.Map(currencies);
+            return _mapper.Map(currencies.OrderBy(currency => currency.Name, StringComparer.OrdinalIgnoreCase));
         }
 
         public async Task<CurrencyDto> GetByIdAsync(Guid id)

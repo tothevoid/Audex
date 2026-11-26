@@ -9,7 +9,7 @@ namespace Audex.Application.Interfaces.Crypto
 {
     public interface ICryptoProviderService
     {
-        Task<IEnumerable<CryptoProviderDto>> GetAllAsync();
+        Task<IEnumerable<CryptoProviderDto>> GetAllAsync(bool onlyActive = false);
         Task<CryptoProviderDto> AddAsync(CryptoProviderDto cryptoProvider, IFormFile cryptoProviderIcon = null);
         Task<CryptoProviderDto> UpdateAsync(CryptoProviderDto cryptoProvider, IFormFile cryptoProviderIcon = null);
         Task DeleteAsync(Guid id);

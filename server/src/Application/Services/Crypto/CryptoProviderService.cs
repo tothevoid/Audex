@@ -1,6 +1,7 @@
 using Audex.Infrastructure.Interfaces.Database;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Audex.Application.DTO.Crypto;
@@ -29,10 +30,12 @@ namespace Audex.Application.Services.Crypto
             _fileStorageService = fileStorageService;
         }
 
-        public async Task<IEnumerable<CryptoProviderDto>> GetAllAsync()
+        public async Task<IEnumerable<CryptoProviderDto>> GetAllAsync(bool onlyActive = false)
         {
-            var cryptoProviders = await _cryptoProviderRepo.GetAllAsync();
-            return _mapper.Map(cryptoProviders);
+            var cryptoProviders = onlyActive
+                ? await _cryptoProviderRepo.GetAllAsync(provider => provider.Active)
+                : await _cryptoProviderRepo.GetAllAsync();
+            return _mapper.Map(cryptoProviders.OrderBy(provider => provider.Name, StringComparer.OrdinalIgnoreCase));
         }
 
         public async Task<CryptoProviderDto> AddAsync(CryptoProviderDto cryptoProviderDto, IFormFile cryptoProviderIcon = null)

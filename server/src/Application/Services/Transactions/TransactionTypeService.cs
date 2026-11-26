@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using Audex.Application.Interfaces.Transactions;
 using Audex.Application.Mappings;
 using Audex.Infrastructure.Interfaces.Database;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Audex.Infrastructure.Entities.Transactions;
 using Audex.Application.DTO.FileStorage;
@@ -35,7 +36,7 @@ namespace Audex.Application.Services.Transactions
             var result = onlyActive
                 ? await _transactionTypeRepo.GetAllAsync(transaction => transaction.Active)
                 : await _transactionTypeRepo.GetAllAsync();
-            return _mapper.Map(result);
+            return _mapper.Map(result.OrderBy(transactionType => transactionType.Name, StringComparer.OrdinalIgnoreCase));
         }
 
         public async Task<string> GetIconUrlAsync(string iconKey)

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Audex.Application.DTO.Banks;
 using Audex.Application.DTO.FileStorage;
 using Audex.Application.DTO.Transactions;
@@ -11,6 +11,7 @@ using Audex.Infrastructure.Entities.Transactions;
 using Audex.Infrastructure.Interfaces.Database;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Audex.Application.Services.Banks
@@ -32,10 +33,12 @@ namespace Audex.Application.Services.Banks
             _fileStorageService = fileStorageService;
         }
 
-        public async Task<IEnumerable<BankDto>> GetAllAsync()
+        public async Task<IEnumerable<BankDto>> GetAllAsync(bool onlyActive = false)
         {
-            var banks = await _bankRepo.GetAllAsync();
-            return _mapper.Map(banks);
+            var banks = onlyActive
+                ? await _bankRepo.GetAllAsync(bank => bank.Active)
+                : await _bankRepo.GetAllAsync();
+            return _mapper.Map(banks.OrderBy(bank => bank.Name, StringComparer.OrdinalIgnoreCase));
         }
 
         public async Task<BankDto> GetByIdAsync(Guid id)
