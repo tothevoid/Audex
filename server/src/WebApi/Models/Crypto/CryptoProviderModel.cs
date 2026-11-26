@@ -11,6 +11,9 @@ namespace Audex.WebApi.Models.Crypto
         [JsonPropertyName("name")]
         public string Name { get; set; }
 
+        [JsonPropertyName("active")]
+        public bool Active { get; set; } = true;
+
         [JsonPropertyName("iconKey")]
         public string IconKey { get; set; }
     }

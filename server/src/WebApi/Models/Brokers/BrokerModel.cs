@@ -1,9 +1,11 @@
-﻿using Audex.Shared.Entities;
+using Audex.Shared.Entities;
 
 namespace Audex.WebApi.Models.Brokers
 {
     public class BrokerModel: BaseEntity
     {
         public string Name { get; set; }
+
+        public bool Active { get; set; } = true;
     }
 }

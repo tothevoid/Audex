@@ -12,6 +12,8 @@ namespace Audex.Infrastructure.Entities.Crypto
     {
         public string Name { get; set; }
 
+        public bool Active { get; set; } = true;
+
         public string IconKey { get; set; }
 
         public ICollection<CryptoAccount> CryptoAccounts { get; set; }

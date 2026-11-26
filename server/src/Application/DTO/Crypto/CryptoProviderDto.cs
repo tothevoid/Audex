@@ -12,6 +12,8 @@ namespace Audex.Application.DTO.Crypto
     {
         public string Name { get; set; }
 
+        public bool Active { get; set; } = true;
+
         public string IconKey { get; set; }
     }
 }
