@@ -1,5 +1,5 @@
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
-import DatePicker from "@/shared/components/DatePicker/DatePicker";
+import { DatePicker, DatePickerProps, DateTimePicker } from "@/shared/components/DatePicker";
 
 interface Props<TFieldValues extends FieldValues> {
     name: Path<TFieldValues>;
@@ -32,22 +32,26 @@ const DateSelect = <TFieldValues extends FieldValues>({
         <Controller
             name={name}
             control={control}
-            render={({ field: { onChange, value } }) => (
-                <DatePicker
-                    name={name}
-                    value={value}
-                    onChange={onChange}
-                    fullWidth={fullWidth}
-                    isDateTime={isDateTime}
-                    showSeconds={showSeconds}
-                    disabled={disabled}
-                    minDate={minDate}
-                    maxDate={maxDate}
-                    isClearable={isClearable}
-                    placeholder={placeholder}
-                    size={size}
-                />
-            )}
+            render={({ field: { onChange, value } }) => {
+                const sharedProps: Omit<DatePickerProps, "inline"> = {
+                    name,
+                    value,
+                    onChange,
+                    fullWidth,
+                    disabled,
+                    minDate,
+                    maxDate,
+                    isClearable,
+                    placeholder,
+                    size,
+                };
+
+                return isDateTime ? (
+                    <DateTimePicker {...sharedProps} showSeconds={showSeconds} />
+                ) : (
+                    <DatePicker {...sharedProps} />
+                );
+            }}
         />
     );
 };
