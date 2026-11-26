@@ -1,12 +1,16 @@
-import { Box, Button, Icon, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { useConfirm } from "@/shared/hooks/useConfirm";
 import { BrokerEntity } from "@/models/brokers/BrokerEntity";
 import BrokerModal from "@/pages/Data/modals/BrokerModal/BrokerModal";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
+import DataTableActiveCheckbox from "@/shared/components/DataTable/DataTableActiveCheckbox";
+import DataTableNameCell from "@/shared/components/DataTable/DataTableNameCell";
+import DataTableRowActions from "@/shared/components/DataTable/DataTableRowActions";
+import DataTableFilterBar from "@/pages/Data/components/DataTableFilterBar/DataTableFilterBar";
+import { useDataTableFilter } from "@/pages/Data/hooks/useDataTableFilter";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import { notify } from "@/shared/components/Toaster";
 import {
@@ -16,8 +20,19 @@ import {
     useUpdateBrokerMutation,
 } from "@/shared/hooks/queries/useBrokers";
 
+const FILTER_OPTIONS = { hasActiveFilter: true };
+
 const BrokersTable: React.FC = () => {
     const { data: brokers = [], isLoading } = useBrokers();
+    const {
+        filteredItems: filteredBrokers,
+        searchText,
+        onSearchTextChanged,
+        onlyActive,
+        onOnlyActiveChanged,
+        showSearch,
+        showActiveFilter,
+    } = useDataTableFilter(brokers, FILTER_OPTIONS);
     const createBrokerMutation = useCreateBrokerMutation();
     const updateBrokerMutation = useUpdateBrokerMutation();
     const deleteBrokerMutation = useDeleteBrokerMutation();
@@ -45,6 +60,17 @@ const BrokersTable: React.FC = () => {
     const onModalClosed = () => {
         setUpdatedBroker(null);
     };
+
+    const onActiveChanged = useCallback(async (broker: BrokerEntity, isChecked: boolean) => {
+        if (broker.active === isChecked) {
+            return;
+        }
+
+        const isUpdated = await updateBrokerMutation.mutateAsync({ ...broker, active: isChecked });
+        if (isUpdated) {
+            notify.success(t("broker_toast_updated_title"), t("broker_toast_updated_desc", { name: broker.name }));
+        }
+    }, [updateBrokerMutation, t]);
 
     const onBrokerSaved = async (savedBroker: BrokerEntity) => {
         const isModified = brokers.some((brokerItem: BrokerEntity) => brokerItem.id === savedBroker.id);
@@ -79,39 +105,30 @@ const BrokersTable: React.FC = () => {
     const columns: ColumnDef<BrokerEntity>[] = useMemo(() => [
         {
             header: t("entity_broker_name"),
-            render: (broker) => <Text>{broker.name}</Text>
+            render: (broker) => <DataTableNameCell name={broker.name} />
         },
         {
+            header: t("entity_broker_active"),
             width: 10,
             render: (broker) => (
-                <Button
-                    borderColor="background_secondary"
-                    background="button_background_secondary"
-                    size={'sm'}
-                    onClick={() => onEditClicked(broker)}
-                >
-                    <Icon color="card_action_icon_primary">
-                        <MdEdit/>
-                    </Icon>
-                </Button>
+                <DataTableActiveCheckbox
+                    checked={broker.active}
+                    disabled={updateBrokerMutation.isPending}
+                    onChange={(isChecked) => onActiveChanged(broker, isChecked)}
+                />
             )
         },
         {
-            width: 10,
+            width: "1%",
+            align: "end",
             render: (broker) => (
-                <Button
-                    borderColor="background_secondary"
-                    background="button_background_secondary"
-                    size={'sm'}
-                    onClick={() => onDeleteClicked(broker)}
-                >
-                    <Icon color="card_action_icon_danger">
-                        <MdDelete/>
-                    </Icon>
-                </Button>
+                <DataTableRowActions
+                    onEdit={() => onEditClicked(broker)}
+                    onDelete={() => onDeleteClicked(broker)}
+                />
             )
         }
-    ], [onDeleteClicked, onEditClicked, t]);
+    ], [onDeleteClicked, onEditClicked, onActiveChanged, updateBrokerMutation.isPending, t]);
 
     return <Box color="text_primary">
         <SectionHeader
@@ -119,8 +136,16 @@ const BrokersTable: React.FC = () => {
             onAdd={onAdd}
             addButtonTitle={t("entity_broker_add")}
         />
+        <DataTableFilterBar
+            showSearch={showSearch}
+            searchText={searchText}
+            onSearchTextChanged={onSearchTextChanged}
+            showActiveFilter={showActiveFilter}
+            onlyActive={onlyActive}
+            onOnlyActiveChanged={onOnlyActiveChanged}
+        />
         <DataTable
-            data={brokers}
+            data={filteredBrokers}
             columns={columns}
             keyExtractor={(item) => item.id}
             isLoading={isLoading}

@@ -6,6 +6,8 @@
     "data_tab_broker_account_types": "Типы брокерских счетов",
     "data_tab_brokers": "Брокеры",
     "data_tab_crypto_providers": "Крипто провайдеры",
+    "data_filter_search_placeholder": "Поиск по названию...",
+    "data_filter_only_active": "Только активные",
     "currencies_data_add": "Добавить валюту",
     "currencies_data_sync_rates": "Синхронизировать курсы",
     "currencies_delete_title": "Удалить валюту",
@@ -23,14 +25,17 @@
 
     "entity_broker_account_type_form_title": "Тип брокерского счёта",
     "entity_broker_account_type_name": "Название",
+    "entity_broker_account_type_active": "Активен",
     "entity_broker_account_type_add": "Добавить тип счёта",
 
     "entity_broker_form_title": "Брокер",
     "entity_broker_name": "Название",
+    "entity_broker_active": "Активен",
     "entity_broker_add": "Добавить брокера",
 
     "entity_bank_form_title": "Банк",
     "entity_bank_name": "Название",
+    "entity_bank_active": "Активен",
     "entity_bank_add": "Добавить банк",
     "banks_delete_title": "Удалить банк",
 
@@ -42,6 +47,7 @@
 
     "entity_crypto_provider_form_title": "Крипто провайдер",
     "entity_crypto_provider_name": "Название",
+    "entity_crypto_provider_active": "Активен",
     "entity_crypto_provider_add": "Добавить провайдера",
     "broker_account_types_delete_title": "Удалить тип счёта",
     "brokers_delete_title": "Удалить брокера",

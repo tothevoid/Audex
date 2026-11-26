@@ -6,6 +6,8 @@
     "data_tab_broker_account_types": "Broker account types",
     "data_tab_brokers": "Brokers",
     "data_tab_crypto_providers": "Crypto providers",
+    "data_filter_search_placeholder": "Search by name...",
+    "data_filter_only_active": "Only active",
     "currencies_data_add": "Add currency",
     "currencies_data_sync_rates": "Sync rates",
     "currencies_delete_title": "Delete currency",
@@ -23,14 +25,17 @@
 
     "entity_broker_account_type_form_title": "Broker account type",
     "entity_broker_account_type_name": "Name",
+    "entity_broker_account_type_active": "Active",
     "entity_broker_account_type_add": "Add account type",
 
     "entity_broker_form_title": "Broker",
     "entity_broker_name": "Name",
+    "entity_broker_active": "Active",
     "entity_broker_add": "Add broker",
 
     "entity_bank_form_title": "Bank",
     "entity_bank_name": "Name",
+    "entity_bank_active": "Active",
     "entity_bank_add": "Add bank",
     "banks_delete_title": "Delete bank",
 
@@ -42,6 +47,7 @@
 
     "entity_crypto_provider_form_title": "Crypto provider",
     "entity_crypto_provider_name": "Name",
+    "entity_crypto_provider_active": "Active",
     "entity_crypto_provider_add": "Add provider",
     "broker_account_types_delete_title": "Delete account type",
     "brokers_delete_title": "Delete broker",

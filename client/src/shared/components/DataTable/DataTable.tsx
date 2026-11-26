@@ -1,7 +1,12 @@
-import { Box, Table } from "@chakra-ui/react";
+import { Box, BoxProps, Table } from "@chakra-ui/react";
 import React from "react";
 import TableSkeleton from "@/shared/components/TableSkeleton/TableSkeleton";
 import useDelayedLoading from "@/shared/hooks/useDelayedLoading";
+
+const DEFAULT_DATA_TABLE_MAX_HEIGHT: BoxProps["maxH"] = {
+    base: "60dvh",
+    lg: "calc(100dvh - 250px)",
+};
 
 export interface ColumnDef<T> {
     header?: React.ReactNode;
@@ -16,6 +21,7 @@ export interface DataTableProps<T> {
     keyExtractor: (item: T, index: number) => string | number;
     isLoading?: boolean;
     skeletonRows?: number;
+    maxH?: BoxProps["maxH"];
 }
 
 export const DataTable = <T,>({
@@ -24,6 +30,7 @@ export const DataTable = <T,>({
     keyExtractor,
     isLoading = false,
     skeletonRows = 5,
+    maxH = DEFAULT_DATA_TABLE_MAX_HEIGHT,
 }: DataTableProps<T>) => {
     const showSkeleton = useDelayedLoading(isLoading);
 
@@ -32,10 +39,25 @@ export const DataTable = <T,>({
     }
 
     return (
-        <Box className="table-fade-in" overflowX="auto" maxW="100%">
+        <Box
+            className="table-fade-in"
+            overflowX="auto"
+            overflowY={maxH ? "auto" : undefined}
+            maxH={maxH}
+            maxW="100%"
+            borderWidth="1px"
+            borderColor="border_primary"
+            borderRadius="xl"
+            bg="background_primary"
+        >
             <Table.Root minW="600px">
-                <Table.Header>
-                    <Table.Row border="none" bg="none" color="text_primary">
+                <Table.Header
+                    position={maxH ? "sticky" : undefined}
+                    top={maxH ? 0 : undefined}
+                    zIndex={maxH ? 1 : undefined}
+                    bg="background_primary"
+                >
+                    <Table.Row border="none" bg="background_primary" color="text_primary">
                         {columns.map((col, idx) => (
                             <Table.ColumnHeader
                                 key={idx}

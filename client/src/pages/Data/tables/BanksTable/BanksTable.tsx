@@ -1,6 +1,5 @@
-import { Box, Button, Icon, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { MdDelete, MdEdit } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { useConfirm } from "@/shared/hooks/useConfirm";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
@@ -11,7 +10,11 @@ import BankModal from "@/pages/Data/modals/BankModal/BankModal";
 import { BsBank } from "react-icons/bs";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
-import StoredIcon from "@/shared/components/StoredIcon";
+import DataTableActiveCheckbox from "@/shared/components/DataTable/DataTableActiveCheckbox";
+import DataTableNameCell from "@/shared/components/DataTable/DataTableNameCell";
+import DataTableRowActions from "@/shared/components/DataTable/DataTableRowActions";
+import DataTableFilterBar from "@/pages/Data/components/DataTableFilterBar/DataTableFilterBar";
+import { useDataTableFilter } from "@/pages/Data/hooks/useDataTableFilter";
 import { notify } from "@/shared/components/Toaster";
 import {
     useBanks,
@@ -20,8 +23,19 @@ import {
     useUpdateBankMutation,
 } from "@/shared/hooks/queries/useBanks";
 
+const FILTER_OPTIONS = { hasActiveFilter: true };
+
 const BanksTable: React.FC = () => {
     const { data: banks = [], isLoading } = useBanks();
+    const {
+        filteredItems: filteredBanks,
+        searchText,
+        onSearchTextChanged,
+        onlyActive,
+        onOnlyActiveChanged,
+        showSearch,
+        showActiveFilter,
+    } = useDataTableFilter(banks, FILTER_OPTIONS);
     const createBankMutation = useCreateBankMutation();
     const updateBankMutation = useUpdateBankMutation();
     const deleteBankMutation = useDeleteBankMutation();
@@ -49,6 +63,22 @@ const BanksTable: React.FC = () => {
     const onModalClosed = () => {
         setUpdatedBank(null);
     };
+
+    const onActiveChanged = useCallback(async (bank: BankEntity, isChecked: boolean) => {
+        if (bank.active === isChecked) {
+            return;
+        }
+
+        const updatedResult = await updateBankMutation.mutateAsync({
+            bank: { ...bank, active: isChecked },
+            icon: null,
+        });
+        if (!updatedResult) {
+            return;
+        }
+
+        notify.success(t("bank_toast_updated_title"), t("bank_toast_updated_desc", { name: updatedResult.name }));
+    }, [updateBankMutation, t]);
 
     const onBankSaved = async (savedBank: BankEntity, icon: Nullable<File>) => {
         const isModified = banks.some((bank) => bank.id === savedBank.id);
@@ -94,50 +124,37 @@ const BanksTable: React.FC = () => {
 
     const columns: ColumnDef<BankEntity>[] = useMemo(() => [
         {
-            width: "50px",
+            header: t("entity_bank_name"),
             render: (bank) => (
-                <StoredIcon
-                    src={bank.iconKey ? getBankIconUrl(bank.iconKey) : undefined}
+                <DataTableNameCell
+                    name={bank.name}
+                    iconSrc={bank.iconKey ? getBankIconUrl(bank.iconKey) : undefined}
                     fallbackIcon={<BsBank size={20} color="var(--chakra-colors-text_secondary)" />}
-                    size="md"
                 />
             )
         },
         {
-            header: t("entity_bank_name"),
-            render: (bank) => <Text>{bank.name}</Text>
-        },
-        {
+            header: t("entity_bank_active"),
             width: 10,
             render: (bank) => (
-                <Button
-                    borderColor="background_secondary"
-                    background="button_background_secondary"
-                    size={'sm'}
-                    onClick={() => onEditClicked(bank)}
-                >
-                    <Icon color="card_action_icon_primary">
-                        <MdEdit />
-                    </Icon>
-                </Button>
+                <DataTableActiveCheckbox
+                    checked={bank.active}
+                    disabled={updateBankMutation.isPending}
+                    onChange={(isChecked) => onActiveChanged(bank, isChecked)}
+                />
             )
         },
         {
-            width: 10,
+            width: "1%",
+            align: "end",
             render: (bank) => (
-                <Button
-                    borderColor="background_secondary"
-                    background="button_background_secondary"
-                    size={'sm'}
-                    onClick={() => onDeleteClicked(bank)}
-                >
-                    <Icon color="card_action_icon_danger">
-                        <MdDelete />
-                    </Icon>
-                </Button>
+                <DataTableRowActions
+                    onEdit={() => onEditClicked(bank)}
+                    onDelete={() => onDeleteClicked(bank)}
+                />
             )
         }
-    ], [onDeleteClicked, onEditClicked, t]);
+    ], [onDeleteClicked, onEditClicked, onActiveChanged, updateBankMutation.isPending, t]);
 
     return <Box color="text_primary">
         <SectionHeader
@@ -145,8 +162,16 @@ const BanksTable: React.FC = () => {
             onAdd={onAdd}
             addButtonTitle={t("entity_bank_add")}
         />
+        <DataTableFilterBar
+            showSearch={showSearch}
+            searchText={searchText}
+            onSearchTextChanged={onSearchTextChanged}
+            showActiveFilter={showActiveFilter}
+            onlyActive={onlyActive}
+            onOnlyActiveChanged={onOnlyActiveChanged}
+        />
         <DataTable
-            data={banks}
+            data={filteredBanks}
             columns={columns}
             keyExtractor={(item) => item.id}
             isLoading={isLoading}

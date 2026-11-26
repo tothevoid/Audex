@@ -1,6 +1,6 @@
-import { Box, Button, Checkbox, Icon, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { MdDelete, MdEdit, MdOutlinePayment } from "react-icons/md";
+import { MdOutlinePayment } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { useConfirm } from "@/shared/hooks/useConfirm";
 import { TransactionTypeEntity } from "@/models/transactions/TransactionTypeEntity";
@@ -9,7 +9,11 @@ import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import TransactionTypeModal from "@/pages/Data/modals/TransactionTypeModal/TransactionTypeModal";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
-import StoredIcon from "@/shared/components/StoredIcon";
+import DataTableActiveCheckbox from "@/shared/components/DataTable/DataTableActiveCheckbox";
+import DataTableNameCell from "@/shared/components/DataTable/DataTableNameCell";
+import DataTableRowActions from "@/shared/components/DataTable/DataTableRowActions";
+import DataTableFilterBar from "@/pages/Data/components/DataTableFilterBar/DataTableFilterBar";
+import { useDataTableFilter } from "@/pages/Data/hooks/useDataTableFilter";
 import { notify } from "@/shared/components/Toaster";
 import {
     useCreateTransactionTypeMutation,
@@ -18,8 +22,19 @@ import {
     useUpdateTransactionTypeMutation,
 } from "@/shared/hooks/queries/useTransactionTypes";
 
+const FILTER_OPTIONS = { hasActiveFilter: true };
+
 const TransactionTypesTable: React.FC = () => {
     const { data: transactionTypes = [], isLoading } = useTransactionTypes();
+    const {
+        filteredItems: filteredTransactionTypes,
+        searchText,
+        onSearchTextChanged,
+        onlyActive,
+        onOnlyActiveChanged,
+        showSearch,
+        showActiveFilter,
+    } = useDataTableFilter(transactionTypes, FILTER_OPTIONS);
     const createTransactionTypeMutation = useCreateTransactionTypeMutation();
     const updateTransactionTypeMutation = useUpdateTransactionTypeMutation();
     const deleteTransactionTypeMutation = useDeleteTransactionTypeMutation();
@@ -93,52 +108,55 @@ const TransactionTypesTable: React.FC = () => {
         setUpdatedTransactionType(null);
     };
 
+    const onActiveChanged = useCallback(async (transactionType: TransactionTypeEntity, isChecked: boolean) => {
+        if (transactionType.active === isChecked) {
+            return;
+        }
+
+        const updatedType = await updateTransactionTypeMutation.mutateAsync({
+            transactionType: { ...transactionType, active: isChecked },
+            icon: null,
+        });
+        if (!updatedType) {
+            return;
+        }
+
+        notify.success(t("transaction_type_toast_updated_title"), t("transaction_type_toast_updated_desc", { name: updatedType.name }));
+    }, [updateTransactionTypeMutation, t]);
+
     const columns: ColumnDef<TransactionTypeEntity>[] = useMemo(() => [
         {
-            width: "40px",
+            header: t("entity_transaction_type_name"),
             render: (transactionType) => (
-                <StoredIcon
-                    src={transactionType.iconKey ? getTransactionTypeIconUrl(transactionType.iconKey) : undefined}
+                <DataTableNameCell
+                    name={transactionType.name}
+                    iconSrc={transactionType.iconKey ? getTransactionTypeIconUrl(transactionType.iconKey) : undefined}
                     fallbackIcon={<MdOutlinePayment size={20} color="var(--chakra-colors-text_secondary)" />}
-                    size="md"
                 />
             )
-        },
-        {
-            header: t("entity_transaction_type_name"),
-            render: (transactionType) => <Text>{transactionType.name}</Text>
         },
         {
             header: t("entity_transaction_type_active"),
             width: 10,
             render: (transactionType) => (
-                <Checkbox.Root disabled checked={transactionType.active} variant="subtle">
-                    <Checkbox.HiddenInput />
-                    <Checkbox.Control />
-                </Checkbox.Root>
+                <DataTableActiveCheckbox
+                    checked={transactionType.active}
+                    disabled={updateTransactionTypeMutation.isPending}
+                    onChange={(isChecked) => onActiveChanged(transactionType, isChecked)}
+                />
             )
         },
         {
-            width: 10,
+            width: "1%",
+            align: "end",
             render: (transactionType) => (
-                <Button borderColor="background_secondary" background="button_background_secondary" size={'sm'} onClick={() => onEditClicked(transactionType)}>
-                    <Icon color="card_action_icon_primary">
-                        <MdEdit/>
-                    </Icon>
-                </Button>
-            )
-        },
-        {
-            width: 10,
-            render: (transactionType) => (
-                <Button borderColor="background_secondary" background="button_background_secondary" size={'sm'} onClick={() => onDeleteClicked(transactionType)}>
-                    <Icon color="card_action_icon_danger">
-                        <MdDelete/>
-                    </Icon>
-                </Button>
+                <DataTableRowActions
+                    onEdit={() => onEditClicked(transactionType)}
+                    onDelete={() => onDeleteClicked(transactionType)}
+                />
             )
         }
-    ], [t, onEditClicked, onDeleteClicked]);
+    ], [t, onEditClicked, onDeleteClicked, onActiveChanged, updateTransactionTypeMutation.isPending]);
 
     return <Box color="text_primary">
         <SectionHeader
@@ -146,8 +164,16 @@ const TransactionTypesTable: React.FC = () => {
             onAdd={onAdd}
             addButtonTitle={t("transaction_type_data_add")}
         />
+        <DataTableFilterBar
+            showSearch={showSearch}
+            searchText={searchText}
+            onSearchTextChanged={onSearchTextChanged}
+            showActiveFilter={showActiveFilter}
+            onlyActive={onlyActive}
+            onOnlyActiveChanged={onOnlyActiveChanged}
+        />
         <DataTable
-            data={transactionTypes}
+            data={filteredTransactionTypes}
             columns={columns}
             keyExtractor={(item) => item.id}
             isLoading={isLoading}

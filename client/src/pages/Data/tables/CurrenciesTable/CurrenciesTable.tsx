@@ -1,7 +1,6 @@
-import { Box, Button, Checkbox, Icon, Text } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import { CurrencyEntity } from "@/models/currencies/CurrencyEntity";
 import { useCallback, useMemo, useRef } from "react";
-import { MdDelete } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 import { useConfirm } from "@/shared/hooks/useConfirm";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
@@ -10,7 +9,12 @@ import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserPr
 import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import RefreshButton from "@/shared/components/RefreshButton/RefreshButton";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
+import DataTableActiveCheckbox from "@/shared/components/DataTable/DataTableActiveCheckbox";
+import DataTableNameCell from "@/shared/components/DataTable/DataTableNameCell";
+import DataTableRowActions from "@/shared/components/DataTable/DataTableRowActions";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
+import DataTableFilterBar from "@/pages/Data/components/DataTableFilterBar/DataTableFilterBar";
+import { useDataTableFilter } from "@/pages/Data/hooks/useDataTableFilter";
 import { notify } from "@/shared/components/Toaster";
 import {
     useCurrencies,
@@ -20,8 +24,19 @@ import {
     useUpdateCurrencyMutation,
 } from "@/shared/hooks/queries/useCurrencies";
 
+const FILTER_OPTIONS = { hasActiveFilter: true };
+
 const CurrenciesTable: React.FC = () => {
     const { data: currencies = [], isLoading } = useCurrencies();
+    const {
+        filteredItems: filteredCurrencies,
+        searchText,
+        onSearchTextChanged,
+        onlyActive,
+        onOnlyActiveChanged,
+        showSearch,
+        showActiveFilter,
+    } = useDataTableFilter(currencies, FILTER_OPTIONS);
     const createCurrencyMutation = useCreateCurrencyMutation();
     const updateCurrencyMutation = useUpdateCurrencyMutation();
     const deleteCurrencyMutation = useDeleteCurrencyMutation();
@@ -58,7 +73,7 @@ const CurrenciesTable: React.FC = () => {
         notify.success(t("currency_toast_created_title"), t("currency_toast_created_desc", { name: currency.name }));
     };
 
-    const onDeleteClicked = async (currency: CurrencyEntity) => {
+    const onDeleteClicked = useCallback(async (currency: CurrencyEntity) => {
         const confirmed = await confirmDelete(t("currencies_delete_title"));
         if (!confirmed) {
             return;
@@ -70,7 +85,7 @@ const CurrenciesTable: React.FC = () => {
         }
 
         notify.success(t("currency_toast_deleted_title"), t("currency_toast_deleted_desc", { name: currency.name }));
-    };
+    }, [confirmDelete, deleteCurrencyMutation, t]);
 
     const onSyncRates = async () => {
         await syncRatesMutation.mutateAsync();
@@ -79,7 +94,7 @@ const CurrenciesTable: React.FC = () => {
     const columns: ColumnDef<CurrencyEntity>[] = useMemo(() => [
         {
             header: t("entity_currency_name"),
-            render: (currency) => <Text>{currency.name}</Text>,
+            render: (currency) => <DataTableNameCell name={currency.name} />,
         },
         {
             header: t("entity_currency_rate"),
@@ -91,29 +106,23 @@ const CurrenciesTable: React.FC = () => {
             header: t("entity_currency_active"),
             width: 10,
             render: (currency) => (
-                <Checkbox.Root
+                <DataTableActiveCheckbox
                     checked={currency.active}
-                    variant="subtle"
-                    onCheckedChange={(eventDetails) => {
-                        onActiveChanged(currency, Boolean(eventDetails.checked));
-                    }}
-                >
-                    <Checkbox.HiddenInput />
-                    <Checkbox.Control />
-                </Checkbox.Root>
+                    disabled={updateCurrencyMutation.isPending}
+                    onChange={(isChecked) => onActiveChanged(currency, isChecked)}
+                />
             ),
         },
         {
-            width: 10,
+            width: "1%",
+            align: "end",
             render: (currency) => (
-                <Button borderColor="background_secondary" background="button_background_secondary" size="sm" onClick={() => onDeleteClicked(currency)}>
-                    <Icon color="card_action_icon_danger">
-                        <MdDelete />
-                    </Icon>
-                </Button>
+                <DataTableRowActions
+                    onDelete={() => onDeleteClicked(currency)}
+                />
             ),
         },
-    ], [t, user, onActiveChanged]);
+    ], [t, user, onActiveChanged, onDeleteClicked, updateCurrencyMutation.isPending]);
 
     return (
         <Box color="text_primary">
@@ -129,8 +138,16 @@ const CurrenciesTable: React.FC = () => {
                     />
                 }
             />
+            <DataTableFilterBar
+                showSearch={showSearch}
+                searchText={searchText}
+                onSearchTextChanged={onSearchTextChanged}
+                showActiveFilter={showActiveFilter}
+                onlyActive={onlyActive}
+                onOnlyActiveChanged={onOnlyActiveChanged}
+            />
             <DataTable
-                data={currencies}
+                data={filteredCurrencies}
                 columns={columns}
                 keyExtractor={(item) => item.id}
                 isLoading={isLoading}
