@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex, NativeSelect } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import { useTranslation } from 'react-i18next';
 import { AccountEntity } from '@/models/accounts/AccountEntity';
 import { TransactionTypeEntity } from '@/models/transactions/TransactionTypeEntity';
@@ -56,6 +56,12 @@ export const TransactionFilterBar: React.FC<Props> = ({
         return transactionTypes.find((typeItem) => typeItem.id === selectedTransactionTypeId) ?? null;
     }, [transactionTypes, selectedTransactionTypeId]);
 
+    const typeFilterOptions = React.useMemo<{ value: TypeFilterMode; label: string }[]>(() => [
+        { value: 'all', label: t('filter_all_types') },
+        { value: 'expense', label: t('summary_total_expenses') },
+        { value: 'income', label: t('summary_total_income') }
+    ], [t]);
+
     return (
         <Box
             backgroundColor="background_primary"
@@ -83,25 +89,20 @@ export const TransactionFilterBar: React.FC<Props> = ({
                 />
 
                 {/* 3. Operation Type Select (All / Income / Expense) */}
-                <Box minW="140px">
-                    <NativeSelect.Root size="sm">
-                        <NativeSelect.Field
-                            value={typeFilter}
-                            onChange={(event) => onTypeFilterChange(event.target.value as TypeFilterMode)}
-                            backgroundColor="background_primary"
-                            borderColor="border_primary"
-                            color="text_primary"
-                        >
-                            <option value="all">{t('filter_all_types')}</option>
-                            <option value="expense">{t('summary_total_expenses')}</option>
-                            <option value="income">{t('summary_total_income')}</option>
-                        </NativeSelect.Field>
-                        <NativeSelect.Indicator />
-                    </NativeSelect.Root>
+                <Box w={{ base: '100%', sm: 'auto' }} minW={{ base: 0, sm: '140px' }}>
+                    <BaseSelect<{ value: TypeFilterMode; label: string }>
+                        size="sm"
+                        collection={typeFilterOptions}
+                        selectedValue={typeFilter}
+                        labelSelector={(option) => option.label}
+                        valueSelector={(option) => option.value}
+                        isSearchable={false}
+                        onSelected={(option) => onTypeFilterChange(option.value)}
+                    />
                 </Box>
 
                 {/* 4. Account Select Filter with Search */}
-                <Box minW="180px" maxW="240px">
+                <Box w={{ base: '100%', sm: 'auto' }} minW={{ base: 0, sm: '180px' }} maxW={{ base: 'full', sm: '240px' }}>
                     <BaseSelect<AccountEntity, true>
                         size="sm"
                         placeholder={t('filter_all_accounts')}
@@ -117,7 +118,7 @@ export const TransactionFilterBar: React.FC<Props> = ({
                 </Box>
 
                 {/* 5. Transaction Type Filter with Search */}
-                <Box minW="180px" maxW="240px">
+                <Box w={{ base: '100%', sm: 'auto' }} minW={{ base: 0, sm: '180px' }} maxW={{ base: 'full', sm: '240px' }}>
                     <BaseSelect<TransactionTypeEntity, true>
                         size="sm"
                         placeholder={t('filter_all_transaction_types')}

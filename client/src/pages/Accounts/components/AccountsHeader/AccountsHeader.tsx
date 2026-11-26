@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Card, NativeSelect } from "@chakra-ui/react";
+import { Box, Card } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { AccountCurrencySummary } from "@/models/accounts/accountsSummary";
 import { MetricsGrid, NumericMetricItem } from "@/shared/components/MetricItem";
@@ -7,6 +7,7 @@ import { getCurrencyColor, getCurrencyIcon } from "@/shared/utilities/currencyUt
 import { useColorMode } from "@/shared/context/useColorMode";
 import SectionHeader from "@/shared/components/SectionHeader";
 import FilterBlock, { FilterBlockDivider } from "@/shared/components/FilterBlock";
+import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
 import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 import { useAccountTypes } from "@/shared/hooks/queries/useAccountTypes";
 
@@ -85,44 +86,32 @@ export const AccountsHeader: React.FC<Props> = ({
             >
                 <FilterBlockDivider />
 
-                <Box minW="140px">
-                    <NativeSelect.Root size="sm">
-                        <NativeSelect.Field
-                            value={selectedCurrencyId || ""}
-                            onChange={(e) => onCurrencyChange(e.target.value || null)}
-                            backgroundColor="background_primary"
-                            borderColor="border_primary"
-                            color="text_primary"
-                        >
-                            <option value="">{t("accounts_filter_all_currencies")}</option>
-                            {currencies.map((currency) => (
-                                <option key={currency.id} value={currency.id}>
-                                    {currency.name}
-                                </option>
-                            ))}
-                        </NativeSelect.Field>
-                        <NativeSelect.Indicator />
-                    </NativeSelect.Root>
+                <Box w={{ base: "100%", sm: "auto" }} minW={{ base: 0, sm: "155px" }}>
+                    <BaseSelect
+                        size="sm"
+                        placeholder={t("accounts_filter_all_currencies")}
+                        collection={currencies}
+                        selectedValue={selectedCurrencyId}
+                        labelSelector={(currency) => currency.name}
+                        valueSelector={(currency) => currency.id}
+                        isClearable={true}
+                        isSearchable={false}
+                        onSelected={(currency) => onCurrencyChange(currency?.id ?? null)}
+                    />
                 </Box>
 
-                <Box minW="140px">
-                    <NativeSelect.Root size="sm">
-                        <NativeSelect.Field
-                            value={selectedAccountTypeId || ""}
-                            onChange={(e) => onAccountTypeChange(e.target.value || null)}
-                            backgroundColor="background_primary"
-                            borderColor="border_primary"
-                            color="text_primary"
-                        >
-                            <option value="">{t("accounts_filter_all_types")}</option>
-                            {accountTypes.map((type) => (
-                                <option key={type.id} value={type.id}>
-                                    {type.name}
-                                </option>
-                            ))}
-                        </NativeSelect.Field>
-                        <NativeSelect.Indicator />
-                    </NativeSelect.Root>
+                <Box w={{ base: "100%", sm: "auto" }} minW={{ base: 0, sm: "155px" }}>
+                    <BaseSelect
+                        size="sm"
+                        placeholder={t("accounts_filter_all_types")}
+                        collection={accountTypes}
+                        selectedValue={selectedAccountTypeId}
+                        labelSelector={(accountType) => accountType.name}
+                        valueSelector={(accountType) => accountType.id}
+                        isClearable={true}
+                        isSearchable={false}
+                        onSelected={(accountType) => onAccountTypeChange(accountType?.id ?? null)}
+                    />
                 </Box>
             </FilterBlock>
         </Box>
