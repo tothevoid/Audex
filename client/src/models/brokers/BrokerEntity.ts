@@ -1,4 +1,5 @@
 export interface BrokerEntity {
     id: string,
-    name: string
+    name: string,
+    active: boolean
 }

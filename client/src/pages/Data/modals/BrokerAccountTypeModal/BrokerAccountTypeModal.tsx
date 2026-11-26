@@ -8,6 +8,7 @@ import { BrokerAccountTypeEntity } from "@/models/brokers/BrokerAccountTypeEntit
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { generateGuid } from "@/shared/utilities/idUtilities";
+import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
 
 interface ModalProps {
 	modalRef: RefObject<BaseModalRef | null>;
@@ -22,17 +23,18 @@ const BrokerAccountTypeModal: React.FC<ModalProps> = ({
 	onSaved,
 	onModalClosed,
 }: ModalProps) => {
-	const setDefaultValues = useCallback(() => {
+	const setDefaultValues = useCallback((): BrokerAccountTypeFormInput => {
 		return {
 			id: brokerAccountType?.id ?? generateGuid(),
-			name: brokerAccountType?.name ?? ""
+			name: brokerAccountType?.name ?? "",
+			active: brokerAccountType?.active ?? true
 		};
 	}, [brokerAccountType]);
 
 	const { t } = useTranslation();
 	const validationSchema = useMemo(() => getBrokerAccountTypeValidationSchema(t), [t]);
 
-	const { register, handleSubmit, formState: { errors }, reset } = useForm<BrokerAccountTypeFormInput>({
+	const { register, handleSubmit, control, formState: { errors }, reset } = useForm<BrokerAccountTypeFormInput>({
 		resolver: zodResolver(validationSchema),
 		mode: "onBlur",
 		defaultValues: setDefaultValues()
@@ -66,6 +68,10 @@ const BrokerAccountTypeModal: React.FC<ModalProps> = ({
 				<Field.Label>{t("entity_broker_account_type_name")}</Field.Label>
 				<Input {...register("name")} autoComplete="off" placeholder={t("entity_broker_account_type_name")} />
 				<Field.ErrorText>{errors.name?.message}</Field.ErrorText>
+			</Field.Root>
+			<Field.Root invalid={!!errors.active} mt={4}>
+				<CheckboxInput name="active" control={control} title={t("entity_broker_account_type_active")} />
+				<Field.ErrorText>{errors.active?.message}</Field.ErrorText>
 			</Field.Root>
 		</BaseFormModal>
 	);

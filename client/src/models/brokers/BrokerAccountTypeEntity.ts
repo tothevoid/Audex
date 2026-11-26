@@ -1,4 +1,5 @@
 export interface BrokerAccountTypeEntity {
     id: string,
-    name: string
+    name: string,
+    active: boolean
 }

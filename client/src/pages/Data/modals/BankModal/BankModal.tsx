@@ -11,6 +11,7 @@ import { BankEntity } from "@/models/banks/BankEntity";
 import { Nullable } from "@/shared/utilities/nullable";
 import { getBankIconUrl } from "@/api/banks/bankApi";
 import ImageInput from "@/shared/components/Form/ImageInput/ImageInput";
+import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>,
@@ -25,17 +26,18 @@ const BankModal: React.FC<ModalProps> = ({
     onSaved,
     onModalClosed,
 }: ModalProps) => {
-    const setDefaultValues = useCallback(() => {
+    const setDefaultValues = useCallback((): BankFormInput => {
         return {
             id: bank?.id ?? generateGuid(),
-            name: bank?.name ?? ""
+            name: bank?.name ?? "",
+            active: bank?.active ?? true
         };
     }, [bank]);
 
     const { t } = useTranslation();
     const validationSchema = useMemo(() => getBankValidationSchema(t), [t]);
 
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<BankFormInput>({
+    const { register, handleSubmit, control, formState: { errors }, reset } = useForm<BankFormInput>({
         resolver: zodResolver(validationSchema),
         mode: "onBlur",
         defaultValues: setDefaultValues()
@@ -76,6 +78,10 @@ const BankModal: React.FC<ModalProps> = ({
             <Field.Label>{t("entity_bank_name")}</Field.Label>
             <Input {...register("name")} autoComplete="off" placeholder='Sample bank' />
             <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
+        </Field.Root>
+        <Field.Root invalid={!!errors.active} mt={4}>
+            <CheckboxInput name="active" control={control} title={t("entity_bank_active")} />
+            <Field.ErrorText>{errors.active?.message}</Field.ErrorText>
         </Field.Root>
     </BaseFormModal>;
 };

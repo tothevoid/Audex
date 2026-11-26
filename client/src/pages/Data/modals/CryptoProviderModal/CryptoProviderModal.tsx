@@ -11,6 +11,7 @@ import { generateGuid } from "@/shared/utilities/idUtilities";
 import { Nullable } from "@/shared/utilities/nullable";
 import { getCryptoProviderIconUrl } from "@/api/crypto/cryptoProviderApi";
 import ImageInput from "@/shared/components/Form/ImageInput/ImageInput";
+import CheckboxInput from "@/shared/components/CheckboxInput/CheckboxInput";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>;
@@ -25,17 +26,18 @@ const CryptoProviderModal: React.FC<ModalProps> = ({
     onSaved,
     onModalClosed,
 }: ModalProps) => {
-    const setDefaultValues = useCallback(() => {
+    const setDefaultValues = useCallback((): CryptoProviderFormInput => {
         return {
             id: cryptoProvider?.id ?? generateGuid(),
-            name: cryptoProvider?.name ?? ""
+            name: cryptoProvider?.name ?? "",
+            active: cryptoProvider?.active ?? true
         };
     }, [cryptoProvider]);
 
     const { t } = useTranslation();
     const validationSchema = useMemo(() => getCryptoProviderValidationSchema(t), [t]);
 
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<CryptoProviderFormInput>({
+    const { register, handleSubmit, control, formState: { errors }, reset } = useForm<CryptoProviderFormInput>({
         resolver: zodResolver(validationSchema),
         mode: "onBlur",
         defaultValues: setDefaultValues()
@@ -82,6 +84,10 @@ const CryptoProviderModal: React.FC<ModalProps> = ({
                 <Field.Label>{t("entity_crypto_provider_name")}</Field.Label>
                 <Input {...register("name")} autoComplete="off" placeholder={t("entity_crypto_provider_name")} />
                 <Field.ErrorText>{errors.name?.message}</Field.ErrorText>
+            </Field.Root>
+            <Field.Root invalid={!!errors.active} mt={4}>
+                <CheckboxInput name="active" control={control} title={t("entity_crypto_provider_active")} />
+                <Field.ErrorText>{errors.active?.message}</Field.ErrorText>
             </Field.Root>
         </BaseFormModal>
     );
