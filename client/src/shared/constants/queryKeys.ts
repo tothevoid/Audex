@@ -23,4 +23,7 @@ export const queryKeys = {
     cryptoProviders: {
         all: ['cryptoProviders'] as const,
     },
+    securityTypes: {
+        all: ['securityTypes'] as const,
+    },
 };
