@@ -15,6 +15,7 @@ import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import { generateGuid } from "@/shared/utilities/idUtilities";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 import { ACCOUNT_TYPE } from "@/shared/constants/accountType";
 
 
@@ -69,7 +70,7 @@ const AccountModal: React.FC<ModalProps> = ({
 		const accountEntity = savedAccount as AccountEntity;
 
 		if (savedAccount.bank?.id) {
-			accountEntity.bank = banks.find(bank => bank.id === savedAccount.bank?.id);
+			accountEntity.bank = findEntityById(banks, savedAccount.bank?.id);
 		}
 
 		await onSaved(accountEntity);

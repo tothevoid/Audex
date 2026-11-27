@@ -1,8 +1,8 @@
+import { BaseEntity } from "@/models/common/BaseEntity";
 import { CryptoAccountEntity, CryptoAccountEntityResponse } from './CryptoAccountEntity';
 import { CryptocurrencyEntity } from './CryptocurrencyEntity';
 
-interface CommonCryptoAssetEntity {
-    id: string;
+export interface CommonCryptoAssetEntity extends BaseEntity {
     quantity: number;
 }
 

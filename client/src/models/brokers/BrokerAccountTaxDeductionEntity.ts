@@ -1,3 +1,4 @@
+import { BaseEntity } from "@/models/common/BaseEntity";
 import { Nullable } from "@/shared/utilities/nullable";
 import { BrokerAccountEntity, BrokerAccountEntityResponse } from "./BrokerAccountEntity";
 
@@ -5,8 +6,7 @@ export interface TaxDeductionsQuery {
     brokerAccountId: Nullable<string>;
 }
 
-interface CommonBrokerAccountTaxDeduction {
-    id: string;
+export interface CommonBrokerAccountTaxDeduction extends BaseEntity {
     amount: number;
     name: string;
 }

@@ -1,3 +1,5 @@
+import { BaseEntity } from "@/models/common/BaseEntity";
+
 export const insertByPredicate = <T>(array: T[], newElement: T, predicate: (elm: T) => boolean): T[] => {
     const index = array.findIndex(predicate);
     if (index !== -1){
@@ -35,7 +37,7 @@ export const sumEntities = <T>(records: T[], entitySumSelector: (entity: T) => n
     }, 0);
 };
 
-export const resolveDefaultEntityId = <T extends { id: string }>(
+export const resolveDefaultEntityId = <T extends BaseEntity>(
     items: readonly T[] | T[],
     preferredId?: string | null,
     previousId?: string | null,
@@ -50,7 +52,7 @@ export const resolveDefaultEntityId = <T extends { id: string }>(
     return items.length > 0 ? items[0].id : fallback;
 };
 
-export const findEntityById = <T extends { id: string }>(
+export const findEntityById = <T extends BaseEntity>(
     items: readonly T[] | T[],
     targetId?: string | null,
     fallback?: T | null

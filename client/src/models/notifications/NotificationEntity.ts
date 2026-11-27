@@ -1,3 +1,5 @@
+import { BaseEntity } from "@/models/common/BaseEntity";
+
 export enum NotificationSeverity {
     Info = 1,
     Success = 2,
@@ -5,8 +7,7 @@ export enum NotificationSeverity {
     Danger = 4
 }
 
-export interface NotificationEntity {
-    id: string;
+export interface NotificationEntity extends BaseEntity {
     userProfileId: string;
     title: string;
     message: string;
@@ -18,8 +19,7 @@ export interface NotificationEntity {
     readAt?: Date;
 }
 
-export interface NotificationEntityResponse {
-    id: string;
+export interface NotificationEntityResponse extends BaseEntity {
     userProfileId: string;
     title: string;
     message: string;

@@ -1,9 +1,9 @@
+import { BaseEntity } from '@/models/common/BaseEntity';
 import { BasePageable } from '@/shared/models/BasePageable';
 import { ScheduledTaskAttachmentEntity, ScheduledTaskAttachmentEntityResponse } from './ScheduledTaskAttachmentEntity';
 import { ScheduledTaskExecutionStatus, ScheduledTaskTriggerSource } from './ScheduledTaskEntity';
 
-export interface ScheduledTaskJournalEntity {
-    id: string;
+export interface ScheduledTaskJournalEntity extends BaseEntity {
     taskName: string;
     displayName: string;
     executedAtUtc: Date;
@@ -15,8 +15,7 @@ export interface ScheduledTaskJournalEntity {
     attachments: ScheduledTaskAttachmentEntity[];
 }
 
-export interface ScheduledTaskJournalEntityResponse {
-    id: string;
+export interface ScheduledTaskJournalEntityResponse extends BaseEntity {
     taskName: string;
     displayName: string;
     executedAtUtc: string;

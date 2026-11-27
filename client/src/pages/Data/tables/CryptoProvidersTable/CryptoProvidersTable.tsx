@@ -6,7 +6,6 @@ import { useConfirm } from "@/shared/hooks/useConfirm";
 import { Nullable } from "@/shared/utilities/nullable";
 import { CryptoProviderEntity } from "@/models/crypto/CryptoProviderEntity";
 import CryptoProviderModal from "@/pages/Data/modals/CryptoProviderModal/CryptoProviderModal";
-import { useCryptoProviders } from "@/pages/Data/hooks/useCryptoProviders";
 import { getCryptoProviderIconUrl } from "@/api/crypto/cryptoProviderApi";
 import DataTable, { ColumnDef } from "@/shared/components/DataTable/DataTable";
 import DataTableActiveCheckbox from "@/shared/components/DataTable/DataTableActiveCheckbox";
@@ -16,6 +15,13 @@ import DataTableFilterBar from "@/pages/Data/components/DataTableFilterBar/DataT
 import { useDataTableFilter } from "@/pages/Data/hooks/useDataTableFilter";
 import { useEntityModal } from "@/shared/hooks/useEntityModal";
 import SectionHeader from "@/shared/components/SectionHeader/SectionHeader";
+import { notify } from "@/shared/components/Toaster";
+import {
+	useCreateCryptoProviderMutation,
+	useCryptoProviders,
+	useDeleteCryptoProviderMutation,
+	useUpdateCryptoProviderMutation,
+} from "@/shared/hooks/queries/useCryptoProviders";
 
 const FILTER_OPTIONS = { hasActiveFilter: true };
 
@@ -30,13 +36,10 @@ const CryptoProvidersTable: React.FC = () => {
 		onActionEnded,
 	} = useEntityModal<CryptoProviderEntity>();
 
-	const {
-		cryptoProviders,
-		isCryptoProvidersLoading,
-		createCryptoProviderEntity,
-		updateCryptoProviderEntity,
-		deleteCryptoProviderEntity
-	} = useCryptoProviders();
+	const { data: cryptoProviders = [], isLoading } = useCryptoProviders();
+	const createCryptoProviderMutation = useCreateCryptoProviderMutation();
+	const updateCryptoProviderMutation = useUpdateCryptoProviderMutation();
+	const deleteCryptoProviderMutation = useDeleteCryptoProviderMutation();
 
 	const {
 		filteredItems: filteredCryptoProviders,
@@ -49,12 +52,18 @@ const CryptoProvidersTable: React.FC = () => {
 	} = useDataTableFilter(cryptoProviders, FILTER_OPTIONS);
 
 	const onCryptoProviderSaved = async (cryptoProvider: CryptoProviderEntity, icon: Nullable<File>) => {
-		const isModified = cryptoProviders.some(p => p.id === cryptoProvider.id);
+		const isModified = cryptoProviders.some((provider) => provider.id === cryptoProvider.id);
 
 		if (isModified) {
-			await updateCryptoProviderEntity(cryptoProvider, icon);
+			const updatedResult = await updateCryptoProviderMutation.mutateAsync({ cryptoProvider, icon });
+			if (updatedResult) {
+				notify.success(t("crypto_provider_toast_updated_title"), t("crypto_provider_toast_updated_desc", { name: cryptoProvider.name }));
+			}
 		} else {
-			await createCryptoProviderEntity(cryptoProvider, icon);
+			const createdResult = await createCryptoProviderMutation.mutateAsync({ cryptoProvider, icon });
+			if (createdResult) {
+				notify.success(t("crypto_provider_toast_created_title"), t("crypto_provider_toast_created_desc", { name: createdResult.name }));
+			}
 		}
 		onActionEnded();
 	};
@@ -64,16 +73,25 @@ const CryptoProvidersTable: React.FC = () => {
 		if (!confirmed) {
 			return;
 		}
-		await deleteCryptoProviderEntity(cryptoProvider);
-	}, [confirmDelete, deleteCryptoProviderEntity, t]);
+		const isDeleted = await deleteCryptoProviderMutation.mutateAsync(cryptoProvider.id);
+		if (isDeleted) {
+			notify.success(t("crypto_provider_toast_deleted_title"), t("crypto_provider_toast_deleted_desc", { name: cryptoProvider.name }));
+		}
+	}, [confirmDelete, deleteCryptoProviderMutation, t]);
 
 	const onActiveChanged = useCallback(async (cryptoProvider: CryptoProviderEntity, isChecked: boolean) => {
 		if (cryptoProvider.active === isChecked) {
 			return;
 		}
 
-		await updateCryptoProviderEntity({ ...cryptoProvider, active: isChecked }, null);
-	}, [updateCryptoProviderEntity]);
+		const updatedResult = await updateCryptoProviderMutation.mutateAsync({
+			cryptoProvider: { ...cryptoProvider, active: isChecked },
+			icon: null,
+		});
+		if (updatedResult) {
+			notify.success(t("crypto_provider_toast_updated_title"), t("crypto_provider_toast_updated_desc", { name: cryptoProvider.name }));
+		}
+	}, [updateCryptoProviderMutation, t]);
 
 	const columns: ColumnDef<CryptoProviderEntity>[] = useMemo(() => [
 		{
@@ -92,6 +110,7 @@ const CryptoProvidersTable: React.FC = () => {
 			render: (cryptoProvider) => (
 				<DataTableActiveCheckbox
 					checked={cryptoProvider.active}
+					disabled={updateCryptoProviderMutation.isPending}
 					onChange={(isChecked) => onActiveChanged(cryptoProvider, isChecked)}
 				/>
 			)
@@ -106,7 +125,7 @@ const CryptoProvidersTable: React.FC = () => {
 				/>
 			)
 		}
-	], [t, onEditClicked, onDeleteClicked, onActiveChanged]);
+	], [t, onEditClicked, onDeleteClicked, onActiveChanged, updateCryptoProviderMutation.isPending]);
 
 	return <Box color="text_primary">
 		<SectionHeader
@@ -126,7 +145,7 @@ const CryptoProvidersTable: React.FC = () => {
 			data={filteredCryptoProviders}
 			columns={columns}
 			keyExtractor={(item) => item.id}
-			isLoading={isCryptoProvidersLoading}
+			isLoading={isLoading}
 			skeletonRows={5}
 		/>
 		<CryptoProviderModal

@@ -17,6 +17,7 @@ import CollectionSelect from "@/shared/components/CollectionSelect/CollectionSel
 import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseFormModal from "@/shared/modals/BaseFormModal/BaseFormModal";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 import { useUserProfile } from "./hooks/UserProfileContext";
 import { useColorMode } from "@/shared/context/useColorMode";
 
@@ -29,7 +30,7 @@ const getFormDefaultValues = (
 	userProfile: UserProfileEntity | null,
 	timeZones: TimeZoneEntity[] = []
 ) => {
-	const matchedTimeZone = timeZones.find(timeZone => timeZone.id === userProfile?.timeZoneId) ?? timeZones[0];
+	const matchedTimeZone = findEntityById(timeZones, userProfile?.timeZoneId, timeZones[0]);
 
 	return {
 		id: userProfile?.id ?? "",
@@ -92,7 +93,7 @@ const UserProfileSettingsModal = forwardRef<BaseModalRef>((_, ref) => {
 		const userProfile: UserProfileEntity = {
 			id: userProfileForm.id,
 			userName: user?.userName ?? "",
-			currency: currencies.find(currency => userProfileForm.currency.id === currency.id)!,
+			currency: findEntityById(currencies, userProfileForm.currency.id)!,
 			language: userProfileForm.language,
 			timeZoneId: userProfileForm.timeZone?.id
 		};

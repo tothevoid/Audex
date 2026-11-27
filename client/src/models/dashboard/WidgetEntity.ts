@@ -1,3 +1,5 @@
+import { BaseEntity } from "@/models/common/BaseEntity";
+
 export enum DashboardWidgetType {
     Oil = 'Oil',
     CurrencyRates = 'CurrencyRates',
@@ -56,8 +58,7 @@ export const normalizeWidgetGrid = (
 
 export type BaseWidgetSettings = Record<string, unknown>;
 
-export interface WidgetConfig<TSettings extends BaseWidgetSettings = BaseWidgetSettings> {
-    id: string;
+export interface WidgetConfig<TSettings extends BaseWidgetSettings = BaseWidgetSettings> extends BaseEntity {
     type: WidgetType;
     title: string;
     refreshIntervalSeconds: number; // 0 = manual, 30, 60, 300, 900

@@ -1,5 +1,6 @@
-export interface DebtTagEntity {
-    id: string;
+import { BaseEntity } from "@/models/common/BaseEntity";
+
+export interface DebtTagEntity extends BaseEntity {
     name: string;
     colorHex: string;
     usageCount?: number;

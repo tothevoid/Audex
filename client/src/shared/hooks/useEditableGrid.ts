@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { BaseEntity } from '@/models/common/BaseEntity';
 
 export interface EditableGridDiff<TEntity> {
     added: TEntity[];
@@ -14,14 +15,14 @@ export interface EditableGridRow<TEntity> {
     isModified: boolean;
 }
 
-export interface UseEditableGridOptions<TEntity extends { id: string }> {
+export interface UseEditableGridOptions<TEntity extends BaseEntity> {
     items: TEntity[];
     createRow: () => TEntity | null;
     cloneRow: (sourceRow: TEntity) => TEntity;
     onCommit: (diff: EditableGridDiff<TEntity>) => Promise<void>;
 }
 
-export const useEditableGrid = <TEntity extends { id: string }>({
+export const useEditableGrid = <TEntity extends BaseEntity>({
     items,
     createRow,
     cloneRow,

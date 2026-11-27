@@ -9,7 +9,7 @@ import { getTimeZones } from "@/api/common/timeZoneApi";
 import { TimeZoneEntity } from "@/models/common/TimeZoneEntity";
 import { BrokerStatementImporterEntity } from "@/models/brokers/BrokerStatementImportModels";
 import { Nullable } from "@/shared/utilities/nullable";
-import { resolveDefaultEntityId } from "@/shared/utilities/arrayUtilities";
+import { findEntityById, resolveDefaultEntityId } from "@/shared/utilities/arrayUtilities";
 import { useUserProfile } from "@/features/UserProfileSettingsModal/hooks/UserProfileContext";
 import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
 import { StatementConfig } from "@/pages/BrokerAccount/modals/BrokerStatementImportModal/types";
@@ -100,17 +100,17 @@ export const StatementConfigStep: React.FC<Props> = ({
     };
 
     const selectedImporter = useMemo(
-        () => importers.find((importer) => importer.id === selectedImporterId) ?? null,
+        () => findEntityById(importers, selectedImporterId) ?? null,
         [importers, selectedImporterId]
     );
 
     const selectedAccount = useMemo(
-        () => brokerAccounts.find((account) => account.id === selectedAccountId) ?? null,
+        () => findEntityById(brokerAccounts, selectedAccountId) ?? null,
         [brokerAccounts, selectedAccountId]
     );
 
     const selectedTimeZone = useMemo(
-        () => timeZones.find((timeZone) => timeZone.id === selectedTimeZoneId) ?? null,
+        () => findEntityById(timeZones, selectedTimeZoneId) ?? null,
         [timeZones, selectedTimeZoneId]
     );
 

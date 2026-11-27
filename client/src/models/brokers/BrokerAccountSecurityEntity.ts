@@ -1,25 +1,25 @@
+import { BaseEntity } from "@/models/common/BaseEntity";
 import { BrokerAccountEntity, BrokerAccountEntityResponse } from "./BrokerAccountEntity";
 import { SecurityEntity, SecurityEntityResponse } from "@/models/securities/SecurityEntity";
 
-export interface CommonBrokerAccountSecurityEntity {
-    id: string,
-    quantity: number,
-    price: number,
-    soldPrice: number,
-    soldQuantity: number
+export interface CommonBrokerAccountSecurityEntity extends BaseEntity {
+    quantity: number;
+    price: number;
+    soldPrice: number;
+    soldQuantity: number;
 }
 
 export interface BrokerAccountSecurityEntityRequest extends CommonBrokerAccountSecurityEntity {
-    brokerAccountId: string,
-    securityId: string
+    brokerAccountId: string;
+    securityId: string;
 }
 
 export interface BrokerAccountSecurityEntity extends CommonBrokerAccountSecurityEntity {
-    brokerAccount: BrokerAccountEntity,
-    security: SecurityEntity
+    brokerAccount: BrokerAccountEntity;
+    security: SecurityEntity;
 }
 
 export interface BrokerAccountSecurityEntityResponse extends CommonBrokerAccountSecurityEntity {
-    brokerAccount: BrokerAccountEntityResponse,
-    security: SecurityEntityResponse
+    brokerAccount: BrokerAccountEntityResponse;
+    security: SecurityEntityResponse;
 }

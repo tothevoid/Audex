@@ -1,5 +1,6 @@
-export interface ScheduledTaskAttachmentEntity {
-    id: string;
+import { BaseEntity } from '@/models/common/BaseEntity';
+
+export interface ScheduledTaskAttachmentEntity extends BaseEntity {
     occurrenceId: string;
     fileName: string;
     storagePath: string;
@@ -8,8 +9,7 @@ export interface ScheduledTaskAttachmentEntity {
     createdAt: Date;
 }
 
-export interface ScheduledTaskAttachmentEntityResponse {
-    id: string;
+export interface ScheduledTaskAttachmentEntityResponse extends BaseEntity {
     occurrenceId: string;
     fileName: string;
     storagePath: string;

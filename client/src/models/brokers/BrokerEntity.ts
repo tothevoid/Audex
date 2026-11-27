@@ -1,5 +1,6 @@
-export interface BrokerEntity {
-    id: string,
-    name: string,
-    active: boolean
+import { BaseEntity } from "@/models/common/BaseEntity";
+
+export interface BrokerEntity extends BaseEntity {
+    name: string;
+    active: boolean;
 }

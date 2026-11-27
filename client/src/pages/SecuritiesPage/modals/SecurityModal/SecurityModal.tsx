@@ -1,25 +1,21 @@
-import React, { RefObject, useCallback, useEffect, useState } from "react";
+import React, { RefObject, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { MarketSecurityInfoEntity, SecurityEntity } from "@/models/securities/SecurityEntity";
-import { SecurityTypeEntity } from "@/models/securities/SecurityTypeEntity";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
 import BaseModal from "@/shared/modals/BaseModal/BaseModal";
-import { getSecurityTypes } from "@/api/securities/securityTypeApi";
+import { useSecurityTypes } from "@/shared/hooks/queries/useSecurityTypes";
 import { useCurrencies } from "@/shared/hooks/queries/useCurrencies";
 import { SecurityFormInput } from "./SecurityValidationSchema";
 import SecuritySearchForm from "./components/SecuritySearchForm";
 import SecurityDetailsForm from "./components/SecurityDetailsForm";
 import { generateGuid } from "@/shared/utilities/idUtilities";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 import { OperationResult } from "@/shared/models/OperationResult";
 
 interface ModalProps {
     modalRef: RefObject<BaseModalRef | null>;
     security?: SecurityEntity | null;
     onSaved: (security: SecurityEntity, icon: File | null) => Promise<OperationResult<SecurityEntity>>;
-}
-
-interface State {
-    securityTypes: SecurityTypeEntity[];
 }
 
 const getInitialFormData = (targetSecurity?: SecurityEntity | null): Partial<SecurityFormInput> => {
@@ -52,23 +48,9 @@ const SecurityModal: React.FC<ModalProps> = ({
     const isEditMode = !!security;
 
     const { data: currencies = [] } = useCurrencies();
+    const { data: securityTypes = [] } = useSecurityTypes();
     const [step, setStep] = useState<"search" | "details">(isEditMode ? "details" : "search");
     const [initialFormData, setInitialFormData] = useState<Partial<SecurityFormInput>>(() => getInitialFormData(security));
-    const [state, setState] = useState<State>({ securityTypes: [] });
-
-    useEffect(() => {
-        let isMounted = true;
-        const initData = async () => {
-            const securityTypes = await getSecurityTypes();
-            if (isMounted) {
-                setState({ securityTypes });
-            }
-        };
-        initData();
-        return () => {
-            isMounted = false;
-        };
-    }, []);
 
     const [previousSecurity, setPreviousSecurity] = useState(security);
     if (security !== previousSecurity) {
@@ -88,11 +70,8 @@ const SecurityModal: React.FC<ModalProps> = ({
     };
 
     const handleMarketFound = (marketInfo: MarketSecurityInfoEntity) => {
-        const matchedType = state.securityTypes.find(type => type.id === marketInfo.typeId)
-            ?? state.securityTypes[0];
-
-        const matchedCurrency = currencies.find(currencyItem => currencyItem.id === marketInfo.currencyId)
-            ?? currencies[0];
+        const matchedType = findEntityById(securityTypes, marketInfo.typeId, securityTypes[0]);
+        const matchedCurrency = findEntityById(currencies, marketInfo.currencyId, currencies[0]);
 
         setInitialFormData({
             id: generateGuid(),
@@ -112,7 +91,7 @@ const SecurityModal: React.FC<ModalProps> = ({
             ticker: tickerValue,
             name: tickerValue,
             isin: "",
-            type: state.securityTypes[0],
+            type: securityTypes[0],
             currency: currencies[0]
         });
         setStep("details");
@@ -147,7 +126,7 @@ const SecurityModal: React.FC<ModalProps> = ({
                     key={initialFormData.id ?? initialFormData.ticker ?? "new"}
                     initialValues={initialFormData}
                     security={security}
-                    securityTypes={state.securityTypes}
+                    securityTypes={securityTypes}
                     currencies={currencies}
                     onSave={handleSave}
                     onCancel={handleClose}

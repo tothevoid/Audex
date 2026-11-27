@@ -83,11 +83,11 @@ const TransactionForm: React.FC<ModalProps> = ({ transaction, onTransactionSaved
 			id: formTransaction.id!,
 			name: formTransaction.name,
 			amount: multiplier * formTransaction.amount,
-			account: accounts.find(account => account.id === formTransaction.account.id)!,
+			account: findEntityById(accounts, formTransaction.account.id)!,
 			isSystem: formTransaction.isSystem,
 			date: formTransaction.date,
 			cashback: formTransaction.cashback,
-			transactionType: transactionTypes.find(transactionType => transactionType.id === formTransaction.transactionType.id)!,
+			transactionType: findEntityById(transactionTypes, formTransaction.transactionType.id)!,
 		};
 
 		await onTransactionSaved(transactionEntity);

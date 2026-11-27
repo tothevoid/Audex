@@ -6,6 +6,7 @@ import { ChartTooltipContainer, ChartTooltipHeader, ChartTooltipItem } from "@/s
 import { CHART_THEME_COLORS } from "@/shared/constants/chartColors";
 import { formatMoneyByCurrencyCulture } from "@/shared/utilities/formatters/moneyFormatter";
 import { formatShortMonth } from "@/shared/utilities/formatters/dateFormatter";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 import { AccountItem, MONTH_RANGE, TransfersChartRow, TransfersRangeType } from "./types";
 
 interface TransfersHistoryTooltipPayloadItem {
@@ -50,7 +51,7 @@ const TransfersHistoryTooltip: React.FC<Props> = ({
 
     if (chartRow.accountValues && chartRow.accountValues.length > 0) {
         chartRow.accountValues.forEach((accountValue) => {
-            const accountMeta = accountList.find((item) => item.id === accountValue.accountId);
+            const accountMeta = findEntityById(accountList, accountValue.accountId);
             const accountDisplayName = accountValue.accountName || accountMeta?.name || t("filter_no_category");
 
             if (accountValue.deposited > 0) {

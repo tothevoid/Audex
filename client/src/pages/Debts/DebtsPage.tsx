@@ -8,6 +8,7 @@ import { DebtTagEntity, DebtTagStatsEntity } from "@/models/debts/DebtTagEntity"
 import { getDebtTags, getDebtTagStats } from "@/api/debts/debtTagApi";
 import { getDebts } from "@/api/debts/debtApi";
 import { BaseModalRef } from "@/shared/utilities/modalUtilities";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 
 const DebtsPage: React.FC = () => {
 	const [hasDebts, setHasDebts] = useState(false);
@@ -76,7 +77,7 @@ const DebtsPage: React.FC = () => {
 			return;
 		}
 		const allDebts = await getDebts(false);
-		const found = allDebts.find((d) => d.id === debtId);
+		const found = findEntityById(allDebts, debtId);
 		setSelectedDebtName(found ? found.name : null);
 	};
 
