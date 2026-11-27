@@ -20,4 +20,7 @@ export const queryKeys = {
     brokers: {
         all: ['brokers'] as const,
     },
+    cryptoProviders: {
+        all: ['cryptoProviders'] as const,
+    },
 };
