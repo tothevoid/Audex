@@ -1,7 +1,7 @@
+import { BaseEntity } from "@/models/common/BaseEntity";
 import { Nullable } from "@/shared/utilities/nullable";
 
-export interface CryptoProviderEntity {
-    id: string;
+export interface CryptoProviderEntity extends BaseEntity {
     name: string;
     active: boolean;
     iconKey?: Nullable<string>;

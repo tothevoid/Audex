@@ -1,18 +1,18 @@
+import { BaseEntity } from "@/models/common/BaseEntity";
 import { CryptoProviderEntity } from "./CryptoProviderEntity";
 
-interface CommonCryptoAccountEntity {
-    id: string,
-    name: string,
+export interface CommonCryptoAccountEntity extends BaseEntity {
+    name: string;
 }
 
 export interface CryptoAccountEntityRequest extends CommonCryptoAccountEntity {
-    cryptoProviderId: string
+    cryptoProviderId: string;
 }
 
 export interface CryptoAccountEntity extends CommonCryptoAccountEntity {
-    cryptoProvider: CryptoProviderEntity
+    cryptoProvider: CryptoProviderEntity;
 }
 
 export interface CryptoAccountEntityResponse extends CommonCryptoAccountEntity {
-    cryptoProvider: CryptoProviderEntity
+    cryptoProvider: CryptoProviderEntity;
 }

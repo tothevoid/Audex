@@ -1,5 +1,6 @@
-export interface UserDashboardEntity {
-    id: string;
+import { BaseEntity } from "@/models/common/BaseEntity";
+
+export interface UserDashboardEntity extends BaseEntity {
     userProfileId: string;
     title: string;
     isDefault: boolean;
@@ -14,12 +15,10 @@ export interface CreateUserDashboardRequest {
     layoutJson?: string;
 }
 
-export interface UpdateUserDashboardLayoutRequest {
-    id: string;
+export interface UpdateUserDashboardLayoutRequest extends BaseEntity {
     layoutJson: string;
 }
 
-export interface RenameUserDashboardRequest {
-    id: string;
+export interface RenameUserDashboardRequest extends BaseEntity {
     title: string;
 }
