@@ -14,6 +14,7 @@ import MoneyInput from "@/shared/components/MoneyInput/MoneyInput";
 import { BrokerAccountFundTransferFormInput, getBrokerAccountFundTransferValidationSchema } from "./BrokerAccountFundTransferValidationSchema";
 import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
 import { BrokerAccountEntity } from "@/models/brokers/BrokerAccountEntity";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 
 import { Nullable } from "@/shared/utilities/nullable";
 
@@ -108,7 +109,7 @@ const BrokerAccountFundTransferModal: React.FC<ModalProps> = ({
     const incomeValue = useWatch({ control, name: "income" });
     const selectedBrokerAccount = useWatch({ control, name: "brokerAccount" });
     const selectedAccount = useWatch({ control, name: "account" });
-    const transferCurrency = brokerAccounts.find(brokerAccount => brokerAccount.id === selectedBrokerAccount?.id)?.currency?.name ?? accounts.find(account => account.id === selectedAccount?.id)?.currency?.name ?? '';
+    const transferCurrency = findEntityById(brokerAccounts, selectedBrokerAccount?.id)?.currency?.name ?? findEntityById(accounts, selectedAccount?.id)?.currency?.name ?? '';
     const accountLabel = incomeValue?.value ? t("broker_account_transfer_modal_account_from") : t("broker_account_transfer_modal_account_to");
 
     useEffect(() => {

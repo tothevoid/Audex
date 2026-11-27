@@ -7,6 +7,7 @@ import BaseSelect from '@/shared/components/BaseSelect/BaseSelect';
 import { FilterBarSearch } from '@/shared/components/FilterBar';
 import PeriodPicker from '@/pages/Transactions/components/PeriodPicker/PeriodPicker';
 import SwitchButton from '@/shared/components/SwitchButton/SwitchButton';
+import { findEntityById } from '@/shared/utilities/arrayUtilities';
 
 export type TypeFilterMode = 'all' | 'income' | 'expense';
 export type ViewDisplayMode = 'cards' | 'table';
@@ -49,11 +50,11 @@ export const TransactionFilterBar: React.FC<Props> = ({
     const { t } = useTranslation();
 
     const selectedAccount = React.useMemo(() => {
-        return accounts.find((account) => account.id === selectedAccountId) ?? null;
+        return findEntityById(accounts, selectedAccountId) ?? null;
     }, [accounts, selectedAccountId]);
 
     const selectedTransactionType = React.useMemo(() => {
-        return transactionTypes.find((typeItem) => typeItem.id === selectedTransactionTypeId) ?? null;
+        return findEntityById(transactionTypes, selectedTransactionTypeId) ?? null;
     }, [transactionTypes, selectedTransactionTypeId]);
 
     const typeFilterOptions = React.useMemo<{ value: TypeFilterMode; label: string }[]>(() => [

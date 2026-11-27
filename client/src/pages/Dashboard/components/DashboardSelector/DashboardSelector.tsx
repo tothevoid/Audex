@@ -3,6 +3,7 @@ import { Button, HStack, Icon, Text } from "@chakra-ui/react";
 import { useTranslation } from "react-i18next";
 import { MdAdd } from "react-icons/md";
 import { UserDashboardEntity } from "@/models/dashboard/UserDashboardEntity";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 import { useConfirm } from "@/shared/hooks/useConfirm";
 import { DashboardTabItem } from "./DashboardTabItem";
 import { DashboardTitleModal, DashboardTitleModalRef } from "./DashboardTitleModal";
@@ -34,7 +35,7 @@ export const DashboardSelector: React.FC<DashboardSelectorProps> = ({
 
     const [targetDashboardId, setTargetDashboardId] = useState<string | null>(null);
 
-    const activeDashboard = dashboards.find(d => d.id === activeDashboardId) || dashboards[0];
+    const activeDashboard = findEntityById(dashboards, activeDashboardId, dashboards[0]) ?? dashboards[0];
 
     const handleOpenRename = (dashboard: UserDashboardEntity) => {
         setTargetDashboardId(dashboard.id);

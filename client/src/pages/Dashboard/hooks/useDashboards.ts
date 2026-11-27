@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Layout } from "react-grid-layout";
 import { UserDashboardEntity } from "@/models/dashboard/UserDashboardEntity";
 import { normalizeWidgetGrid, WidgetConfig } from "@/models/dashboard/WidgetEntity";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 import {
     createUserDashboard,
     deleteUserDashboard,
@@ -71,7 +72,7 @@ export const useDashboards = () => {
     // Handle switching dashboards
     const handleSelectDashboard = (dashboardId: string) => {
         setActiveDashboardId(dashboardId);
-        const target = dashboards.find(d => d.id === dashboardId);
+        const target = findEntityById(dashboards, dashboardId);
         if (target) {
             setWidgets(parseLayoutWidgets(target.layoutJson));
         }

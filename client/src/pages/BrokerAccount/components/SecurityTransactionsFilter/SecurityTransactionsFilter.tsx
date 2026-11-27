@@ -5,6 +5,7 @@ import { MdFilterList, MdClose } from "react-icons/md";
 import DatePicker from "@/shared/components/DatePicker/DatePicker";
 import BaseSelect from "@/shared/components/BaseSelect/BaseSelect";
 import { convertToDateOnly, parseIsoDateOnly } from "@/shared/utilities/dateUtils";
+import { findEntityById } from "@/shared/utilities/arrayUtilities";
 import { getSecurities } from "@/api/securities/securityApi";
 import { getBrokerAccounts } from "@/api/brokers/brokerAccountApi";
 import { SecurityEntity } from "@/models/securities/SecurityEntity";
@@ -52,12 +53,12 @@ const SecurityTransactionsFilter: React.FC<Props> = ({
 
     const selectedSecurity = useMemo(() => {
         if (!filters.securityId) return null;
-        return securities.find(security => security.id === filters.securityId) ?? null;
+        return findEntityById(securities, filters.securityId) ?? null;
     }, [securities, filters.securityId]);
 
     const selectedBrokerAccount = useMemo(() => {
         if (!filters.brokerAccountId) return null;
-        return brokerAccounts.find(account => account.id === filters.brokerAccountId) ?? null;
+        return findEntityById(brokerAccounts, filters.brokerAccountId) ?? null;
     }, [brokerAccounts, filters.brokerAccountId]);
 
     const selectedStartDate = useMemo(() => {
